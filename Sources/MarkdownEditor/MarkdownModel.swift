@@ -7,7 +7,6 @@
 
 import Foundation
 import SwiftUI
-import Swatches
 
 extension AttributeDynamicLookup {
     subscript<T: AttributedStringKey>(dynamicMember keyPath: KeyPath<MarkdownAttributes, T>) -> T {
@@ -217,7 +216,7 @@ public enum MarkdownSyntax: String, CaseIterable, Identifiable {
     public var foreGroundColor: NSColor {
         switch self {
         case .inlineCode, .codeBlock:
-            NSColor(Swatch.eggplant.colour)
+            NSColor(.purple)
         default:
                 .textColor.withAlphaComponent(0.85)
         }

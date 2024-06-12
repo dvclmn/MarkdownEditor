@@ -7,7 +7,7 @@
 
 import Foundation
 import SwiftUI
-import GeneralStyles
+//import GeneralStyles
 import Highlightr
 
 class CopyButtonAttachment: NSTextAttachment {
@@ -153,7 +153,7 @@ public class MarkdownEditor: NSTextView {
             let paddedRect = boundingRect.insetBy(dx: -padding * 1.2, dy: -padding)
             
             // Draw the rounded rectangle
-            let rounding = CGFloat(Styles.roundingSmall)
+            let rounding = CGFloat(6)
             
             let path = NSBezierPath(roundedRect: paddedRect, xRadius: rounding, yRadius: rounding)
             NSColor.black.withAlphaComponent(MarkdownDefaults.backgroundAlphaAlt).setFill()

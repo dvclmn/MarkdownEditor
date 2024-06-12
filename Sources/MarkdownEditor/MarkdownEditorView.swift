@@ -7,8 +7,8 @@
 
 import Foundation
 import SwiftUI
-import GeneralUtilities
-import GeneralStyles
+//import GeneralUtilities
+//import GeneralStyles
 
 public protocol Markdownable {
     var userPrompt: String { get set }
@@ -174,7 +174,7 @@ extension MarkdownEditorRepresentable {
         textView.isAutomaticSpellingCorrectionEnabled = true
         textView.isAutomaticTextCompletionEnabled = true
 
-        textView.textContainer?.lineFragmentPadding = Styles.paddingSomething
+        textView.textContainer?.lineFragmentPadding = 34
         
         textView.font = NSFont.systemFont(ofSize: fontSize)
         textView.isEditable = isEditable
@@ -215,27 +215,28 @@ extension MarkdownEditorRepresentable {
 //}
 
 
-//struct MarkdownExampleView: View {
-//
-//    @State private var text: String = ExampleText.paragraphs[3]
-//    @State private var editorHeight: Double = 300
-//
-//    @FocusState private var isFocused
-//
-//    var body: some View {
-//
-//        ScrollView {
-//            MarkdownEditorRepresentable(
-//                text: $text,
-//                editorHeight: $editorHeight,
-//                isFocused: $isFocused
-//            )
-//        }
-//        .border(Color.green.opacity(0.2))
-//    }
-//}
-//#Preview {
-//    MarkdownExampleView()
-//        .frame(width: 600, height: 300)
-//}
+struct MarkdownExampleView: View {
+
+    @State private var text: String = "Example"
+    @State private var editorHeight: Double = 300
+
+    @FocusState private var isFocused
+
+    var body: some View {
+
+        ScrollView {
+            MarkdownEditorRepresentable(
+                text: $text,
+                isFocused: true
+            ) { height in
+                print(height)
+            }
+        }
+        .border(Color.green.opacity(0.2))
+    }
+}
+#Preview {
+    MarkdownExampleView()
+        .frame(width: 600, height: 300)
+}
 
