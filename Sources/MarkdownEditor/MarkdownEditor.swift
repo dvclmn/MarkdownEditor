@@ -27,7 +27,7 @@ public class MarkdownEditor: NSTextView {
     
     var textBinding: Binding<String>?
     
-    var height: Double = 0
+    var editorHeight: Double = 0
     
     var shouldAutocompleteForEmptySelection: Bool = false
     
@@ -45,33 +45,20 @@ public class MarkdownEditor: NSTextView {
 
         let rect = layoutManager.usedRect(for: container)
         
-        let contentSize = NSSize(width: NSView.noIntrinsicMetric, height: rect.height)
+        let bufferHeight: CGFloat = 80
+
+        let contentSize = NSSize(width: NSView.noIntrinsicMetric, height: rect.height + bufferHeight)
         
-        height = contentSize.height
+        if self.editorHeight != contentSize.height {
+            self.editorHeight = Double(contentSize.height)
+        }
         
+        print("This is the height from `NSTextView`: \(editorHeight)")
+
         return contentSize
     }
     
-    
-//    @MainActor
-//    func updateHeight() {
-//        guard let layoutManager = layoutManager, let textContainer = textContainer else {
-//            print("Couldn't get layout manager or text container")
-//            return
-//        }
-//            
-//        layoutManager.ensureLayout(for: textContainer)
-//        
-//        let textBounds = layoutManager.usedRect(for: textContainer)
-//        
-//        let newHeight = textBounds.height
-//        
-//        if self.frame.height != newHeight {
-//            self.frame.size.height = newHeight
-////            return newHeight
-//        }
-//    }
-    
+
     func createCopyButton() -> NSButton {
         let button = NSButton(frame: .zero)
         button.title = "Copy"
@@ -282,6 +269,7 @@ public class MarkdownEditor: NSTextView {
         }
         self.setSelectedRange(selectedRange)
         
+        self.needsDisplay = true
         self.invalidateIntrinsicContentSize()
     }
     

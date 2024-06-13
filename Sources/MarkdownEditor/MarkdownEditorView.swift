@@ -18,6 +18,7 @@ public protocol Markdownable {
 public struct MarkdownEditorRepresentable: NSViewRepresentable {
     
     @Binding public var text: String
+    @Binding public var height: Double
     
     public var isFocused: Bool
     
@@ -25,51 +26,44 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
     
     public var fontSize: Double
     
-    public var height: (Double) -> Void
-    
     private let verticalPadding: Double = 30
     
     @State private var previousWidth: Double = 0
     
     public init(
         text: Binding<String>,
+        height: Binding<Double>,
         isFocused: Bool = false,
         
         isEditable: Bool = true,
-        fontSize: Double = 15,
-        
-        height: @escaping (Double) -> Void
+        fontSize: Double = 15
     ) {
         self._text = text
+        self._height = height
         
         self.isFocused = isFocused
         
         self.isEditable = isEditable
         self.fontSize = fontSize
-        
-        self.height = height
     }
     
-    
+    /// This function creates the NSView and configures its initial state
     public func makeNSView(context: Context) -> MarkdownEditor {
         
         let textView = MarkdownEditor()
         
         textView.textBinding = $text
-        
         textView.delegate = context.coordinator
-        
         textView.string = text
-        
         textView.positionButtons()
-        
         setUpTextViewOptions(for: textView)
-        
-        textView.invalidateIntrinsicContentSize()
-        
-        height(textView.height)
-        
         textView.applyStyles()
+        DispatchQueue.main.async {
+            $height.wrappedValue = textView.editorHeight
+            print("Attempting to initialise the SwiftUI height, with the NSTextView height.")
+            print("NSTextView height: \(textView.editorHeight)")
+            print("SwiftUI height: \($height.wrappedValue)")
+        }
         
         if isFocused {
             textView.window?.makeFirstResponder(textView)
@@ -78,34 +72,36 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
         return textView
     }
     
+    /// This function is to communicate updates **from** SwiftUI, back **to** the NSView
+    /// It is not for sending updates back up to SwiftUI
     public func updateNSView(_ textView: MarkdownEditor, context: Context) {
         
-        textView.needsLayout = true
+//        textView.needsLayout = true
         
         if textView.string != text {
             textView.string = text
             textView.applyStyles()
-            textView.positionButtons()
+//            textView.positionButtons()
         }
         
         if textView.isEditable != isEditable {
             textView.isEditable = isEditable
         }
         
-        let currentWidth = textView.bounds.width
-        
-        if previousWidth != currentWidth {
-            DispatchQueue.main.async {
-                previousWidth = currentWidth
-
-                textView.invalidateIntrinsicContentSize()
-                textView.needsDisplay = true
-                
-            }
-        }
+//        let currentWidth = textView.bounds.width
+//        
+//        if previousWidth != currentWidth {
+//            DispatchQueue.main.async {
+//                previousWidth = currentWidth
+//
+//                textView.invalidateIntrinsicContentSize()
+//                textView.needsDisplay = true
+//                
+//            }
+//        }
     } // END update nsView
     
-    
+    /// It is the Coordinator that is responsible for sending information back **to** SwiftUI, from the NSView
     public func makeCoordinator() -> Coordinator {
         return Coordinator(self)
     }
@@ -130,27 +126,26 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
         public func textDidChange(_ notification: Notification) {
             guard let textView = notification.object as? MarkdownEditor else { return }
             
-            
             DispatchQueue.main.async {
-                self.parent.text = textView.string
                 
-                textView.needsDisplay = true
-                
-                self.parent.height(textView.height)
-                
-                textView.applyStyles()
-                textView.invalidateIntrinsicContentSize()
-                //                textView.updateHeight()
+                if self.parent.text != textView.string {
+                    self.parent.text = textView.string
+                    
+                    textView.applyStyles()
+                }
+
+                self.parent.height = textView.editorHeight
             }
             
         } // END Text did change
         
-        public func textViewDidChangeSelection(_ notification: Notification) {
-            guard let textView = notification.object as? MarkdownEditor else { return }
-            DispatchQueue.main.async {
-                textView.needsDisplay = true
-            }
-        }
+//        public func textViewDidChangeSelection(_ notification: Notification) {
+//            guard let textView = notification.object as? MarkdownEditor else { return }
+            
+//            DispatchQueue.main.async {
+//                textView.needsDisplay = true
+//            }
+//        }
         
         
         
@@ -218,7 +213,7 @@ extension MarkdownEditorRepresentable {
 struct MarkdownExampleView: View {
 
     @State private var text: String = "Example"
-    @State private var editorHeight: Double = 300
+    @State private var editorHeight: Double = 0
 
     @FocusState private var isFocused
 
@@ -227,10 +222,9 @@ struct MarkdownExampleView: View {
         ScrollView {
             MarkdownEditorRepresentable(
                 text: $text,
+                height: $editorHeight,
                 isFocused: true
-            ) { height in
-                print(height)
-            }
+            )
         }
         .border(Color.green.opacity(0.2))
     }
