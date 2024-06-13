@@ -29,6 +29,8 @@ public class MarkdownEditor: NSTextView {
     
     var editorHeight: Double = 0
     
+    var isShowingFrames: Bool = false
+    
     var shouldAutocompleteForEmptySelection: Bool = false
     
     let highlightr = Highlightr()
@@ -118,35 +120,65 @@ public class MarkdownEditor: NSTextView {
         return nil
     }
     
-    
-    
-    public override func drawBackground(in rect: NSRect) {
-        super.drawBackground(in: rect)
-        
+
+    func drawCustomBackground(
+        in rect: NSRect,
+        for syntax: MarkdownSyntax,
+        paddingBase: CGFloat,
+        rounding: Double,
+        backgroundColor: NSColor
+    ) {
         guard let layoutManager = layoutManager, let textContainer = textContainer else { return }
         
-        let regex: Regex<(Substring, Substring)> = MarkdownSyntax.codeBlock.regex
+        let regex: Regex<(Substring, Substring)> = syntax.regex
         
-        let matches = string.matches(of: regex)
-        
-        // Define padding
-        let padding = CGFloat(14)  // Adjust the padding value as needed
+        let matches = self.string.matches(of: regex)
         
         for match in matches {
             let glyphRange = NSRange(match.range, in: string)
             let boundingRect = layoutManager.boundingRect(forGlyphRange: glyphRange, in: textContainer)
             
-            // Apply padding to the bounding rectangle
-            let paddedRect = boundingRect.insetBy(dx: -padding * 1.2, dy: -padding)
-            
-            // Draw the rounded rectangle
-            let rounding = CGFloat(6)
+            let paddingLeft: CGFloat = paddingBase * 1.2
+            let paddingRight: CGFloat = paddingBase * 1.2
+            let paddingTop: CGFloat = paddingBase * 1.1
+            let paddingBottom: CGFloat = 0
+
+            var paddedRect = boundingRect
+            paddedRect.origin.x -= paddingLeft
+            paddedRect.origin.y -= paddingTop
+            paddedRect.size.width += paddingLeft + paddingRight
+            paddedRect.size.height += paddingTop + paddingBottom
             
             let path = NSBezierPath(roundedRect: paddedRect, xRadius: rounding, yRadius: rounding)
-            NSColor.black.withAlphaComponent(MarkdownDefaults.backgroundAlphaAlt).setFill()
+            backgroundColor.setFill()
             
             path.fill()
+        
         }
+    }
+    
+    
+    public override func drawBackground(in rect: NSRect) {
+        
+        super.drawBackground(in: rect)
+        
+        let opacity: Double = 0.4
+
+        drawCustomBackground(
+            in: rect,
+            for: .inlineCode,
+            paddingBase: 4,
+            rounding: 3,
+            backgroundColor: NSColor.black.withAlphaComponent(opacity)
+        )
+
+        drawCustomBackground(
+            in: rect,
+            for: .codeBlock,
+            paddingBase: 10,
+            rounding: 6,
+            backgroundColor: NSColor.black.withAlphaComponent(opacity)
+        )
     }
 
     public override func keyDown(with event: NSEvent) {
@@ -434,13 +466,16 @@ public class MarkdownEditor: NSTextView {
 
 extension MarkdownEditor {
     
-            public override func draw(_ rect: NSRect) {
-                super.draw(rect)
-                let border:NSBezierPath = NSBezierPath(rect: bounds)
-                let borderColor = NSColor.red.withAlphaComponent(0.3)
-                borderColor.set()
-                border.lineWidth = 1.0
-                border.stroke()
-            }
+    public override func draw(_ rect: NSRect) {
+        super.draw(rect)
+        
+        if isShowingFrames {
+            let border:NSBezierPath = NSBezierPath(rect: bounds)
+            let borderColor = NSColor.red.withAlphaComponent(0.3)
+            borderColor.set()
+            border.lineWidth = 1.0
+            border.stroke()
+        }
+    }
     
 }

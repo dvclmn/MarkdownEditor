@@ -24,6 +24,7 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
     
     public var isEditable: Bool
     
+    public var isShowingFrames: Bool
     public var fontSize: Double
     
     private let verticalPadding: Double = 30
@@ -36,6 +37,7 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
         isFocused: Bool = false,
         
         isEditable: Bool = true,
+        isShowingFrames: Bool = false,
         fontSize: Double = 15
     ) {
         self._text = text
@@ -44,6 +46,7 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
         self.isFocused = isFocused
         
         self.isEditable = isEditable
+        self.isShowingFrames = isShowingFrames
         self.fontSize = fontSize
     }
     
@@ -56,6 +59,9 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
         textView.delegate = context.coordinator
         textView.string = text
         textView.positionButtons()
+        
+        textView.isShowingFrames = isShowingFrames
+        
         setUpTextViewOptions(for: textView)
         textView.applyStyles()
         DispatchQueue.main.async {
