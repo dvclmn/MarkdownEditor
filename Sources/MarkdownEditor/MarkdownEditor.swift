@@ -27,6 +27,8 @@ public class MarkdownEditor: NSTextView {
     
     var textBinding: Binding<String>?
     
+//    var isReadOnly: Bool = true
+    
     var editorHeight: Double = 0
     
     var isShowingFrames: Bool = false
@@ -47,7 +49,7 @@ public class MarkdownEditor: NSTextView {
 
         let rect = layoutManager.usedRect(for: container)
         
-        let bufferHeight: CGFloat = 80
+        let bufferHeight: CGFloat = isEditable ? 120 : 0
 
         let contentSize = NSSize(width: NSView.noIntrinsicMetric, height: rect.height + bufferHeight)
         

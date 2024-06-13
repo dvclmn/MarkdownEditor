@@ -94,17 +94,17 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
             textView.isEditable = isEditable
         }
         
-//        let currentWidth = textView.bounds.width
-//        
-//        if previousWidth != currentWidth {
-//            DispatchQueue.main.async {
-//                previousWidth = currentWidth
-//
-//                textView.invalidateIntrinsicContentSize()
-//                textView.needsDisplay = true
-//                
-//            }
-//        }
+        let currentWidth = textView.bounds.width
+        
+        if previousWidth != currentWidth {
+            DispatchQueue.main.async {
+                previousWidth = currentWidth
+
+                textView.invalidateIntrinsicContentSize()
+                textView.needsDisplay = true
+                
+            }
+        }
     } // END update nsView
     
     /// It is the Coordinator that is responsible for sending information back **to** SwiftUI, from the NSView
@@ -178,7 +178,9 @@ extension MarkdownEditorRepresentable {
         textView.textContainer?.lineFragmentPadding = 34
         
         textView.font = NSFont.systemFont(ofSize: fontSize)
-        textView.isEditable = isEditable
+        
+        textView.isEditable = self.isEditable
+        
         textView.drawsBackground = false
         textView.allowsUndo = true
         textView.setNeedsDisplay(textView.bounds)
