@@ -15,12 +15,13 @@ let package = Package(
         )
     ],
     dependencies: [
-            .package(url: "https://github.com/raspu/Highlightr.git", from: "2.1.2")
+            .package(url: "https://github.com/raspu/Highlightr.git", from: "2.1.2"),
+            .package(name: "ExampleText", path: "../Collection/ExampleText"),
         ],
     targets: [
         .target(
             name: "MarkdownEditor",
-            dependencies: ["Highlightr"]
+            dependencies: ["Highlightr", "ExampleText"]
         )
     ]
 )

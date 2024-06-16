@@ -46,6 +46,28 @@ struct MarkdownAttributes: AttributeScope {
 
 
 
+public struct MarkdownStyleConfig {
+    var fontSize: Double
+    var foregroundColor: NSColor
+    var backgroundColor: NSColor?
+    var fontWeight: NSFont.Weight
+    var fontTraits: NSFontDescriptor.SymbolicTraits
+    
+    public init(fontSize: Double = MarkdownDefaults.fontSize,
+                foregroundColor: NSColor = .textColor.withAlphaComponent(0.85),
+                backgroundColor: NSColor? = nil,
+                fontWeight: NSFont.Weight = .regular,
+                fontTraits: NSFontDescriptor.SymbolicTraits = []) {
+        self.fontSize = fontSize
+        self.foregroundColor = foregroundColor
+        self.backgroundColor = backgroundColor
+        self.fontWeight = fontWeight
+        self.fontTraits = fontTraits
+    }
+}
+
+
+
 public struct MarkdownDefaults {
     
     public static let fontSize:                 Double = 15
@@ -198,8 +220,8 @@ public enum MarkdownSyntax: String, CaseIterable, Identifiable {
                 .init("k", modifiers: [.command, .shift])
         }
     }
-        
-        
+    
+    
     public var fontSize: Double {
         switch self {
         case .h1:
@@ -283,8 +305,8 @@ public enum MarkdownSyntax: String, CaseIterable, Identifiable {
         case .inlineCode, .codeBlock:
             return [
                 .font: NSFont.monospacedSystemFont(ofSize: self.fontSize, weight: .medium),
-                .foregroundColor: self.foreGroundColor
-//                .backgroundColor: NSColor.white.withAlphaComponent(MarkdownDefaults.backgroundAlpha)
+                .foregroundColor: self.foreGroundColor,
+                .backgroundColor: NSColor.black.withAlphaComponent(MarkdownDefaults.backgroundAlpha)
             ]
         }
     } // END content attributes
@@ -315,7 +337,8 @@ public enum MarkdownSyntax: String, CaseIterable, Identifiable {
         case.inlineCode, .codeBlock:
             return [
                 .font: NSFont.monospacedSystemFont(ofSize: self.fontSize, weight: .regular),
-                .foregroundColor: NSColor.textColor.withAlphaComponent(MarkdownDefaults.syntaxAlpha)
+                .foregroundColor: NSColor.textColor.withAlphaComponent(MarkdownDefaults.syntaxAlpha),
+                .backgroundColor: NSColor.black.withAlphaComponent(MarkdownDefaults.backgroundAlpha)
             ]
             
         }

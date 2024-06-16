@@ -7,6 +7,7 @@
 
 import Foundation
 import SwiftUI
+import ExampleText
 //import GeneralUtilities
 //import GeneralStyles
 
@@ -18,7 +19,9 @@ public protocol Markdownable {
 public struct MarkdownEditorRepresentable: NSViewRepresentable {
     
     @Binding public var text: String
-    @Binding public var height: Double
+    @Binding public var editorHeight: CGFloat
+    
+    public var inlineCodeColour: Color
     
     public var isFocused: Bool
     
@@ -33,7 +36,8 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
     
     public init(
         text: Binding<String>,
-        height: Binding<Double>,
+        editorHeight: Binding<CGFloat>,
+        inlineCodeColour: Color,
         isFocused: Bool = false,
         
         isEditable: Bool = true,
@@ -41,7 +45,8 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
         fontSize: Double = 15
     ) {
         self._text = text
-        self._height = height
+        self._editorHeight = editorHeight
+        self.inlineCodeColour = inlineCodeColour
         
         self.isFocused = isFocused
         
@@ -53,28 +58,31 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
     /// This function creates the NSView and configures its initial state
     public func makeNSView(context: Context) -> MarkdownEditor {
         
-        let textView = MarkdownEditor()
-        
-        textView.textBinding = $text
+        let textView = MarkdownEditor(
+            frame: .zero,
+            editorHeight: editorHeight,
+            inlineCodeColour: inlineCodeColour,
+            isShowingFrames: isShowingFrames
+        )
         textView.delegate = context.coordinator
         textView.string = text
-        textView.positionButtons()
-        
-        textView.isShowingFrames = isShowingFrames
         
         setUpTextViewOptions(for: textView)
         textView.applyStyles()
-        DispatchQueue.main.async {
-            $height.wrappedValue = textView.editorHeight
-            print("Attempting to initialise the SwiftUI height, with the NSTextView height.")
-            print("NSTextView height: \(textView.editorHeight)")
-            print("SwiftUI height: \($height.wrappedValue)")
-        }
+//        textView.positionButtons()
+        
+//        textView.isShowingFrames = isShowingFrames
         
         if isFocused {
             textView.window?.makeFirstResponder(textView)
         }
+
         
+        DispatchQueue.main.async {
+            self.editorHeight = textView.editorHeight
+        }
+        
+
         return textView
     }
     
@@ -82,14 +90,18 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
     /// It is not for sending updates back up to SwiftUI
     public func updateNSView(_ textView: MarkdownEditor, context: Context) {
         
-//        textView.needsLayout = true
+        textView.needsLayout = true
         
         if textView.string != text {
             textView.string = text
-            textView.applyStyles()
+            
+            DispatchQueue.main.async {
+                textView.applyStyles()
+                self.editorHeight = textView.editorHeight
+            }
 //            textView.positionButtons()
         }
-        
+            
         if textView.isEditable != isEditable {
             textView.isEditable = isEditable
         }
@@ -97,12 +109,13 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
         let currentWidth = textView.bounds.width
         
         if previousWidth != currentWidth {
+            
+            textView.needsDisplay = true
+
             DispatchQueue.main.async {
                 previousWidth = currentWidth
-
-                textView.invalidateIntrinsicContentSize()
-                textView.needsDisplay = true
-                
+                textView.applyStyles()
+                self.editorHeight = textView.editorHeight
             }
         }
     } // END update nsView
@@ -115,7 +128,7 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
     public class Coordinator: NSObject, NSTextViewDelegate {
         
         var parent: MarkdownEditorRepresentable
-        var copyButtons = [NSButton]()
+//        var copyButtons = [NSButton]()
         
         public init(_ parent: MarkdownEditorRepresentable) {
             self.parent = parent
@@ -126,6 +139,8 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
             guard let textView = notification.object as? MarkdownEditor else { return }
             
             self.parent.text = textView.string
+            
+            
         }
         
         
@@ -133,15 +148,12 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
             guard let textView = notification.object as? MarkdownEditor else { return }
             
             DispatchQueue.main.async {
-                
                 if self.parent.text != textView.string {
                     self.parent.text = textView.string
-                    
                     textView.applyStyles()
+                    self.parent.editorHeight = textView.editorHeight
                 }
-
-                self.parent.height = textView.editorHeight
-            }
+            } // END dispatch async
             
         } // END Text did change
         
@@ -164,7 +176,6 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
 extension MarkdownEditorRepresentable {
     
     private func setUpTextViewOptions(for textView: MarkdownEditor) {
-        
         
         textView.isVerticallyResizable = false
         
@@ -220,8 +231,8 @@ extension MarkdownEditorRepresentable {
 
 struct MarkdownExampleView: View {
 
-    @State private var text: String = "Example"
-    @State private var editorHeight: Double = 0
+    @State private var text: String = ExampleText.smallCodeBlock
+    @State private var editorHeight: CGFloat = 0
 
     @FocusState private var isFocused
 
@@ -230,7 +241,8 @@ struct MarkdownExampleView: View {
         ScrollView {
             MarkdownEditorRepresentable(
                 text: $text,
-                height: $editorHeight,
+                editorHeight: $editorHeight,
+                inlineCodeColour: .cyan,
                 isFocused: true
             )
         }
@@ -239,6 +251,6 @@ struct MarkdownExampleView: View {
 }
 #Preview {
     MarkdownExampleView()
-        .frame(width: 600, height: 300)
+        .frame(width: 600, height: 700)
 }
 
