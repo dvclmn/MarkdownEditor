@@ -69,20 +69,16 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
         
         setUpTextViewOptions(for: textView)
         textView.applyStyles()
-//        textView.positionButtons()
-        
-//        textView.isShowingFrames = isShowingFrames
+
         
         if isFocused {
             textView.window?.makeFirstResponder(textView)
         }
 
-        
         DispatchQueue.main.async {
             self.editorHeight = textView.editorHeight
         }
         
-
         return textView
     }
     
@@ -99,7 +95,6 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
                 textView.applyStyles()
                 self.editorHeight = textView.editorHeight
             }
-//            textView.positionButtons()
         }
             
         if textView.isEditable != isEditable {
@@ -128,7 +123,6 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
     public class Coordinator: NSObject, NSTextViewDelegate {
         
         var parent: MarkdownEditorRepresentable
-//        var copyButtons = [NSButton]()
         
         public init(_ parent: MarkdownEditorRepresentable) {
             self.parent = parent

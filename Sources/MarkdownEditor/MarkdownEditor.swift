@@ -25,17 +25,13 @@ class CopyButtonAttachment: NSTextAttachment {
 
 public class MarkdownEditor: NSTextView {
     
-    //    var textBinding: Binding<String>?
-    
-    //    var isReadOnly: Bool = true
+//        var textBinding: Binding<String>?
     
     var editorHeight: CGFloat
     
     var inlineCodeColour: Color
     
     var isShowingFrames: Bool = false
-    
-    //    var shouldAutocompleteForEmptySelection: Bool = false
     
     let highlightr = Highlightr()
     
@@ -44,13 +40,11 @@ public class MarkdownEditor: NSTextView {
         editorHeight: CGFloat,
         inlineCodeColour: Color,
         isShowingFrames: Bool
-        //        shouldAutocompleteForEmptySelection: Bool
     ) {
 
         self.editorHeight = editorHeight
         self.inlineCodeColour = inlineCodeColour
         self.isShowingFrames = isShowingFrames
-        //        self.shouldAutocompleteForEmptySelection = shouldAutocompleteForEmptySelection
         
         let textStorage = NSTextStorage()
         let layoutManager = NSLayoutManager()
@@ -61,19 +55,11 @@ public class MarkdownEditor: NSTextView {
         layoutManager.addTextContainer(textContainer)
         
         super.init(frame: frameRect, textContainer: textContainer)
-        
-        // Additional setup here if needed
-        self.isVerticallyResizable = true
-        self.isHorizontallyResizable = true
-        self.autoresizingMask = .width
-        self.textContainerInset = CGSize(width: 10, height: 20)
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
-    //    var copyButtons = [NSButton]()
     
     
     public override var intrinsicContentSize: NSSize {
@@ -98,198 +84,46 @@ public class MarkdownEditor: NSTextView {
         return contentSize
     }
     
-    
-    //    func createCopyButton() -> NSButton {
-    //        let button = NSButton(frame: .zero)
-    //        button.title = "Copy"
-    //        button.bezelStyle = .rounded
-    //        button.wantsLayer = true
-    //        button.layer?.backgroundColor = NSColor.red.cgColor
-    //        button.layer?.borderColor = NSColor.black.cgColor
-    //        button.layer?.borderWidth = 2.0
-    //        button.target = self
-    //        button.action = #selector(copyText(_:))
-    //        return button
-    //    }
-    
-    //    func positionButtons() {
-    //        removeAllCopyButtons()
-    //        guard let layoutManager = layoutManager, let textContainer = textContainer else { return }
-    //
-    //        let regex: Regex<(Substring, Substring)> = MarkdownSyntax.codeBlock.regex
-    //        let matches = string.matches(of: regex)
-    //
-    //        for match in matches {
-    //            let glyphRange = NSRange(match.range, in: string)
-    //            let boundingRect = layoutManager.boundingRect(forGlyphRange: glyphRange, in: textContainer)
-    //
-    //            let button = createCopyButton()
-    //            button.frame = NSRect(x: boundingRect.minX - 110, y: boundingRect.minY, width: 100, height: 30)
-    //
-    //            self.addSubview(button)
-    //            copyButtons.append(button)
-    //        }
-    //    }
-    //
-    //    func removeAllCopyButtons() {
-    //        for button in copyButtons {
-    //            button.removeFromSuperview()
-    //        }
-    //        copyButtons.removeAll()
-    //    }
-    //
-    //    @objc func copyText(_ sender: NSButton) {
-    //        // Implement copying logic here, possibly using sender to identify the text range
-    //    }
-    
-    //    private func findCodeBlock() -> (Range<String.Index>, NSRect)? {
-    //        guard let layoutManager = layoutManager, let textContainer = textContainer else { return nil }
-    //
-    //        let regex: Regex<(Substring, Substring)> = MarkdownSyntax.codeBlock.regex
-    //
-    //        let matches = string.matches(of: regex)
-    //
-    //        for match in matches {
-    //            let glyphRange = NSRange(match.range, in: string)
-    //            let boundingRect = layoutManager.boundingRect(forGlyphRange: glyphRange, in: textContainer)
-    //            return (match.range, boundingRect)
-    //
-    //        }
-    //        return nil
-    //    }
-    //
-    
-//    func drawCustomBackground(
-//        in rect: NSRect,
-//        for syntax: MarkdownSyntax,
-//        paddingBase: CGFloat,
-//        rounding: Double,
-//        backgroundColor: NSColor
-//    ) {
-//        guard let layoutManager = layoutManager, let textContainer = textContainer else { return }
-//        
-//        let regex: Regex<(Substring, Substring)> = syntax.regex
-//        
-//        let matches = self.string.matches(of: regex)
-//        
-//        for match in matches {
-//            
-//            let glyphRange = NSRange(match.range, in: string)
-//            
-//            if syntax == .inlineCode {
-//                
-//                layoutManager.enumerateLineFragments(forGlyphRange: glyphRange) { (lineRect, usedRect, textContainer, lineGlyphRange, stop) in
-//                    
-//                    let intersectionRange = NSIntersectionRange(lineGlyphRange, glyphRange)
-//                    if intersectionRange.length > 0 {
-//                        let boundingRect = layoutManager.boundingRect(forGlyphRange: intersectionRange, in: textContainer)
-//                        
-//                        let paddingLeft: CGFloat = paddingBase * 1.2
-//                        let paddingRight: CGFloat = paddingBase * 1.2
-//                        let paddingTop: CGFloat = paddingBase * 1.1
-//                        let paddingBottom: CGFloat = 0
-//                        
-//                        var paddedRect = boundingRect
-//                        paddedRect.origin.x -= paddingLeft
-//                        paddedRect.origin.y -= paddingTop
-//                        paddedRect.size.width += paddingLeft + paddingRight
-//                        paddedRect.size.height += paddingTop + paddingBottom
-//                        
-//                        let path = NSBezierPath(roundedRect: paddedRect, xRadius: rounding, yRadius: rounding)
-//                        backgroundColor.setFill()
-//                        
-//                        path.fill()
-//                    }
-//                }
-//                
-//            } else if syntax == .codeBlock {
-//                
-//                let boundingRect = layoutManager.boundingRect(forGlyphRange: glyphRange, in: textContainer)
-//                
-//                let paddingLeft: CGFloat = paddingBase * 1.2
-//                let paddingRight: CGFloat = paddingBase * 1.2
-//                let paddingTop: CGFloat = paddingBase * 1.1
-//                let paddingBottom: CGFloat = 0
-//                
-//                var paddedRect = boundingRect
-//                paddedRect.origin.x -= paddingLeft
-//                paddedRect.origin.y -= paddingTop
-//                paddedRect.size.width += paddingLeft + paddingRight
-//                paddedRect.size.height += paddingTop + paddingBottom
-//                
-//                let path = NSBezierPath(roundedRect: paddedRect, xRadius: rounding, yRadius: rounding)
-//                backgroundColor.setFill()
-//                
-//                path.fill()
-//                
+//
+//        public override func keyDown(with event: NSEvent) {
+//    
+//            let wrappingSyntax: [String] = ["`", "*"]
+//    
+//            guard let character = event.characters, wrappingSyntax.contains(character) else {
+//                super.keyDown(with: event)
+//                return
 //            }
-//            
+//    
+//            let selectedRange = self.selectedRange()
+//    
+//            if selectedRange.length > 0 || shouldAutocompleteForEmptySelection {
+//                let selectedText = (self.string as NSString).substring(with: selectedRange)
+//                let wrappedText = character + selectedText + character
+//    
+//                // Prepare undo for this action
+//                undoManager?.registerUndo(withTarget: self) { target in
+//                    target.replaceCharacters(in: NSRange(location: selectedRange.location, length: wrappedText.count), with: selectedText)
+//                    target.setSelectedRange(selectedRange)
+//                    self.applyStylesAndUpdateSwiftUI()
+//                }
+//                undoManager?.setActionName("Wrap with \(character)")
+//    
+//                // Perform the text replacement
+//                self.replaceCharacters(in: selectedRange, with: wrappedText)
+//    
+//                self.setSelectedRange(NSRange(location: selectedRange.location + 1, length: wrappedText.count - 2))
+//    
+//                applyStylesAndUpdateSwiftUI()
+//    
+//            } else {
+//                super.keyDown(with: event)
+//            }
 //        }
-//    }
-    
-    
-//    public override func drawBackground(in rect: NSRect) {
-//        
-//        super.drawBackground(in: rect)
-//        
-//        let opacity: Double = 0.4
-//        
-//        drawCustomBackground(
-//            in: rect,
-//            for: .inlineCode,
-//            paddingBase: 2,
-//            rounding: 2,
-//            backgroundColor: NSColor.black.withAlphaComponent(opacity)
-//        )
-//        
-//        drawCustomBackground(
-//            in: rect,
-//            for: .codeBlock,
-//            paddingBase: 10,
-//            rounding: 4,
-//            backgroundColor: NSColor.black.withAlphaComponent(opacity)
-//        )
-//    }
-    
-    //    public override func keyDown(with event: NSEvent) {
-    //
-    //        let wrappingSyntax: [String] = ["`", "*"]
-    //
-    //        guard let character = event.characters, wrappingSyntax.contains(character) else {
-    //            super.keyDown(with: event)
-    //            return
-    //        }
-    //
-    //        let selectedRange = self.selectedRange()
-    //
-    //        if selectedRange.length > 0 || shouldAutocompleteForEmptySelection {
-    //            let selectedText = (self.string as NSString).substring(with: selectedRange)
-    //            let wrappedText = character + selectedText + character
-    //
-    //            // Prepare undo for this action
-    //            undoManager?.registerUndo(withTarget: self) { target in
-    //                target.replaceCharacters(in: NSRange(location: selectedRange.location, length: wrappedText.count), with: selectedText)
-    //                target.setSelectedRange(selectedRange)
-    //                self.applyStylesAndUpdateSwiftUI()
-    //            }
-    //            undoManager?.setActionName("Wrap with \(character)")
-    //
-    //            // Perform the text replacement
-    //            self.replaceCharacters(in: selectedRange, with: wrappedText)
-    //
-    //            self.setSelectedRange(NSRange(location: selectedRange.location + 1, length: wrappedText.count - 2))
-    //
-    //            applyStylesAndUpdateSwiftUI()
-    //
-    //        } else {
-    //            super.keyDown(with: event)
-    //        }
-    //    }
-    
-    //    func applyStylesAndUpdateSwiftUI() {
-    //        self.applyStyles()
-    //        textBinding?.wrappedValue = self.string
-    //    }
+//    
+//        func applyStylesAndUpdateSwiftUI() {
+//            self.applyStyles()
+//            textBinding?.wrappedValue = self.string
+//        }
     
     
     
@@ -321,7 +155,6 @@ public class MarkdownEditor: NSTextView {
                     activeSyntaxTypes.append(syntax)
                 } else {
                     return []
-                    //                        print("No reported selection matches for \(syntax.name)")
                 }
             } // END match loop
             
@@ -346,10 +179,6 @@ public class MarkdownEditor: NSTextView {
         
         globalParagraphStyles.paragraphSpacing = 0
         
-        //        globalParagraphStyles.firstLineHeadIndent = 40
-        //        globalParagraphStyles.headIndent = 40
-        //        globalParagraphStyles.tailIndent = -40
-        
         let baseStyles: [NSAttributedString.Key : Any] = [
             .font: NSFont.systemFont(ofSize: MarkdownDefaults.fontSize, weight: .medium),
             .foregroundColor: NSColor.textColor.withAlphaComponent(0.88),
@@ -371,12 +200,10 @@ public class MarkdownEditor: NSTextView {
         }
         self.setSelectedRange(selectedRange)
         
-        self.needsDisplay = true
+//        self.needsDisplay = true
         
         self.invalidateIntrinsicContentSize()
     }
-    
-    
     
     public func styleText(
         for syntax: MarkdownSyntax,
@@ -418,8 +245,6 @@ public class MarkdownEditor: NSTextView {
             let paragraphLength = min(range.length, attributedString.length)
             let paragraphRange = NSRange(location: paragraphLocation, length: paragraphLength)
             
-            
-            
             /// Apply attributes to opening and closing syntax
             if attributedString.length >= startSyntaxRange.upperBound {
                 attributedString.addAttributes(syntax.syntaxAttributes, range: startSyntaxRange)
@@ -432,58 +257,25 @@ public class MarkdownEditor: NSTextView {
             /// Apply attributes to content
             if attributedString.length >= contentRange.upperBound {
                 
-                if syntax == .codeBlock {
-                    
-                }
-                
                 attributedString.addAttributes(syntax.contentAttributes, range: contentRange)
                 
-                
-                
+                if syntax == .inlineCode {
+                    
+                    let userCodeColour: [NSAttributedString.Key : Any] = [
+                        .foregroundColor: NSColor(self.inlineCodeColour),
+                    ]
+                    
+                    attributedString.addAttributes(userCodeColour, range: contentRange)
+                }
             }
-            
-            
             
             if attributedString.length >= paragraphRange.upperBound {
                 
                 let paragraphStyles = NSMutableParagraphStyle()
                 
-                switch syntax {
-                case .h1:
-                    paragraphStyles.lineSpacing = 1
-                    //                    paragraphStyles.headIndent = 26
-                    paragraphStyles.paragraphSpacing = 12
-                case .h2:
-                    paragraphStyles.paragraphSpacing = 10
-                case .h3:
-                    paragraphStyles.paragraphSpacing = 10
-                    
-                case .codeBlock:
-                    paragraphStyles.lineSpacing = 4
-                    
-                    
-                    
-                    //                    paragraphStyles.paragraphSpacingBefore = 20
-                    //                    paragraphStyles.paragraphSpacing = 20
-                    //                    paragraphStyles.headIndent = -40
-                    //                    paragraphStyles.tailIndent = 80
-                    
-                    
-                default:
-                    paragraphStyles.lineSpacing = 4
-                    paragraphStyles.firstLineHeadIndent = 80
-                    paragraphStyles.headIndent = 80
-                    paragraphStyles.tailIndent = -80
-                }
-                
-                
                 let paragraphAttributes: [NSMutableAttributedString.Key : Any] = [
                     .paragraphStyle: paragraphStyles
                 ]
-                
-                
-                //                let paragraphAtt = attributedString.attributedSubstring(from: paragraphRange).string
-                //                attributedString.replaceCharacters(in: paragraphRange, with: paragraphAtt)
                 
                 attributedString.addAttributes(paragraphAttributes, range: paragraphRange)
                 
@@ -492,10 +284,7 @@ public class MarkdownEditor: NSTextView {
                     if let highlightr = highlightr {
                         
                         highlightr.setTheme(to: "tomorrow-night-eighties")
-                        //                                    highlightr.setTheme(to: "paraiso-dark")
-                        //                                    highlightr.setTheme(to: "atom-one-dark")
-                        //                                    highlightr.setTheme(to: "atelier-plateau-dark")
-                        
+
                         highlightr.theme.setCodeFont(.monospacedSystemFont(ofSize: 14, weight: .medium))
                         
                         // Extract the substring for the code block
@@ -506,14 +295,14 @@ public class MarkdownEditor: NSTextView {
                             
                             attributedString.replaceCharacters(in: contentRange, with: highlightedCode)
                             
+                            let codeBackground: [NSAttributedString.Key : Any] = [.backgroundColor: NSColor.black.withAlphaComponent(MarkdownDefaults.backgroundAlphaAlt)]
+                            
+                            attributedString.addAttributes(codeBackground, range: contentRange)
+                            
+                            
                         }
-                    }
-                    
-                    
-                    
-                    
-                    
-                    
+                    } // END highlighter check
+
                 } // end code block check
                 
             } // END paragraph styles
@@ -532,7 +321,6 @@ public class MarkdownEditor: NSTextView {
     
     
 }
-
 
 extension MarkdownEditor {
     

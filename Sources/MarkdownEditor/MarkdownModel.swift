@@ -8,65 +8,6 @@
 import Foundation
 import SwiftUI
 
-extension AttributeDynamicLookup {
-    subscript<T: AttributedStringKey>(dynamicMember keyPath: KeyPath<MarkdownAttributes, T>) -> T {
-        return self[T.self]
-    }
-}
-
-
-enum FontAttribute: AttributedStringKey {
-    typealias Value = Font
-    static let name = "Font"
-}
-
-enum ForegroundColorAttribute: AttributedStringKey {
-    typealias Value = Color
-    static let name = "ForegroundColor"
-}
-
-enum BackgroundColorAttribute: AttributedStringKey {
-    typealias Value = Color
-    static let name = "BackgroundColor"
-}
-
-enum StrikethroughStyleAttribute: AttributedStringKey {
-    typealias Value = NSUnderlineStyle
-    static let name = "StrikethroughStyle"
-}
-
-
-struct MarkdownAttributes: AttributeScope {
-    let font: FontAttribute
-    let foregroundColor: ForegroundColorAttribute
-    let backgroundColor: BackgroundColorAttribute
-    let strikethroughStyle: StrikethroughStyleAttribute
-}
-
-
-
-
-public struct MarkdownStyleConfig {
-    var fontSize: Double
-    var foregroundColor: NSColor
-    var backgroundColor: NSColor?
-    var fontWeight: NSFont.Weight
-    var fontTraits: NSFontDescriptor.SymbolicTraits
-    
-    public init(fontSize: Double = MarkdownDefaults.fontSize,
-                foregroundColor: NSColor = .textColor.withAlphaComponent(0.85),
-                backgroundColor: NSColor? = nil,
-                fontWeight: NSFont.Weight = .regular,
-                fontTraits: NSFontDescriptor.SymbolicTraits = []) {
-        self.fontSize = fontSize
-        self.foregroundColor = foregroundColor
-        self.backgroundColor = backgroundColor
-        self.fontWeight = fontWeight
-        self.fontTraits = fontTraits
-    }
-}
-
-
 
 public struct MarkdownDefaults {
     
@@ -74,8 +15,8 @@ public struct MarkdownDefaults {
     public static let headerSyntaxSize:        Double = 20
     public static let fontSizeMono:            Double = 14
     public static let syntaxAlpha:             Double = 0.3
-    public static let backgroundAlpha:         Double = 0.06
-    public static let backgroundAlphaAlt:         Double = 0.5
+    public static let backgroundAlpha:         Double = 0.14
+    public static let backgroundAlphaAlt:         Double = 0.3
 }
 
 public enum MarkdownSyntax: String, CaseIterable, Identifiable {
@@ -215,12 +156,11 @@ public enum MarkdownSyntax: String, CaseIterable, Identifiable {
         case .strikethrough:
                 .init("u", modifiers: [.command])
         case .inlineCode:
-                .init("`", modifiers: [])
+                .init("c", modifiers: [.command, .option])
         case .codeBlock:
                 .init("k", modifiers: [.command, .shift])
         }
     }
-    
     
     public var fontSize: Double {
         switch self {
@@ -243,7 +183,6 @@ public enum MarkdownSyntax: String, CaseIterable, Identifiable {
                 .textColor.withAlphaComponent(0.85)
         }
     }
-    
     
     public var contentAttributes: [NSAttributedString.Key : Any] {
         
@@ -302,45 +241,42 @@ public enum MarkdownSyntax: String, CaseIterable, Identifiable {
                 .strikethroughStyle: NSUnderlineStyle.single.rawValue
             ]
             
-        case .inlineCode, .codeBlock:
+        case .inlineCode:
             return [
                 .font: NSFont.monospacedSystemFont(ofSize: self.fontSize, weight: .medium),
                 .foregroundColor: self.foreGroundColor,
                 .backgroundColor: NSColor.black.withAlphaComponent(MarkdownDefaults.backgroundAlpha)
             ]
+        case .codeBlock:
+            return [
+                .font: NSFont.monospacedSystemFont(ofSize: self.fontSize, weight: .medium),
+                .foregroundColor: self.foreGroundColor,
+                .backgroundColor: NSColor.black.withAlphaComponent(MarkdownDefaults.backgroundAlphaAlt)
+            ]
         }
     } // END content attributes
     
     public var syntaxAttributes: [NSAttributedString.Key : Any]  {
+        
         switch self {
-        case .h1:
-            
-            return [
-                .font: NSFont.monospacedSystemFont(ofSize: self.fontSize, weight: .light),
-                .foregroundColor: NSColor.textColor.withAlphaComponent(MarkdownDefaults.syntaxAlpha)
-            ]
-        case .h2:
-            return [
-                .font: NSFont.monospacedSystemFont(ofSize: self.fontSize, weight: .light),
-                .foregroundColor: NSColor.textColor.withAlphaComponent(MarkdownDefaults.syntaxAlpha)
-            ]
-        case .h3:
-            return [
-                .font: NSFont.monospacedSystemFont(ofSize: self.fontSize, weight: .light),
-                .foregroundColor: NSColor.textColor.withAlphaComponent(MarkdownDefaults.syntaxAlpha)
-            ]
-        case .bold, .italic, .boldItalic, .strikethrough:
+        
+        case .inlineCode:
             return [
                 .font: NSFont.monospacedSystemFont(ofSize: self.fontSize, weight: .regular),
-                .foregroundColor: NSColor.textColor.withAlphaComponent(MarkdownDefaults.syntaxAlpha)
+                    .foregroundColor: NSColor.textColor.withAlphaComponent(MarkdownDefaults.syntaxAlpha),
+                    .backgroundColor: NSColor.black.withAlphaComponent(MarkdownDefaults.backgroundAlpha)
             ]
-        case.inlineCode, .codeBlock:
+        case .codeBlock:
             return [
                 .font: NSFont.monospacedSystemFont(ofSize: self.fontSize, weight: .regular),
                 .foregroundColor: NSColor.textColor.withAlphaComponent(MarkdownDefaults.syntaxAlpha),
-                .backgroundColor: NSColor.black.withAlphaComponent(MarkdownDefaults.backgroundAlpha)
+                .backgroundColor: NSColor.black.withAlphaComponent(MarkdownDefaults.backgroundAlphaAlt)
             ]
-            
+        default:
+            return [
+                .font: NSFont.monospacedSystemFont(ofSize: self.fontSize, weight: .regular),
+                .foregroundColor: NSColor.textColor.withAlphaComponent(MarkdownDefaults.syntaxAlpha)
+            ]
         }
     }
 }
