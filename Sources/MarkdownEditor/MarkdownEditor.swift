@@ -29,20 +29,28 @@ public class MarkdownEditor: NSTextView {
     
     var editorHeight: CGFloat
     
+    var editorMaxHeight: CGFloat?
+    
+    var editorHeightTypingBuffer: CGFloat
+    
     var inlineCodeColour: Color
     
-    var isShowingFrames: Bool = false
+    var isShowingFrames: Bool
     
     let highlightr = Highlightr()
     
     init(
         frame frameRect: NSRect,
         editorHeight: CGFloat,
+        editorMaxHeight: CGFloat?,
+        editorHeightTypingBuffer: CGFloat,
         inlineCodeColour: Color,
         isShowingFrames: Bool
     ) {
 
         self.editorHeight = editorHeight
+        self.editorMaxHeight = editorMaxHeight
+        self.editorHeightTypingBuffer = editorHeightTypingBuffer
         self.inlineCodeColour = inlineCodeColour
         self.isShowingFrames = isShowingFrames
         
@@ -71,11 +79,15 @@ public class MarkdownEditor: NSTextView {
         
         let rect = layoutManager.usedRect(for: container)
         
-        let bufferHeight: CGFloat = isEditable ? 120 : 0
+        let bufferHeight: CGFloat = isEditable ? editorHeightTypingBuffer : 0
         
         let contentSize = NSSize(width: NSView.noIntrinsicMetric, height: rect.height + bufferHeight)
         
-        self.editorHeight = contentSize.height
+        if let maxHeight = editorMaxHeight {
+            self.editorHeight = min(contentSize.height, maxHeight)
+        } else {
+            self.editorHeight = contentSize.height            
+        }
         
         /// Reminder: this print statement executes multiple times, because MarkdownEditor
         /// is being used not only as the app's editor, but also to display Single Messages
