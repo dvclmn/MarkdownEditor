@@ -31,7 +31,6 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
     
     public var isEditable: Bool
 
-    
     public var fontSize: Double
     
     private let verticalPadding: Double = 30
@@ -45,8 +44,8 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
 
         editorMaxHeight: CGFloat? = nil,
         
-        editorHeightTypingBuffer: CGFloat = .zero,
-        inlineCodeColour: Color,
+        editorHeightTypingBuffer: CGFloat = 120,
+        inlineCodeColour: Color = .purple,
         
         isEditable: Bool = true,
         fontSize: Double = 15
@@ -99,24 +98,29 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
 //        os_log("`updateNSView` was called")
         
 
-        
-        if textView.editorHeight != self.editorHeight || textView.string != text {
+        if textView.editorHeight != self.editorHeight {
             DispatchQueue.main.async {
                 
-                textView.string = text
                 
-                textView.applyStyles()
                 
-                os_log("PRE-UPDATE: `updateNSView` editor height from SwiftUI: \(self.editorHeight), editor height from nstextview: \(textView.editorHeight)")
+//                textView.applyStyles()
+                
+//                os_log("PRE-UPDATE: `updateNSView` editor height from SwiftUI: \(self.editorHeight), editor height from nstextview: \(textView.editorHeight)")
                 
                 self.editorHeight = textView.editorHeight
                 
-                os_log("NOW UPDATED: `updateNSView` editor height from SwiftUI: \(self.editorHeight), editor height from nstextview: \(textView.editorHeight)")
+//                os_log("NOW UPDATED: `updateNSView` editor height from SwiftUI: \(self.editorHeight), editor height from nstextview: \(textView.editorHeight)")
                 
-//                textView.invalidateIntrinsicContentSize()
+                textView.invalidateIntrinsicContentSize()
                 
-                textView.needsDisplay = true
+//                textView.needsDisplay = true
             }
+        }
+        
+        if textView.string != text {
+            
+            textView.string = text
+            
         }
         
         

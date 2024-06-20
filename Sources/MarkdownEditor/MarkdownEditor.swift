@@ -25,8 +25,6 @@ class CopyButtonAttachment: NSTextAttachment {
 
 public class MarkdownEditor: NSTextView {
     
-//        var textBinding: Binding<String>?
-    
     var editorHeight: CGFloat
     
     var editorMaxHeight: CGFloat?
@@ -83,12 +81,13 @@ public class MarkdownEditor: NSTextView {
         
         let contentSize = NSSize(width: NSView.noIntrinsicMetric, height: rect.height + bufferHeight)
         
-        if let maxHeight = editorMaxHeight {
-            self.editorHeight = min(contentSize.height, maxHeight)
-        } else {
-            self.editorHeight = contentSize.height            
-        }
+//        if let maxHeight = editorMaxHeight {
+//            self.editorHeight = min(contentSize.height, maxHeight)
+//        } else {
+//            self.editorHeight = contentSize.height            
+//        }
         
+        self.editorHeight = contentSize.height
         /// Reminder: this print statement executes multiple times, because MarkdownEditor
         /// is being used not only as the app's editor, but also to display Single Messages
         print("This is the height from `NSTextView`: \(String(describing: editorHeight))")
