@@ -54,6 +54,7 @@ public class MarkdownEditor: NSTextView {
         
         let textStorage = NSTextStorage()
         let layoutManager = NSLayoutManager()
+        
         textStorage.addLayoutManager(layoutManager)
         
         let textContainer = NSTextContainer(size: CGSize(width: frameRect.width, height: CGFloat.greatestFiniteMagnitude))
@@ -69,6 +70,7 @@ public class MarkdownEditor: NSTextView {
     
     
     public override var intrinsicContentSize: NSSize {
+        
         guard let layoutManager = self.layoutManager, let container = self.textContainer else {
             return super.intrinsicContentSize
         }
@@ -77,103 +79,18 @@ public class MarkdownEditor: NSTextView {
         
         let rect = layoutManager.usedRect(for: container)
         
-        let bufferHeight: CGFloat = isEditable ? editorHeightTypingBuffer : 0
+        print("NSTextView is editable?: \(self.isEditable)")
+        
+        let bufferHeight: CGFloat = self.isEditable ? editorHeightTypingBuffer : 0
         
         let contentSize = NSSize(width: NSView.noIntrinsicMetric, height: rect.height + bufferHeight)
-        
-//        if let maxHeight = editorMaxHeight {
-//            self.editorHeight = min(contentSize.height, maxHeight)
-//        } else {
-//            self.editorHeight = contentSize.height            
-//        }
-        
+
         self.editorHeight = contentSize.height
-        /// Reminder: this print statement executes multiple times, because MarkdownEditor
-        /// is being used not only as the app's editor, but also to display Single Messages
-        print("This is the height from `NSTextView`: \(String(describing: editorHeight))")
         
         return contentSize
     }
-    
-//
-//        public override func keyDown(with event: NSEvent) {
-//    
-//            let wrappingSyntax: [String] = ["`", "*"]
-//    
-//            guard let character = event.characters, wrappingSyntax.contains(character) else {
-//                super.keyDown(with: event)
-//                return
-//            }
-//    
-//            let selectedRange = self.selectedRange()
-//    
-//            if selectedRange.length > 0 || shouldAutocompleteForEmptySelection {
-//                let selectedText = (self.string as NSString).substring(with: selectedRange)
-//                let wrappedText = character + selectedText + character
-//    
-//                // Prepare undo for this action
-//                undoManager?.registerUndo(withTarget: self) { target in
-//                    target.replaceCharacters(in: NSRange(location: selectedRange.location, length: wrappedText.count), with: selectedText)
-//                    target.setSelectedRange(selectedRange)
-//                    self.applyStylesAndUpdateSwiftUI()
-//                }
-//                undoManager?.setActionName("Wrap with \(character)")
-//    
-//                // Perform the text replacement
-//                self.replaceCharacters(in: selectedRange, with: wrappedText)
-//    
-//                self.setSelectedRange(NSRange(location: selectedRange.location + 1, length: wrappedText.count - 2))
-//    
-//                applyStylesAndUpdateSwiftUI()
-//    
-//            } else {
-//                super.keyDown(with: event)
-//            }
-//        }
-//    
-//        func applyStylesAndUpdateSwiftUI() {
-//            self.applyStyles()
-//            textBinding?.wrappedValue = self.string
-//        }
-    
-    
-    
-    
-    public func assessSelectedRange(_ selectedRange: NSRange) -> [MarkdownSyntax] {
-        
-        guard let textStorage = self.textStorage else {
-            print("Text storage not available for styling")
-            return []
-        }
-        
-        let string = textStorage.string
-        
-        guard let range = Range(selectedRange, in: string) else {
-            print("No range found")
-            return []
-        }
-        
-        var activeSyntaxTypes: [MarkdownSyntax] = []
-        
-        for syntax in MarkdownSyntax.allCases {
-            
-            let syntaxMatches = string.matches(of: syntax.regex)
-            
-            for match in syntaxMatches {
-                
-                if match.range.contains(range.lowerBound) {
-                    print("Cursor is within \(syntax.name)")
-                    activeSyntaxTypes.append(syntax)
-                } else {
-                    return []
-                }
-            } // END match loop
-            
-        } // END loop markdown syntax
-        
-        return activeSyntaxTypes
-        
-    } // END assess selecred range
+
+   
     
     public func applyStyles() {
         
