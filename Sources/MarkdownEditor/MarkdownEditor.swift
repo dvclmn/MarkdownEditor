@@ -10,44 +10,26 @@ import SwiftUI
 //import GeneralStyles
 import Highlightr
 
-class CopyButtonAttachment: NSTextAttachment {
-    var range: NSRange
-    
-    init(range: NSRange) {
-        self.range = range
-        super.init(data: nil, ofType: nil)
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-}
-
+/// Help with NSTextViews:
+/// https://developer.apple.com/library/archive/documentation/TextFonts/Conceptual/CocoaTextArchitecture/TextEditing/TextEditing.html#//apple_ref/doc/uid/TP40009459-CH3-SW16
+/// https://developer.apple.com/library/archive/documentation/Cocoa/Conceptual/TextLayout/TextLayout.html#//apple_ref/doc/uid/10000158i
 public class MarkdownEditor: NSTextView {
     
     var editorHeight: CGFloat
-    
-    var editorMaxHeight: CGFloat?
-    
     var editorHeightTypingBuffer: CGFloat
-    
     var inlineCodeColour: Color
-    
     var isShowingFrames: Bool
-    
     let highlightr = Highlightr()
     
     init(
         frame frameRect: NSRect,
         editorHeight: CGFloat,
-        editorMaxHeight: CGFloat?,
         editorHeightTypingBuffer: CGFloat,
         inlineCodeColour: Color,
         isShowingFrames: Bool
     ) {
 
         self.editorHeight = editorHeight
-        self.editorMaxHeight = editorMaxHeight
         self.editorHeightTypingBuffer = editorHeightTypingBuffer
         self.inlineCodeColour = inlineCodeColour
         self.isShowingFrames = isShowingFrames
@@ -78,8 +60,6 @@ public class MarkdownEditor: NSTextView {
         layoutManager.ensureLayout(for: container)
         
         let rect = layoutManager.usedRect(for: container)
-        
-        print("NSTextView is editable?: \(self.isEditable)")
         
         let bufferHeight: CGFloat = self.isEditable ? editorHeightTypingBuffer : 0
         
@@ -128,7 +108,7 @@ public class MarkdownEditor: NSTextView {
         }
         self.setSelectedRange(selectedRange)
         
-//        self.needsDisplay = true
+        self.needsDisplay = true
         
         self.invalidateIntrinsicContentSize()
     }
@@ -211,7 +191,7 @@ public class MarkdownEditor: NSTextView {
                     
                     if let highlightr = highlightr {
                         
-                        highlightr.setTheme(to: "tomorrow-night-eighties")
+                        highlightr.setTheme(to: "xcode-dark")
 
                         highlightr.theme.setCodeFont(.monospacedSystemFont(ofSize: 14, weight: .medium))
                         
@@ -223,7 +203,7 @@ public class MarkdownEditor: NSTextView {
                             
                             attributedString.replaceCharacters(in: contentRange, with: highlightedCode)
                             
-                            let codeBackground: [NSAttributedString.Key : Any] = [.backgroundColor: NSColor.black.withAlphaComponent(MarkdownDefaults.backgroundAlphaAlt)]
+                            let codeBackground: [NSAttributedString.Key : Any] = [.backgroundColor: NSColor.black.withAlphaComponent(MarkdownDefaults.backgroundCodeBlock)]
                             
                             attributedString.addAttributes(codeBackground, range: contentRange)
                             

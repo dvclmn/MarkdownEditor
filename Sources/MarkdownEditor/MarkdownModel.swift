@@ -11,12 +11,12 @@ import SwiftUI
 
 public struct MarkdownDefaults {
     
-    public static let fontSize:                 Double = 15
+    public static let fontSize:                Double = 15
     public static let headerSyntaxSize:        Double = 20
     public static let fontSizeMono:            Double = 14
     public static let syntaxAlpha:             Double = 0.3
-    public static let backgroundAlpha:         Double = 0.14
-    public static let backgroundAlphaAlt:         Double = 0.3
+    public static let backgroundInlineCode:    Double = 0.2
+    public static let backgroundCodeBlock:     Double = 0.4
 }
 
 public enum MarkdownSyntax: String, CaseIterable, Identifiable {
@@ -245,13 +245,13 @@ public enum MarkdownSyntax: String, CaseIterable, Identifiable {
             return [
                 .font: NSFont.monospacedSystemFont(ofSize: self.fontSize, weight: .medium),
                 .foregroundColor: self.foreGroundColor,
-                .backgroundColor: NSColor.black.withAlphaComponent(MarkdownDefaults.backgroundAlpha)
+                .backgroundColor: NSColor.black.withAlphaComponent(MarkdownDefaults.backgroundInlineCode)
             ]
         case .codeBlock:
             return [
                 .font: NSFont.monospacedSystemFont(ofSize: self.fontSize, weight: .medium),
                 .foregroundColor: self.foreGroundColor,
-                .backgroundColor: NSColor.black.withAlphaComponent(MarkdownDefaults.backgroundAlphaAlt)
+                .backgroundColor: NSColor.black.withAlphaComponent(MarkdownDefaults.backgroundCodeBlock)
             ]
         }
     } // END content attributes
@@ -264,13 +264,13 @@ public enum MarkdownSyntax: String, CaseIterable, Identifiable {
             return [
                 .font: NSFont.monospacedSystemFont(ofSize: self.fontSize, weight: .regular),
                     .foregroundColor: NSColor.textColor.withAlphaComponent(MarkdownDefaults.syntaxAlpha),
-                    .backgroundColor: NSColor.black.withAlphaComponent(MarkdownDefaults.backgroundAlpha)
+                    .backgroundColor: NSColor.black.withAlphaComponent(MarkdownDefaults.backgroundInlineCode)
             ]
         case .codeBlock:
             return [
                 .font: NSFont.monospacedSystemFont(ofSize: self.fontSize, weight: .regular),
                 .foregroundColor: NSColor.textColor.withAlphaComponent(MarkdownDefaults.syntaxAlpha),
-                .backgroundColor: NSColor.black.withAlphaComponent(MarkdownDefaults.backgroundAlphaAlt)
+                .backgroundColor: NSColor.black.withAlphaComponent(MarkdownDefaults.backgroundCodeBlock)
             ]
         default:
             return [

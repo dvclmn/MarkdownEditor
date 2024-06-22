@@ -23,8 +23,7 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
     @Binding public var text: String
     @Binding public var editorHeight: CGFloat
     @Binding public var isShowingFrames: Bool
-    
-    public var editorMaxHeight: CGFloat?
+    @Binding public var isLoading: Bool
     
     public var editorHeightTypingBuffer: CGFloat
     public var inlineCodeColour: Color
@@ -45,8 +44,7 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
         text: Binding<String>,
         editorHeight: Binding<CGFloat>,
         isShowingFrames: Binding<Bool> = .constant(false),
-        
-        editorMaxHeight: CGFloat? = nil,
+        isLoading: Binding<Bool> = .constant(false),
         
         editorHeightTypingBuffer: CGFloat = 120,
         inlineCodeColour: Color = .purple,
@@ -57,8 +55,7 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
         self._text = text
         self._editorHeight = editorHeight
         self._isShowingFrames = isShowingFrames
-        
-        self.editorMaxHeight = editorMaxHeight
+        self._isLoading = isLoading
         
         self.editorHeightTypingBuffer = editorHeightTypingBuffer
         self.inlineCodeColour = inlineCodeColour
@@ -72,10 +69,10 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
         
         os_log("`makeNSView` was called")
         
+        
         let textView = MarkdownEditor(
             frame: .zero,
             editorHeight: editorHeight,
-            editorMaxHeight: editorMaxHeight,
             editorHeightTypingBuffer: editorHeightTypingBuffer,
             inlineCodeColour: inlineCodeColour,
             isShowingFrames: isShowingFrames
@@ -91,6 +88,8 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
             self.editorHeight = textView.editorHeight
         }
         
+
+        
         return textView
     }
     
@@ -99,55 +98,56 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
     /// This *will* update any time a `@Binding` property is mutated from SwiftUI
     public func updateNSView(_ textView: MarkdownEditor, context: Context) {
         
+
+        
         //        os_log("`updateNSView` was called")
         
         
         if textView.editorHeight != self.editorHeight {
+            
             DispatchQueue.main.async {
-                
-                // TODO: These changes caused the editor height to *not* change, when sending a message, and the Messages to not update their height when the GPT response is streamed in
-                
-                //                textView.applyStyles()
-                
-                //                os_log("PRE-UPDATE: `updateNSView` editor height from SwiftUI: \(self.editorHeight), editor height from nstextview: \(textView.editorHeight)")
-                
-                self.editorHeight = textView.editorHeight
-                
-                //                os_log("NOW UPDATED: `updateNSView` editor height from SwiftUI: \(self.editorHeight), editor height from nstextview: \(textView.editorHeight)")
-                
                 textView.invalidateIntrinsicContentSize()
-                
-                
-                //                textView.needsDisplay = true
+                self.editorHeight = textView.editorHeight
+                textView.needsDisplay = true
             } // END dispatch queue
-            
-            
-            Task { @MainActor in
-                self.needsDisplayFlag = true
-                
-                // If the timer is not already running, start it
-                if self.needsDisplayTimer == nil {
-                    self.needsDisplayTimer = Timer.scheduledTimer(withTimeInterval: 2.0, repeats: false) { _ in
-                        Task { @MainActor in
-                            if self.needsDisplayFlag {
-                                textView.needsDisplay = true
-                                self.needsDisplayFlag = false
-                            }
-                            self.needsDisplayTimer = nil
-                        }
-                    }
-                }
-            }
-            
-            
         } // END editor height changed check
+        // TODO: These changes caused the editor height to *not* change, when sending a message, and the Messages to not update their height when the GPT response is streamed in
+        
+        //                textView.applyStyles()
+        
+        //                os_log("PRE-UPDATE: `updateNSView` editor height from SwiftUI: \(self.editorHeight), editor height from nstextview: \(textView.editorHeight)")
+        
+        
+        //                os_log("NOW UPDATED: `updateNSView` editor height from SwiftUI: \(self.editorHeight), editor height from nstextview: \(textView.editorHeight)")
+        
+        
+        
+        
+        
+        //            Task { @MainActor in
+        //                self.needsDisplayFlag = true
+        //
+        //                // If the timer is not already running, start it
+        //                if self.needsDisplayTimer == nil {
+        //                    self.needsDisplayTimer = Timer.scheduledTimer(withTimeInterval: 2.0, repeats: false) { _ in
+        //                        Task { @MainActor in
+        //                            if self.needsDisplayFlag {
+        //                                textView.needsDisplay = true
+        //                                self.needsDisplayFlag = false
+        //                            }
+        //                            self.needsDisplayTimer = nil
+        //                        }
+        //                    }
+        //                }
+        //            }
+        
+        
         
         if textView.string != text {
-            
             DispatchQueue.main.async {
                 textView.string = text
+                textView.applyStyles()
                 self.editorHeight = textView.editorHeight
-                textView.invalidateIntrinsicContentSize()
             }
         }
         
@@ -175,7 +175,6 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
             }
         }
         
-        textView.needsLayout = true
         
     } // END update nsView
     
@@ -196,9 +195,11 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
         public func textDidBeginEditing(_ notification: Notification) {
             guard let textView = notification.object as? MarkdownEditor else { return }
             
-            os_log("`textDidBeginEditing` was called")
-            
-            self.parent.text = textView.string
+            if self.parent.text != textView.string {
+                DispatchQueue.main.async {
+                    self.parent.text = textView.string
+                }
+            }
         }
         
         public func textDidChange(_ notification: Notification) {
@@ -206,24 +207,16 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
             
             //            os_log("`textDidChange` was called")
             
-            DispatchQueue.main.async {
+            if self.parent.text != textView.string {
                 
-                if self.parent.text != textView.string {
-                    
+                DispatchQueue.main.async {
                     /// FROM nstextview, to SwiftUI
                     self.parent.text = textView.string
-                    
-                    self.parent.editorHeight = textView.editorHeight
                     textView.applyStyles()
+                    self.parent.editorHeight = textView.editorHeight
                     
-                    //                    os_log("PRE-UPDATE:`textDidChange` editor height from SwiftUI: \(self.parent.editorHeight), editor height from nstextview: \(textView.editorHeight)")
-                    
-                    
-                    //                    os_log("NOW UPDATED: `textDidChange` editor height from SwiftUI: \(self.parent.editorHeight), editor height from nstextview: \(textView.editorHeight)")
-                    
-                    //                    textView.needsDisplay = true
-                }
-            } // END dispatch async
+                } // END dispatch async
+            } // END text equality check
             
         } // END Text did change
         
@@ -270,36 +263,6 @@ extension MarkdownEditorRepresentable {
     
 }
 
-//
-//extension MarkdownEditorRepresentable.Coordinator {
-//
-//    @MainActor func wrapSelectedTextWithAsterisks(textView: MarkdownEditor) {
-//
-//        guard let textRange = textView.selectedRanges.first as? NSRange, textRange.length > 0 else {
-//            print("No text is selected")
-//            return
-//        }
-//
-//        guard let textStorage = textView.textStorage else {
-//            print("Couldn't get text storage")
-//            return
-//        }
-//
-//        let selectedText = textStorage.attributedSubstring(from: textRange).string
-//
-//        let wrappedText = "*\(selectedText)*"
-//
-//        textStorage.replaceCharacters(in: textRange, with: wrappedText)
-//
-//        let newRange = NSRange(location: textRange.location, length: textRange.length + 2)
-//
-//        textView.setSelectedRange(newRange)
-//        parent.handler.userPrompt = textView.string
-//
-//    }
-//}
-
-
 struct MarkdownExampleView: View {
     
     @State private var text: String = ExampleText.smallCodeBlock
@@ -313,13 +276,12 @@ struct MarkdownExampleView: View {
             MarkdownEditorRepresentable(
                 text: $text,
                 editorHeight: $editorHeight,
-                editorMaxHeight: 400,
                 editorHeightTypingBuffer: 60,
                 inlineCodeColour: .cyan
-                //                isFocused: true
             )
         }
         .border(Color.green.opacity(0.2))
+        .background(.green.opacity(0.3))
     }
 }
 #Preview {
