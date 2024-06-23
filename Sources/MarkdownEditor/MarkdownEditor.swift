@@ -13,6 +13,8 @@ import Highlightr
 /// Help with NSTextViews:
 /// https://developer.apple.com/library/archive/documentation/TextFonts/Conceptual/CocoaTextArchitecture/TextEditing/TextEditing.html#//apple_ref/doc/uid/TP40009459-CH3-SW16
 /// https://developer.apple.com/library/archive/documentation/Cocoa/Conceptual/TextLayout/TextLayout.html#//apple_ref/doc/uid/10000158i
+
+
 public class MarkdownEditor: NSTextView {
     
     var editorHeight: CGFloat
@@ -21,6 +23,10 @@ public class MarkdownEditor: NSTextView {
     var isShowingFrames: Bool
     let highlightr = Highlightr()
     
+    private var stylingQueue = DispatchQueue(label: "text.styling.queue", qos: .userInitiated)
+    private var debounceTimer: Timer?
+    
+    
     init(
         frame frameRect: NSRect,
         editorHeight: CGFloat,
@@ -28,7 +34,7 @@ public class MarkdownEditor: NSTextView {
         inlineCodeColour: Color,
         isShowingFrames: Bool
     ) {
-
+        
         self.editorHeight = editorHeight
         self.editorHeightTypingBuffer = editorHeightTypingBuffer
         self.inlineCodeColour = inlineCodeColour
@@ -64,14 +70,14 @@ public class MarkdownEditor: NSTextView {
         let bufferHeight: CGFloat = self.isEditable ? editorHeightTypingBuffer : 0
         
         let contentSize = NSSize(width: NSView.noIntrinsicMetric, height: rect.height + bufferHeight)
-
+        
         self.editorHeight = contentSize.height
         
         return contentSize
     }
-
-   
     
+    
+    @MainActor
     public func applyStyles() {
         
         guard let textStorage = self.textStorage else {
@@ -81,33 +87,58 @@ public class MarkdownEditor: NSTextView {
         
         let selectedRange = self.selectedRange()
         
-        let globalParagraphStyles = NSMutableParagraphStyle()
+        let string = textStorage.string
         
-        globalParagraphStyles.lineSpacing = MarkdownDefaults.lineSpacing
-        globalParagraphStyles.paragraphSpacing = MarkdownDefaults.paragraphSpacing
-        
-        let baseStyles: [NSAttributedString.Key : Any] = [
-            .font: NSFont.systemFont(ofSize: MarkdownDefaults.fontSize, weight: MarkdownDefaults.fontWeight),
-            .foregroundColor: NSColor.textColor.withAlphaComponent(MarkdownDefaults.fontOpacity),
-            .paragraphStyle: globalParagraphStyles
-        ]
-        
-        // MARK: - Set initial styles (First!)
-        let attributedString = NSMutableAttributedString(string: textStorage.string, attributes: baseStyles)
-        
-        textStorage.setAttributedString(attributedString)
-        
-        let syntaxList = MarkdownSyntax.allCases
-        
-        for syntax in syntaxList {
-            styleText(
-                for: syntax,
-                withString: attributedString
-            )
+        // Debounce mechanism
+        debounceTimer?.invalidate()
+        debounceTimer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: false) { [weak self] _ in
+            self?.stylingQueue.async {
+                let attributedString = NSMutableAttributedString(string: string)
+                let syntaxList = MarkdownSyntax.allCases
+                
+                for syntax in syntaxList {
+                    self?.styleText(for: syntax, withString: attributedString)
+                }
+                
+                DispatchQueue.main.async {
+                    textStorage.setAttributedString(attributedString)
+                    self?.setSelectedRange(selectedRange)
+                    self?.invalidateIntrinsicContentSize()
+                    self?.needsDisplay = true
+                }
+            }
         }
-        self.setSelectedRange(selectedRange)
+        
+        
+//        let globalParagraphStyles = NSMutableParagraphStyle()
+//        
+//        globalParagraphStyles.lineSpacing = MarkdownDefaults.lineSpacing
+//        globalParagraphStyles.paragraphSpacing = MarkdownDefaults.paragraphSpacing
+//        
+//        let baseStyles: [NSAttributedString.Key : Any] = [
+//            .font: NSFont.systemFont(ofSize: MarkdownDefaults.fontSize, weight: MarkdownDefaults.fontWeight),
+//            .foregroundColor: NSColor.textColor.withAlphaComponent(MarkdownDefaults.fontOpacity),
+//            .paragraphStyle: globalParagraphStyles
+//        ]
+//        
+//        // MARK: - Set initial styles (First!)
+//        let attributedString = NSMutableAttributedString(string: string, attributes: baseStyles)
+//        
+//        textStorage.setAttributedString(attributedString)
+//        
+//        let syntaxList = MarkdownSyntax.allCases
+//        
+//        for syntax in syntaxList {
+//            styleText(
+//                for: syntax,
+//                withString: attributedString
+//            )
+//        }
+//        self.setSelectedRange(selectedRange)
     }
     
+    
+    @MainActor
     public func styleText(
         for syntax: MarkdownSyntax,
         withString attributedString: NSMutableAttributedString
@@ -116,6 +147,9 @@ public class MarkdownEditor: NSTextView {
             print("Text storage not available for styling")
             return
         }
+        
+
+                    
         
         let regexLiteral: Regex<(Substring, Substring)> = syntax.regex
         
@@ -128,6 +162,11 @@ public class MarkdownEditor: NSTextView {
         for match in matches {
             let range = NSRange(match.range, in: string)
             
+            
+
+            
+            
+            
             /// Content range
             let contentLocation = max(0, range.location + syntaxCharacterRanges)
             let contentLength = min(range.length - (syntaxSymmetrical ? 2 : 1) * syntaxCharacterRanges, attributedString.length - contentLocation)
@@ -137,7 +176,7 @@ public class MarkdownEditor: NSTextView {
             let startSyntaxLocation = range.location
             let startSyntaxLength = min(syntaxCharacterRanges, attributedString.length - startSyntaxLocation)
             let startSyntaxRange = NSRange(location: startSyntaxLocation, length: startSyntaxLength)
-            
+
             /// Closing syntax range
             let endSyntaxLocation = max(0, range.location + range.length - syntaxCharacterRanges)
             let endSyntaxLength = min(syntax == .codeBlock ? syntaxCharacterRanges + 1 : syntaxCharacterRanges, attributedString.length - endSyntaxLocation)
@@ -147,6 +186,7 @@ public class MarkdownEditor: NSTextView {
             let paragraphLocation = max(0, range.location)
             let paragraphLength = min(range.length, attributedString.length)
             let paragraphRange = NSRange(location: paragraphLocation, length: paragraphLength)
+            
             
             /// Apply attributes to opening and closing syntax
             if attributedString.length >= startSyntaxRange.upperBound {
@@ -159,9 +199,8 @@ public class MarkdownEditor: NSTextView {
             
             /// Apply attributes to content
             if attributedString.length >= contentRange.upperBound {
-                
                 attributedString.addAttributes(syntax.contentAttributes, range: contentRange)
-                
+
                 if syntax == .inlineCode {
                     
                     let userCodeColour: [NSAttributedString.Key : Any] = [
@@ -187,7 +226,7 @@ public class MarkdownEditor: NSTextView {
                     if let highlightr = highlightr {
                         
                         highlightr.setTheme(to: "xcode-dark")
-
+                        
                         highlightr.theme.setCodeFont(.monospacedSystemFont(ofSize: 14, weight: .medium))
                         
                         // Extract the substring for the code block
@@ -205,14 +244,14 @@ public class MarkdownEditor: NSTextView {
                             
                         }
                     } // END highlighter check
-
+                    
                 } // end code block check
                 
             } // END paragraph styles
             
         } // Loop over matches
         
-        textStorage.setAttributedString(attributedString)
+//        textStorage.setAttributedString(attributedString)
         
     } // END style text
     
