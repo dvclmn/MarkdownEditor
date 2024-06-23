@@ -83,13 +83,12 @@ public class MarkdownEditor: NSTextView {
         
         let globalParagraphStyles = NSMutableParagraphStyle()
         
-        globalParagraphStyles.lineSpacing = 4
-        
-        globalParagraphStyles.paragraphSpacing = 0
+        globalParagraphStyles.lineSpacing = MarkdownDefaults.lineSpacing
+        globalParagraphStyles.paragraphSpacing = MarkdownDefaults.paragraphSpacing
         
         let baseStyles: [NSAttributedString.Key : Any] = [
-            .font: NSFont.systemFont(ofSize: MarkdownDefaults.fontSize, weight: .medium),
-            .foregroundColor: NSColor.textColor.withAlphaComponent(0.88),
+            .font: NSFont.systemFont(ofSize: MarkdownDefaults.fontSize, weight: MarkdownDefaults.fontWeight),
+            .foregroundColor: NSColor.textColor.withAlphaComponent(MarkdownDefaults.fontOpacity),
             .paragraphStyle: globalParagraphStyles
         ]
         
@@ -107,10 +106,6 @@ public class MarkdownEditor: NSTextView {
             )
         }
         self.setSelectedRange(selectedRange)
-        
-        self.needsDisplay = true
-        
-        self.invalidateIntrinsicContentSize()
     }
     
     public func styleText(

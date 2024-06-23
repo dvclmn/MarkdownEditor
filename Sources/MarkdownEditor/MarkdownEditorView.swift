@@ -39,7 +39,6 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
     @State private var needsDisplayTimer: Timer?
     @State private var needsDisplayFlag = false
     
-    
     public init(
         text: Binding<String>,
         editorHeight: Binding<CGFloat>,
@@ -69,7 +68,6 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
         
         os_log("`makeNSView` was called")
         
-        
         let textView = MarkdownEditor(
             frame: .zero,
             editorHeight: editorHeight,
@@ -81,14 +79,11 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
         textView.delegate = context.coordinator
         textView.string = text
         
-        setUpTextViewOptions(for: textView)
-        
         DispatchQueue.main.async {
+            setUpTextViewOptions(for: textView)
             textView.applyStyles()
             self.editorHeight = textView.editorHeight
         }
-        
-
         
         return textView
     }
@@ -98,59 +93,21 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
     /// This *will* update any time a `@Binding` property is mutated from SwiftUI
     public func updateNSView(_ textView: MarkdownEditor, context: Context) {
         
-
-        
-        //        os_log("`updateNSView` was called")
+        if textView.string != text {
+            DispatchQueue.main.async {
+                textView.string = text
+                
+                redrawEditor(includingStyles: false)
+            }
+        }
         
         
         if textView.editorHeight != self.editorHeight {
             
             DispatchQueue.main.async {
-                textView.invalidateIntrinsicContentSize()
-                self.editorHeight = textView.editorHeight
-                textView.needsDisplay = true
+                redrawEditor()
             } // END dispatch queue
         } // END editor height changed check
-        // TODO: These changes caused the editor height to *not* change, when sending a message, and the Messages to not update their height when the GPT response is streamed in
-        
-        //                textView.applyStyles()
-        
-        //                os_log("PRE-UPDATE: `updateNSView` editor height from SwiftUI: \(self.editorHeight), editor height from nstextview: \(textView.editorHeight)")
-        
-        
-        //                os_log("NOW UPDATED: `updateNSView` editor height from SwiftUI: \(self.editorHeight), editor height from nstextview: \(textView.editorHeight)")
-        
-        
-        
-        
-        
-        //            Task { @MainActor in
-        //                self.needsDisplayFlag = true
-        //
-        //                // If the timer is not already running, start it
-        //                if self.needsDisplayTimer == nil {
-        //                    self.needsDisplayTimer = Timer.scheduledTimer(withTimeInterval: 2.0, repeats: false) { _ in
-        //                        Task { @MainActor in
-        //                            if self.needsDisplayFlag {
-        //                                textView.needsDisplay = true
-        //                                self.needsDisplayFlag = false
-        //                            }
-        //                            self.needsDisplayTimer = nil
-        //                        }
-        //                    }
-        //                }
-        //            }
-        
-        
-        
-        if textView.string != text {
-            DispatchQueue.main.async {
-                textView.string = text
-                textView.applyStyles()
-                self.editorHeight = textView.editorHeight
-            }
-        }
-        
         
         
         if textView.isShowingFrames != self.isShowingFrames {
@@ -170,13 +127,21 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
             DispatchQueue.main.async {
                 previousWidth = currentWidth
                 textView.applyStyles()
-                self.editorHeight = textView.editorHeight
-                textView.needsDisplay = true
+                redrawEditor(includingStyles: false)
             }
         }
         
         
+        func redrawEditor(includingStyles: Bool = true) {
+            if includingStyles {
+                textView.applyStyles()
+            }
+            self.editorHeight = textView.editorHeight
+            textView.invalidateIntrinsicContentSize()
+            textView.needsDisplay = true
+        }
     } // END update nsView
+    
     
     /// It is the Coordinator that is responsible for sending information back **to** SwiftUI, from the NSView
     public func makeCoordinator() -> Coordinator {
@@ -202,6 +167,8 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
             }
         }
         
+
+        
         public func textDidChange(_ notification: Notification) {
             guard let textView = notification.object as? MarkdownEditor else { return }
             
@@ -210,11 +177,13 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
             if self.parent.text != textView.string {
                 
                 DispatchQueue.main.async {
-                    /// FROM nstextview, to SwiftUI
-                    self.parent.text = textView.string
-                    textView.applyStyles()
-                    self.parent.editorHeight = textView.editorHeight
-                    
+                    if self.parent.text != textView.string {
+                        self.parent.text = textView.string
+                        textView.applyStyles()
+                        self.parent.editorHeight = textView.editorHeight
+                        textView.invalidateIntrinsicContentSize()
+                        textView.needsDisplay = true
+                    }
                 } // END dispatch async
             } // END text equality check
             
@@ -252,7 +221,7 @@ extension MarkdownEditorRepresentable {
         textView.textContainer?.lineFragmentPadding = 34
         textView.textContainerInset = NSSize(width: 0, height: 30)
         
-        textView.font = NSFont.systemFont(ofSize: fontSize)
+        textView.font = NSFont.systemFont(ofSize: MarkdownDefaults.fontSize, weight: .medium)
         
         textView.isEditable = self.isEditable
         

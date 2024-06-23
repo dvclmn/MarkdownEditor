@@ -11,12 +11,19 @@ import SwiftUI
 
 public struct MarkdownDefaults {
     
-    public static let fontSize:                Double = 15
-    public static let headerSyntaxSize:        Double = 20
-    public static let fontSizeMono:            Double = 14
-    public static let syntaxAlpha:             Double = 0.3
-    public static let backgroundInlineCode:    Double = 0.2
-    public static let backgroundCodeBlock:     Double = 0.4
+    public static let fontSize:                 Double = 15
+    public static let fontWeight:               NSFont.Weight = .medium
+    public static let fontOpacity:              Double = 0.88
+        
+    public static let headerSyntaxSize:         Double = 20
+    public static let fontSizeMono:             Double = 14
+        
+    public static let syntaxAlpha:              Double = 0.3
+    public static let backgroundInlineCode:     Double = 0.2
+    public static let backgroundCodeBlock:      Double = 0.4
+    
+    public static let lineSpacing:              Double = 4
+    public static let paragraphSpacing:         Double = 0
 }
 
 public enum MarkdownSyntax: String, CaseIterable, Identifiable {
