@@ -26,6 +26,7 @@ public struct MarkdownDefaults {
     public static let paragraphSpacing:         Double = 0
 }
 
+
 public enum MarkdownSyntax: String, CaseIterable, Identifiable {
     case h1
     case h2

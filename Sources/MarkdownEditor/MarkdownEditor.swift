@@ -14,6 +14,36 @@ import Highlightr
 /// https://developer.apple.com/library/archive/documentation/TextFonts/Conceptual/CocoaTextArchitecture/TextEditing/TextEditing.html#//apple_ref/doc/uid/TP40009459-CH3-SW16
 /// https://developer.apple.com/library/archive/documentation/Cocoa/Conceptual/TextLayout/TextLayout.html#//apple_ref/doc/uid/10000158i
 
+actor TextStylingActor {
+    
+    private var debounceTimer: Timer?
+
+    func styleText(currentText: String, selectedRange: NSRange, completion: @escaping (NSAttributedString, NSRange) -> Void) {
+        // Invalidate previous timer
+        debounceTimer?.invalidate()
+
+        // Set up a new timer for debouncing
+        debounceTimer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: false) { [weak self] _ in
+            self?.performStyling(currentText: currentText, selectedRange: selectedRange, completion: completion)
+        }
+    }
+
+    private func performStyling(currentText: String, selectedRange: NSRange, completion: (NSAttributedString, NSRange) -> Void) {
+        let attributedString = NSMutableAttributedString(string: currentText)
+        let syntaxList = MarkdownSyntax.allCases
+
+        for syntax in syntaxList {
+            // Apply styles (simplified for brevity)
+            let range = NSRange(location: 0, length: attributedString.length) // Example range
+            attributedString.addAttribute(.font, value: syntax.contentAttributes[.font]!, range: range)
+        }
+
+        // Call completion on the main thread
+        DispatchQueue.main.async {
+            completion(attributedString, selectedRange)
+        }
+    }
+}
 
 public class MarkdownEditor: NSTextView {
     
@@ -23,9 +53,8 @@ public class MarkdownEditor: NSTextView {
     var isShowingFrames: Bool
     let highlightr = Highlightr()
     
-    private var stylingQueue = DispatchQueue(label: "text.styling.queue", qos: .userInitiated)
-    private var debounceTimer: Timer?
-    
+    private var stylingActor = TextStylingActor()
+
     
     init(
         frame frameRect: NSRect,
@@ -57,85 +86,69 @@ public class MarkdownEditor: NSTextView {
     }
     
     
-    public override var intrinsicContentSize: NSSize {
-        
-        guard let layoutManager = self.layoutManager, let container = self.textContainer else {
-            return super.intrinsicContentSize
-        }
-        container.containerSize = NSSize(width: self.bounds.width, height: CGFloat.greatestFiniteMagnitude)
-        layoutManager.ensureLayout(for: container)
-        
-        let rect = layoutManager.usedRect(for: container)
-        
-        let bufferHeight: CGFloat = self.isEditable ? editorHeightTypingBuffer : 0
-        
-        let contentSize = NSSize(width: NSView.noIntrinsicMetric, height: rect.height + bufferHeight)
-        
-        self.editorHeight = contentSize.height
-        
-        return contentSize
-    }
-    
-    
-    @MainActor
+
     public func applyStyles() {
         
-        guard let textStorage = self.textStorage else {
-            print("Text storage not available for styling")
-            return
-        }
+        /// Capture current state that will be used in styling
+        let currentText = self.string
+        let currentSelectedRange = self.selectedRange()
         
-        let selectedRange = self.selectedRange()
         
-        let string = textStorage.string
-        
-        // Debounce mechanism
-        debounceTimer?.invalidate()
-        debounceTimer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: false) { [weak self] _ in
-            self?.stylingQueue.async {
-                let attributedString = NSMutableAttributedString(string: string)
-                let syntaxList = MarkdownSyntax.allCases
-                
-                for syntax in syntaxList {
-                    self?.styleText(for: syntax, withString: attributedString)
-                }
-                
-                DispatchQueue.main.async {
-                    textStorage.setAttributedString(attributedString)
-                    self?.setSelectedRange(selectedRange)
+        // Request styling
+                stylingActor.styleText(currentText: currentText, selectedRange: currentSelectedRange) { [weak self] styledText, newSelectedRange in
+                    // Update UI on the main thread
+                    self?.textStorage?.setAttributedString(styledText)
+                    self?.selectedRange = newSelectedRange
                     self?.invalidateIntrinsicContentSize()
                     self?.needsDisplay = true
                 }
             }
-        }
         
-        
+
+
+
+
+//        guard let textStorage = self.textStorage else {
+//            print("Text storage not available for styling")
+//            return
+//        }
+//        
+//        let selectedRange = self.selectedRange()
+//        
+//        let string = textStorage.string
+//        
 //        let globalParagraphStyles = NSMutableParagraphStyle()
 //        
-//        globalParagraphStyles.lineSpacing = MarkdownDefaults.lineSpacing
-//        globalParagraphStyles.paragraphSpacing = MarkdownDefaults.paragraphSpacing
+//                globalParagraphStyles.lineSpacing = MarkdownDefaults.lineSpacing
+//                globalParagraphStyles.paragraphSpacing = MarkdownDefaults.paragraphSpacing
 //        
-//        let baseStyles: [NSAttributedString.Key : Any] = [
-//            .font: NSFont.systemFont(ofSize: MarkdownDefaults.fontSize, weight: MarkdownDefaults.fontWeight),
-//            .foregroundColor: NSColor.textColor.withAlphaComponent(MarkdownDefaults.fontOpacity),
-//            .paragraphStyle: globalParagraphStyles
-//        ]
+//                let baseStyles: [NSAttributedString.Key : Any] = [
+//                    .font: NSFont.systemFont(ofSize: MarkdownDefaults.fontSize, weight: MarkdownDefaults.fontWeight),
+//                    .foregroundColor: NSColor.textColor.withAlphaComponent(MarkdownDefaults.fontOpacity),
+//                    .paragraphStyle: globalParagraphStyles
+//                ]
 //        
-//        // MARK: - Set initial styles (First!)
-//        let attributedString = NSMutableAttributedString(string: string, attributes: baseStyles)
-//        
-//        textStorage.setAttributedString(attributedString)
-//        
-//        let syntaxList = MarkdownSyntax.allCases
-//        
-//        for syntax in syntaxList {
-//            styleText(
-//                for: syntax,
-//                withString: attributedString
-//            )
-//        }
-//        self.setSelectedRange(selectedRange)
-    }
+//        // Debounce mechanism
+//        debounceTimer?.invalidate()
+//        debounceTimer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: false) { [weak self] _ in
+//            guard let self = self else { return }
+//            Task {
+//                let attributedString = NSMutableAttributedString(string: string, attributes: baseStyles)
+//                let syntaxList = await MarkdownSyntax.allCases
+//                
+//                for syntax in syntaxList {
+//                    await self.styleText(for: syntax, withString: attributedString)
+//                }
+//                
+//                await MainActor.run {
+//                    textStorage.setAttributedString(attributedString)
+//                    self.setSelectedRange(selectedRange)
+//                    self.invalidateIntrinsicContentSize()
+//                    self.needsDisplay = true
+//                }
+//            }
+//        } // END debounce timer
+//    }
     
     
     @MainActor
@@ -143,13 +156,6 @@ public class MarkdownEditor: NSTextView {
         for syntax: MarkdownSyntax,
         withString attributedString: NSMutableAttributedString
     ) {
-        guard let textStorage = self.textStorage else {
-            print("Text storage not available for styling")
-            return
-        }
-        
-
-                    
         
         let regexLiteral: Regex<(Substring, Substring)> = syntax.regex
         
@@ -161,11 +167,7 @@ public class MarkdownEditor: NSTextView {
         
         for match in matches {
             let range = NSRange(match.range, in: string)
-            
-            
 
-            
-            
             
             /// Content range
             let contentLocation = max(0, range.location + syntaxCharacterRanges)
@@ -176,7 +178,7 @@ public class MarkdownEditor: NSTextView {
             let startSyntaxLocation = range.location
             let startSyntaxLength = min(syntaxCharacterRanges, attributedString.length - startSyntaxLocation)
             let startSyntaxRange = NSRange(location: startSyntaxLocation, length: startSyntaxLength)
-
+            
             /// Closing syntax range
             let endSyntaxLocation = max(0, range.location + range.length - syntaxCharacterRanges)
             let endSyntaxLength = min(syntax == .codeBlock ? syntaxCharacterRanges + 1 : syntaxCharacterRanges, attributedString.length - endSyntaxLocation)
@@ -200,7 +202,7 @@ public class MarkdownEditor: NSTextView {
             /// Apply attributes to content
             if attributedString.length >= contentRange.upperBound {
                 attributedString.addAttributes(syntax.contentAttributes, range: contentRange)
-
+                
                 if syntax == .inlineCode {
                     
                     let userCodeColour: [NSAttributedString.Key : Any] = [
@@ -251,7 +253,7 @@ public class MarkdownEditor: NSTextView {
             
         } // Loop over matches
         
-//        textStorage.setAttributedString(attributedString)
+        //        textStorage.setAttributedString(attributedString)
         
     } // END style text
     
@@ -259,6 +261,26 @@ public class MarkdownEditor: NSTextView {
     public override func didChangeText() {
         super.didChangeText()
         applyStyles()
+    }
+    
+    
+    public override var intrinsicContentSize: NSSize {
+        
+        guard let layoutManager = self.layoutManager, let container = self.textContainer else {
+            return super.intrinsicContentSize
+        }
+        container.containerSize = NSSize(width: self.bounds.width, height: CGFloat.greatestFiniteMagnitude)
+        layoutManager.ensureLayout(for: container)
+        
+        let rect = layoutManager.usedRect(for: container)
+        
+        let bufferHeight: CGFloat = self.isEditable ? editorHeightTypingBuffer : 0
+        
+        let contentSize = NSSize(width: NSView.noIntrinsicMetric, height: rect.height + bufferHeight)
+        
+        self.editorHeight = contentSize.height
+        
+        return contentSize
     }
     
     
