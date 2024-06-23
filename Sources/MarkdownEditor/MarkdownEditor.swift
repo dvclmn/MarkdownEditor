@@ -15,6 +15,7 @@ import OSLog
 /// https://developer.apple.com/library/archive/documentation/TextFonts/Conceptual/CocoaTextArchitecture/TextEditing/TextEditing.html#//apple_ref/doc/uid/TP40009459-CH3-SW16
 /// https://developer.apple.com/library/archive/documentation/Cocoa/Conceptual/TextLayout/TextLayout.html#//apple_ref/doc/uid/10000158i
 
+@MainActor
 public class MarkdownEditor: NSTextView {
     
     var editorHeight: CGFloat
@@ -53,6 +54,7 @@ public class MarkdownEditor: NSTextView {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+
     
     func debouncedStyle(currentText: String) async throws -> NSAttributedString? {
         // Cancel previous task if it was scheduled
@@ -60,7 +62,7 @@ public class MarkdownEditor: NSTextView {
         
         // Debounce by delaying the execution
         debounceTask = Task {
-            try await Task.sleep(nanoseconds: 80_000_000) // 80ms
+            try await Task.sleep(nanoseconds: 40_000_000) // 80ms
             return await self.performStyling(currentText: currentText)
         }
         
@@ -96,13 +98,13 @@ public class MarkdownEditor: NSTextView {
 
     func applyStyles() {
 
-        let currentSelectedRange = self.selectedRange()
         let currentText = self.string
+        let currentSelectedRange = self.selectedRange()
         
         Task {
             do {
                 guard let styledText = try await debouncedStyle(currentText: currentText) else {
-//                    print("Error getting styled text")
+                    print("Error getting styled text")
                     return
                 }
 

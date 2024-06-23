@@ -157,6 +157,7 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
         public func textDidChange(_ notification: Notification) {
             guard let textView = notification.object as? MarkdownEditor else { return }
             
+            
             if self.parent.text != textView.string {
                 
                 DispatchQueue.main.async {

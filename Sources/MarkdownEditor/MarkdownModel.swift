@@ -27,7 +27,7 @@ public struct MarkdownDefaults {
             
 }
 
-
+@MainActor
 public enum MarkdownSyntax: String, CaseIterable, Identifiable {
     case h1
     case h2
@@ -70,29 +70,47 @@ public enum MarkdownSyntax: String, CaseIterable, Identifiable {
         }
     }
     
-    /// https://swiftregex.com
-    public var regex: Regex<(Substring, Substring)> {
-        switch self {
-        case .h1:
-            return /# (.*)/
-        case .h2:
-            return /## (.*)/
-        case .h3:
-            return /### (.*)/
-        case .bold:
-            return /\*\*(.*?)\*\*/
-        case .italic:
-            return /\*(.*?)\*/
-        case .boldItalic:
-            return /\*\*\*(.*?)\*\*\*/
-        case .strikethrough:
-            return /\~\~(.*?)\~\~/
-        case .inlineCode:
-            return /`([^\n`]+)(?!``)`(?!`)/
-        case .codeBlock:
-            return /(?m)^```([\s\S]*?)^```/
+    private static let regexCache: [MarkdownSyntax: Regex<(Substring, Substring)>] = {
+            var cache = [MarkdownSyntax: Regex<(Substring, Substring)>]()
+            cache[.h1] = /# (.*)/
+            cache[.h2] = /## (.*)/
+            cache[.h3] = /### (.*)/
+            cache[.bold] = /\*\*(.*?)\*\*/
+            cache[.italic] = /\*(.*?)\*/
+            cache[.boldItalic] = /\*\*\*(.*?)\*\*\*/
+            cache[.strikethrough] = /\~\~(.*?)\~\~/
+            cache[.inlineCode] = /`([^\n`]+)(?!``)`(?!`)/
+            cache[.codeBlock] = /(?m)^```([\s\S]*?)^```/
+            return cache
+        }()
+
+        public var regex: Regex<(Substring, Substring)> {
+            return MarkdownSyntax.regexCache[self]!
         }
-    }
+    
+//    /// https://swiftregex.com
+//    public var regex: Regex<(Substring, Substring)> {
+//        switch self {
+//        case .h1:
+//            return /# (.*)/
+//        case .h2:
+//            return /## (.*)/
+//        case .h3:
+//            return /### (.*)/
+//        case .bold:
+//            return /\*\*(.*?)\*\*/
+//        case .italic:
+//            return /\*(.*?)\*/
+//        case .boldItalic:
+//            return /\*\*\*(.*?)\*\*\*/
+//        case .strikethrough:
+//            return /\~\~(.*?)\~\~/
+//        case .inlineCode:
+//            return /`([^\n`]+)(?!``)`(?!`)/
+//        case .codeBlock:
+//            return /(?m)^```([\s\S]*?)^```/
+//        }
+//    }
     
     public var hideSyntax: Bool {
         switch self {
