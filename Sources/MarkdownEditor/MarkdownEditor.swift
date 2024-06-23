@@ -14,36 +14,12 @@ import Highlightr
 /// https://developer.apple.com/library/archive/documentation/TextFonts/Conceptual/CocoaTextArchitecture/TextEditing/TextEditing.html#//apple_ref/doc/uid/TP40009459-CH3-SW16
 /// https://developer.apple.com/library/archive/documentation/Cocoa/Conceptual/TextLayout/TextLayout.html#//apple_ref/doc/uid/10000158i
 
-actor TextStylingActor {
-    
-    private var debounceTimer: Timer?
 
-    func styleText(currentText: String, selectedRange: NSRange, completion: @escaping (NSAttributedString, NSRange) -> Void) {
-        // Invalidate previous timer
-        debounceTimer?.invalidate()
-
-        // Set up a new timer for debouncing
-        debounceTimer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: false) { [weak self] _ in
-            self?.performStyling(currentText: currentText, selectedRange: selectedRange, completion: completion)
-        }
-    }
-
-    private func performStyling(currentText: String, selectedRange: NSRange, completion: (NSAttributedString, NSRange) -> Void) {
-        let attributedString = NSMutableAttributedString(string: currentText)
-        let syntaxList = MarkdownSyntax.allCases
-
-        for syntax in syntaxList {
-            // Apply styles (simplified for brevity)
-            let range = NSRange(location: 0, length: attributedString.length) // Example range
-            attributedString.addAttribute(.font, value: syntax.contentAttributes[.font]!, range: range)
-        }
-
-        // Call completion on the main thread
-        DispatchQueue.main.async {
-            completion(attributedString, selectedRange)
-        }
-    }
-}
+//actor TextStylingActor {
+//    
+//
+//    
+//}
 
 public class MarkdownEditor: NSTextView {
     
@@ -53,8 +29,7 @@ public class MarkdownEditor: NSTextView {
     var isShowingFrames: Bool
     let highlightr = Highlightr()
     
-    private var stylingActor = TextStylingActor()
-
+    var debounceTask: Task<NSAttributedString, Error>?
     
     init(
         frame frameRect: NSRect,
@@ -86,77 +61,76 @@ public class MarkdownEditor: NSTextView {
     }
     
     
+    
+    func debouncedStyle(currentText: String) async throws -> NSAttributedString? {
+        // Cancel previous task if it was scheduled
+        debounceTask?.cancel()
+        
+        // Debounce by delaying the execution
+        debounceTask = Task {
+            try await Task.sleep(nanoseconds: 80_000_000) // 80ms
+            return await self.performStyling(currentText: currentText)
+        }
+        
+        return try await debounceTask?.value
+    }
+    
+    func performStyling(currentText: String) async -> NSAttributedString {
+        
+        let globalParagraphStyles = NSMutableParagraphStyle()
+        globalParagraphStyles.lineSpacing = MarkdownDefaults.lineSpacing
+        globalParagraphStyles.paragraphSpacing = MarkdownDefaults.paragraphSpacing
+        
+        let baseStyles: [NSAttributedString.Key : Any] = [
+            .font: NSFont.systemFont(ofSize: MarkdownDefaults.fontSize, weight: MarkdownDefaults.fontWeight),
+            .foregroundColor: NSColor.textColor.withAlphaComponent(MarkdownDefaults.fontOpacity),
+            .paragraphStyle: globalParagraphStyles
+        ]
+        
+        let attributedString = NSMutableAttributedString(string: currentText, attributes: baseStyles)
+        
+        let syntaxList = MarkdownSyntax.allCases
 
-    public func applyStyles() {
-        
-        /// Capture current state that will be used in styling
-        let currentText = self.string
+        for syntax in syntaxList {
+            styleText(
+                for: syntax,
+                withString: attributedString
+            )
+        }
+
+        return attributedString
+    }
+    
+
+    func applyStyles() {
+        // Capture current state that will be used in styling
         let currentSelectedRange = self.selectedRange()
-        
+        let currentText = self.string
         
         // Request styling
-                stylingActor.styleText(currentText: currentText, selectedRange: currentSelectedRange) { [weak self] styledText, newSelectedRange in
-                    // Update UI on the main thread
-                    self?.textStorage?.setAttributedString(styledText)
-                    self?.selectedRange = newSelectedRange
-                    self?.invalidateIntrinsicContentSize()
-                    self?.needsDisplay = true
+        Task {
+            do {
+                guard let styledText = try await debouncedStyle(currentText: currentText) else {
+                    print("Error getting styled text")
+                    return
                 }
+
+                self.textStorage?.setAttributedString(styledText)
+                self.setSelectedRange(currentSelectedRange)
+                self.invalidateIntrinsicContentSize()
+                self.needsDisplay = true
+            } catch {
+                print("Error during text styling: \(error)")
             }
-        
-
-
-
-
-//        guard let textStorage = self.textStorage else {
-//            print("Text storage not available for styling")
-//            return
-//        }
-//        
-//        let selectedRange = self.selectedRange()
-//        
-//        let string = textStorage.string
-//        
-//        let globalParagraphStyles = NSMutableParagraphStyle()
-//        
-//                globalParagraphStyles.lineSpacing = MarkdownDefaults.lineSpacing
-//                globalParagraphStyles.paragraphSpacing = MarkdownDefaults.paragraphSpacing
-//        
-//                let baseStyles: [NSAttributedString.Key : Any] = [
-//                    .font: NSFont.systemFont(ofSize: MarkdownDefaults.fontSize, weight: MarkdownDefaults.fontWeight),
-//                    .foregroundColor: NSColor.textColor.withAlphaComponent(MarkdownDefaults.fontOpacity),
-//                    .paragraphStyle: globalParagraphStyles
-//                ]
-//        
-//        // Debounce mechanism
-//        debounceTimer?.invalidate()
-//        debounceTimer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: false) { [weak self] _ in
-//            guard let self = self else { return }
-//            Task {
-//                let attributedString = NSMutableAttributedString(string: string, attributes: baseStyles)
-//                let syntaxList = await MarkdownSyntax.allCases
-//                
-//                for syntax in syntaxList {
-//                    await self.styleText(for: syntax, withString: attributedString)
-//                }
-//                
-//                await MainActor.run {
-//                    textStorage.setAttributedString(attributedString)
-//                    self.setSelectedRange(selectedRange)
-//                    self.invalidateIntrinsicContentSize()
-//                    self.needsDisplay = true
-//                }
-//            }
-//        } // END debounce timer
-//    }
-    
+        }
+    }
     
     @MainActor
     public func styleText(
         for syntax: MarkdownSyntax,
         withString attributedString: NSMutableAttributedString
     ) {
-        
+
         let regexLiteral: Regex<(Substring, Substring)> = syntax.regex
         
         let syntaxCharacterRanges: Int = syntax.syntaxCharacters.count
@@ -167,7 +141,6 @@ public class MarkdownEditor: NSTextView {
         
         for match in matches {
             let range = NSRange(match.range, in: string)
-
             
             /// Content range
             let contentLocation = max(0, range.location + syntaxCharacterRanges)
@@ -183,12 +156,6 @@ public class MarkdownEditor: NSTextView {
             let endSyntaxLocation = max(0, range.location + range.length - syntaxCharacterRanges)
             let endSyntaxLength = min(syntax == .codeBlock ? syntaxCharacterRanges + 1 : syntaxCharacterRanges, attributedString.length - endSyntaxLocation)
             let endSyntaxRange = NSRange(location: endSyntaxLocation, length: endSyntaxLength)
-            
-            /// Paragraph range
-            let paragraphLocation = max(0, range.location)
-            let paragraphLength = min(range.length, attributedString.length)
-            let paragraphRange = NSRange(location: paragraphLocation, length: paragraphLength)
-            
             
             /// Apply attributes to opening and closing syntax
             if attributedString.length >= startSyntaxRange.upperBound {
@@ -213,44 +180,31 @@ public class MarkdownEditor: NSTextView {
                 }
             }
             
-            if attributedString.length >= paragraphRange.upperBound {
+            if syntax == .codeBlock {
                 
-                let paragraphStyles = NSMutableParagraphStyle()
-                
-                let paragraphAttributes: [NSMutableAttributedString.Key : Any] = [
-                    .paragraphStyle: paragraphStyles
-                ]
-                
-                attributedString.addAttributes(paragraphAttributes, range: paragraphRange)
-                
-                if syntax == .codeBlock {
+                if let highlightr = highlightr {
                     
-                    if let highlightr = highlightr {
-                        
-                        highlightr.setTheme(to: "xcode-dark")
-                        
-                        highlightr.theme.setCodeFont(.monospacedSystemFont(ofSize: 14, weight: .medium))
-                        
-                        // Extract the substring for the code block
-                        let codeString = attributedString.attributedSubstring(from: contentRange).string
-                        
-                        // Highlight the extracted code string
-                        if let highlightedCode = highlightr.highlight(codeString, as: "swift") {
-                            
-                            attributedString.replaceCharacters(in: contentRange, with: highlightedCode)
-                            
-                            let codeBackground: [NSAttributedString.Key : Any] = [.backgroundColor: NSColor.black.withAlphaComponent(MarkdownDefaults.backgroundCodeBlock)]
-                            
-                            attributedString.addAttributes(codeBackground, range: contentRange)
-                            
-                            
-                        }
-                    } // END highlighter check
+                    highlightr.setTheme(to: "xcode-dark")
                     
-                } // end code block check
+                    highlightr.theme.setCodeFont(.monospacedSystemFont(ofSize: 14, weight: .medium))
+                    
+                    // Extract the substring for the code block
+                    let codeString = attributedString.attributedSubstring(from: contentRange).string
+                    
+                    // Highlight the extracted code string
+                    if let highlightedCode = highlightr.highlight(codeString, as: "swift") {
+                        
+                        attributedString.replaceCharacters(in: contentRange, with: highlightedCode)
+                        
+                        let codeBackground: [NSAttributedString.Key : Any] = [.backgroundColor: NSColor.black.withAlphaComponent(MarkdownDefaults.backgroundCodeBlock)]
+                        
+                        attributedString.addAttributes(codeBackground, range: contentRange)
+                        
+                        
+                    }
+                } // END highlighter check
                 
-            } // END paragraph styles
-            
+            } // end code block check
         } // Loop over matches
         
         //        textStorage.setAttributedString(attributedString)

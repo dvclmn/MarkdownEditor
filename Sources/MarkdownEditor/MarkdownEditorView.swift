@@ -221,7 +221,9 @@ extension MarkdownEditorRepresentable {
         textView.textContainer?.lineFragmentPadding = 34
         textView.textContainerInset = NSSize(width: 0, height: 30)
         
+        /// When the text field has an attributed string value, the system ignores the textColor, font, alignment, lineBreakMode, and lineBreakStrategy properties. Set the foregroundColor, font, alignment, lineBreakMode, and lineBreakStrategy properties in the attributed string instead.
         textView.font = NSFont.systemFont(ofSize: MarkdownDefaults.fontSize, weight: .medium)
+        textView.textColor = NSColor.textColor.withAlphaComponent(MarkdownDefaults.fontOpacity)
         
         textView.isEditable = self.isEditable
         
