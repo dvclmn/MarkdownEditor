@@ -24,8 +24,6 @@ public class MarkdownEditor: NSTextView {
     var isShowingFrames: Bool
     let highlightr = Highlightr()
     
-    var debounceTask: Task<NSAttributedString, Error>?
-    
     init(
         frame frameRect: NSRect,
         editorHeight: CGFloat,
@@ -54,22 +52,20 @@ public class MarkdownEditor: NSTextView {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-
     
-    func debouncedStyle(currentText: String) async throws -> NSAttributedString? {
-        // Cancel previous task if it was scheduled
-        debounceTask?.cancel()
+    
+    
+    
+    func applyStyles() {
         
-        // Debounce by delaying the execution
-        debounceTask = Task {
-            try await Task.sleep(nanoseconds: 40_000_000) // 80ms
-            return await self.performStyling(currentText: currentText)
+        guard let textStorage = self.textStorage else {
+            print("Text storage not available for styling")
+            return
         }
         
-        return try await debounceTask?.value
-    }
-    
-    func performStyling(currentText: String) async -> NSAttributedString {
+        
+        let currentSelectedRange = self.selectedRange()
+        
         
         let globalParagraphStyles = NSMutableParagraphStyle()
         globalParagraphStyles.lineSpacing = MarkdownDefaults.lineSpacing
@@ -81,41 +77,22 @@ public class MarkdownEditor: NSTextView {
             .paragraphStyle: globalParagraphStyles
         ]
         
-        let attributedString = NSMutableAttributedString(string: currentText, attributes: baseStyles)
+        let attributedString = NSMutableAttributedString(string: textStorage.string, attributes: baseStyles)
         
         let syntaxList = MarkdownSyntax.allCases
-
+        
         for syntax in syntaxList {
             styleText(
                 for: syntax,
                 withString: attributedString
             )
         }
-
-        return attributedString
-    }
-    
-
-    func applyStyles() {
-
-        let currentText = self.string
-        let currentSelectedRange = self.selectedRange()
         
-        Task {
-            do {
-                guard let styledText = try await debouncedStyle(currentText: currentText) else {
-                    print("Error getting styled text")
-                    return
-                }
-
-                self.textStorage?.setAttributedString(styledText)
-                self.setSelectedRange(currentSelectedRange)
-                self.invalidateIntrinsicContentSize()
-                self.needsDisplay = true
-            } catch {
-//                os_log("Error during text styling: \(error)")
-            }
-        }
+        textStorage.setAttributedString(attributedString)
+        self.setSelectedRange(currentSelectedRange)
+        self.invalidateIntrinsicContentSize()
+        self.needsDisplay = true
+        
     }
     
     @MainActor
@@ -123,7 +100,7 @@ public class MarkdownEditor: NSTextView {
         for syntax: MarkdownSyntax,
         withString attributedString: NSMutableAttributedString
     ) {
-
+        
         let regexLiteral: Regex<(Substring, Substring)> = syntax.regex
         
         let syntaxCharacterRanges: Int = syntax.syntaxCharacters.count

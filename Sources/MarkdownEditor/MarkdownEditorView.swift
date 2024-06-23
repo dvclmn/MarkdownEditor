@@ -9,6 +9,7 @@ import Foundation
 import SwiftUI
 import ExampleText
 import OSLog
+import GeneralStyles
 
 @MainActor
 public struct MarkdownEditorRepresentable: NSViewRepresentable {
@@ -74,7 +75,7 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
         textView.string = text
         
         setUpTextViewOptions(for: textView)
-
+        
         DispatchQueue.main.async {
             textView.applyStyles()
             self.editorHeight = textView.editorHeight
@@ -88,36 +89,55 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
     /// This *will* update any time a `@Binding` property is mutated from SwiftUI
     public func updateNSView(_ textView: MarkdownEditor, context: Context) {
         
-        if textView.string != text {
-            DispatchQueue.main.async {
-                textView.string = text
+        if textView.isEditable != self.isEditable {
+            os_log("Editability changed.")
+            os_log("`textView.isEditable`: \(textView.isEditable)")
+            os_log("`self.isEditable`: \(self.isEditable)")
+            textView.isEditable = self.isEditable
+        }
+        
+        if self.isEditable {
+            
+            if textView.string != text {
+                DispatchQueue.main.async {
+                    textView.string = text
+                    redrawEditor()
+                }
+            }
+            
+            if textView.editorHeight != self.editorHeight {
+                DispatchQueue.main.async {
+                    redrawEditor()
+                } // END dispatch queue
+            } // END editor height changed check
+            
+            if textView.isShowingFrames != self.isShowingFrames {
+                textView.isShowingFrames = self.isShowingFrames
                 redrawEditor()
             }
-        }
-        
-        if textView.editorHeight != self.editorHeight {
-            DispatchQueue.main.async {
-                redrawEditor()
-            } // END dispatch queue
-        } // END editor height changed check
-        
-        if textView.isShowingFrames != self.isShowingFrames {
-            textView.isShowingFrames = self.isShowingFrames
-            redrawEditor()
-        }
-        
-        if textView.isEditable != isEditable {
-            textView.isEditable = isEditable
-        }
-        
-        let currentWidth = textView.bounds.width
-        
-        if previousWidth != currentWidth {
-            DispatchQueue.main.async {
-                previousWidth = currentWidth
-                redrawEditor()
+            
+            
+            
+            let currentWidth = textView.bounds.width
+            
+            if previousWidth != currentWidth {
+                DispatchQueue.main.async {
+                    previousWidth = currentWidth
+                    redrawEditor()
+                }
             }
-        }
+            
+        } else  {
+            let currentWidth = textView.bounds.width
+            
+            if previousWidth != currentWidth {
+                DispatchQueue.main.async {
+                    previousWidth = currentWidth
+                    redrawEditor()
+                }
+            }
+            
+        } // END edtiable check
         
         func redrawEditor() {
             if !self.isEditorResizing {
@@ -191,7 +211,7 @@ extension MarkdownEditorRepresentable {
         textView.isAutomaticSpellingCorrectionEnabled = true
         textView.isAutomaticTextCompletionEnabled = true
         
-        textView.textContainer?.lineFragmentPadding = 34
+        textView.textContainer?.lineFragmentPadding = Styles.paddingLarge
         textView.textContainerInset = NSSize(width: 0, height: 30)
         
         /// When the text field has an attributed string value, the system ignores the textColor, font, alignment, lineBreakMode, and lineBreakStrategy properties. Set the foregroundColor, font, alignment, lineBreakMode, and lineBreakStrategy properties in the attributed string instead.
