@@ -9,13 +9,6 @@ import Foundation
 import SwiftUI
 import ExampleText
 import OSLog
-//import GeneralUtilities
-//import GeneralStyles
-
-@MainActor
-public protocol Markdownable {
-    var userPrompt: String { get set }
-}
 
 @MainActor
 public struct MarkdownEditorRepresentable: NSViewRepresentable {
@@ -29,6 +22,7 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
     public var inlineCodeColour: Color
     
     public var isEditable: Bool
+    public var isEditorResizing: Bool
     
     public var fontSize: Double
     
@@ -49,6 +43,7 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
         inlineCodeColour: Color = .purple,
         
         isEditable: Bool = true,
+        isEditorResizing: Bool = false,
         fontSize: Double = 15
     ) {
         self._text = text
@@ -60,13 +55,12 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
         self.inlineCodeColour = inlineCodeColour
         
         self.isEditable = isEditable
+        self.isEditorResizing = isEditorResizing
         self.fontSize = fontSize
     }
     
     /// This function creates the NSView and configures its initial state
     public func makeNSView(context: Context) -> MarkdownEditor {
-        
-        os_log("`makeNSView` was called")
         
         let textView = MarkdownEditor(
             frame: .zero,
@@ -79,8 +73,9 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
         textView.delegate = context.coordinator
         textView.string = text
         
+        setUpTextViewOptions(for: textView)
+
         DispatchQueue.main.async {
-            setUpTextViewOptions(for: textView)
             textView.applyStyles()
             self.editorHeight = textView.editorHeight
         }
@@ -96,25 +91,19 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
         if textView.string != text {
             DispatchQueue.main.async {
                 textView.string = text
-                
-                redrawEditor(includingStyles: false)
+                redrawEditor()
             }
         }
         
-        
         if textView.editorHeight != self.editorHeight {
-            
             DispatchQueue.main.async {
                 redrawEditor()
             } // END dispatch queue
         } // END editor height changed check
         
-        
         if textView.isShowingFrames != self.isShowingFrames {
-            /// Interestingly, this little bit of code does *not* work, without the `needsDisplay` call
             textView.isShowingFrames = self.isShowingFrames
-            os_log("MDE showing frames?: `\(textView.isShowingFrames)`")
-            textView.needsDisplay = true
+            redrawEditor()
         }
         
         if textView.isEditable != isEditable {
@@ -126,19 +115,17 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
         if previousWidth != currentWidth {
             DispatchQueue.main.async {
                 previousWidth = currentWidth
-                textView.applyStyles()
-                redrawEditor(includingStyles: false)
+                redrawEditor()
             }
         }
         
-        
-        func redrawEditor(includingStyles: Bool = true) {
-            if includingStyles {
+        func redrawEditor() {
+            if !self.isEditorResizing {
                 textView.applyStyles()
+                self.editorHeight = textView.editorHeight
+                textView.invalidateIntrinsicContentSize()
+                textView.needsDisplay = true
             }
-            self.editorHeight = textView.editorHeight
-            textView.invalidateIntrinsicContentSize()
-            textView.needsDisplay = true
         }
     } // END update nsView
     
@@ -167,12 +154,8 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
             }
         }
         
-
-        
         public func textDidChange(_ notification: Notification) {
             guard let textView = notification.object as? MarkdownEditor else { return }
-            
-            //            os_log("`textDidChange` was called")
             
             if self.parent.text != textView.string {
                 
@@ -188,17 +171,6 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
             } // END text equality check
             
         } // END Text did change
-        
-        //        public func textViewDidChangeSelection(_ notification: Notification) {
-        //            guard let textView = notification.object as? MarkdownEditor else { return }
-        
-        //            DispatchQueue.main.async {
-        //                textView.needsDisplay = true
-        //            }
-        //        }
-        
-        
-        
         
     }
 } // END NSViewRepresentable

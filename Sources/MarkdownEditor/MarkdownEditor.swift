@@ -9,17 +9,11 @@ import Foundation
 import SwiftUI
 //import GeneralStyles
 import Highlightr
+import OSLog
 
 /// Help with NSTextViews:
 /// https://developer.apple.com/library/archive/documentation/TextFonts/Conceptual/CocoaTextArchitecture/TextEditing/TextEditing.html#//apple_ref/doc/uid/TP40009459-CH3-SW16
 /// https://developer.apple.com/library/archive/documentation/Cocoa/Conceptual/TextLayout/TextLayout.html#//apple_ref/doc/uid/10000158i
-
-
-//actor TextStylingActor {
-//    
-//
-//    
-//}
 
 public class MarkdownEditor: NSTextView {
     
@@ -59,8 +53,6 @@ public class MarkdownEditor: NSTextView {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
-    
     
     func debouncedStyle(currentText: String) async throws -> NSAttributedString? {
         // Cancel previous task if it was scheduled
@@ -103,15 +95,14 @@ public class MarkdownEditor: NSTextView {
     
 
     func applyStyles() {
-        // Capture current state that will be used in styling
+
         let currentSelectedRange = self.selectedRange()
         let currentText = self.string
         
-        // Request styling
         Task {
             do {
                 guard let styledText = try await debouncedStyle(currentText: currentText) else {
-                    print("Error getting styled text")
+//                    print("Error getting styled text")
                     return
                 }
 
@@ -120,7 +111,7 @@ public class MarkdownEditor: NSTextView {
                 self.invalidateIntrinsicContentSize()
                 self.needsDisplay = true
             } catch {
-                print("Error during text styling: \(error)")
+//                os_log("Error during text styling: \(error)")
             }
         }
     }
@@ -200,14 +191,11 @@ public class MarkdownEditor: NSTextView {
                         
                         attributedString.addAttributes(codeBackground, range: contentRange)
                         
-                        
                     }
                 } // END highlighter check
                 
             } // end code block check
         } // Loop over matches
-        
-        //        textStorage.setAttributedString(attributedString)
         
     } // END style text
     
