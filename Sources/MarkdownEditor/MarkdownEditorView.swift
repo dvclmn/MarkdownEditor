@@ -17,7 +17,6 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
     @Binding public var text: String
     @Binding public var editorHeight: CGFloat
     @Binding public var isShowingFrames: Bool
-    @Binding public var isLoading: Bool
     
     public var editorHeightTypingBuffer: CGFloat
     public var inlineCodeColour: Color
@@ -26,6 +25,8 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
     public var isEditorResizing: Bool
     
     public var fontSize: Double
+    
+    var isLoading: (Bool) -> Void
     
     private let verticalPadding: Double = 30
     
@@ -38,19 +39,20 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
         text: Binding<String>,
         editorHeight: Binding<CGFloat>,
         isShowingFrames: Binding<Bool> = .constant(false),
-        isLoading: Binding<Bool> = .constant(false),
         
         editorHeightTypingBuffer: CGFloat = 120,
         inlineCodeColour: Color = .purple,
         
         isEditable: Bool = true,
         isEditorResizing: Bool = false,
-        fontSize: Double = 15
+        fontSize: Double = 15,
+        
+        isLoading: @escaping (Bool) -> Void
+        
     ) {
         self._text = text
         self._editorHeight = editorHeight
         self._isShowingFrames = isShowingFrames
-        self._isLoading = isLoading
         
         self.editorHeightTypingBuffer = editorHeightTypingBuffer
         self.inlineCodeColour = inlineCodeColour
@@ -58,10 +60,15 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
         self.isEditable = isEditable
         self.isEditorResizing = isEditorResizing
         self.fontSize = fontSize
+        
+        self.isLoading = isLoading
     }
     
     /// This function creates the NSView and configures its initial state
     public func makeNSView(context: Context) -> MarkdownEditor {
+        
+        self.isLoading(true)
+        
         
         let textView = MarkdownEditor(
             frame: .zero,
@@ -80,6 +87,8 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
             textView.applyStyles()
             self.editorHeight = textView.editorHeight
         }
+        
+        self.isLoading(false)
         
         return textView
     }
@@ -131,16 +140,21 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
             let currentWidth = textView.bounds.width
             
             if previousWidth != currentWidth {
+                isLoading(true)
+                print("Width changed")
                 DispatchQueue.main.async {
                     previousWidth = currentWidth
                     redrawEditor()
                 }
+                isLoading(false)
             }
             
         } // END edtiable check
         
         func redrawEditor() {
+            print("Outside if statement: `self.isEditorResizing`: \(self.isEditorResizing)")
             if !self.isEditorResizing {
+                print("Inside if: `self.isEditorResizing`: \(self.isEditorResizing)")
                 textView.applyStyles()
                 self.editorHeight = textView.editorHeight
                 textView.invalidateIntrinsicContentSize()
@@ -242,7 +256,9 @@ struct MarkdownExampleView: View {
                 editorHeight: $editorHeight,
                 editorHeightTypingBuffer: 60,
                 inlineCodeColour: .cyan
-            )
+            ) { isLoading in
+                
+            }
         }
         .border(Color.green.opacity(0.2))
         .background(.green.opacity(0.3))
