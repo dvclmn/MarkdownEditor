@@ -16,13 +16,16 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
     
     @Binding public var text: String
     @Binding public var editorHeight: CGFloat
+    public var id: String
+    public var didAppear: Bool
+    
     @Binding public var isShowingFrames: Bool
     
     public var editorHeightTypingBuffer: CGFloat
     public var inlineCodeColour: Color
     
+    
     public var isEditable: Bool
-    public var isEditorResizing: Bool
     
     public var fontSize: Double
     
@@ -38,13 +41,16 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
     public init(
         text: Binding<String>,
         editorHeight: Binding<CGFloat>,
+        id: String,
+        didAppear: Bool = false,
+        
         isShowingFrames: Binding<Bool> = .constant(false),
         
         editorHeightTypingBuffer: CGFloat = 120,
         inlineCodeColour: Color = .purple,
         
+        
         isEditable: Bool = true,
-        isEditorResizing: Bool = false,
         fontSize: Double = 15,
         
         isLoading: @escaping (Bool) -> Void
@@ -52,13 +58,16 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
     ) {
         self._text = text
         self._editorHeight = editorHeight
+        self.id = id
+        self.didAppear = didAppear
+        
         self._isShowingFrames = isShowingFrames
         
         self.editorHeightTypingBuffer = editorHeightTypingBuffer
         self.inlineCodeColour = inlineCodeColour
         
+        
         self.isEditable = isEditable
-        self.isEditorResizing = isEditorResizing
         self.fontSize = fontSize
         
         self.isLoading = isLoading
@@ -68,7 +77,6 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
     public func makeNSView(context: Context) -> MarkdownEditor {
         
         self.isLoading(true)
-        
         
         let textView = MarkdownEditor(
             frame: .zero,
@@ -83,14 +91,23 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
         
         setUpTextViewOptions(for: textView)
         
-        DispatchQueue.main.async {
+        Task {
+            await setUpTextView(for: textView)
+        }
+        
+        return textView
+        
+    }
+    
+    private func setUpTextView(for textView: MarkdownEditor) async {
+        
+//                try? await Task.sleep(for: .seconds(2))
+        
+        await MainActor.run {
             textView.applyStyles()
             self.editorHeight = textView.editorHeight
         }
-        
         self.isLoading(false)
-        
-        return textView
     }
     
     /// This function is to communicate updates **from** SwiftUI, back **to** the NSView
@@ -98,68 +115,73 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
     /// This *will* update any time a `@Binding` property is mutated from SwiftUI
     public func updateNSView(_ textView: MarkdownEditor, context: Context) {
         
-        if textView.isEditable != self.isEditable {
-            os_log("Editability changed.")
-            os_log("`textView.isEditable`: \(textView.isEditable)")
-            os_log("`self.isEditable`: \(self.isEditable)")
-            textView.isEditable = self.isEditable
-        }
-        
-        if self.isEditable {
+        if didAppear {
             
-            if textView.string != text {
-                DispatchQueue.main.async {
+            os_log("Can now update MDE of id: `\(id)`, view has appeared")
+            if textView.isEditable != self.isEditable {
+//                os_log("Editability changed.")
+//                os_log("`textView.isEditable`: \(textView.isEditable)")
+//                os_log("`self.isEditable`: \(self.isEditable)")
+                textView.isEditable = self.isEditable
+            }
+            
+            if self.isEditable {
+                
+                if textView.string != text {
+                    
                     textView.string = text
-                    redrawEditor()
+                    Task {
+                        await setUpTextView(for: textView)
+                    }
+                    
                 }
-            }
-            
-            if textView.editorHeight != self.editorHeight {
-                DispatchQueue.main.async {
-                    redrawEditor()
-                } // END dispatch queue
-            } // END editor height changed check
-            
-            if textView.isShowingFrames != self.isShowingFrames {
-                textView.isShowingFrames = self.isShowingFrames
-                redrawEditor()
-            }
-            
-            
-            
-            let currentWidth = textView.bounds.width
-            
-            if previousWidth != currentWidth {
-                DispatchQueue.main.async {
+                
+                if textView.editorHeight != self.editorHeight {
+                    
+                    Task {
+                        await setUpTextView(for: textView)
+                    }
+                    
+                } // END editor height changed check
+                
+                if textView.isShowingFrames != self.isShowingFrames {
+                    textView.isShowingFrames = self.isShowingFrames
+                    Task {
+                        await setUpTextView(for: textView)
+                    }
+                }
+                
+                
+                
+                let currentWidth = textView.bounds.width
+                
+                if previousWidth != currentWidth {
+                    
                     previousWidth = currentWidth
-                    redrawEditor()
+                    Task {
+                        await setUpTextView(for: textView)
+                    }
+                    
                 }
-            }
-            
-        } else  {
-            let currentWidth = textView.bounds.width
-            
-            if previousWidth != currentWidth {
-                isLoading(true)
-                print("Width changed")
-                DispatchQueue.main.async {
+                
+            } else  {
+                let currentWidth = textView.bounds.width
+                
+                if previousWidth != currentWidth {
+                    os_log("Width changed")
+                    
                     previousWidth = currentWidth
-                    redrawEditor()
+                    Task {
+                        await setUpTextView(for: textView)
+                    }
+                    
                 }
-                isLoading(false)
-            }
+                
+            } // END edtiable check
             
-        } // END edtiable check
-        
-        func redrawEditor() {
-            print("Outside if statement: `self.isEditorResizing`: \(self.isEditorResizing)")
-            if !self.isEditorResizing {
-                print("Inside if: `self.isEditorResizing`: \(self.isEditorResizing)")
-                textView.applyStyles()
-                self.editorHeight = textView.editorHeight
-                textView.invalidateIntrinsicContentSize()
-                textView.needsDisplay = true
-            }
+            
+        } else {
+            os_log("Not updating view, MDE of id \(id) has not appeared yet.")
         }
     } // END update nsView
     
@@ -248,20 +270,29 @@ struct MarkdownExampleView: View {
     
     @FocusState private var isFocused
     
+    @State private var mdeDidAppear: Bool = false
+    @State private var isLoading: Bool = false
+    
     var body: some View {
         
         ScrollView {
             MarkdownEditorRepresentable(
                 text: $text,
                 editorHeight: $editorHeight,
+                id: "Markdown editor preview",
+                didAppear: mdeDidAppear,
                 editorHeightTypingBuffer: 60,
                 inlineCodeColour: .cyan
             ) { isLoading in
                 
+                self.isLoading = isLoading
             }
         }
         .border(Color.green.opacity(0.2))
-        .background(.green.opacity(0.3))
+        .background(.blue.opacity(isLoading ? 0.6 : 0.1))
+        //        .task {
+        //            mdeDidAppear = true
+        //        }
     }
 }
 #Preview {
