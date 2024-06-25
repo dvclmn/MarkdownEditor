@@ -53,9 +53,6 @@ public class MarkdownEditor: NSTextView {
         fatalError("init(coder:) has not been implemented")
     }
     
-    
-    
-    
     func applyStyles() {
         
         guard let textStorage = self.textStorage else {
