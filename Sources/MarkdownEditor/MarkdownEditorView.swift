@@ -7,9 +7,7 @@
 
 import Foundation
 import SwiftUI
-import ExampleText
 import OSLog
-import GeneralStyles
 
 @MainActor
 public struct MarkdownEditorRepresentable: NSViewRepresentable {
@@ -34,8 +32,8 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
     //    @State private var startedLoadingTime: Date = .now
     //    @State private var finishedLoadingTime: Date = .now
     
-    @State private var needsDisplayTimer: Timer?
-    @State private var needsDisplayFlag = false
+    
+    private let padding: Double = 30
     
     @State private var debounceTask: Task<Void, Error>?
     
@@ -129,72 +127,59 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
         
         /// The below two statements are called a billion times a second, on SwiftUI ScrollView scroll!
         /// I think I will need to make sure anything in this function, is *ONLY* called if neccesary
-//        os_log("`updateNSView` > MDE width for ID `\(self.id)`: \(textView.bounds.width)")
+        //        os_log("`updateNSView` > MDE width for ID `\(self.id)`: \(textView.bounds.width)")
         
         if textView.isEditable != self.isEditable {
-//            os_log("MDE ID: `\(self.id)`. `textView.isEditable`: \(textView.isEditable) is not equal to `self.isEditable`: \(self.isEditable).")
             textView.isEditable = self.isEditable
         }
         
-        if self.isEditable {
-            
-//            os_log("--- BEGIN: `updateNSView > if self.isEditable {` ---")
-//            os_log("This is likely to contain only the live editor's operations")
-            
-            if textView.string != self.text {
-                
-//                os_log("""
-//--- EDITOR STRING Changed — `if textView.string != self.text` ---
-//MDE ID: `\(self.id)`
-//`textView.isEditable`: \(textView.isEditable), `self.isEditable`: \(self.isEditable)
-//`textView.string`: \"\(textView.string.suffix(60))\", `self.text`: \"\(self.text.suffix(60))\" (last 60 characters)
-//---
-//""")
-                
-                textView.string = text
-                Task {
-                    await setUpTextView(for: textView)
-                }
-                
+        
+        
+        if textView.string != self.text && self.isEditable {
+            textView.string = text
+            Task {
+                await setUpTextView(for: textView)
             }
             
-            if textView.editorHeight != self.editorHeight {
-                
-//                os_log("""
-//--- EDITOR HEIGHT Changed — `if textView.editorHeight != self.editorHeight` ---
-//MDE ID: `\(self.id)`
-//`textView.isEditable`: \(textView.isEditable), `self.isEditable`: \(self.isEditable)
-//`textView.editorHeight`: \"\(textView.editorHeight)\", `self.editorHeight`: \"\(self.editorHeight)\"
-//---
-//""")
-                
-                Task {
-                    await setUpTextView(for: textView)
-                }
-                
-            } // END editor height changed check
+        }
+        
+        if textView.editorHeight != self.editorHeight && self.isEditable {
             
-            if textView.isShowingFrames != self.isShowingFrames {
-                
-                textView.isShowingFrames = self.isShowingFrames
-                Task {
-                    await setUpTextView(for: textView)
-                }
+            //                os_log("""
+            //--- EDITOR HEIGHT Changed — `if textView.editorHeight != self.editorHeight` ---
+            //MDE ID: `\(self.id)`
+            //`textView.isEditable`: \(textView.isEditable), `self.isEditable`: \(self.isEditable)
+            //`textView.editorHeight`: \"\(textView.editorHeight)\", `self.editorHeight`: \"\(self.editorHeight)\"
+            //---
+            //""")
+            
+            Task {
+                await setUpTextView(for: textView)
             }
             
+        } // END editor height changed check
+        
+        if textView.isShowingFrames != self.isShowingFrames {
             
-            /// NOTE: This value changes a LOT, so debounce it, or avoid tying expensive operations to it
-            if textView.bounds.width != editorWidth {
-                
-                Task {
-                    await redrawWidth(for: textView)
-                }
+            textView.isShowingFrames = self.isShowingFrames
+            Task {
+                await setUpTextView(for: textView)
             }
+        }
+        
+        
+        /// NOTE: This value changes a LOT, so debounce it, or avoid tying expensive operations to it
+        if textView.bounds.width != editorWidth {
             
-            
-//            os_log("--- END: `updateNSView > if self.isEditable {` ---\n\n\n")
-            
-        } // END is editable check
+            Task {
+                await redrawWidth(for: textView)
+            }
+        }
+        
+        
+        //            os_log("--- END: `updateNSView > if self.isEditable {` ---\n\n\n")
+        
+        
         
     } // END update nsView
     
@@ -293,8 +278,8 @@ extension MarkdownEditorRepresentable {
         textView.isAutomaticSpellingCorrectionEnabled = true
         textView.isAutomaticTextCompletionEnabled = true
         
-        textView.textContainer?.lineFragmentPadding = Styles.paddingLarge
-        textView.textContainerInset = NSSize(width: 0, height: Styles.paddingLarge)
+        textView.textContainer?.lineFragmentPadding = padding
+        textView.textContainerInset = NSSize(width: 0, height: padding)
         
         /// When the text field has an attributed string value, the system ignores the textColor, font, alignment, lineBreakMode, and lineBreakStrategy properties. Set the foregroundColor, font, alignment, lineBreakMode, and lineBreakStrategy properties in the attributed string instead.
         textView.font = NSFont.systemFont(ofSize: MarkdownDefaults.fontSize, weight: .medium)

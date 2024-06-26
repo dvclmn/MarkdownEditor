@@ -1,0 +1,14 @@
+{
+  "pins" : [
+    {
+      "identity" : "highlightr",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/raspu/Highlightr.git",
+      "state" : {
+        "revision" : "fa483d37c692961ecc2391eac568ba3d3935e663",
+        "version" : "2.2.0"
+      }
+    }
+  ],
+  "version" : 2
+}

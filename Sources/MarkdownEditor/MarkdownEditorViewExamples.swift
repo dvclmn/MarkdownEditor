@@ -7,11 +7,11 @@
 
 import Foundation
 import SwiftUI
-import ExampleText
+import TestStrings
 
 struct MarkdownExampleView: View {
     
-    @State private var text: String = ExampleText.smallCodeBlock
+    @State private var text: String = TestStrings.smallCodeBlock
     @State private var editorHeight: CGFloat = 0
     
     @FocusState private var isFocused
