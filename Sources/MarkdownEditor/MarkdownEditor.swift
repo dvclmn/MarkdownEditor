@@ -22,6 +22,7 @@ public class MarkdownEditor: NSTextView {
     var inlineCodeColour: Color
     var isShowingFrames: Bool
     let highlightr = Highlightr()
+
     
     init(
         frame frameRect: NSRect,
@@ -51,6 +52,8 @@ public class MarkdownEditor: NSTextView {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+    
+    
     
     func applyStyles() {
         
@@ -179,7 +182,7 @@ public class MarkdownEditor: NSTextView {
         super.didChangeText()
         applyStyles()
     }
-    
+
     
     public override var intrinsicContentSize: NSSize {
         
@@ -191,9 +194,10 @@ public class MarkdownEditor: NSTextView {
         
         let rect = layoutManager.usedRect(for: container)
         
-        let bufferHeight: CGFloat = self.isEditable ? editorHeightTypingBuffer : 0
+//        let bufferHeight: CGFloat = self.isEditable ? editorHeightTypingBuffer : 0
+//        let contentSize = NSSize(width: NSView.noIntrinsicMetric, height: rect.height + bufferHeight)
         
-        let contentSize = NSSize(width: NSView.noIntrinsicMetric, height: rect.height + bufferHeight)
+        let contentSize = NSSize(width: NSView.noIntrinsicMetric, height: rect.height)
         
         self.editorHeight = contentSize.height
         

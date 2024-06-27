@@ -8,6 +8,7 @@
 import Foundation
 import SwiftUI
 import OSLog
+import AsyncAlgorithms
 
 @MainActor
 public struct MarkdownEditorRepresentable: NSViewRepresentable {
@@ -28,11 +29,8 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
     public var fontSize: Double
     
     var isLoading: (Bool) -> Void
-    
-    //    @State private var startedLoadingTime: Date = .now
-    //    @State private var finishedLoadingTime: Date = .now
-    
-    
+    var onCaretPositionChange: ((NSRect) -> Void)?
+
     private let padding: Double = 30
     
     @State private var debounceTask: Task<Void, Error>?
@@ -53,7 +51,8 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
         isEditable: Bool = true,
         fontSize: Double = 15,
         
-        isLoading: @escaping (Bool) -> Void
+        isLoading: @escaping (Bool) -> Void,
+        onCaretPositionChange: ((NSRect) -> Void)? = nil
         
     ) {
         self._text = text
@@ -71,6 +70,7 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
         self.fontSize = fontSize
         
         self.isLoading = isLoading
+        self.onCaretPositionChange = onCaretPositionChange
     }
     
     /// This function creates the NSView and configures its initial state
@@ -125,6 +125,16 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
     /// This *will* update any time a `@Binding` property is mutated from SwiftUI
     public func updateNSView(_ textView: MarkdownEditor, context: Context) {
         
+
+        /// Had the idea to add the 'text is the same' part, so this gets called less often
+        if textView.editorHeight != self.editorHeight && textView.string == self.text {
+            Task {
+                await setUpTextView(for: textView)
+            }
+        }
+        
+        
+
         /// The below two statements are called a billion times a second, on SwiftUI ScrollView scroll!
         /// I think I will need to make sure anything in this function, is *ONLY* called if neccesary
         //        os_log("`updateNSView` > MDE width for ID `\(self.id)`: \(textView.bounds.width)")
@@ -132,7 +142,6 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
         if textView.isEditable != self.isEditable {
             textView.isEditable = self.isEditable
         }
-        
         
         
         if textView.string != self.text && self.isEditable {
@@ -143,24 +152,7 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
             
         }
         
-        if textView.editorHeight != self.editorHeight && self.isEditable {
-            
-            //                os_log("""
-            //--- EDITOR HEIGHT Changed — `if textView.editorHeight != self.editorHeight` ---
-            //MDE ID: `\(self.id)`
-            //`textView.isEditable`: \(textView.isEditable), `self.isEditable`: \(self.isEditable)
-            //`textView.editorHeight`: \"\(textView.editorHeight)\", `self.editorHeight`: \"\(self.editorHeight)\"
-            //---
-            //""")
-            
-            Task {
-                await setUpTextView(for: textView)
-            }
-            
-        } // END editor height changed check
-        
         if textView.isShowingFrames != self.isShowingFrames {
-            
             textView.isShowingFrames = self.isShowingFrames
             Task {
                 await setUpTextView(for: textView)
@@ -169,12 +161,12 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
         
         
         /// NOTE: This value changes a LOT, so debounce it, or avoid tying expensive operations to it
-        if textView.bounds.width != editorWidth {
-            
-            Task {
-                await redrawWidth(for: textView)
-            }
-        }
+//        if textView.bounds.width != editorWidth {
+//            
+//            Task {
+//                await redrawWidth(for: textView)
+//            }
+//        }
         
         
         //            os_log("--- END: `updateNSView > if self.isEditable {` ---\n\n\n")
@@ -194,7 +186,7 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
             debounceTask?.cancel()
             debounceTask = Task {
                 do {
-                    os_log("Let's wait for 2 seconds before adjust instrinsic size and height")
+//                    os_log("Let's wait for 2 seconds before adjust instrinsic size and height")
                     try await Task.sleep(for: .seconds(2))
                     if !Task.isCancelled {
                         os_log("Waited 2 seconds. Now adjusting")
@@ -257,6 +249,20 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
             
         } // END Text did change
         
+        public func textViewDidChangeSelection(_ notification: Notification) {
+            guard let textView = notification.object as? MarkdownEditor else { return }
+            
+            DispatchQueue.main.async {
+                let caretRect = textView.layoutManager?.boundingRect(forGlyphRange: textView.selectedRange(), in: textView.textContainer!)
+                if let caretRect = caretRect {
+                    print("Caret position? `\(caretRect)`")
+                    self.parent.onCaretPositionChange?(caretRect)
+                }
+            }
+
+            
+        }
+        
     }
 } // END NSViewRepresentable
 
@@ -277,6 +283,18 @@ extension MarkdownEditorRepresentable {
         
         textView.isAutomaticSpellingCorrectionEnabled = true
         textView.isAutomaticTextCompletionEnabled = true
+        textView.isAutomaticQuoteSubstitutionEnabled = false
+        textView.isAutomaticTextReplacementEnabled = true
+        
+        textView.isRichText = false
+        textView.importsGraphics = false
+        
+        textView.insertionPointColor = .purple
+        
+        textView.smartInsertDeleteEnabled = true
+        
+        textView.usesFindBar = true
+
         
         textView.textContainer?.lineFragmentPadding = padding
         textView.textContainerInset = NSSize(width: 0, height: padding)
