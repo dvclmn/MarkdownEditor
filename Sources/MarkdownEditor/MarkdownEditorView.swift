@@ -10,83 +10,83 @@ import SwiftUI
 import OSLog
 import AsyncAlgorithms
 
+public struct MarkdownEditorConfiguration {
+    public var fontSize: Double
+    public var insertionPointColour: Color
+    public var defaultCodeColour: Color
+    public var paddingX: Double
+    public var paddingY: Double
+    
+    public init(fontSize: Double, insertionPointColour: Color, defaultCodeColour: Color, paddingX: Double, paddingY: Double) {
+        self.fontSize = fontSize
+        self.insertionPointColour = insertionPointColour
+        self.defaultCodeColour = defaultCodeColour
+        self.paddingX = paddingX
+        self.paddingY = paddingY
+    }
+}
+
 @MainActor
 public struct MarkdownEditorRepresentable: NSViewRepresentable {
     
     @Binding public var text: String
     @Binding public var editorHeight: CGFloat
+    
+    public var configuration: MarkdownEditorConfiguration?
+    
     public var id: String
     public var didAppear: Bool
     public var editorWidth: CGFloat?
     
     @Binding public var isShowingFrames: Bool
     
-    public var editorHeightTypingBuffer: CGFloat
-    public var inlineCodeColour: Color
-    
     public var isEditable: Bool
-    
-    public var fontSize: Double
-    
-    var isLoading: (Bool) -> Void
-    var onCaretPositionChange: ((NSRect) -> Void)?
 
-    private let padding: Double = 30
+    var isLoading: (Bool) -> Void
+//    var onCaretPositionChange: ((NSRect) -> Void)?
     
     @State private var debounceTask: Task<Void, Error>?
     
     public init(
         text: Binding<String>,
         editorHeight: Binding<CGFloat>,
+        configuration: MarkdownEditorConfiguration? = nil,
         id: String,
         didAppear: Bool = false,
         editorWidth: CGFloat? = nil,
         
         isShowingFrames: Binding<Bool> = .constant(false),
         
-        editorHeightTypingBuffer: CGFloat = 120,
         inlineCodeColour: Color = .purple,
         
         
         isEditable: Bool = true,
-        fontSize: Double = 15,
         
-        isLoading: @escaping (Bool) -> Void,
-        onCaretPositionChange: ((NSRect) -> Void)? = nil
+        isLoading: @escaping (Bool) -> Void
+//        onCaretPositionChange: ((NSRect) -> Void)? = nil
         
     ) {
         self._text = text
         self._editorHeight = editorHeight
+        self.configuration = configuration
         self.id = id
         self.didAppear = didAppear
         self.editorWidth = editorWidth
         self._isShowingFrames = isShowingFrames
         
-        self.editorHeightTypingBuffer = editorHeightTypingBuffer
-        self.inlineCodeColour = inlineCodeColour
-        
-        
         self.isEditable = isEditable
-        self.fontSize = fontSize
         
         self.isLoading = isLoading
-        self.onCaretPositionChange = onCaretPositionChange
     }
     
     /// This function creates the NSView and configures its initial state
     public func makeNSView(context: Context) -> MarkdownEditor {
         
         self.isLoading(true)
-        //        Task { @MainActor in
-        //            self.startedLoadingTime = Date.now
-        //        }
-        //        os_log("`makeNSView`: `self.isLoading(true)`")
-        
+
         let textView = MarkdownEditor(
             frame: .zero,
             editorHeight: editorHeight,
-            editorHeightTypingBuffer: editorHeightTypingBuffer,
-            inlineCodeColour: inlineCodeColour,
             isShowingFrames: isShowingFrames
         )
         
@@ -249,19 +249,19 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
             
         } // END Text did change
         
-        public func textViewDidChangeSelection(_ notification: Notification) {
-            guard let textView = notification.object as? MarkdownEditor else { return }
-            
-            DispatchQueue.main.async {
-                let caretRect = textView.layoutManager?.boundingRect(forGlyphRange: textView.selectedRange(), in: textView.textContainer!)
-                if let caretRect = caretRect {
-                    print("Caret position? `\(caretRect)`")
-                    self.parent.onCaretPositionChange?(caretRect)
-                }
-            }
-
-            
-        }
+//        public func textViewDidChangeSelection(_ notification: Notification) {
+//            guard let textView = notification.object as? MarkdownEditor else { return }
+//            
+//            DispatchQueue.main.async {
+//                let caretRect = textView.layoutManager?.boundingRect(forGlyphRange: textView.selectedRange(), in: textView.textContainer!)
+//                if let caretRect = caretRect {
+//                    print("Caret position? `\(caretRect)`")
+//                    self.parent.onCaretPositionChange?(caretRect)
+//                }
+//            }
+//
+//            
+//        }
         
     }
 } // END NSViewRepresentable
@@ -289,18 +289,17 @@ extension MarkdownEditorRepresentable {
         textView.isRichText = false
         textView.importsGraphics = false
         
-        textView.insertionPointColor = .purple
+        textView.insertionPointColor = NSColor(configuration?.insertionPointColour ?? .blue)
         
         textView.smartInsertDeleteEnabled = true
         
         textView.usesFindBar = true
 
-        
-        textView.textContainer?.lineFragmentPadding = padding
-        textView.textContainerInset = NSSize(width: 0, height: padding)
+        textView.textContainer?.lineFragmentPadding = configuration?.paddingX ?? 30
+        textView.textContainerInset = NSSize(width: 0, height: configuration?.paddingY ?? 30)
         
         /// When the text field has an attributed string value, the system ignores the textColor, font, alignment, lineBreakMode, and lineBreakStrategy properties. Set the foregroundColor, font, alignment, lineBreakMode, and lineBreakStrategy properties in the attributed string instead.
-        textView.font = NSFont.systemFont(ofSize: MarkdownDefaults.fontSize, weight: .medium)
+        textView.font = NSFont.systemFont(ofSize: configuration?.fontSize ?? MarkdownDefaults.fontSize, weight: .medium)
         textView.textColor = NSColor.textColor.withAlphaComponent(MarkdownDefaults.fontOpacity)
         
         textView.isEditable = self.isEditable

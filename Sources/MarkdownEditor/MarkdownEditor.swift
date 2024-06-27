@@ -18,23 +18,23 @@ import OSLog
 public class MarkdownEditor: NSTextView {
     
     var editorHeight: CGFloat
-    var editorHeightTypingBuffer: CGFloat
-    var inlineCodeColour: Color
+    
+    var configuration: MarkdownEditorConfiguration?
+    
     var isShowingFrames: Bool
+    
     let highlightr = Highlightr()
 
     
     init(
         frame frameRect: NSRect,
+        configuration: MarkdownEditorConfiguration? = nil,
         editorHeight: CGFloat,
-        editorHeightTypingBuffer: CGFloat,
-        inlineCodeColour: Color,
         isShowingFrames: Bool
     ) {
         
         self.editorHeight = editorHeight
-        self.editorHeightTypingBuffer = editorHeightTypingBuffer
-        self.inlineCodeColour = inlineCodeColour
+        self.configuration = configuration
         self.isShowingFrames = isShowingFrames
         
         let textStorage = NSTextStorage()
@@ -142,7 +142,7 @@ public class MarkdownEditor: NSTextView {
                 if syntax == .inlineCode {
                     
                     let userCodeColour: [NSAttributedString.Key : Any] = [
-                        .foregroundColor: NSColor(self.inlineCodeColour),
+                        .foregroundColor: NSColor(configuration?.defaultCodeColour ?? .white),
                     ]
                     
                     attributedString.addAttributes(userCodeColour, range: contentRange)
@@ -194,10 +194,10 @@ public class MarkdownEditor: NSTextView {
         
         let rect = layoutManager.usedRect(for: container)
         
-//        let bufferHeight: CGFloat = self.isEditable ? editorHeightTypingBuffer : 0
-//        let contentSize = NSSize(width: NSView.noIntrinsicMetric, height: rect.height + bufferHeight)
+        let bufferHeight: CGFloat = self.isEditable ? 120 : 0
+        let contentSize = NSSize(width: NSView.noIntrinsicMetric, height: rect.height + bufferHeight)
         
-        let contentSize = NSSize(width: NSView.noIntrinsicMetric, height: rect.height)
+//        let contentSize = NSSize(width: NSView.noIntrinsicMetric, height: rect.height)
         
         self.editorHeight = contentSize.height
         
