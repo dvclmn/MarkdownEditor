@@ -101,7 +101,6 @@ public class MarkdownEditor: NSTextView {
             )
         }
         
-//        textStorage.setAttributes(<#T##attrs: [NSAttributedString.Key : Any]?##[NSAttributedString.Key : Any]?#>, range: <#T##NSRange#>)
 //        textStorage.setAttributedString(attributedString)
         self.setSelectedRange(currentSelectedRange)
         self.invalidateIntrinsicContentSize()

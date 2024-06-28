@@ -33,7 +33,7 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
     
     public var configuration: MarkdownEditorConfiguration?
     
-    public var id: String
+    public var id: String?
     public var didAppear: Bool
     public var editorWidth: CGFloat?
     
@@ -41,15 +41,16 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
     
     public var isEditable: Bool
     
-    var output: (_ isLoading: Bool, _ editorHeight: CGFloat) -> Void
+    var output: (_ editorHeight: CGFloat) -> Void
     
+    private let isPrinting: Bool = true
     
     @State private var debounceTask: Task<Void, Error>?
     
     public init(
         text: Binding<String>,
         configuration: MarkdownEditorConfiguration? = nil,
-        id: String,
+        id: String? = nil,
         didAppear: Bool = false,
         editorWidth: CGFloat? = nil,
         
@@ -57,7 +58,7 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
         
         isEditable: Bool = true,
         
-        output: @escaping (_ isLoading: Bool, _ editorHeight: CGFloat) -> Void
+        output: @escaping (_ editorHeight: CGFloat) -> Void = {_ in}
         
     ) {
         self._text = text
@@ -81,29 +82,17 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
             isShowingFrames: isShowingFrames
         )
         
-        self.output(true, textView.editorHeight)
-        
         textView.delegate = context.coordinator
         textView.string = text
         
         setUpTextViewOptions(for: textView)
         
-        //        os_log("`makeNSView`: Performed all setup *except* for expensive `setUpTextView(for: textView)`")
-        
-        Task {
-            await setStyles(for: textView)
-        }
-        
-        //        os_log("`makeNSView`: Now, performed *all* setup")
-        
-        //        Task { @MainActor in
-        //            self.finishedLoadingTime = Date.now
-        //        }
-        //        os_log("`makeNSView`: `self.isLoading(false)`")
-        //        os_log("Total loading time for ID `\(self.id)`: \(differenceInMilliseconds(from: startedLoadingTime, to: finishedLoadingTime))")
+        textView.applyStyles()
+        self.output(textView.editorHeight)
+
+//        if isPrinting { os_log("Made the nsview\n") }
         
         return textView
-        
     }
     
     
@@ -118,98 +107,96 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
     public func updateNSView(_ textView: MarkdownEditor, context: Context) {
         
         
-        /// Had the idea to add the 'text is the same' part, so this gets called less often
-        //        if textView.editorHeight != self.editorHeight && textView.string == self.text {
-        //            Task {
-        //                await setUpTextView(for: textView)
-        //            }
-        //        }
-        
-        
-        
         /// The below two statements are called a billion times a second, on SwiftUI ScrollView scroll!
         /// I think I will need to make sure anything in this function, is *ONLY* called if neccesary
         //        os_log("`updateNSView` > MDE width for ID `\(self.id)`: \(textView.bounds.width)")
         
-        if textView.isEditable != self.isEditable {
-            textView.isEditable = self.isEditable
-        }
+        /// This should already be set up in the `setUpTextViewOptions`
+        //        if textView.isEditable != self.isEditable {
+        //            textView.isEditable = self.isEditable
+        //        }
         
         
+        /// How is this working without the below, i don't understand.
         /// Issue with including `&& self.isEditable` is that the non-editable MDEs can still have their text change
-        if textView.string != self.text {
-            //        if textView.string != self.text && self.isEditable {
-//            let currentSelectedRange = textView.selectedRange()
-            
-            textView.string = text
-            
-//            textView.setSelectedRange(currentSelectedRange)
-            
-            Task {
-                await setStyles(for: textView)
-            }
-            
-        }
-        
-        if textView.isShowingFrames != self.isShowingFrames {
-            textView.isShowingFrames = self.isShowingFrames
-            Task {
-                await setStyles(for: textView)
-            }
-        }
+        //        if textView.string != self.text {
+        //
+        //            textView.string = text
+        //
+        ////            textView.setSelectedRange(currentSelectedRange)
+        //
+        //            Task {
+        //                await setStyles(for: textView)
+        //            }
+        //
+        //        }
+//        
+//        if textView.isShowingFrames != self.isShowingFrames {
+//            textView.isShowingFrames = self.isShowingFrames
+//            if isPrinting { os_log("Checked if showing frames. Result: \(textView.isShowingFrames)") }
+//            textView.applyStyles()
+//            self.output(textView.editorHeight)
+//        }
         
         
-        /// NOTE: This value changes a LOT, so debounce it, or avoid tying expensive operations to it
-        if textView.bounds.width != editorWidth {
-            
-            
-            
-            //            Task {
-            //                await setUpTextView(for: textView)
-            //            }
-        }
-        
-        
-        //            os_log("--- END: `updateNSView > if self.isEditable {` ---\n\n\n")
-        
+        /// THIS WORKS TO FIX HEIGHT, WHEN WIDTH CHANGES — DON'T LOSE THISSSSS
+//        if textView.bounds.width != self.editorWidth {
+//            
+//            textView.bounds.width = self.editorWidth
+//            
+//            if isPrinting {
+//                os_log("Checked if bounds width has changed")
+//                os_log("`textView.bounds.width`: \(textView.bounds.width)")
+//                os_log("`self.editorWidth`: \(self.editorWidth?.description ?? "nil")")
+//            }
+//            Task {
+//                await MainActor.run {
+//                    textView.needsLayout = true
+//                    textView.invalidateIntrinsicContentSize()
+//                    textView.needsDisplay = true
+//                }
+//            }
+//        }
         
         
     } // END update nsView
     
     
     
-    func dismantleNSView(_ textView: MarkdownEditor, context: Context) {
-        debounceTask?.cancel()
-    }
-    
-    private func setStyles(for textView: MarkdownEditor) async {
-        
-        await MainActor.run {
-            
-            debounceTask?.cancel()
-            debounceTask = Task {
-                do {
-                    try await Task.sleep(for: .seconds(1))
-                    if !Task.isCancelled {
-                        os_log("Waited, now adjusting")
-                        textView.applyStyles()
-                        self.output(false, textView.editorHeight)
-                        //                        textView.needsLayout = true
-                        //                        textView.invalidateIntrinsicContentSize()
-                        //                        textView.needsDisplay = true
-                        //                        textView.isShowingFrames = false
-                    }
-                } catch {}
-            }
-            
-        }
-    }
-    
-    
-//    private func regexAndStyles(for textView: MarkdownEditor) async {
+//    func dismantleNSView(_ textView: MarkdownEditor, context: Context) {
 //        
-//        
+//        if isPrinting { os_log("Dismantling nsView\n") }
+//        debounceTask?.cancel()
 //    }
+//    
+    //    private func setStyles(for textView: MarkdownEditor) async {
+    //
+    //        await MainActor.run {
+    //
+    //            debounceTask?.cancel()
+    //            debounceTask = Task {
+    //                do {
+    //                    try await Task.sleep(for: .seconds(1))
+    //                    if !Task.isCancelled {
+    //                        os_log("Waited, now adjusting")
+    //                        textView.applyStyles()
+    //                        self.output(textView.editorHeight)
+    //                        //                        textView.needsLayout = true
+    //                        //                        textView.invalidateIntrinsicContentSize()
+    //                        //                        textView.needsDisplay = true
+    //                        //                        textView.isShowingFrames = false
+    //                    }
+    //                } catch {}
+    //            }
+    //
+    //        }
+    //    }
+    
+    
+    //    private func regexAndStyles(for textView: MarkdownEditor) async {
+    //
+    //
+    //    }
     
     
     /// It is the Coordinator that is responsible for sending information back **to** SwiftUI, from the NSView
@@ -223,37 +210,69 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
         
         public init(_ parent: MarkdownEditorRepresentable) {
             self.parent = parent
-            super.init()
+//            super.init()
         }
         
-        public func textDidBeginEditing(_ notification: Notification) {
-            guard let textView = notification.object as? MarkdownEditor else { return }
-            
-            if self.parent.text != textView.string {
-                DispatchQueue.main.async {
-                    self.parent.text = textView.string
-                }
-            }
-        }
+        //        public func textDidBeginEditing(_ notification: Notification) {
+        //            guard let textView = notification.object as? MarkdownEditor else { return }
+        //
+        //            if self.parent.text != textView.string {
+        //                DispatchQueue.main.async {
+        //                    self.parent.text = textView.string
+        //                }
+        //            }
+        //        }
         
+        /// Try `scrollRangeToVisible_` for when scroll jumps to top when pasting
 //        public func textDidChange(_ notification: Notification) {
 //            guard let textView = notification.object as? MarkdownEditor else { return }
 //            
 //            
 //            if self.parent.text != textView.string {
+//
+//                self.parent.text = textView.string
 //                
-//                DispatchQueue.main.async {
-//                    if self.parent.text != textView.string {
-//                        self.parent.text = textView.string
-//                        textView.applyStyles()
+//                if self.parent.isPrinting {
+//                    os_log("Checked if text has changed")
+//                    os_log("`self.parent.text`: \(self.parent.text)")
+//                    os_log("`textView.string`: \(textView.string)")
+//                }
+//                
+//                Task {
+//                    await MainActor.run {
 //                        
-//                        //                        self.parent.editorHeight = textView.editorHeight
-//                        self.parent.output(false, textView.editorHeight)
+//                        self.parent.debounceTask?.cancel()
+//                        self.parent.debounceTask = Task {
+//                            do {
+//                                try await Task.sleep(for: .seconds(1))
+//                                if !Task.isCancelled {
+//                                    os_log("Waited, now adjusting")
+//                                    textView.applyStyles()
+//                                    self.parent.output(textView.editorHeight)
+//                                    //                        textView.needsLayout = true
+//                                    //                        textView.invalidateIntrinsicContentSize()
+//                                    //                        textView.needsDisplay = true
+//                                    //                        textView.isShowingFrames = false
+//                                }
+//                            } catch {}
+//                        }
 //                        
-//                        textView.invalidateIntrinsicContentSize()
-//                        textView.needsDisplay = true
 //                    }
-//                } // END dispatch async
+//                }
+//                
+//                //                DispatchQueue.main.async {
+//                //                    if self.parent.text != textView.string {
+//                //                        self.parent.text = textView.string
+//                //                        textView.applyStyles()
+//                //
+//                //
+//                //                        //                        self.parent.editorHeight = textView.editorHeight
+//                //                        self.parent.output(false, textView.editorHeight)
+//                //
+//                //                        textView.invalidateIntrinsicContentSize()
+//                //                        textView.needsDisplay = true
+//                //                    }
+//                //                } // END dispatch async
 //                
 //            } // END text equality check
 //            
@@ -291,13 +310,17 @@ extension MarkdownEditorRepresentable {
         
         textView.isVerticallyResizable = true
         textView.isHorizontallyResizable = false
-//        textView.autoresizingMask = [.width]
-
+        //        textView.autoresizingMask = [.width]
+        
         textView.isAutomaticSpellingCorrectionEnabled = true
         textView.isAutomaticTextCompletionEnabled = true
         textView.isAutomaticQuoteSubstitutionEnabled = false
         textView.isAutomaticTextReplacementEnabled = true
         
+        textView.wantsScrollEventsForSwipeTracking(on: .none)
+        textView.wantsForwardedScrollEvents(for: .none)
+        
+
         
         textView.isRichText = false
         textView.importsGraphics = false
