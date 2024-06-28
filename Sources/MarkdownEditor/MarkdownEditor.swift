@@ -17,23 +17,20 @@ import OSLog
 @MainActor
 public class MarkdownEditor: NSTextView {
     
-    var editorHeight: CGFloat
+    var editorHeight: CGFloat = .zero
     
     var configuration: MarkdownEditorConfiguration?
     
     var isShowingFrames: Bool
     
     let highlightr = Highlightr()
-
+    
     
     init(
         frame frameRect: NSRect,
         configuration: MarkdownEditorConfiguration? = nil,
-        editorHeight: CGFloat,
         isShowingFrames: Bool
     ) {
-        
-        self.editorHeight = editorHeight
         self.configuration = configuration
         self.isShowingFrames = isShowingFrames
         
@@ -54,17 +51,16 @@ public class MarkdownEditor: NSTextView {
     }
     
     
+    func handleRawText() {
+        
+    }
     
-    func applyStyles() {
+    func applyParagraphStyles() {
         
         guard let textStorage = self.textStorage else {
             print("Text storage not available for styling")
             return
         }
-        
-        
-        let currentSelectedRange = self.selectedRange()
-        
         
         let globalParagraphStyles = NSMutableParagraphStyle()
         globalParagraphStyles.lineSpacing = MarkdownDefaults.lineSpacing
@@ -78,6 +74,24 @@ public class MarkdownEditor: NSTextView {
         
         let attributedString = NSMutableAttributedString(string: textStorage.string, attributes: baseStyles)
         
+        textStorage.setAttributedString(attributedString)
+        
+    }
+    
+    func applyStyles() {
+        
+        guard let textStorage = self.textStorage else {
+            print("Text storage not available for styling")
+            return
+        }
+        
+        
+        let currentSelectedRange = self.selectedRange()
+        
+        
+        let attributedString = NSMutableAttributedString(string: textStorage.string)
+        
+        
         let syntaxList = MarkdownSyntax.allCases
         
         for syntax in syntaxList {
@@ -87,7 +101,8 @@ public class MarkdownEditor: NSTextView {
             )
         }
         
-        textStorage.setAttributedString(attributedString)
+//        textStorage.setAttributes(<#T##attrs: [NSAttributedString.Key : Any]?##[NSAttributedString.Key : Any]?#>, range: <#T##NSRange#>)
+//        textStorage.setAttributedString(attributedString)
         self.setSelectedRange(currentSelectedRange)
         self.invalidateIntrinsicContentSize()
         self.needsDisplay = true
@@ -99,6 +114,11 @@ public class MarkdownEditor: NSTextView {
         for syntax: MarkdownSyntax,
         withString attributedString: NSMutableAttributedString
     ) {
+        
+        guard let textStorage = self.textStorage else {
+            print("Text storage not available for styling")
+            return
+        }
         
         let regexLiteral: Regex<(Substring, Substring)> = syntax.regex
         
@@ -128,16 +148,19 @@ public class MarkdownEditor: NSTextView {
             
             /// Apply attributes to opening and closing syntax
             if attributedString.length >= startSyntaxRange.upperBound {
-                attributedString.addAttributes(syntax.syntaxAttributes, range: startSyntaxRange)
+//                attributedString.addAttributes(syntax.syntaxAttributes, range: startSyntaxRange)
+                textStorage.addAttributes(syntax.syntaxAttributes, range: startSyntaxRange)
             }
             
             if attributedString.length >= endSyntaxRange.upperBound {
-                attributedString.addAttributes(syntax.syntaxAttributes, range: endSyntaxRange)
+//                attributedString.addAttributes(syntax.syntaxAttributes, range: endSyntaxRange)
+                textStorage.addAttributes(syntax.syntaxAttributes, range: endSyntaxRange)
             }
             
             /// Apply attributes to content
             if attributedString.length >= contentRange.upperBound {
                 attributedString.addAttributes(syntax.contentAttributes, range: contentRange)
+                textStorage.addAttributes(syntax.contentAttributes, range: contentRange)
                 
                 if syntax == .inlineCode {
                     
@@ -146,6 +169,7 @@ public class MarkdownEditor: NSTextView {
                     ]
                     
                     attributedString.addAttributes(userCodeColour, range: contentRange)
+                    textStorage.addAttributes(userCodeColour, range: contentRange)
                 }
             }
             
@@ -163,11 +187,13 @@ public class MarkdownEditor: NSTextView {
                     // Highlight the extracted code string
                     if let highlightedCode = highlightr.highlight(codeString, as: "swift") {
                         
-                        attributedString.replaceCharacters(in: contentRange, with: highlightedCode)
+//                        attributedString.replaceCharacters(in: contentRange, with: highlightedCode)
+                        textStorage.replaceCharacters(in: contentRange, with: highlightedCode)
                         
                         let codeBackground: [NSAttributedString.Key : Any] = [.backgroundColor: NSColor.black.withAlphaComponent(MarkdownDefaults.backgroundCodeBlock)]
                         
-                        attributedString.addAttributes(codeBackground, range: contentRange)
+//                        attributedString.addAttributes(codeBackground, range: contentRange)
+                        textStorage.addAttributes(codeBackground, range: contentRange)
                         
                     }
                 } // END highlighter check
@@ -182,7 +208,6 @@ public class MarkdownEditor: NSTextView {
         super.didChangeText()
         applyStyles()
     }
-
     
     public override var intrinsicContentSize: NSSize {
         
@@ -194,15 +219,33 @@ public class MarkdownEditor: NSTextView {
         
         let rect = layoutManager.usedRect(for: container)
         
+//        let bufferHeight: CGFloat = 120
         let bufferHeight: CGFloat = self.isEditable ? 120 : 0
         let contentSize = NSSize(width: NSView.noIntrinsicMetric, height: rect.height + bufferHeight)
-        
-//        let contentSize = NSSize(width: NSView.noIntrinsicMetric, height: rect.height)
         
         self.editorHeight = contentSize.height
         
         return contentSize
     }
+    
+    /// Attempt to update the text layout when width changes
+//    public override func viewDidMoveToSuperview() {
+//        super.viewDidMoveToSuperview()
+//        // Register for frame change notifications
+//        NotificationCenter.default.addObserver(self, selector: #selector(frameDidChange), name: NSView.frameDidChangeNotification, object: self)
+//    }
+//    
+//    deinit {
+//        // Remove observer when the view is no longer in use
+////        DispatchQueue.main.async {
+//            NotificationCenter.default.removeObserver(self, name: NSView.frameDidChangeNotification, object: self)
+////        }
+//    }
+//    
+//    @objc private func frameDidChange(notification: Notification) {
+//        // Invalidate intrinsic content size to trigger a layout update
+//        self.invalidateIntrinsicContentSize()
+//    }
     
     
 }
