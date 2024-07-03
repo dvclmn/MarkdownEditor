@@ -25,17 +25,25 @@ public class MarkdownEditor: NSTextView {
     
     let highlightr = Highlightr()
     
+    let textHighlighter: TextHighlighter
+    
+    var searchText: String
+    
     
     init(
         frame frameRect: NSRect,
         configuration: MarkdownEditorConfiguration? = nil,
-        isShowingFrames: Bool
+        isShowingFrames: Bool,
+        searchText: String
     ) {
         self.configuration = configuration
         self.isShowingFrames = isShowingFrames
+        self.searchText = searchText
         
         let textStorage = NSTextStorage()
         let layoutManager = NSLayoutManager()
+        
+        self.textHighlighter = TextHighlighter(textStorage: textStorage)
         
         textStorage.addLayoutManager(layoutManager)
         
@@ -101,10 +109,10 @@ public class MarkdownEditor: NSTextView {
             )
         }
         
-//        textStorage.setAttributedString(attributedString)
+        //        textStorage.setAttributedString(attributedString)
         self.setSelectedRange(currentSelectedRange)
-//        self.invalidateIntrinsicContentSize()
-//        self.needsDisplay = true
+        //        self.invalidateIntrinsicContentSize()
+        //        self.needsDisplay = true
         
     }
     
@@ -147,18 +155,18 @@ public class MarkdownEditor: NSTextView {
             
             /// Apply attributes to opening and closing syntax
             if attributedString.length >= startSyntaxRange.upperBound {
-//                attributedString.addAttributes(syntax.syntaxAttributes, range: startSyntaxRange)
+                //                attributedString.addAttributes(syntax.syntaxAttributes, range: startSyntaxRange)
                 textStorage.addAttributes(syntax.syntaxAttributes, range: startSyntaxRange)
             }
             
             if attributedString.length >= endSyntaxRange.upperBound {
-//                attributedString.addAttributes(syntax.syntaxAttributes, range: endSyntaxRange)
+                //                attributedString.addAttributes(syntax.syntaxAttributes, range: endSyntaxRange)
                 textStorage.addAttributes(syntax.syntaxAttributes, range: endSyntaxRange)
             }
             
             /// Apply attributes to content
             if attributedString.length >= contentRange.upperBound {
-                attributedString.addAttributes(syntax.contentAttributes, range: contentRange)
+                //                attributedString.addAttributes(syntax.contentAttributes, range: contentRange)
                 textStorage.addAttributes(syntax.contentAttributes, range: contentRange)
                 
                 if syntax == .inlineCode {
@@ -167,7 +175,7 @@ public class MarkdownEditor: NSTextView {
                         .foregroundColor: NSColor(configuration?.defaultCodeColour ?? .white),
                     ]
                     
-                    attributedString.addAttributes(userCodeColour, range: contentRange)
+                    //                    attributedString.addAttributes(userCodeColour, range: contentRange)
                     textStorage.addAttributes(userCodeColour, range: contentRange)
                 }
             }
@@ -186,12 +194,12 @@ public class MarkdownEditor: NSTextView {
                     // Highlight the extracted code string
                     if let highlightedCode = highlightr.highlight(codeString, as: "swift") {
                         
-//                        attributedString.replaceCharacters(in: contentRange, with: highlightedCode)
+                        //                        attributedString.replaceCharacters(in: contentRange, with: highlightedCode)
                         textStorage.replaceCharacters(in: contentRange, with: highlightedCode)
                         
                         let codeBackground: [NSAttributedString.Key : Any] = [.backgroundColor: NSColor.black.withAlphaComponent(MarkdownDefaults.backgroundCodeBlock)]
                         
-//                        attributedString.addAttributes(codeBackground, range: contentRange)
+                        //                        attributedString.addAttributes(codeBackground, range: contentRange)
                         textStorage.addAttributes(codeBackground, range: contentRange)
                         
                     }
@@ -200,7 +208,106 @@ public class MarkdownEditor: NSTextView {
             } // end code block check
         } // Loop over matches
         
+        
+        if self.searchText.count > 0 {
+            textHighlighter.applyHighlights(forSearchTerm: self.searchText)
+        } else {
+            textHighlighter.clearHighlights()
+        }
+        
+        
+//        if self.searchText.count > 0 {
+//            
+//            
+//            let fullRange = NSRange(location: 0, length: attributedString.length)
+//            let highlightColour = NSColor.orange
+//            let escapedSearchTerm = NSRegularExpression.escapedPattern(for: self.searchText)
+//            
+//            // Step 1: Store the original background colors before highlighting
+//            var originalBackgroundColors: [NSRange: NSColor] = [:]
+//            
+//            textStorage.enumerateAttribute(.backgroundColor, in: fullRange, options: []) { attributeValue, range, _ in
+//                if let backgroundColor = attributeValue as? NSColor {
+//                    originalBackgroundColors[range] = backgroundColor
+//                }
+//            }
+//            
+//            // Step 2: Apply the search term highlights (as you've done in your existing code)
+//            textStorage.addAttribute(.backgroundColor, value: NSColor.clear, range: fullRange)
+//            
+//            if let searchRegex = try? Regex(escapedSearchTerm) {
+//                
+//                let searchMatches = string.matches(of: searchRegex)
+//                
+//                for match in searchMatches {
+//                    let range = NSRange(match.range, in: string)
+//                    
+//                    let highlightAttribute: [NSAttributedString.Key: Any] = [.backgroundColor: highlightColour]
+//                    
+//                    //                    attributedString.addAttributes(highlightAttribute, range: range)
+//                    textStorage.addAttributes(highlightAttribute, range: range)
+//                }
+//            } else {
+//                print("Error highlighting search term")
+//            }
+//        } // END search check
+        
+        // ...
+        
+//        // Step 3: Restore the original background colors when the search is cleared or changed
+//        if self.searchText.count == 0 {
+//            for (range, color) in originalBackgroundColors {
+//                textStorage.addAttribute(.backgroundColor, value: color, range: range)
+//            }
+//        } else {
+//            // Clear search highlights without affecting other attributes
+//            for (range, _) in originalBackgroundColors {
+//                if let originalColor = originalBackgroundColors[range] {
+//                    textStorage.addAttribute(.backgroundColor, value: originalColor, range: range)
+//                } else {
+//                    textStorage.removeAttribute(.backgroundColor, range: range)
+//                }
+//            }
+//            
+//            // Apply new search term highlights...
+//            // ...
+//        }
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
     } // END style text
+    
+    @MainActor
+    public func findRangesWithBackgroundColor(
+        color: NSColor,
+        in attributedString: NSAttributedString
+    ) -> [NSRange] {
+        
+        var rangesWithColor: [NSRange] = []
+        
+        attributedString.enumerateAttribute(
+            .backgroundColor,
+            in: NSRange(location: 0, length: attributedString.length),
+            options: []
+        ) { (attributeValue, range, _) in
+            if let backgroundColor = attributeValue as? NSColor, backgroundColor == color {
+                rangesWithColor.append(range)
+            }
+        }
+        
+        return rangesWithColor
+    }
     
     /// This really seems to be vital to styling the text. Have to keep this
     public override func didChangeText() {
@@ -218,7 +325,7 @@ public class MarkdownEditor: NSTextView {
         
         let rect = layoutManager.usedRect(for: container)
         
-//        let bufferHeight: CGFloat = 120
+        //        let bufferHeight: CGFloat = 120
         let bufferHeight: CGFloat = self.isEditable ? 120 : 0
         let contentSize = NSSize(width: NSView.noIntrinsicMetric, height: rect.height + bufferHeight)
         
@@ -228,23 +335,23 @@ public class MarkdownEditor: NSTextView {
     }
     
     /// Attempt to update the text layout when width changes
-//    public override func viewDidMoveToSuperview() {
-//        super.viewDidMoveToSuperview()
-//        // Register for frame change notifications
-//        NotificationCenter.default.addObserver(self, selector: #selector(frameDidChange), name: NSView.frameDidChangeNotification, object: self)
-//    }
-//    
-//    deinit {
-//        // Remove observer when the view is no longer in use
-////        DispatchQueue.main.async {
-//            NotificationCenter.default.removeObserver(self, name: NSView.frameDidChangeNotification, object: self)
-////        }
-//    }
-//    
-//    @objc private func frameDidChange(notification: Notification) {
-//        // Invalidate intrinsic content size to trigger a layout update
-//        self.invalidateIntrinsicContentSize()
-//    }
+    //    public override func viewDidMoveToSuperview() {
+    //        super.viewDidMoveToSuperview()
+    //        // Register for frame change notifications
+    //        NotificationCenter.default.addObserver(self, selector: #selector(frameDidChange), name: NSView.frameDidChangeNotification, object: self)
+    //    }
+    //
+    //    deinit {
+    //        // Remove observer when the view is no longer in use
+    ////        DispatchQueue.main.async {
+    //            NotificationCenter.default.removeObserver(self, name: NSView.frameDidChangeNotification, object: self)
+    ////        }
+    //    }
+    //
+    //    @objc private func frameDidChange(notification: Notification) {
+    //        // Invalidate intrinsic content size to trigger a layout update
+    //        self.invalidateIntrinsicContentSize()
+    //    }
     
     
 }

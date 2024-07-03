@@ -31,6 +31,7 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
     
     @Binding public var text: String
     
+    public var searchText: String
     public var configuration: MarkdownEditorConfiguration?
     
     public var id: String?
@@ -49,6 +50,7 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
     
     public init(
         text: Binding<String>,
+        searchText: String = "",
         configuration: MarkdownEditorConfiguration? = nil,
         id: String? = nil,
         didAppear: Bool = false,
@@ -62,6 +64,7 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
         
     ) {
         self._text = text
+        self.searchText = searchText
         self.configuration = configuration
         self.id = id
         self.didAppear = didAppear
@@ -77,7 +80,8 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
         
         let textView = MarkdownEditor(
             frame: .zero,
-            isShowingFrames: isShowingFrames
+            isShowingFrames: self.isShowingFrames,
+            searchText: self.searchText
         )
         
         textView.delegate = context.coordinator
@@ -128,9 +132,23 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
         //
         if textView.isShowingFrames != self.isShowingFrames {
             textView.isShowingFrames = self.isShowingFrames
+            os_log("Does this ever change? is `textView.isShowingFrames` \(textView.isShowingFrames), ever different from `self.isShowingFrames`? \(self.isShowingFrames)")
             //            if isPrinting { os_log("Checked if showing frames. Result: \(textView.isShowingFrames)") }
             //            textView.applyStyles()
             //            self.output(textView.editorHeight)
+        }
+        
+        if textView.searchText != self.searchText {
+            textView.searchText = self.searchText
+            os_log("Does this ever change? is `textView.searchText` \(textView.searchText), ever different from `self.searchText`? \(self.searchText)")
+            
+            Task {
+                await MainActor.run {
+                    textView.applyStyles()
+                    self.output(textView.editorHeight)
+                    textView.invalidateIntrinsicContentSize()
+                }
+            }
         }
         
         
