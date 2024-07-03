@@ -103,8 +103,8 @@ public class MarkdownEditor: NSTextView {
         
 //        textStorage.setAttributedString(attributedString)
         self.setSelectedRange(currentSelectedRange)
-        self.invalidateIntrinsicContentSize()
-        self.needsDisplay = true
+//        self.invalidateIntrinsicContentSize()
+//        self.needsDisplay = true
         
     }
     

@@ -41,7 +41,7 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
     
     public var isEditable: Bool
     
-    var output: (_ editorHeight: CGFloat) -> Void
+        var output: (_ editorHeight: CGFloat) -> Void
     
     private let isPrinting: Bool = true
     
@@ -58,7 +58,7 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
         
         isEditable: Bool = true,
         
-        output: @escaping (_ editorHeight: CGFloat) -> Void = {_ in}
+                output: @escaping (_ editorHeight: CGFloat) -> Void = {_ in}
         
     ) {
         self._text = text
@@ -69,7 +69,6 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
         self.isShowingFrames = isShowingFrames
         
         self.isEditable = isEditable
-        
         self.output = output
     }
     
@@ -104,11 +103,6 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
         /// I think I will need to make sure anything in this function, is *ONLY* called if neccesary
         //        os_log("`updateNSView` > MDE width for ID `\(self.id)`: \(textView.bounds.width)")
         
-        /// This should already be set up in the `setUpTextViewOptions`
-        //                if textView.isEditable != self.isEditable {
-        //            textView.isEditable = self.isEditable
-        //        }
-        
         /// Issue with including `&& self.isEditable` is that the non-editable MDEs can still have their text change
         if textView.string != self.text {
             //
@@ -117,8 +111,9 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
             /// **IMPORTANT** Before adding the below, when text would get streamed (SSE) in to the MDE (non-Editable mode), the height would not re-calculate per-stream event. So the text would very quickly bleed off the bottom of the Message. With `textView.needsLayout = true`, `textView.invalidateIntrinsicContentSize()`, `textView.needsDisplay = true` etc added, the text view is able to re-adjust its container whenever the binding string is mutated
             Task {
                 await MainActor.run {
-//                  /// It does seem to work with ONLY `textView.invalidateIntrinsicContentSize()`
+                    //                  /// It does seem to work with ONLY `textView.invalidateIntrinsicContentSize()`
                     /// Keep `needsLayout`  and `needsDisplay` as a backup just in case
+                    self.output(textView.editorHeight)
                     textView.invalidateIntrinsicContentSize()
                 }
             }
@@ -131,27 +126,28 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
             //
         }
         //
-                if textView.isShowingFrames != self.isShowingFrames {
-                    textView.isShowingFrames = self.isShowingFrames
-        //            if isPrinting { os_log("Checked if showing frames. Result: \(textView.isShowingFrames)") }
-        //            textView.applyStyles()
-        //            self.output(textView.editorHeight)
-                }
+        if textView.isShowingFrames != self.isShowingFrames {
+            textView.isShowingFrames = self.isShowingFrames
+            //            if isPrinting { os_log("Checked if showing frames. Result: \(textView.isShowingFrames)") }
+            //            textView.applyStyles()
+            //            self.output(textView.editorHeight)
+        }
         
         
         /// THIS WORKS TO FIX HEIGHT, WHEN WIDTH CHANGES — DON'T LOSE THISSSSS
-                if textView.bounds.width != self.editorWidth {
-                    Task {
-                        await MainActor.run {
-//                            textView.needsLayout = true
-                            
-                            /// It does seem to work with ONLY `textView.invalidateIntrinsicContentSize()`
-                            /// Keep `needsLayout`  and `needsDisplay` as a backup just in case
-                            textView.invalidateIntrinsicContentSize()
-
-                        }
-                    }
+        if textView.bounds.width != self.editorWidth {
+            Task {
+                await MainActor.run {
+                    //                            textView.needsLayout = true
+                    
+                    /// It does seem to work with ONLY `textView.invalidateIntrinsicContentSize()`
+                    /// Keep `needsLayout`  and `needsDisplay` as a backup just in case
+                    self.output(textView.editorHeight)
+                    textView.invalidateIntrinsicContentSize()
+                    
                 }
+            }
+        }
         
         
     } // END update nsView
