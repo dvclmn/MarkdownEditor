@@ -33,9 +33,14 @@ public class MarkdownEditor: NSTextView {
     
     var searchText: String
     
+    private var syntaxList: [MarkdownSyntax] = [
+        .bold, .boldItalic, .italic, .codeBlock, .inlineCode
+    ]
+    
     
     init(
         frame frameRect: NSRect,
+        textContainer container: NSTextContainer?,
         configuration: MarkdownEditorConfiguration? = nil,
         isShowingFrames: Bool,
         searchText: String
@@ -46,14 +51,13 @@ public class MarkdownEditor: NSTextView {
         
         let textStorage = NSTextStorage()
         let layoutManager = NSLayoutManager()
-        
-        self.textHighlighter = TextHighlighter(textStorage: textStorage)
-        
-        textStorage.addLayoutManager(layoutManager)
-        
         let textContainer = NSTextContainer(size: CGSize(width: frameRect.width, height: CGFloat.greatestFiniteMagnitude))
         
+        textStorage.addLayoutManager(layoutManager)
         layoutManager.addTextContainer(textContainer)
+        
+        
+        self.textHighlighter = TextHighlighter(textStorage: textStorage)
         
         super.init(frame: frameRect, textContainer: textContainer)
     }
@@ -61,7 +65,11 @@ public class MarkdownEditor: NSTextView {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-
+    
+    private func setupTextStorage() {
+        textStorage?.delegate = self
+    }
+    
     
     func applyParagraphStyles() {
         
@@ -86,76 +94,110 @@ public class MarkdownEditor: NSTextView {
         
     }
     
-    func applyStyles() {
+    func applyStyles(to range: NSRange) {
+        guard let textStorage = self.textStorage else { return }
         
-        guard let textStorage = self.textStorage else {
-            print("Text storage not available for styling")
-            return
-        }
-        
-        let currentSelectedRange = self.selectedRange()
-        
-        let attributedString = NSMutableAttributedString(string: textStorage.string)
-        
-//        let syntaxList = MarkdownSyntax.allCases
-        
-        let syntaxList: [MarkdownSyntax] = [
-            .bold, .boldItalic, .italic, .codeBlock, .inlineCode
-        ]
+        textStorage.beginEditing()
         
         for syntax in syntaxList {
-            styleText(
-                for: syntax,
-                withString: attributedString
-            )
+            styleText(for: syntax, in: range)
         }
         
-        self.setSelectedRange(currentSelectedRange)
-//                self.invalidateIntrinsicContentSize()
-//                self.needsDisplay = true
-        
+        textStorage.endEditing()
     }
+    
+    //    func applyStyles() {
+    //
+    //        guard let textStorage = self.textStorage else {
+    //            print("Text storage not available for styling")
+    //            return
+    //        }
+    //
+    //        let currentSelectedRange = self.selectedRange()
+    //
+    //        let attributedString = NSMutableAttributedString(string: textStorage.string)
+    //
+    //        //        let syntaxList = MarkdownSyntax.allCases
+    //
+    //
+    //
+    //        for syntax in syntaxList {
+    //            styleText(
+    //                for: syntax,
+    //                withString: attributedString
+    //            )
+    //        }
+    //
+    //        self.setSelectedRange(currentSelectedRange)
+    //        //                self.invalidateIntrinsicContentSize()
+    //        //                self.needsDisplay = true
+    //
+    //    }
     
     @MainActor
     public func styleText(
         for syntax: MarkdownSyntax,
-        withString attributedString: NSMutableAttributedString
+        in range: NSRange
     ) {
         
-        guard let textStorage = self.textStorage else {
-            print("Text storage not available for styling")
-            return
-        }
+        guard let textStorage = self.textStorage else { return }
         
         let regexLiteral: Regex<(Substring, Substring)> = syntax.regex
         
         let syntaxCharacterCount: Int = syntax.syntaxCharacters.count
         let isSyntaxSymmetrical: Bool = syntax.syntaxSymmetrical
         
-        let string = attributedString.string
-        let matches = string.matches(of: regexLiteral)
+        let string = textStorage.string
+        let searchRange = NSIntersectionRange(range, NSRange(location: 0, length: textStorage.length))
+        
+        //        let matches = string.matches(of: regexLiteral)
+        
+        let matches = string[Range(searchRange, in: string)!].matches(of: regexLiteral)
+        
+        
+        //        let regex = try? NSRegularExpression(pattern: syntax.regex, options: [])
+        //        regex?.enumerateMatches(in: string, options: [], range: searchRange) { match, _, _ in
+        //            guard let match = match else { return }
+        //        }
+        //
+        
+        
         
         for match in matches {
-            let range = NSRange(match.range, in: string)
+            let matchRange = NSRange(match.range, in: string)
+            
+            
+            
+            let contentRange = NSRange(location: matchRange.location + syntax.syntaxCharacters.count,
+                                       length: matchRange.length - 2 * syntax.syntaxCharacters.count)
+            
+            textStorage.addAttributes(syntax.syntaxAttributes, range: NSRange(location: matchRange.location, length: syntax.syntaxCharacters.count))
+            textStorage.addAttributes(syntax.syntaxAttributes, range: NSRange(location: matchRange.location + matchRange.length - syntax.syntaxCharacters.count, length: syntax.syntaxCharacters.count))
+            textStorage.addAttributes(syntax.contentAttributes, range: contentRange)
+            
+            
+            
+            
+            
             
             /// Content range
-            let contentLocation = max(0,syntax == .codeBlock ?  range.location + syntaxCharacterCount + 1 : range.location + syntaxCharacterCount)
-            let contentLength = min(range.length - (isSyntaxSymmetrical ? 2 : 1) * syntaxCharacterCount, attributedString.length - contentLocation)
+            let contentLocation = max(0,syntax == .codeBlock ?  matchRange.location + syntaxCharacterCount + 1 : matchRange.location + syntaxCharacterCount)
+            let contentLength = min(matchRange.length - (isSyntaxSymmetrical ? 2 : 1) * syntaxCharacterCount, attributedString.length - contentLocation)
             let contentRange = NSRange(location: contentLocation, length: contentLength)
             
             /// Opening syntax range
-            let startSyntaxLocation = range.location
+            let startSyntaxLocation = matchRange.location
             let startSyntaxLength = min(syntax == .codeBlock ? syntaxCharacterCount + 1 : syntaxCharacterCount, attributedString.length - startSyntaxLocation)
             let startSyntaxRange = NSRange(location: startSyntaxLocation, length: startSyntaxLength)
             
             /// Closing syntax range
-            let endSyntaxLocation = max(0, range.location + range.length - syntaxCharacterCount)
+            let endSyntaxLocation = max(0, matchRange.location + matchRange.length - syntaxCharacterCount)
             let endSyntaxLength = min(syntax == .codeBlock ? syntaxCharacterCount + 1 : syntaxCharacterCount, attributedString.length - endSyntaxLocation)
             let endSyntaxRange = NSRange(location: endSyntaxLocation, length: endSyntaxLength)
             
             /// Apply attributes to opening and closing syntax
             if attributedString.length >= startSyntaxRange.upperBound {
-
+                
                 textStorage.addAttributes(syntax.syntaxAttributes, range: startSyntaxRange)
             }
             
@@ -215,63 +257,63 @@ public class MarkdownEditor: NSTextView {
         
         
         /// Re-applies codeBlock background
-        /// 
-//        if self.searchText.count > 0 {
-//            
-//            
-//            let fullRange = NSRange(location: 0, length: attributedString.length)
-//            let highlightColour = NSColor.orange
-//            let escapedSearchTerm = NSRegularExpression.escapedPattern(for: self.searchText)
-//            
-//            // Step 1: Store the original background colors before highlighting
-//            var originalBackgroundColors: [NSRange: NSColor] = [:]
-//            
-//            textStorage.enumerateAttribute(.backgroundColor, in: fullRange, options: []) { attributeValue, range, _ in
-//                if let backgroundColor = attributeValue as? NSColor {
-//                    originalBackgroundColors[range] = backgroundColor
-//                }
-//            }
-//            
-//            // Step 2: Apply the search term highlights (as you've done in your existing code)
-//            textStorage.addAttribute(.backgroundColor, value: NSColor.clear, range: fullRange)
-//            
-//            if let searchRegex = try? Regex(escapedSearchTerm) {
-//                
-//                let searchMatches = string.matches(of: searchRegex)
-//                
-//                for match in searchMatches {
-//                    let range = NSRange(match.range, in: string)
-//                    
-//                    let highlightAttribute: [NSAttributedString.Key: Any] = [.backgroundColor: highlightColour]
-//                    
-//                    //                    attributedString.addAttributes(highlightAttribute, range: range)
-//                    textStorage.addAttributes(highlightAttribute, range: range)
-//                }
-//            } else {
-//                print("Error highlighting search term")
-//            }
-//        } // END search check
+        ///
+        //        if self.searchText.count > 0 {
+        //
+        //
+        //            let fullRange = NSRange(location: 0, length: attributedString.length)
+        //            let highlightColour = NSColor.orange
+        //            let escapedSearchTerm = NSRegularExpression.escapedPattern(for: self.searchText)
+        //
+        //            // Step 1: Store the original background colors before highlighting
+        //            var originalBackgroundColors: [NSRange: NSColor] = [:]
+        //
+        //            textStorage.enumerateAttribute(.backgroundColor, in: fullRange, options: []) { attributeValue, range, _ in
+        //                if let backgroundColor = attributeValue as? NSColor {
+        //                    originalBackgroundColors[range] = backgroundColor
+        //                }
+        //            }
+        //
+        //            // Step 2: Apply the search term highlights (as you've done in your existing code)
+        //            textStorage.addAttribute(.backgroundColor, value: NSColor.clear, range: fullRange)
+        //
+        //            if let searchRegex = try? Regex(escapedSearchTerm) {
+        //
+        //                let searchMatches = string.matches(of: searchRegex)
+        //
+        //                for match in searchMatches {
+        //                    let range = NSRange(match.range, in: string)
+        //
+        //                    let highlightAttribute: [NSAttributedString.Key: Any] = [.backgroundColor: highlightColour]
+        //
+        //                    //                    attributedString.addAttributes(highlightAttribute, range: range)
+        //                    textStorage.addAttributes(highlightAttribute, range: range)
+        //                }
+        //            } else {
+        //                print("Error highlighting search term")
+        //            }
+        //        } // END search check
         
         // ...
         
-//        // Step 3: Restore the original background colors when the search is cleared or changed
-//        if self.searchText.count == 0 {
-//            for (range, color) in originalBackgroundColors {
-//                textStorage.addAttribute(.backgroundColor, value: color, range: range)
-//            }
-//        } else {
-//            // Clear search highlights without affecting other attributes
-//            for (range, _) in originalBackgroundColors {
-//                if let originalColor = originalBackgroundColors[range] {
-//                    textStorage.addAttribute(.backgroundColor, value: originalColor, range: range)
-//                } else {
-//                    textStorage.removeAttribute(.backgroundColor, range: range)
-//                }
-//            }
-//            
-//            // Apply new search term highlights...
-//            // ...
-//        }
+        //        // Step 3: Restore the original background colors when the search is cleared or changed
+        //        if self.searchText.count == 0 {
+        //            for (range, color) in originalBackgroundColors {
+        //                textStorage.addAttribute(.backgroundColor, value: color, range: range)
+        //            }
+        //        } else {
+        //            // Clear search highlights without affecting other attributes
+        //            for (range, _) in originalBackgroundColors {
+        //                if let originalColor = originalBackgroundColors[range] {
+        //                    textStorage.addAttribute(.backgroundColor, value: originalColor, range: range)
+        //                } else {
+        //                    textStorage.removeAttribute(.backgroundColor, range: range)
+        //                }
+        //            }
+        //
+        //            // Apply new search term highlights...
+        //            // ...
+        //        }
         
         
         
@@ -287,6 +329,30 @@ public class MarkdownEditor: NSTextView {
         
         
     } // END style text
+    
+    
+    
+    
+    //        private func styleText(for syntax: MarkdownSyntax, in range: NSRange) {
+    //                guard let textStorage = self.textStorage else { return }
+    //
+    //                let string = textStorage.string
+    //                let searchRange = NSIntersectionRange(range, NSRange(location: 0, length: string.length))
+    //
+    //                let regex = try? NSRegularExpression(pattern: syntax.regex.description, options: [])
+    //                regex?.enumerateMatches(in: string, options: [], range: searchRange) { match, _, _ in
+    //                    guard let match = match else { return }
+    //
+    //                    let matchRange = match.range
+    //                    let contentRange = NSRange(location: matchRange.location + syntax.syntaxCharacters.count,
+    //                                               length: matchRange.length - 2 * syntax.syntaxCharacters.count)
+    //
+    //                    textStorage.addAttributes(syntax.syntaxAttributes, range: NSRange(location: matchRange.location, length: syntax.syntaxCharacters.count))
+    //                    textStorage.addAttributes(syntax.syntaxAttributes, range: NSRange(location: matchRange.location + matchRange.length - syntax.syntaxCharacters.count, length: syntax.syntaxCharacters.count))
+    //                    textStorage.addAttributes(syntax.contentAttributes, range: contentRange)
+    //                }
+    //            }
+    
     
     @MainActor
     public func findRangesWithBackgroundColor(
@@ -373,3 +439,13 @@ extension MarkdownEditor {
 }
 
 #endif
+
+@MainActor
+extension MarkdownEditor: NSTextStorageDelegate {
+    public func textStorage(_ textStorage: NSTextStorage, didProcessEditing editedMask: NSTextStorageEditActions, range editedRange: NSRange, changeInLength delta: Int) {
+        if editedMask.contains(.editedCharacters) {
+            let extendedRange = NSUnionRange(editedRange, textStorage.editedRange)
+            applyStyles(to: extendedRange)
+        }
+    }
+}
