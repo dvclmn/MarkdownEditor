@@ -8,6 +8,10 @@
 import Foundation
 import SwiftUI
 
+#if os(macOS)
+
+
+
 class TextHighlighter {
     private var originalAttributes: [NSRange: [NSAttributedString.Key: Any]] = [:]
     private weak var textStorage: NSTextStorage?
@@ -63,3 +67,6 @@ class TextHighlighter {
 //textHighlighter.applyHighlights(forSearchTerm: "searchTerm")
 // ... when done with searching
 //textHighlighter.clearHighlights()
+
+
+#endif

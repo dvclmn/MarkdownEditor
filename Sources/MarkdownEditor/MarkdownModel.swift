@@ -5,6 +5,10 @@
 //  Created by Dave Coleman on 20/4/2024.
 //
 
+#if os(macOS)
+
+
+
 import Foundation
 import SwiftUI
 
@@ -14,17 +18,17 @@ public struct MarkdownDefaults {
     public static let fontSize:                 Double = 15
     public static let fontWeight:               NSFont.Weight = .medium
     public static let fontOpacity:              Double = 0.88
-        
+    
     public static let headerSyntaxSize:         Double = 20
     public static let fontSizeMono:             Double = 14
-        
+    
     public static let syntaxAlpha:              Double = 0.3
     public static let backgroundInlineCode:     Double = 0.2
     public static let backgroundCodeBlock:      Double = 0.4
     
     public static let lineSpacing:              Double = 4
     public static let paragraphSpacing:         Double = 0
-            
+    
 }
 
 @MainActor
@@ -71,46 +75,22 @@ public enum MarkdownSyntax: String, CaseIterable, Identifiable {
     }
     
     private static let regexCache: [MarkdownSyntax: Regex<(Substring, Substring)>] = {
-            var cache = [MarkdownSyntax: Regex<(Substring, Substring)>]()
-            cache[.h1] = /# (.*)/
-            cache[.h2] = /## (.*)/
-            cache[.h3] = /### (.*)/
-            cache[.bold] = /\*\*(.*?)\*\*/
-            cache[.italic] = /\*(.*?)\*/
-            cache[.boldItalic] = /\*\*\*(.*?)\*\*\*/
-            cache[.strikethrough] = /\~\~(.*?)\~\~/
-            cache[.inlineCode] = /`([^\n`]+)(?!``)`(?!`)/
-            cache[.codeBlock] = /(?m)^```([\s\S]*?)^```/
-            return cache
-        }()
-
-        public var regex: Regex<(Substring, Substring)> {
-            return MarkdownSyntax.regexCache[self]!
-        }
+        var cache = [MarkdownSyntax: Regex<(Substring, Substring)>]()
+        cache[.h1] = /# (.*)/
+        cache[.h2] = /## (.*)/
+        cache[.h3] = /### (.*)/
+        cache[.bold] = /\*\*(.*?)\*\*/
+        cache[.italic] = /\*(.*?)\*/
+        cache[.boldItalic] = /\*\*\*(.*?)\*\*\*/
+        cache[.strikethrough] = /\~\~(.*?)\~\~/
+        cache[.inlineCode] = /`([^\n`]+)(?!``)`(?!`)/
+        cache[.codeBlock] = /^\s*```([\s\S]*?)^\s*```/.anchorsMatchLineEndings()
+        return cache
+    }()
     
-//    /// https://swiftregex.com
-//    public var regex: Regex<(Substring, Substring)> {
-//        switch self {
-//        case .h1:
-//            return /# (.*)/
-//        case .h2:
-//            return /## (.*)/
-//        case .h3:
-//            return /### (.*)/
-//        case .bold:
-//            return /\*\*(.*?)\*\*/
-//        case .italic:
-//            return /\*(.*?)\*/
-//        case .boldItalic:
-//            return /\*\*\*(.*?)\*\*\*/
-//        case .strikethrough:
-//            return /\~\~(.*?)\~\~/
-//        case .inlineCode:
-//            return /`([^\n`]+)(?!``)`(?!`)/
-//        case .codeBlock:
-//            return /(?m)^```([\s\S]*?)^```/
-//        }
-//    }
+    public var regex: Regex<(Substring, Substring)> {
+        return MarkdownSyntax.regexCache[self]!
+    }
     
     public var hideSyntax: Bool {
         switch self {
@@ -286,12 +266,12 @@ public enum MarkdownSyntax: String, CaseIterable, Identifiable {
     public var syntaxAttributes: [NSAttributedString.Key : Any]  {
         
         switch self {
-        
+            
         case .inlineCode:
             return [
                 .font: NSFont.monospacedSystemFont(ofSize: self.fontSize, weight: .regular),
-                    .foregroundColor: NSColor.textColor.withAlphaComponent(MarkdownDefaults.syntaxAlpha),
-                    .backgroundColor: NSColor.black.withAlphaComponent(MarkdownDefaults.backgroundInlineCode)
+                .foregroundColor: NSColor.textColor.withAlphaComponent(MarkdownDefaults.syntaxAlpha),
+                .backgroundColor: NSColor.black.withAlphaComponent(MarkdownDefaults.backgroundInlineCode)
             ]
         case .codeBlock:
             return [
@@ -312,3 +292,5 @@ enum CodeLanguage {
     case swift
     case python
 }
+
+#endif

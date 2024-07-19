@@ -5,6 +5,10 @@
 //  Created by Dave Coleman on 17/4/2024.
 //
 
+#if os(macOS)
+
+
+
 import Foundation
 import SwiftUI
 import OSLog
@@ -42,7 +46,7 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
     
     public var isEditable: Bool
     
-        var output: (_ editorHeight: CGFloat) -> Void
+    var output: (_ editorHeight: CGFloat) -> Void
     
     private let isPrinting: Bool = true
     
@@ -60,7 +64,7 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
         
         isEditable: Bool = true,
         
-                output: @escaping (_ editorHeight: CGFloat) -> Void = {_ in}
+        output: @escaping (_ editorHeight: CGFloat) -> Void = {_ in}
         
     ) {
         self._text = text
@@ -90,9 +94,11 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
         setUpTextViewOptions(for: textView)
         
         textView.applyStyles()
-        self.output(textView.editorHeight)
         
-        //        if isPrinting { os_log("Made the nsview\n") }
+        /// Not sure there's anything to invalidate on startup
+//        textView.invalidateIntrinsicContentSize()
+        
+        self.output(textView.editorHeight)
         
         return textView
     }
@@ -103,40 +109,41 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
     public func updateNSView(_ textView: MarkdownEditor, context: Context) {
         
         
-        /// The below two statements are called a billion times a second, on SwiftUI ScrollView scroll!
-        /// I think I will need to make sure anything in this function, is *ONLY* called if neccesary
-        //        os_log("`updateNSView` > MDE width for ID `\(self.id)`: \(textView.bounds.width)")
+        /// Actions that *should* reapply the styles. Determining these, so I don't have to apply styles on *every* keypress
+        /// - Clicking anywhere in the text. This could be achieved with a change in selected range
+        /// - Pasting new content in — I think `textDidChange` in the coordinator could help with this
+        /// - Pressing space key, or return key
+        /// - Possibly pressing any syntax key(s)
         
-        /// Issue with including `&& self.isEditable` is that the non-editable MDEs can still have their text change
         if textView.string != self.text {
-            //
             textView.string = text
-            
-            /// **IMPORTANT** Before adding the below, when text would get streamed (SSE) in to the MDE (non-Editable mode), the height would not re-calculate per-stream event. So the text would very quickly bleed off the bottom of the Message. With `textView.needsLayout = true`, `textView.invalidateIntrinsicContentSize()`, `textView.needsDisplay = true` etc added, the text view is able to re-adjust its container whenever the binding string is mutated
             Task {
                 await MainActor.run {
-                    //                  /// It does seem to work with ONLY `textView.invalidateIntrinsicContentSize()`
-                    /// Keep `needsLayout`  and `needsDisplay` as a backup just in case
-                    self.output(textView.editorHeight)
-                    textView.invalidateIntrinsicContentSize()
+                    
+                    if self.isEditable {
+                        /// Keep `needsLayout`  and `needsDisplay` as a backup just in case
+                        textView.invalidateIntrinsicContentSize()
+                        //                    textView.needsLayout = true
+//                                            textView.needsDisplay = true
+                        self.output(textView.editorHeight)
+                        
+                    } else {
+                        /// I can run a 'more expensive' operation on non-Editable MDE's
+                        textView.applyStyles()
+//                        textView.invalidateIntrinsicContentSize()
+//                        self.output(textView.editorHeight)
+                    }
+                    
                 }
-            }
-            //
-            ////            textView.setSelectedRange(currentSelectedRange)
-            //
-            //            Task {
-            //                await setStyles(for: textView)
-            //            }
-            //
+            } // END task
         }
-        //
+
         if textView.isShowingFrames != self.isShowingFrames {
             textView.isShowingFrames = self.isShowingFrames
             os_log("Does this ever change? is `textView.isShowingFrames` \(textView.isShowingFrames), ever different from `self.isShowingFrames`? \(self.isShowingFrames)")
-            //            if isPrinting { os_log("Checked if showing frames. Result: \(textView.isShowingFrames)") }
-            //            textView.applyStyles()
-            //            self.output(textView.editorHeight)
         }
+        
+        
         
         if textView.searchText != self.searchText {
             textView.searchText = self.searchText
@@ -145,8 +152,8 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
             Task {
                 await MainActor.run {
                     textView.applyStyles()
-                    self.output(textView.editorHeight)
                     textView.invalidateIntrinsicContentSize()
+                    self.output(textView.editorHeight)
                 }
             }
         }
@@ -156,12 +163,9 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
         if textView.bounds.width != self.editorWidth {
             Task {
                 await MainActor.run {
-                    //                            textView.needsLayout = true
                     
-                    /// It does seem to work with ONLY `textView.invalidateIntrinsicContentSize()`
-                    /// Keep `needsLayout`  and `needsDisplay` as a backup just in case
-                    self.output(textView.editorHeight)
                     textView.invalidateIntrinsicContentSize()
+                    self.output(textView.editorHeight)
                     
                 }
             }
@@ -169,43 +173,6 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
         
         
     } // END update nsView
-    
-    
-    
-    //    func dismantleNSView(_ textView: MarkdownEditor, context: Context) {
-    //
-    //        if isPrinting { os_log("Dismantling nsView\n") }
-    //        debounceTask?.cancel()
-    //    }
-    //
-    //    private func setStyles(for textView: MarkdownEditor) async {
-    //
-    //        await MainActor.run {
-    //
-    //            debounceTask?.cancel()
-    //            debounceTask = Task {
-    //                do {
-    //                    try await Task.sleep(for: .seconds(1))
-    //                    if !Task.isCancelled {
-    //                        os_log("Waited, now adjusting")
-    //                        textView.applyStyles()
-    //                        self.output(textView.editorHeight)
-    //                        //                        textView.needsLayout = true
-    //                        //                        textView.invalidateIntrinsicContentSize()
-    //                        //                        textView.needsDisplay = true
-    //                        //                        textView.isShowingFrames = false
-    //                    }
-    //                } catch {}
-    //            }
-    //
-    //        }
-    //    }
-    
-    
-    //    private func regexAndStyles(for textView: MarkdownEditor) async {
-    //
-    //
-    //    }
     
     
     /// It is the Coordinator that is responsible for sending information back **to** SwiftUI, from the NSView
@@ -219,87 +186,26 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
         
         public init(_ parent: MarkdownEditorRepresentable) {
             self.parent = parent
-            //            super.init()
         }
-        
-        //        public func textDidBeginEditing(_ notification: Notification) {
-        //            guard let textView = notification.object as? MarkdownEditor else { return }
-        //
-        //            if self.parent.text != textView.string {
-        //                DispatchQueue.main.async {
-        //                    self.parent.text = textView.string
-        //                }
-        //            }
-        //        }
         
         /// Try `scrollRangeToVisible_` for when scroll jumps to top when pasting
         public func textDidChange(_ notification: Notification) {
+            
             guard let textView = notification.object as? MarkdownEditor else { return }
-            //
-            //
+            
             if self.parent.text != textView.string {
-                //
                 self.parent.text = textView.string
-                //
-                //                if self.parent.isPrinting {
-                //                    os_log("Checked if text has changed")
-                //                    os_log("`self.parent.text`: \(self.parent.text)")
-                //                    os_log("`textView.string`: \(textView.string)")
-                //                }
-                //
-                //                Task {
-                //                    await MainActor.run {
-                //
-                //                        self.parent.debounceTask?.cancel()
-                //                        self.parent.debounceTask = Task {
-                //                            do {
-                //                                try await Task.sleep(for: .seconds(1))
-                //                                if !Task.isCancelled {
-                //                                    os_log("Waited, now adjusting")
-                //                                    textView.applyStyles()
-                //                                    self.parent.output(textView.editorHeight)
-                //                                    //                        textView.needsLayout = true
-                //                                    //                        textView.invalidateIntrinsicContentSize()
-                //                                    //                        textView.needsDisplay = true
-                //                                    //                        textView.isShowingFrames = false
-                //                                }
-                //                            } catch {}
-                //                        }
-                //
-                //                    }
-                //                }
-                //
-                //                //                DispatchQueue.main.async {
-                //                //                    if self.parent.text != textView.string {
-                //                //                        self.parent.text = textView.string
-                //                //                        textView.applyStyles()
-                //                //
-                //                //
-                //                //                        //                        self.parent.editorHeight = textView.editorHeight
-                //                //                        self.parent.output(false, textView.editorHeight)
-                //                //
-                //                //                        textView.invalidateIntrinsicContentSize()
-                //                //                        textView.needsDisplay = true
-                //                //                    }
-                //                //                } // END dispatch async
-                //
+                Task {
+                    await MainActor.run {
+                        self.parent.output(textView.editorHeight)
+                        textView.applyStyles()
+                        textView.invalidateIntrinsicContentSize()
+                    }
+                }
+                
             } // END text equality check
             //
         } // END Text did change
-        
-        //        public func textViewDidChangeSelection(_ notification: Notification) {
-        //            guard let textView = notification.object as? MarkdownEditor else { return }
-        //
-        //            DispatchQueue.main.async {
-        //                let caretRect = textView.layoutManager?.boundingRect(forGlyphRange: textView.selectedRange(), in: textView.textContainer!)
-        //                if let caretRect = caretRect {
-        //                    print("Caret position? `\(caretRect)`")
-        //                    self.parent.onCaretPositionChange?(caretRect)
-        //                }
-        //            }
-        //
-        //
-        //        }
         
     }
 } // END NSViewRepresentable
@@ -336,7 +242,7 @@ extension MarkdownEditorRepresentable {
         
         textView.insertionPointColor = NSColor(configuration?.insertionPointColour ?? .blue)
         
-        textView.smartInsertDeleteEnabled = true
+        textView.smartInsertDeleteEnabled = false
         
         textView.usesFindBar = true
         
@@ -352,8 +258,10 @@ extension MarkdownEditorRepresentable {
         textView.drawsBackground = false
         textView.allowsUndo = true
         textView.setNeedsDisplay(textView.bounds)
-        //        textView.setNeedsDisplay(NSRect(x: 0, y: 0, width: self.editorWidth ?? 200, height: 200))
+//                textView.setNeedsDisplay(NSRect(x: 0, y: 0, width: self.editorWidth ?? 200, height: 200))
     }
     
 }
 
+
+#endif

@@ -5,6 +5,10 @@
 //  Created by Dave Coleman on 19/4/2024.
 //
 
+#if os(macOS)
+
+
+
 import Foundation
 import SwiftUI
 import Highlightr
@@ -57,11 +61,7 @@ public class MarkdownEditor: NSTextView {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
-    
-    func handleRawText() {
-        
-    }
+
     
     func applyParagraphStyles() {
         
@@ -93,14 +93,15 @@ public class MarkdownEditor: NSTextView {
             return
         }
         
-        
         let currentSelectedRange = self.selectedRange()
-        
         
         let attributedString = NSMutableAttributedString(string: textStorage.string)
         
+//        let syntaxList = MarkdownSyntax.allCases
         
-        let syntaxList = MarkdownSyntax.allCases
+        let syntaxList: [MarkdownSyntax] = [
+            .bold, .boldItalic, .italic, .codeBlock, .inlineCode
+        ]
         
         for syntax in syntaxList {
             styleText(
@@ -109,10 +110,9 @@ public class MarkdownEditor: NSTextView {
             )
         }
         
-        //        textStorage.setAttributedString(attributedString)
         self.setSelectedRange(currentSelectedRange)
-        //        self.invalidateIntrinsicContentSize()
-        //        self.needsDisplay = true
+//                self.invalidateIntrinsicContentSize()
+//                self.needsDisplay = true
         
     }
     
@@ -129,8 +129,8 @@ public class MarkdownEditor: NSTextView {
         
         let regexLiteral: Regex<(Substring, Substring)> = syntax.regex
         
-        let syntaxCharacterRanges: Int = syntax.syntaxCharacters.count
-        let syntaxSymmetrical: Bool = syntax.syntaxSymmetrical
+        let syntaxCharacterCount: Int = syntax.syntaxCharacters.count
+        let isSyntaxSymmetrical: Bool = syntax.syntaxSymmetrical
         
         let string = attributedString.string
         let matches = string.matches(of: regexLiteral)
@@ -139,40 +139,38 @@ public class MarkdownEditor: NSTextView {
             let range = NSRange(match.range, in: string)
             
             /// Content range
-            let contentLocation = max(0, range.location + syntaxCharacterRanges)
-            let contentLength = min(range.length - (syntaxSymmetrical ? 2 : 1) * syntaxCharacterRanges, attributedString.length - contentLocation)
+            let contentLocation = max(0,syntax == .codeBlock ?  range.location + syntaxCharacterCount + 1 : range.location + syntaxCharacterCount)
+            let contentLength = min(range.length - (isSyntaxSymmetrical ? 2 : 1) * syntaxCharacterCount, attributedString.length - contentLocation)
             let contentRange = NSRange(location: contentLocation, length: contentLength)
             
             /// Opening syntax range
             let startSyntaxLocation = range.location
-            let startSyntaxLength = min(syntaxCharacterRanges, attributedString.length - startSyntaxLocation)
+            let startSyntaxLength = min(syntax == .codeBlock ? syntaxCharacterCount + 1 : syntaxCharacterCount, attributedString.length - startSyntaxLocation)
             let startSyntaxRange = NSRange(location: startSyntaxLocation, length: startSyntaxLength)
             
             /// Closing syntax range
-            let endSyntaxLocation = max(0, range.location + range.length - syntaxCharacterRanges)
-            let endSyntaxLength = min(syntax == .codeBlock ? syntaxCharacterRanges + 1 : syntaxCharacterRanges, attributedString.length - endSyntaxLocation)
+            let endSyntaxLocation = max(0, range.location + range.length - syntaxCharacterCount)
+            let endSyntaxLength = min(syntax == .codeBlock ? syntaxCharacterCount + 1 : syntaxCharacterCount, attributedString.length - endSyntaxLocation)
             let endSyntaxRange = NSRange(location: endSyntaxLocation, length: endSyntaxLength)
             
             /// Apply attributes to opening and closing syntax
             if attributedString.length >= startSyntaxRange.upperBound {
-                //                attributedString.addAttributes(syntax.syntaxAttributes, range: startSyntaxRange)
+
                 textStorage.addAttributes(syntax.syntaxAttributes, range: startSyntaxRange)
             }
             
             if attributedString.length >= endSyntaxRange.upperBound {
-                //                attributedString.addAttributes(syntax.syntaxAttributes, range: endSyntaxRange)
                 textStorage.addAttributes(syntax.syntaxAttributes, range: endSyntaxRange)
             }
             
             /// Apply attributes to content
             if attributedString.length >= contentRange.upperBound {
-                //                attributedString.addAttributes(syntax.contentAttributes, range: contentRange)
                 textStorage.addAttributes(syntax.contentAttributes, range: contentRange)
                 
                 if syntax == .inlineCode {
                     
                     let userCodeColour: [NSAttributedString.Key : Any] = [
-                        .foregroundColor: NSColor(configuration?.defaultCodeColour ?? .white),
+                        .foregroundColor: NSColor(configuration?.defaultCodeColour ?? .white).withAlphaComponent(0.8),
                     ]
                     
                     //                    attributedString.addAttributes(userCodeColour, range: contentRange)
@@ -216,6 +214,8 @@ public class MarkdownEditor: NSTextView {
         }
         
         
+        /// Re-applies codeBlock background
+        /// 
 //        if self.searchText.count > 0 {
 //            
 //            
@@ -371,3 +371,5 @@ extension MarkdownEditor {
     }
     
 }
+
+#endif
