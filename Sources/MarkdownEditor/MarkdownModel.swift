@@ -15,6 +15,7 @@ import SwiftUI
 
 public struct MarkdownDefaults {
     
+    public static let defaultFont =               NSFont.systemFont(ofSize: MarkdownDefaults.fontSize, weight: MarkdownDefaults.fontWeight)
     public static let fontSize:                 Double = 15
     public static let fontWeight:               NSFont.Weight = .medium
     public static let fontOpacity:              Double = 0.88
@@ -74,22 +75,33 @@ public enum MarkdownSyntax: String, CaseIterable, Identifiable {
         }
     }
     
-    private static let regexCache: [MarkdownSyntax: Regex<(Substring, Substring)>] = {
-        var cache = [MarkdownSyntax: Regex<(Substring, Substring)>]()
-        cache[.h1] = /# (.*)/
-        cache[.h2] = /## (.*)/
-        cache[.h3] = /### (.*)/
-        cache[.bold] = /\*\*(.*?)\*\*/
-        cache[.italic] = /\*(.*?)\*/
-        cache[.boldItalic] = /\*\*\*(.*?)\*\*\*/
-        cache[.strikethrough] = /\~\~(.*?)\~\~/
-        cache[.inlineCode] = /`([^\n`]+)(?!``)`(?!`)/
-        cache[.codeBlock] = /^\s*```([\s\S]*?)^\s*```/.anchorsMatchLineEndings()
+    private static let regexPatterns: [MarkdownSyntax: String] = [
+        .h1: "# (.*)",
+        .h2: "## (.*)",
+        .h3: "### (.*)",
+        .bold: "\\*\\*(.*?)\\*\\*",
+        .italic: "\\*(.*?)\\*",
+        .boldItalic: "\\*\\*\\*(.*?)\\*\\*\\*",
+        .strikethrough: "~~(.*?)~~",
+        .inlineCode: "`([^\\n`]+)(?!``)`(?!`)",
+        .codeBlock: "^\\s*```([\\s\\S]*?)^\\s*```"
+    ]
+    
+    private static let regexCache: [MarkdownSyntax: NSRegularExpression] = {
+        var cache = [MarkdownSyntax: NSRegularExpression]()
+        for (syntax, pattern) in regexPatterns {
+            do {
+                let regex = try NSRegularExpression(pattern: pattern, options: syntax == .codeBlock ? .anchorsMatchLines : [])
+                cache[syntax] = regex
+            } catch {
+                print("Error creating regex for \(syntax): \(error)")
+            }
+        }
         return cache
     }()
     
-    public var regex: Regex<(Substring, Substring)> {
-        return MarkdownSyntax.regexCache[self]!
+    public var regex: NSRegularExpression? {
+        return MarkdownSyntax.regexCache[self]
     }
     
     public var hideSyntax: Bool {
@@ -184,8 +196,6 @@ public enum MarkdownSyntax: String, CaseIterable, Identifiable {
     }
     public var foreGroundColor: NSColor {
         switch self {
-        case .inlineCode, .codeBlock:
-            NSColor(.purple)
         default:
                 .textColor.withAlphaComponent(0.85)
         }

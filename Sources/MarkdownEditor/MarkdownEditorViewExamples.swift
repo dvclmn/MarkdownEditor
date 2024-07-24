@@ -15,7 +15,7 @@ struct MarkdownExampleView: View {
     
     @State private var isStreaming: Bool = false
     
-    @State private var text: String = TestStrings.paragraphsWithCode[0]
+    @State private var text: String = TestStrings.paragraphs[1]
     @State private var editorHeight: CGFloat = 0
     
     @FocusState private var isFocused
@@ -25,34 +25,44 @@ struct MarkdownExampleView: View {
     
     var body: some View {
         
-        ScrollView {
+//        GeometryReader { geo in
+//        ScrollView {
             
-            HStack {
+                MarkdownTextView(text: $text)
                 
-                VStack {
-                    Text("Editable")
-                    MarkdownEditorRepresentable(text: $text)
-                }
-                VStack {
-                    Text("Non-editable")
-                    MarkdownEditorRepresentable(text: $text, isEditable: false)
-                }
-            }
+                    .padding()
+                    .background(.blue.opacity(0.3))
+                    .border(Color.purple.opacity(0.3))
+//                    .frame(height: geo.size.height, alignment: .top)
+//            } // END scrollview
             
-        }
-        .task {
-            if isStreaming {
-                do {
-                    for try await chunk in MockupTextStream.chunks(chunkSize: 1, speed: 300) {
-                        await MainActor.run {
-                            text += chunk
-                        }
-                    }
-                } catch {
-                    print("Error: \(error)")
-                }
-            }
-        }
+//            HStack {
+                
+//                VStack {
+//                    Text("Editable")
+//                    MarkdownEditorRepresentable(text: $text)
+//                }
+//                VStack {
+//                    Text("Non-editable")
+//                    MarkdownEditorRepresentable(text: $text, isEditable: false)
+//                }
+//            }
+            
+//        } // END geo reader
+        .border(Color.green.opacity(0.3))
+//        .task {
+//            if isStreaming {
+//                do {
+//                    for try await chunk in MockupTextStream.chunks(chunkSize: 1, speed: 300) {
+//                        await MainActor.run {
+//                            text += chunk
+//                        }
+//                    }
+//                } catch {
+//                    print("Error: \(error)")
+//                }
+//            }
+//        }
 //        .border(Color.green.opacity(0.2))
         .background(.blue.opacity(isLoading ? 0.6 : 0.1))
         //        .task {
@@ -68,7 +78,8 @@ extension MarkdownExampleView {
 }
 #Preview {
     MarkdownExampleView()
-        .frame(width: 600, height: 700)
+        .frame(width: 500, height: 700)
 }
 
 #endif
+

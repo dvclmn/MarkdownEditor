@@ -16,8 +16,6 @@ let package = Package(
     ],
     dependencies: [
             .package(url: "https://github.com/raspu/Highlightr.git", from: "2.1.2"),
-            .package(url: "https://github.com/apple/swift-async-algorithms.git", from: "1.0.0"),
-//            .package(name: "Highlightr", path: "../Highlightr"),
             .package(name: "TestStrings", path: "../TestStrings"),
             .package(name: "Utilities", path: "../Utilities")
             
@@ -27,8 +25,8 @@ let package = Package(
             name: "MarkdownEditor",
             dependencies: [
                 "Utilities",
-                .product(name: "Highlightr", package: "Highlightr"), "TestStrings",
-                .product(name: "AsyncAlgorithms", package: "swift-async-algorithms"),
+                "TestStrings",
+                .product(name: "Highlightr", package: "Highlightr"),
             ]
         )
     ]
