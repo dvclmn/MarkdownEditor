@@ -10,14 +10,21 @@ import SwiftUI
 @MainActor
 public struct MarkdownTextView: NSViewRepresentable {
     @Binding var text: String
+    @Binding var height: CGFloat
+    
+    public var isEditable: Bool
     
     public init(
-        text: Binding<String>
+        text: Binding<String>,
+        height: Binding<CGFloat>,
+        isEditable: Bool = true
     ) {
         self._text = text
+        self._height = height
+        self.isEditable = isEditable
     }
     
-    public func makeNSView(context: Context) -> NSTextView {
+    public func makeNSView(context: Context) -> AutoGrowingTextView {
         
         let textStorage = NSTextStorage()
         let layoutManager = NSLayoutManager()
@@ -26,47 +33,66 @@ public struct MarkdownTextView: NSViewRepresentable {
         layoutManager.addTextContainer(textContainer)
         textStorage.addLayoutManager(layoutManager)
         
-        let textView = NSTextView(frame: .zero, textContainer: textContainer)
-        textView.isRichText = true
-        textView.isEditable = true
+        let textView = AutoGrowingTextView(frame: .zero, heightChangeHandler: nil)
+        
+//        textView.translatesAutoresizingMaskIntoConstraints = false
+        
+        textView.delegate = context.coordinator
+        
+        textView.textContainer?.containerSize = CGSize(width: textView.bounds.width, height: .greatestFiniteMagnitude)
+        
+        
+        textView.isRichText = false
+        textView.isEditable = self.isEditable
         textView.isSelectable = true
         textView.drawsBackground = false
         textView.allowsUndo = true
         
-        textView.translatesAutoresizingMaskIntoConstraints = true
-        
-        textView.isHorizontallyResizable = false
         textView.isVerticallyResizable = true
+        textView.isHorizontallyResizable = false
         textView.autoresizingMask = [.width]
-
+        
         textView.textColor = .white
         textView.font = MarkdownDefaults.defaultFont
+        textView.textContainer?.lineFragmentPadding = 30
+        textView.textContainerInset = NSSize(width: 0, height: 30)
         
-        textContainer.widthTracksTextView = true
-        textContainer.heightTracksTextView = false
+        textView.textContainer?.widthTracksTextView = true
+        textView.textContainer?.heightTracksTextView = false
+        
+        textView.heightChangeHandler = { newHeight in
+            DispatchQueue.main.async {
+                self.height = newHeight
+            }
+        }
+        
+        textView.setNeedsDisplay(textView.bounds)
         
         
-        textView.delegate = context.coordinator
         
         return textView
     }
     
-    public func updateNSView(_ textView: NSTextView, context: Context) {
+    public func updateNSView(_ textView: AutoGrowingTextView, context: Context) {
         
-
-        if textView.string != text {
+        
+        if textView.string != self.text {
             let selectedRanges = textView.selectedRanges
-            textView.string = text
+            textView.string = self.text
             textView.selectedRanges = selectedRanges
             context.coordinator.applyMarkdownStyling(to: textView)
+            
+            DispatchQueue.main.async {
+                self.height = textView.intrinsicContentSize.height
+            }
         }
         
         // Check if the width has changed significantly
-        let currentWidth = textView.frame.width
-        if abs(currentWidth - context.coordinator.lastKnownWidth) > 10 { // 10 points threshold
-            context.coordinator.lastKnownWidth = currentWidth
-            context.coordinator.applyMarkdownStyling(to: textView)
-        }
+        //        let currentWidth = textView.frame.width
+        //        if abs(currentWidth - context.coordinator.lastKnownWidth) > 10 { // 10 points threshold
+        //            context.coordinator.lastKnownWidth = currentWidth
+        //            context.coordinator.applyMarkdownStyling(to: textView)
+        //        }
         
         
     }
@@ -82,16 +108,16 @@ public struct MarkdownTextView: NSViewRepresentable {
             self.parent = parent
         }
         
-        var lastKnownWidth: CGFloat = 0
+        //        var lastKnownWidth: CGFloat = 0
         
         public func textDidChange(_ notification: Notification) {
-            guard let textView = notification.object as? NSTextView else { return }
+            guard let textView = notification.object as? AutoGrowingTextView else { return }
             parent.text = textView.string
             applyMarkdownStyling(to: textView)
         }
         
         @MainActor
-        func applyMarkdownStyling(to textView: NSTextView) {
+        func applyMarkdownStyling(to textView: AutoGrowingTextView) {
             
             guard let textStorage = textView.textStorage else { return }
             
@@ -130,5 +156,52 @@ public struct MarkdownTextView: NSViewRepresentable {
             // Restore the selection
             textView.selectedRanges = selectedRanges
         }
+    }
+}
+
+
+
+@MainActor
+public class AutoGrowingTextView: NSTextView {
+    var heightChangeHandler: ((CGFloat) -> Void)?
+    
+    public init(
+        frame frameRect: NSRect,
+        heightChangeHandler: ((CGFloat) -> Void)? = nil
+    ) {
+
+        let textStorage = NSTextStorage()
+        let layoutManager = NSLayoutManager()
+        let textContainer = NSTextContainer(size: CGSize(width: frameRect.width, height: CGFloat.greatestFiniteMagnitude))
+        
+        textStorage.addLayoutManager(layoutManager)
+        layoutManager.addTextContainer(textContainer)
+        
+        super.init(frame: frameRect, textContainer: textContainer)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    public override var intrinsicContentSize: NSSize {
+        
+        guard let layoutManager = self.layoutManager, let container = self.textContainer else {
+            return super.intrinsicContentSize
+        }
+        
+        container.containerSize = NSSize(width: self.bounds.width, height: CGFloat.greatestFiniteMagnitude)
+        layoutManager.ensureLayout(for: container)
+        
+        let rect = layoutManager.usedRect(for: container).size
+        
+        return rect
+    }
+    
+    public override func didChangeText() {
+        super.didChangeText()
+        invalidateIntrinsicContentSize()
+        let height = intrinsicContentSize.height
+        heightChangeHandler?(height)
     }
 }

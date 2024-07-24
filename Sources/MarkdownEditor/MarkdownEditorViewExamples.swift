@@ -31,14 +31,15 @@ struct MarkdownExampleView: View {
 //        GeometryReader { geo in
 //        ScrollView {
             
-                MarkdownTextView(text: $text)
+                MarkdownTextView(text: $text, height: $editorHeight)
                     .padding()
-                    .resizable(
-                        isManualMode: $isManualMode,
-                        edge: .trailing,
-                        lengthMin: 100,
-                        lengthMax: 400
-                    )
+//                    .resizable(
+//                        isManualMode: $isManualMode,
+//                        edge: .trailing,
+//                        lengthMin: 100,
+//                        lengthMax: 400
+//                    )
+                    .frame(maxWidth: .infinity)
                     .background(.blue.opacity(0.3))
                     .border(Color.purple.opacity(0.3))
         
