@@ -19,7 +19,8 @@ import OSLog
 @MainActor
 public class MarkdownEditor: NSTextView, NSTextStorageDelegate {
     
-    var editorHeight: CGFloat = .zero
+    var editorHeight: CGFloat
+    var editorWidth: CGFloat
     
     var configuration: MarkdownEditorConfiguration?
     
@@ -38,10 +39,14 @@ public class MarkdownEditor: NSTextView, NSTextStorageDelegate {
     
     init(
         frame frameRect: NSRect,
+        editorHeight: CGFloat = .zero,
+        editorWidth: CGFloat = .zero,
         configuration: MarkdownEditorConfiguration? = nil,
         isShowingFrames: Bool,
         searchText: String
     ) {
+        self.editorHeight = editorHeight
+        self.editorWidth = editorWidth
         self.configuration = configuration
         self.isShowingFrames = isShowingFrames
         self.searchText = searchText
@@ -72,7 +77,6 @@ public class MarkdownEditor: NSTextView, NSTextStorageDelegate {
             
 //            os_log("Applied styles. Executed from within `func textStorage(_ textStorage: NSTextStorage, didProcessEditing editedMask: NSTextStorageEditActions, range editedRange: NSRange, changeInLength delta: Int)`")
             let extendedRange = NSUnionRange(editedRange, textStorage.editedRange)
-            
             
                 applyStyles(to: extendedRange)
             
@@ -130,8 +134,10 @@ public class MarkdownEditor: NSTextView, NSTextStorageDelegate {
             // Apply attributes
             textStorage.addAttributes(syntax.syntaxAttributes, range: startSyntaxRange)
             textStorage.addAttributes(syntax.syntaxAttributes, range: endSyntaxRange)
-            textStorage.addAttributes(syntax.contentAttributes, range: contentRange)
             
+//            textStorage.removeAttribute(.backgroundColor, range: contentRange)
+            textStorage.addAttributes(syntax.contentAttributes, range: contentRange)
+
             if syntax == .codeBlock {
     
                 if let highlightr = highlightr {
@@ -247,33 +253,27 @@ public class MarkdownEditor: NSTextView, NSTextStorageDelegate {
     
     
     
-    @MainActor
-    public func findRangesWithBackgroundColor(
-        color: NSColor,
-        in attributedString: NSAttributedString
-    ) -> [NSRange] {
-        
-        var rangesWithColor: [NSRange] = []
-        
-        attributedString.enumerateAttribute(
-            .backgroundColor,
-            in: NSRange(location: 0, length: attributedString.length),
-            options: []
-        ) { (attributeValue, range, _) in
-            if let backgroundColor = attributeValue as? NSColor, backgroundColor == color {
-                rangesWithColor.append(range)
-            }
-        }
-        
-        return rangesWithColor
-    }
-    
-    /// This really seems to be vital to styling the text. Have to keep this
-    //public override func didChangeText() {
-    //    super.didChangeText()
-    //    applyStyles()
-    //}
-    
+//    @MainActor
+//    public func findRangesWithBackgroundColor(
+//        color: NSColor,
+//        in attributedString: NSAttributedString
+//    ) -> [NSRange] {
+//        
+//        var rangesWithColor: [NSRange] = []
+//        
+//        attributedString.enumerateAttribute(
+//            .backgroundColor,
+//            in: NSRange(location: 0, length: attributedString.length),
+//            options: []
+//        ) { (attributeValue, range, _) in
+//            if let backgroundColor = attributeValue as? NSColor, backgroundColor == color {
+//                rangesWithColor.append(range)
+//            }
+//        }
+//        
+//        return rangesWithColor
+//    }
+
     public override var intrinsicContentSize: NSSize {
         
         guard let layoutManager = self.layoutManager, let container = self.textContainer else {
@@ -282,40 +282,29 @@ public class MarkdownEditor: NSTextView, NSTextStorageDelegate {
         container.containerSize = NSSize(width: self.bounds.width, height: CGFloat.greatestFiniteMagnitude)
         layoutManager.ensureLayout(for: container)
         
-        let rect = layoutManager.usedRect(for: container)
+        let rect = layoutManager.usedRect(for: container).size
         
         //        let bufferHeight: CGFloat = 120
-        let bufferHeight: CGFloat = self.isEditable ? 120 : 0
-        let contentSize = NSSize(width: NSView.noIntrinsicMetric, height: rect.height + bufferHeight)
+//        let bufferHeight: CGFloat = self.isEditable ? 120 : 0
+        let contentSize = NSSize(width: NSView.noIntrinsicMetric, height: rect.height)
+        
+//        let contentSize = NSSize(width: NSView.noIntrinsicMetric, height: rect.height + bufferHeight)
         
         self.editorHeight = contentSize.height
+        self.editorWidth = rect.width
         
         return contentSize
     }
-    
-    /// Attempt to update the text layout when width changes
-    //    public override func viewDidMoveToSuperview() {
-    //        super.viewDidMoveToSuperview()
-    //        // Register for frame change notifications
-    //        NotificationCenter.default.addObserver(self, selector: #selector(frameDidChange), name: NSView.frameDidChangeNotification, object: self)
-    //    }
-    //
-    //    deinit {
-    //        // Remove observer when the view is no longer in use
-    ////        DispatchQueue.main.async {
-    //            NotificationCenter.default.removeObserver(self, name: NSView.frameDidChangeNotification, object: self)
-    ////        }
-    //    }
-    //
-    //    @objc private func frameDidChange(notification: Notification) {
-    //        // Invalidate intrinsic content size to trigger a layout update
-    //        self.invalidateIntrinsicContentSize()
-    //    }
-    
-    
 }
 
 extension MarkdownEditor {
+    
+    public override func didChangeText() {
+        super.didChangeText()
+        invalidateIntrinsicContentSize()
+//        editorHeight = intrinsicContentSize.height
+//        heightChangeHandler(height)
+    }
     
     public override func draw(_ rect: NSRect) {
         super.draw(rect)

@@ -1,6 +1,6 @@
 //
 //  File.swift
-//  
+//
 //
 //  Created by Dave Coleman on 25/6/2024.
 //
@@ -14,10 +14,13 @@ import Resizable
 
 struct MarkdownExampleView: View {
     
-    @State private var isStreaming: Bool = true
+    @State private var isStreaming: Bool = false
     
     @State private var text: String = TestStrings.paragraphs[1]
-    @State private var editorHeight: CGFloat = 0
+    
+    @State private var editorHeight: CGFloat = .zero
+    @State private var editorWidth: CGFloat = .zero
+    @State private var editorMetrics: String = "nil"
     
     @FocusState private var isFocused
     
@@ -27,57 +30,49 @@ struct MarkdownExampleView: View {
     @State private var isManualMode: Bool = false
     
     var body: some View {
-        
-//        GeometryReader { geo in
-//        ScrollView {
+        VStack {
             
-                MarkdownTextView(text: $text, height: $editorHeight)
-                    .padding()
-//                    .resizable(
-//                        isManualMode: $isManualMode,
-//                        edge: .trailing,
-//                        lengthMin: 100,
-//                        lengthMax: 400
-//                    )
-                    .frame(maxWidth: .infinity)
-                    .background(.blue.opacity(0.3))
-                    .border(Color.purple.opacity(0.3))
-        
-//                    .frame(height: geo.size.height, alignment: .top)
-//            } // END scrollview
+            MarkdownEditorRepresentable(text: $text, width: editorWidth) { metrics, height in
+                editorMetrics = metrics
+                editorHeight = height
+            }
+            .readSize { size in
+                editorWidth = size.width
+            }
+                            .frame(height: editorHeight + 60)
+                            .border(Color.green.opacity(0.3))
+                            .resizable(
+                                isManualMode: $isManualMode,
+                                edge: .trailing,
+                                lengthMin: 100,
+                                lengthMax: 400
+                            )
             
-//            HStack {
-                
-//                VStack {
-//                    Text("Editable")
-//                    MarkdownEditorRepresentable(text: $text)
-//                }
-//                VStack {
-//                    Text("Non-editable")
-//                    MarkdownEditorRepresentable(text: $text, isEditable: false)
-//                }
+            .task {
+                if isStreaming {
+                    do {
+                        for try await chunk in MockupTextStream.chunks(chunkSize: 1, speed: 300) {
+                            await MainActor.run {
+                                text += chunk
+                            }
+                        }
+                    } catch {
+                        print("Error: \(error)")
+                    }
+                }
+            }
+            
+        } // END vstack
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+        .border(Color.purple.opacity(0.3))
+        .overlay(alignment: .trailing) {
+//            VStack {
+//                Text("Metrics: \(editorMetrics)")
+//                Text("Height: \(editorHeight)")
+//                Text("Width: \(editorWidth)")
 //            }
-            
-//        } // END geo reader
-        
-//        .task {
-//            if isStreaming {
-//                do {
-//                    for try await chunk in MockupTextStream.chunks(chunkSize: 1, speed: 300) {
-//                        await MainActor.run {
-//                            text += chunk
-//                        }
-//                    }
-//                } catch {
-//                    print("Error: \(error)")
-//                }
-//            }
-//        }
-//        .border(Color.green.opacity(0.2))
-        
-        //        .task {
-        //            mdeDidAppear = true
-        //        }
+//            .font(.caption)
+        }
     }
 }
 

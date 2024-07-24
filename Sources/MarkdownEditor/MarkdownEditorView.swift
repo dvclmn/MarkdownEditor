@@ -7,12 +7,9 @@
 
 #if os(macOS)
 
-
-
 import Foundation
 import SwiftUI
 import OSLog
-
 
 public struct MarkdownEditorConfiguration {
     public var fontSize: Double
@@ -34,50 +31,47 @@ public struct MarkdownEditorConfiguration {
 public struct MarkdownEditorRepresentable: NSViewRepresentable {
     
     @Binding public var text: String
+//    @Binding public var height: CGFloat
+    public var width: CGFloat
     
     public var searchText: String
     public var configuration: MarkdownEditorConfiguration?
     
     public var id: String?
-    public var didAppear: Bool
-    public var editorWidth: CGFloat?
     
     public var isShowingFrames: Bool
     
     public var isEditable: Bool
     
-    var output: (_ editorHeight: CGFloat) -> Void
-    
-    private let isPrinting: Bool = true
-    
-    @State private var debounceTask: Task<Void, Error>?
+    public var output: (_ metrics: String, _ height: CGFloat) -> Void
     
     public init(
         text: Binding<String>,
+        
+        width: CGFloat,
         searchText: String = "",
         configuration: MarkdownEditorConfiguration? = nil,
         id: String? = nil,
-        didAppear: Bool = false,
-        editorWidth: CGFloat? = nil,
         
         isShowingFrames: Bool = false,
         
         isEditable: Bool = true,
         
-        output: @escaping (_ editorHeight: CGFloat) -> Void = {_ in}
+        output: @escaping (_ metrics: String, _ height: CGFloat) -> Void = {_,_ in }
         
     ) {
         self._text = text
+        
+        self.width = width
         self.searchText = searchText
         self.configuration = configuration
         self.id = id
-        self.didAppear = didAppear
-        self.editorWidth = editorWidth
         self.isShowingFrames = isShowingFrames
-        
         self.isEditable = isEditable
         self.output = output
     }
+    
+    private let isPrinting: Bool = true
     
     /// This function creates the NSView and configures its initial state
     public func makeNSView(context: Context) -> MarkdownEditor {
@@ -95,12 +89,16 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
         
         textView.applyStyles(to: NSRange(location: 0, length: text.utf16.count))
         
-        //        textView.applyStyles()
+        // Set up width constraint
+//                let widthConstraint = textView.widthAnchor.constraint(equalToConstant: width)
+//                widthConstraint.isActive = true
+//                context.coordinator.widthConstraint = widthConstraint
+                
+                // Initial size update
+                
         
-        /// Not sure there's anything to invalidate on startup
-        //        textView.invalidateIntrinsicContentSize()
         
-        self.output(textView.editorHeight)
+        self.sendOutSize(for: textView)
         
         return textView
     }
@@ -117,85 +115,110 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
         /// - Pressing space key, or return key
         /// - Possibly pressing any syntax key(s)
         
-        if textView.string != self.text {
-            let oldLength = textView.string.utf16.count
-            textView.string = text
-            let newLength = text.utf16.count
-            
-            // Apply styles only to the changed range
-            let changedRange = NSRange(location: 0, length: max(oldLength, newLength))
-            
-            textView.applyStyles(to: changedRange)
-            
-            outputEditorHeight(for: textView, withReason: "Within `updateNSView`, textView.string != self.text")
-//            Task { @MainActor in
-//            }
-        }
-        
-        if textView.bounds.width != self.editorWidth {
-            outputEditorHeight(for: textView, withReason: "Within `updateNSView`, textView.bounds.width != self.editorWidth")
-//            Task { @MainActor in
-//            }
-        }
         
         
         
         
-        
-        //        if textView.string != self.text {
-        //            textView.string = text
-        //            Task {
-        //                await MainActor.run {
-        //
-        //                    if self.isEditable {
-        //                        /// Keep `needsLayout`  and `needsDisplay` as a backup just in case
-        //                        textView.invalidateIntrinsicContentSize()
-        //                        //                    textView.needsLayout = true
-        ////                                            textView.needsDisplay = true
-        //                        self.output(textView.editorHeight)
-        //
-        //                    } else {
-        //                        /// I can run a 'more expensive' operation on non-Editable MDE's
-        ////                        textView.applyStyles()
-        ////                        textView.invalidateIntrinsicContentSize()
-        ////                        self.output(textView.editorHeight)
-        //                    }
-        //
-        //                }
-        //            } // END task
-        //        }
-        
-        if textView.isShowingFrames != self.isShowingFrames {
-            textView.isShowingFrames = self.isShowingFrames
-            os_log("Does this ever change? is `textView.isShowingFrames` \(textView.isShowingFrames), ever different from `self.isShowingFrames`? \(self.isShowingFrames)")
-        }
-        
-        
-        
-        if textView.searchText != self.searchText {
-            textView.searchText = self.searchText
-            os_log("Does this ever change? is `textView.searchText` \(textView.searchText), ever different from `self.searchText`? \(self.searchText)")
-            
-//            Task {
-//                await MainActor.run {
-                    outputEditorHeight(for: textView, withReason: "Within `updateNSView`, textView.searchText != self.searchText")
-//                }
-//            }
-        }
+        // Update text if changed
+                if textView.string != self.text {
+                    let oldLength = textView.string.utf16.count
+                    textView.string = text
+                    let newLength = text.utf16.count
+                    
+                    // Apply styles only to the changed range
+                    let changedRange = NSRange(location: 0, length: max(oldLength, newLength))
+                    textView.applyStyles(to: changedRange)
+                }
+
+        let currentWidth = self.width
+                // Update width if changed
+//                if abs(textView.frame.width - self.width) > 0.1 {  // Use a small threshold to avoid floating point issues
+        if currentWidth != self.width {
+//                    context.coordinator.widthConstraint?.constant = self.width
+                    textView.invalidateIntrinsicContentSize()
+                    self.sendOutSize(for: textView)
+                }
+
+                // Update other properties if changed
+                if textView.isShowingFrames != self.isShowingFrames {
+                    textView.isShowingFrames = self.isShowingFrames
+                }
+                
+                if textView.searchText != self.searchText {
+                    textView.searchText = self.searchText
+                }
+
         
         
-        /// THIS WORKS TO FIX HEIGHT, WHEN WIDTH CHANGES — DON'T LOSE THISSSSS
-        //        if textView.bounds.width != self.editorWidth {
-        //            Task {
-        //                await MainActor.run {
-        //
-        //                    textView.invalidateIntrinsicContentSize()
-        //                    self.output(textView.editorHeight)
-        //
-        //                }
-        //            }
-        //        }
         
+        
+//
+//        if textView.string != self.text {
+//            let oldLength = textView.string.utf16.count
+//            textView.string = text
+//            let newLength = text.utf16.count
+//            
+//            // Apply styles only to the changed range
+//            let changedRange = NSRange(location: 0, length: max(oldLength, newLength))
+//            
+//            textView.applyStyles(to: changedRange)
+//            
+//            self.sendOutSize(for: textView)
+//        }
+//
+//        if textView.isShowingFrames != self.isShowingFrames {
+//            textView.isShowingFrames = self.isShowingFrames
+//            os_log("Does this ever change? is `textView.isShowingFrames` \(textView.isShowingFrames), ever different from `self.isShowingFrames`? \(self.isShowingFrames)")
+//        }
+//        
+//        
+//        
+//        if textView.searchText != self.searchText {
+//            textView.searchText = self.searchText
+//            os_log("Does this ever change? is `textView.searchText` \(textView.searchText), ever different from `self.searchText`? \(self.searchText)")
+//        }
+//        
+//        //        DispatchQueue.main.async {
+//        //                    output("Current width \(textView.frame.width)")
+//        //                }
+//            
+//        let currentWidth = textView.frame.width
+//        if currentWidth != textView.frame.width {
+//            context.coordinator.lastKnownWidth = currentWidth
+//            
+//            textView.invalidateIntrinsicContentSize()
+//            
+//            self.sendOutSize(for: textView)
+//            
+//            output("Current width \(textView.frame.width)")
+//            
+////            DispatchQueue.main.async {
+////                self.height = textView.editorHeight
+////                self.width = textView.editorWidth
+////            }
+//            //                context.coordinator.applyMarkdownStyling(to: textView)
+//        }
+//        
+//        
+//        /// THIS WORKS TO FIX HEIGHT, WHEN WIDTH CHANGES — DON'T LOSE THISSSSS
+//                        if textView.bounds.width != self.width {
+//                            
+//                            self.sendOutSize(for: textView)
+//                            
+//                            
+////                            DispatchQueue.main.async {
+////                                output("The width changed")
+////                            }
+//        //                    Task {
+//        //                        await MainActor.run {
+//        //
+//        //                            textView.invalidateIntrinsicContentSize()
+//        //                            self.output(textView.editorHeight)
+//        //
+//        //                        }
+//        //                    }
+//                        }
+//        
         
     } // END update nsView
     
@@ -209,6 +232,9 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
         
         var parent: MarkdownEditorRepresentable
         
+//        var widthConstraint: NSLayoutConstraint?
+
+        
         public init(_ parent: MarkdownEditorRepresentable) {
             self.parent = parent
         }
@@ -220,77 +246,33 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
             
             if self.parent.text != textView.string {
                 self.parent.text = textView.string
-//                Task { @MainActor in
-                    self.parent.outputEditorHeight(for: textView, withReason: "`textDidChange`, if self.parent.text != textView.string {")
-//                }
+                self.parent.sendOutSize(for: textView)
+                //                self.parent.outputEditorHeight(for: textView, withReason: "`textDidChange`, if self.parent.text != textView.string {")
             }  // END text equality check
             //
         } // END Text did change
         
+    } // END coordinator
+    
+    private func sendOutSize(for textView: MarkdownEditor) {
+        DispatchQueue.main.async {
+            self.output("Height: \(textView.editorHeight), Width: \(textView.editorWidth)", textView.editorHeight)
+        }
     }
     
-    @MainActor
-    private func outputEditorHeight(for textView: MarkdownEditor, withReason: String) {
-        textView.invalidateIntrinsicContentSize()
-        self.output(textView.editorHeight)
-//        os_log("Sent editor height from `textView` to SwiftUI: \(textView.editorHeight.displayAsInt()), and invalidated content size. The reason/trigger for this being executed was: \(withReason)")
-    }
+    //    @MainActor
+    //    private func outputEditorHeight(for textView: MarkdownEditor, withReason: String) {
+    //        DispatchQueue.main.async {
+    //            textView.invalidateIntrinsicContentSize()
+    ////            self.height = textView.editorHeight
+    ////            self.output(textView.editorHeight)
+    //        }
+    //        //        os_log("Sent editor height from `textView` to SwiftUI: \(textView.editorHeight.displayAsInt()), and invalidated content size. The reason/trigger for this being executed was: \(withReason)")
+    //    }
     
 } // END NSViewRepresentable
 
 
-
-
-extension MarkdownEditorRepresentable {
-    
-    private func setUpTextViewOptions(for textView: MarkdownEditor) {
-        
-        textView.textContainer?.containerSize = CGSize(width: textView.bounds.width, height: .greatestFiniteMagnitude)
-        
-        /// If this is set to false, then the text tends to be allowed to run off the right edge,
-        /// and less width-related calculations seem to be neccesary
-        textView.textContainer?.widthTracksTextView = true
-        textView.textContainer?.heightTracksTextView = false
-        
-        textView.isVerticallyResizable = true
-        textView.isHorizontallyResizable = false
-        //        textView.autoresizingMask = [.width]
-        
-        textView.isAutomaticSpellingCorrectionEnabled = true
-        textView.isAutomaticTextCompletionEnabled = true
-        textView.isAutomaticQuoteSubstitutionEnabled = false
-        textView.isAutomaticTextReplacementEnabled = true
-        
-        textView.wantsScrollEventsForSwipeTracking(on: .none)
-        textView.wantsForwardedScrollEvents(for: .none)
-        
-        
-        
-        textView.isRichText = false
-        textView.importsGraphics = false
-        
-        textView.insertionPointColor = NSColor(configuration?.insertionPointColour ?? .blue)
-        
-        textView.smartInsertDeleteEnabled = false
-        
-        textView.usesFindBar = true
-        
-        textView.textContainer?.lineFragmentPadding = configuration?.paddingX ?? 30
-        textView.textContainerInset = NSSize(width: 0, height: configuration?.paddingY ?? 30)
-        
-        /// When the text field has an attributed string value, the system ignores the textColor, font, alignment, lineBreakMode, and lineBreakStrategy properties. Set the foregroundColor, font, alignment, lineBreakMode, and lineBreakStrategy properties in the attributed string instead.
-        textView.font = NSFont.systemFont(ofSize: configuration?.fontSize ?? MarkdownDefaults.fontSize, weight: .medium)
-        textView.textColor = NSColor.textColor.withAlphaComponent(MarkdownDefaults.fontOpacity)
-        
-        textView.isEditable = self.isEditable
-        
-        textView.drawsBackground = false
-        textView.allowsUndo = true
-        textView.setNeedsDisplay(textView.bounds)
-        //                textView.setNeedsDisplay(NSRect(x: 0, y: 0, width: self.editorWidth ?? 200, height: 200))
-    }
-    
-}
 
 
 #endif

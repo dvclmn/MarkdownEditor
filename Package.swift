@@ -23,11 +23,7 @@ let package = Package(
     targets: [
         .target(
             name: "MarkdownEditor",
-            dependencies: [
-                "Utilities",
-                "TestStrings",
-                .product(name: "Highlightr", package: "Highlightr"),
-            ]
+            dependencies: ["Utilities", "TestStrings", "Highlightr"]
         )
     ]
 )

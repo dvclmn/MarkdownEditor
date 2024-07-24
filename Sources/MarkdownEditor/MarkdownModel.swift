@@ -13,6 +13,60 @@ import Foundation
 import SwiftUI
 
 
+
+extension MarkdownEditorRepresentable {
+    
+    func setUpTextViewOptions(for textView: MarkdownEditor) {
+        
+        textView.textContainer?.containerSize = CGSize(width: textView.bounds.width, height: .greatestFiniteMagnitude)
+        
+        /// If this is set to false, then the text tends to be allowed to run off the right edge,
+        /// and less width-related calculations seem to be neccesary
+        textView.textContainer?.widthTracksTextView = true
+        textView.textContainer?.heightTracksTextView = false
+        
+        textView.isVerticallyResizable = true
+        textView.isHorizontallyResizable = false
+        //        textView.autoresizingMask = [.width]
+        
+        textView.isAutomaticSpellingCorrectionEnabled = true
+        textView.isAutomaticTextCompletionEnabled = true
+        textView.isAutomaticQuoteSubstitutionEnabled = false
+        textView.isAutomaticTextReplacementEnabled = true
+        
+        textView.wantsScrollEventsForSwipeTracking(on: .none)
+        textView.wantsForwardedScrollEvents(for: .none)
+        
+        
+        
+        textView.isRichText = false
+        textView.importsGraphics = false
+        
+        textView.insertionPointColor = NSColor(configuration?.insertionPointColour ?? .blue)
+        
+        textView.smartInsertDeleteEnabled = false
+        
+        textView.usesFindBar = true
+        
+        textView.textContainer?.lineFragmentPadding = configuration?.paddingX ?? 30
+        textView.textContainerInset = NSSize(width: 0, height: configuration?.paddingY ?? 30)
+        
+        /// When the text field has an attributed string value, the system ignores the textColor, font, alignment, lineBreakMode, and lineBreakStrategy properties. Set the foregroundColor, font, alignment, lineBreakMode, and lineBreakStrategy properties in the attributed string instead.
+        textView.font = NSFont.systemFont(ofSize: configuration?.fontSize ?? MarkdownDefaults.fontSize, weight: .medium)
+        textView.textColor = NSColor.textColor.withAlphaComponent(MarkdownDefaults.fontOpacity)
+        
+        textView.isEditable = self.isEditable
+        
+        textView.drawsBackground = false
+        textView.allowsUndo = true
+        textView.setNeedsDisplay(textView.bounds)
+        //                textView.setNeedsDisplay(NSRect(x: 0, y: 0, width: self.editorWidth ?? 200, height: 200))
+    }
+    
+}
+
+
+
 public struct MarkdownDefaults {
     
     public static let defaultFont =               NSFont.systemFont(ofSize: MarkdownDefaults.fontSize, weight: MarkdownDefaults.fontWeight)
