@@ -10,10 +10,11 @@ import Foundation
 import SwiftUI
 import TestStrings
 import BaseUtilities
+import Resizable
 
 struct MarkdownExampleView: View {
     
-    @State private var isStreaming: Bool = false
+    @State private var isStreaming: Bool = true
     
     @State private var text: String = TestStrings.paragraphs[1]
     @State private var editorHeight: CGFloat = 0
@@ -23,16 +24,24 @@ struct MarkdownExampleView: View {
     @State private var mdeDidAppear: Bool = false
     @State private var isLoading: Bool = false
     
+    @State private var isManualMode: Bool = false
+    
     var body: some View {
         
 //        GeometryReader { geo in
 //        ScrollView {
             
                 MarkdownTextView(text: $text)
-                
                     .padding()
+                    .resizable(
+                        isManualMode: $isManualMode,
+                        edge: .trailing,
+                        lengthMin: 100,
+                        lengthMax: 400
+                    )
                     .background(.blue.opacity(0.3))
                     .border(Color.purple.opacity(0.3))
+        
 //                    .frame(height: geo.size.height, alignment: .top)
 //            } // END scrollview
             
@@ -49,7 +58,7 @@ struct MarkdownExampleView: View {
 //            }
             
 //        } // END geo reader
-        .border(Color.green.opacity(0.3))
+        
 //        .task {
 //            if isStreaming {
 //                do {
@@ -64,18 +73,14 @@ struct MarkdownExampleView: View {
 //            }
 //        }
 //        .border(Color.green.opacity(0.2))
-        .background(.blue.opacity(isLoading ? 0.6 : 0.1))
+        
         //        .task {
         //            mdeDidAppear = true
         //        }
     }
 }
 
-extension MarkdownExampleView {
-    
-    
-    
-}
+
 #Preview {
     MarkdownExampleView()
         .frame(width: 500, height: 700)

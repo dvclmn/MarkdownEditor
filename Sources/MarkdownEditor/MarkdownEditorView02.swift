@@ -7,105 +7,128 @@
 
 import SwiftUI
 
-struct MarkdownTextView: NSViewRepresentable {
+@MainActor
+public struct MarkdownTextView: NSViewRepresentable {
     @Binding var text: String
     
-    @MainActor func makeNSView(context: Context) -> NSScrollView {
+    public init(
+        text: Binding<String>
+    ) {
+        self._text = text
+    }
+    
+    public func makeNSView(context: Context) -> NSTextView {
         
-        let textView = NSTextView()
-        textView.isRichText = false
+        let textStorage = NSTextStorage()
+        let layoutManager = NSLayoutManager()
+        let textContainer = NSTextContainer()
+        
+        layoutManager.addTextContainer(textContainer)
+        textStorage.addLayoutManager(layoutManager)
+        
+        let textView = NSTextView(frame: .zero, textContainer: textContainer)
+        textView.isRichText = true
         textView.isEditable = true
         textView.isSelectable = true
-        textView.allowsUndo = true
         textView.drawsBackground = false
+        textView.allowsUndo = true
         
+        textView.translatesAutoresizingMaskIntoConstraints = true
+        
+        textView.isHorizontallyResizable = false
+        textView.isVerticallyResizable = true
+        textView.autoresizingMask = [.width]
+
         textView.textColor = .white
         textView.font = MarkdownDefaults.defaultFont
         
-        textView.autoresizingMask = [.width]
-        textView.translatesAutoresizingMaskIntoConstraints = true
+        textContainer.widthTracksTextView = true
+        textContainer.heightTracksTextView = false
         
-        //        textView.textContainer?.containerSize = CGSize(width: textView.bounds.width, height: .greatestFiniteMagnitude)
         
-        //        textView.textContainer?.widthTracksTextView = true
         textView.delegate = context.coordinator
         
-        let scrollView = NSScrollView()
-        scrollView.hasVerticalScroller = true
-        scrollView.hasHorizontalScroller = false
-        scrollView.autohidesScrollers = true
-        scrollView.borderType = .noBorder
-        scrollView.drawsBackground = false
-        
-        scrollView.documentView = textView
-        
-        textView.minSize = NSSize(width: 0, height: scrollView.bounds.height)
-        textView.maxSize = NSSize(width: CGFloat.greatestFiniteMagnitude, height: CGFloat.greatestFiniteMagnitude)
-        textView.isVerticallyResizable = true
-        textView.frame = scrollView.bounds
-        
-        styleText(for: textView)
-        
-        return scrollView
+        return textView
     }
     
-    func updateNSView(_ nsView: NSScrollView, context: Context) {
+    public func updateNSView(_ textView: NSTextView, context: Context) {
         
-        guard let textView = nsView.documentView as? NSTextView else { return }
-        
-        if textView.string != self.text {
-            styleText(for: textView)
+
+        if textView.string != text {
+            let selectedRanges = textView.selectedRanges
+            textView.string = text
+            textView.selectedRanges = selectedRanges
+            context.coordinator.applyMarkdownStyling(to: textView)
         }
+        
+        // Check if the width has changed significantly
+        let currentWidth = textView.frame.width
+        if abs(currentWidth - context.coordinator.lastKnownWidth) > 10 { // 10 points threshold
+            context.coordinator.lastKnownWidth = currentWidth
+            context.coordinator.applyMarkdownStyling(to: textView)
+        }
+        
+        
     }
     
-    func makeCoordinator() -> Coordinator {
+    public func makeCoordinator() -> Coordinator {
         Coordinator(self)
     }
     
-    class Coordinator: NSObject, NSTextViewDelegate {
+    public class Coordinator: NSObject, NSTextViewDelegate {
         var parent: MarkdownTextView
         
         init(_ parent: MarkdownTextView) {
             self.parent = parent
         }
         
-        func textDidChange(_ notification: Notification) {
+        var lastKnownWidth: CGFloat = 0
+        
+        public func textDidChange(_ notification: Notification) {
             guard let textView = notification.object as? NSTextView else { return }
             parent.text = textView.string
+            applyMarkdownStyling(to: textView)
         }
-    }
-}
-
-extension MarkdownTextView {
-    
-    @MainActor
-    func styleText(for textView: NSTextView) {
         
-        let selectedRanges = textView.selectedRanges
-        
-        let attributedString = NSAttributedString(string: self.text)
-        
-        
-        
-        try? NSAttributedString(markdown: text, options: .init(allowsExtendedAttributes: true, interpretedSyntax: .full, failurePolicy: .returnPartiallyParsedIfPossible))
-        
-        textView.textStorage?.setAttributedString(attributedString ?? NSAttributedString(string: text))
-        textView.selectedRanges = selectedRanges
-        
-        
-//                        textView.string = text
-        //
-        //            do {
-        //                let thankYouString = try AttributedString(
-        //                    markdown:"**Thank you!** Please visit our [website](https://example.com)")
-        //            } catch {
-        //                print("Couldn't parse the string. \(error.localizedDescription)")
-        //            }
-        //
-        //
-        
-        
-        //            let attributedString = try? NSAttributedString(markdown: text)
-        //            textView.textStorage?.setAttributedString(attributedString ?? NSAttributedString(string: text))
+        @MainActor
+        func applyMarkdownStyling(to textView: NSTextView) {
+            
+            guard let textStorage = textView.textStorage else { return }
+            
+            let fullRange = NSRange(location: 0, length: textStorage.length)
+            let text = textStorage.string
+            
+            // Store the current selection
+            let selectedRanges = textView.selectedRanges
+            
+            // Remove all existing styles
+            textStorage.removeAttribute(.font, range: fullRange)
+            textStorage.removeAttribute(.foregroundColor, range: fullRange)
+            
+            // Apply default style
+            textStorage.addAttribute(.font, value: NSFont.systemFont(ofSize: 14), range: fullRange)
+            textStorage.addAttribute(.foregroundColor, value: NSColor.textColor, range: fullRange)
+            
+            // Apply bold styling
+            let boldPattern = try! NSRegularExpression(pattern: "\\*\\*(.+?)\\*\\*")
+            boldPattern.enumerateMatches(in: text, range: fullRange) { match, _, _ in
+                if let matchRange = match?.range(at: 1) {
+                    textStorage.addAttribute(.font, value: NSFont.boldSystemFont(ofSize: 14), range: matchRange)
+                    textStorage.addAttribute(.foregroundColor, value: NSColor.orange, range: matchRange)
+                }
+            }
+            
+            // Apply inline code styling
+            let codePattern = try! NSRegularExpression(pattern: "`(.+?)`")
+            codePattern.enumerateMatches(in: text, range: fullRange) { match, _, _ in
+                if let matchRange = match?.range(at: 1) {
+                    textStorage.addAttribute(.font, value: NSFont.monospacedSystemFont(ofSize: 14, weight: .regular), range: matchRange)
+                    textStorage.addAttribute(.foregroundColor, value: NSColor.systemRed, range: matchRange)
+                }
+            }
+            
+            // Restore the selection
+            textView.selectedRanges = selectedRanges
+        }
     }
 }
