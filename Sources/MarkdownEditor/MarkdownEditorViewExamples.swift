@@ -32,15 +32,17 @@ struct MarkdownExampleView: View {
     var body: some View {
         VStack {
             
-            MarkdownEditorRepresentable(text: $text, width: editorWidth) { metrics, height in
-                editorMetrics = metrics
-                editorHeight = height
+            ScrollView(.vertical) {
+                MarkdownEditorRepresentable(text: $text, width: editorWidth) { metrics, height in
+                    editorMetrics = metrics
+                    editorHeight = height
+                }
+                .border(Color.green.opacity(0.3))
+                .frame(height: editorHeight + 60)
             }
             .readSize { size in
                 editorWidth = size.width
             }
-                            .frame(height: editorHeight + 60)
-                            .border(Color.green.opacity(0.3))
                             .resizable(
                                 isManualMode: $isManualMode,
                                 edge: .trailing,
