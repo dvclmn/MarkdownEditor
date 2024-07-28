@@ -80,27 +80,35 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
         /// which gives you access to newer TextKit functionality and performance improvements.
         /// Reading: https://developer.apple.com/documentation/appkit/nstextview/1449347-init#discussion
 
+        // Create NSTextContentStorage
+        let textContentStorage = NSTextContentStorage()
+        
+        // Create NSTextLayoutManager
         let textLayoutManager = NSTextLayoutManager()
+        
+        // Create NSTextContainer
         let containerSize = NSSize(width: self.width, height: CGFloat.greatestFiniteMagnitude)
         let textContainer = NSTextContainer(size: containerSize)
-        textLayoutManager.textContainer = textContainer
+        
         
         // Important: Keep a reference to text storage since NSTextView weakly references it.
-        var textContentStorage = NSTextContentStorage()
+//        var textContentStorage = NSTextContentStorage()
         textContentStorage.addTextLayoutManager(textLayoutManager)
+        textLayoutManager.textContainer = textContainer
         
         let textView = MarkdownEditor(
             viewWidth: self.width,
             isShowingFrames: self.isShowingFrames,
             isShowingSyntax: self.isShowingSyntax,
             searchText: self.searchText,
-            textContainer: textLayoutManager.textContainer
+            textContainer: textContainer
         )
         
         textView.delegate = context.coordinator
         textView.string = text
         
-        textView.textContentStorage
+        // Important: Store a reference to textContentStorage
+        context.coordinator.textContentStorage = textContentStorage
         
         setUpTextViewOptions(for: textView)
         
@@ -256,6 +264,7 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
     public class Coordinator: NSObject, NSTextViewDelegate {
         
         var parent: MarkdownEditorRepresentable
+        var textContentStorage: NSTextContentStorage?
         
         var lastKnownWidth: CGFloat = 0
         //        let widthChangeSubject = AsyncStream<CGFloat>.makeStream()
