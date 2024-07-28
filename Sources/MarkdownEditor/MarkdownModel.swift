@@ -12,6 +12,21 @@
 import Foundation
 import SwiftUI
 
+public struct MarkdownEditorConfiguration {
+    public var fontSize: Double
+    public var insertionPointColour: Color
+    public var defaultCodeColour: Color
+    public var paddingX: Double
+    public var paddingY: Double
+    
+    public init(fontSize: Double, insertionPointColour: Color, defaultCodeColour: Color, paddingX: Double, paddingY: Double) {
+        self.fontSize = fontSize
+        self.insertionPointColour = insertionPointColour
+        self.defaultCodeColour = defaultCodeColour
+        self.paddingX = paddingX
+        self.paddingY = paddingY
+    }
+}
 
 
 extension MarkdownEditorRepresentable {

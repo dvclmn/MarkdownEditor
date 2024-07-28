@@ -10,23 +10,7 @@
 import Foundation
 import SwiftUI
 import OSLog
-//import AsyncAlgorithms
 
-public struct MarkdownEditorConfiguration {
-    public var fontSize: Double
-    public var insertionPointColour: Color
-    public var defaultCodeColour: Color
-    public var paddingX: Double
-    public var paddingY: Double
-    
-    public init(fontSize: Double, insertionPointColour: Color, defaultCodeColour: Color, paddingX: Double, paddingY: Double) {
-        self.fontSize = fontSize
-        self.insertionPointColour = insertionPointColour
-        self.defaultCodeColour = defaultCodeColour
-        self.paddingX = paddingX
-        self.paddingY = paddingY
-    }
-}
 
 @MainActor
 public struct MarkdownEditorRepresentable: NSViewRepresentable {
@@ -43,6 +27,7 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
     public var id: String?
     
     public var isShowingFrames: Bool
+    public var isShowingSyntax: Bool
     
     public var isEditable: Bool
     
@@ -57,6 +42,7 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
         id: String? = nil,
         
         isShowingFrames: Bool = false,
+        isShowingSyntax: Bool = false,
         
         isEditable: Bool = true,
         
@@ -70,6 +56,7 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
         self.configuration = configuration
         self.id = id
         self.isShowingFrames = isShowingFrames
+        self.isShowingSyntax = isShowingSyntax
         self.isEditable = isEditable
         self.output = output
     }
@@ -80,23 +67,44 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
     /// This function creates the NSView and configures its initial state
     public func makeNSView(context: Context) -> MarkdownEditor {
         
+        
+        /// Unlike init(frame:), which builds up an entire group of text-handling objects, you use
+        /// this method after you’ve created the other components of the text-handling system —
+        /// a text storage object, a layout manager, and a text container.
+        ///
+        /// Assembling the components in this fashion means that the text storage,
+        /// not the text view, is the principal owner of the component objects.
+        ///
+        /// When you use this initializer (`init(frame frameRect: NSRect, textContainer container: NSTextContainer?)`)
+        /// in macOS 12 and later, you have the option to use NSTextLayoutManager
+        /// which gives you access to newer TextKit functionality and performance improvements.
+        /// Reading: https://developer.apple.com/documentation/appkit/nstextview/1449347-init#discussion
+
         let textLayoutManager = NSTextLayoutManager()
-        let textContainer = NSTextContainer(size: NSSize(width: self.width, height: .zero))
+        let containerSize = NSSize(width: self.width, height: CGFloat.greatestFiniteMagnitude)
+        let textContainer = NSTextContainer(size: containerSize)
         textLayoutManager.textContainer = textContainer
         
+        // Important: Keep a reference to text storage since NSTextView weakly references it.
+        var textContentStorage = NSTextContentStorage()
+        textContentStorage.addTextLayoutManager(textLayoutManager)
         
         let textView = MarkdownEditor(
             viewWidth: self.width,
             isShowingFrames: self.isShowingFrames,
-            searchText: self.searchText
+            isShowingSyntax: self.isShowingSyntax,
+            searchText: self.searchText,
+            textContainer: textLayoutManager.textContainer
         )
         
         textView.delegate = context.coordinator
         textView.string = text
         
+        textView.textContentStorage
+        
         setUpTextViewOptions(for: textView)
         
-        textView.applyStyles(to: NSRange(location: 0, length: text.utf16.count))
+//        textView.applyStyles(to: NSRange(location: 0, length: text.utf16.count))
         
         // Set up width constraint
         //                let widthConstraint = textView.widthAnchor.constraint(equalToConstant: width)
@@ -276,7 +284,46 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
             //
         } // END Text did change
         
-        
+//        @MainActor
+//        func applyMarkdownStyling(to textView: AutoGrowingTextView) {
+//            
+//            guard let textStorage = textView.textStorage else { return }
+//            
+//            let fullRange = NSRange(location: 0, length: textStorage.length)
+//            let text = textStorage.string
+//            
+//            // Store the current selection
+//            let selectedRanges = textView.selectedRanges
+//            
+//            // Remove all existing styles
+//            textStorage.removeAttribute(.font, range: fullRange)
+//            textStorage.removeAttribute(.foregroundColor, range: fullRange)
+//            
+//            // Apply default style
+//            textStorage.addAttribute(.font, value: NSFont.systemFont(ofSize: 14), range: fullRange)
+//            textStorage.addAttribute(.foregroundColor, value: NSColor.textColor, range: fullRange)
+//            
+//            // Apply bold styling
+//            let boldPattern = try! NSRegularExpression(pattern: "\\*\\*(.+?)\\*\\*")
+//            boldPattern.enumerateMatches(in: text, range: fullRange) { match, _, _ in
+//                if let matchRange = match?.range(at: 1) {
+//                    textStorage.addAttribute(.font, value: NSFont.boldSystemFont(ofSize: 14), range: matchRange)
+//                    textStorage.addAttribute(.foregroundColor, value: NSColor.orange, range: matchRange)
+//                }
+//            }
+//            
+//            // Apply inline code styling
+//            let codePattern = try! NSRegularExpression(pattern: "`(.+?)`")
+//            codePattern.enumerateMatches(in: text, range: fullRange) { match, _, _ in
+//                if let matchRange = match?.range(at: 1) {
+//                    textStorage.addAttribute(.font, value: NSFont.monospacedSystemFont(ofSize: 14, weight: .regular), range: matchRange)
+//                    textStorage.addAttribute(.foregroundColor, value: NSColor.systemRed, range: matchRange)
+//                }
+//            }
+//            
+//            // Restore the selection
+//            textView.selectedRanges = selectedRanges
+//        }
         //        func setupDebounce() {
         //            self.debounceTask = Task {
         //                for await width in widthChangeSubject.debounce(for: .milliseconds(100)) {

@@ -31,20 +31,30 @@ import OSLog
 
 // NSTextStorage's edited(_:range:changeInLength:)
 
+/// ⚠️ In macOS 12 and later, if you explicitly call the layoutManager property on a text view or text container,
+/// the framework reverts to a compatibility mode that uses NSLayoutManager. The text view also switches
+/// to this compatibility mode when it encounters text content that’s not yet supported, such as NSTextTable.
+/// Read more: https://developer.apple.com/documentation/appkit/nstextview
+///
+/// Either one of these statements makes text view switch to TextKit 1
+/// `let layoutManager = textView. layoutManager`
+/// `let containerLayoutManager = textView.textContainer. layoutManager`
+
 @MainActor
-public class MarkdownEditor: NSTextView, NSTextContentManagerDelegate, NSTextContentStorageDelegate {
+public class MarkdownEditor: NSTextView {
     
     var editorHeight: CGFloat
     
     var configuration: MarkdownEditorConfiguration?
     
     var isShowingFrames: Bool
+    var isShowingSyntax: Bool
     
     let highlightr = Highlightr()
     
-//    private var lastStyledRanges: [NSRange] = []
+    private var lastStyledRanges: [NSRange] = []
     
-    private var styler: MarkdownStyler
+//    private var styler: MarkdownStyler
     
     var searchText: String
     
@@ -57,30 +67,18 @@ public class MarkdownEditor: NSTextView, NSTextContentManagerDelegate, NSTextCon
         editorHeight: CGFloat = .zero,
         configuration: MarkdownEditorConfiguration? = nil,
         isShowingFrames: Bool,
+        isShowingSyntax: Bool,
         searchText: String,
-        textContainer: NSTextContainer
+        textContainer: NSTextContainer?
     ) {
         
         self.editorHeight = editorHeight
         self.configuration = configuration
         self.isShowingFrames = isShowingFrames
+        self.isShowingSyntax = isShowingSyntax
         self.searchText = searchText
         
-        // Create TextKit 2 stack
-        
-//        let textContentStorage = NSTextContentStorage()
-        
-//        let textContainer = NSTextContainer(size: CGSize(width: frameRect.width, height: .greatestFiniteMagnitude))
-        
-//        textContentStorage.addTextLayoutManager(textLayoutManager)
-        
-        self.styler = MarkdownStyler(textContentStorage: textContentStorage)
-        
-        super.init(frame: frameRect, textContainer: textContainer)
-        
-        // Set up the text view
-        isRichText = false
-        font = NSFont.systemFont(ofSize: 14)
+//        self.styler = MarkdownStyler(textContentStorage: textContentStorage)
         
         // Set up markdown styling
         setupMarkdownStyling()
@@ -101,17 +99,7 @@ public class MarkdownEditor: NSTextView, NSTextContentManagerDelegate, NSTextCon
         // and using regular expressions to apply attributes
     }
     
-    
-    
-    
-    
-    //
-    //    // Override textDidChange to update styling
-    //    override func textDidChange(_ notification: Notification) {
-    //        super.textDidChange(notification)
-    //        // Update markdown styling here
-    //    }
-    //
+
     
     public func textStorage(_ textStorage: NSTextStorage, didProcessEditing editedMask: NSTextStorageEditActions, range editedRange: NSRange, changeInLength delta: Int) {
         if editedMask.contains(.editedCharacters) {
@@ -129,7 +117,7 @@ public class MarkdownEditor: NSTextView, NSTextContentManagerDelegate, NSTextCon
         
         textStorage.beginEditing()
         
-        for syntax in syntaxList {
+        for syntax in MarkdownSyntax.allCases {
             styleText(for: syntax, in: range)
         }
         
@@ -306,22 +294,22 @@ public class MarkdownEditor: NSTextView, NSTextContentManagerDelegate, NSTextCon
     //    }
     //
     
-    public override var intrinsicContentSize: NSSize {
-        
-        guard let textLayoutManager = self.textLayoutManager, let container = self.textContainer else {
-            return super.intrinsicContentSize
-        }
-        container.containerSize = NSSize(width: self.bounds.width, height: CGFloat.greatestFiniteMagnitude)
-        layoutManager.ensureLayout(for: container)
-        
-        let rect = layoutManager.usedRect(for: container).size
-        
-        let contentSize = NSSize(width: NSView.noIntrinsicMetric, height: rect.height)
-        
-        self.editorHeight = contentSize.height
-        
-        return contentSize
-    }
+//    public override var intrinsicContentSize: NSSize {
+//        
+//        guard let textLayoutManager = self.textLayoutManager, let container = self.textContainer else {
+//            return super.intrinsicContentSize
+//        }
+//        container.containerSize = NSSize(width: self.bounds.width, height: CGFloat.greatestFiniteMagnitude)
+//        layoutManager.ensureLayout(for: container)
+//        
+//        let rect = layoutManager.usedRect(for: container).size
+//        
+//        let contentSize = NSSize(width: NSView.noIntrinsicMetric, height: rect.height)
+//        
+//        self.editorHeight = contentSize.height
+//        
+//        return contentSize
+//    }
 }
 
 
@@ -334,6 +322,7 @@ extension MarkdownEditor {
     public override func didChangeText() {
         super.didChangeText()
         invalidateIntrinsicContentSize()
+        self.editorHeight = intrinsicContentSize.height
         // Clear the cached styled ranges when text changes
                     lastStyledRanges = []
                     updateStyling()
@@ -445,17 +434,26 @@ extension MarkdownEditor {
         }
 }
 
-extension NSTextContentManager {
-  func range(for textRange: NSTextRange) -> NSRange? {
-    let location = offset(from: documentRange.location, to: textRange.location)
-    let length = offset(from: textRange.location, to: textRange.endLocation)
-    if location == NSNotFound || length == NSNotFound { return nil }
-    return NSRange(location: location, length: length)
-  }
+//extension NSTextContentManager {
+//  func range(for textRange: NSTextRange) -> NSRange? {
+//    let location = offset(from: documentRange.location, to: textRange.location)
+//    let length = offset(from: textRange.location, to: textRange.endLocation)
+//    if location == NSNotFound || length == NSNotFound { return nil }
+//    return NSRange(location: location, length: length)
+//  }
+//
+//  func textRange(for range: NSRange) -> NSTextRange? {
+//    guard let textRangeLocation = location(documentRange.location, offsetBy: range.location),
+//          let endLocation = location(textRangeLocation, offsetBy: range.length) else { return nil }
+//    return NSTextRange(location: textRangeLocation, end: endLocation)
+//  }
+//}
 
-  func textRange(for range: NSRange) -> NSTextRange? {
-    guard let textRangeLocation = location(documentRange.location, offsetBy: range.location),
-          let endLocation = location(textRangeLocation, offsetBy: range.length) else { return nil }
-    return NSTextRange(location: textRangeLocation, end: endLocation)
-  }
-}
+
+/// To listen for a notificaiton when Text 2 has to switch to TextKit 1
+//extension MarkdownEditor {
+//    public class let willSwitchToNSLayoutManagerNotification: NSNotification.Name
+//    public class let didSwitchToNSLayoutManagerNotification: NSNotification.Name
+//}
+
+
