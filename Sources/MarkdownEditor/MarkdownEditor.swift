@@ -42,20 +42,23 @@ public class MarkdownEditor: NSTextView, NSTextContentManagerDelegate, NSTextCon
     
     let highlightr = Highlightr()
     
+//    private var lastStyledRanges: [NSRange] = []
+    
     private var styler: MarkdownStyler
     
     var searchText: String
     
-    private var syntaxList: [MarkdownSyntax] = [
-        .bold, .boldItalic, .italic, .codeBlock, .inlineCode
-    ]
+//    private var syntaxList: [MarkdownSyntax] = [
+//        .bold, .boldItalic, .italic, .codeBlock, .inlineCode
+//    ]
     
     init(
-        frame frameRect: NSRect,
+        viewWidth: CGFloat,
         editorHeight: CGFloat = .zero,
         configuration: MarkdownEditorConfiguration? = nil,
         isShowingFrames: Bool,
-        searchText: String
+        searchText: String,
+        textContainer: NSTextContainer
     ) {
         
         self.editorHeight = editorHeight
@@ -64,14 +67,12 @@ public class MarkdownEditor: NSTextView, NSTextContentManagerDelegate, NSTextCon
         self.searchText = searchText
         
         // Create TextKit 2 stack
-        let textContentStorage = NSTextContentStorage()
-        let textLayoutManager = NSTextLayoutManager()
-        let textContainer = NSTextContainer(size: frameRect.size)
+        
+//        let textContentStorage = NSTextContentStorage()
         
 //        let textContainer = NSTextContainer(size: CGSize(width: frameRect.width, height: .greatestFiniteMagnitude))
         
-        textContentStorage.addTextLayoutManager(textLayoutManager)
-        textLayoutManager.textContainer = textContainer
+//        textContentStorage.addTextLayoutManager(textLayoutManager)
         
         self.styler = MarkdownStyler(textContentStorage: textContentStorage)
         
@@ -85,40 +86,7 @@ public class MarkdownEditor: NSTextView, NSTextContentManagerDelegate, NSTextCon
         setupMarkdownStyling()
     }
     
-    
-    
-    //    init(
-    //        frame frameRect: NSRect,
-    //        editorHeight: CGFloat = .zero,
-    //        configuration: MarkdownEditorConfiguration? = nil,
-    //        isShowingFrames: Bool,
-    //        searchText: String
-    //    ) {
-    //        self.editorHeight = editorHeight
-    //        self.configuration = configuration
-    //        self.isShowingFrames = isShowingFrames
-    //        self.searchText = searchText
-    //
-    //        let textContainer = NSTextContainer(size: CGSize(width: frameRect.width, height: .greatestFiniteMagnitude))
-    //
-    //        self.styler = MarkdownStyler(textContentStorage: textContentStorage)
-    //
-    //        super.init(frame: frameRect, textContainer: textContainer)
-    //
-    //        self.textContentStorage?.delegate = self
-    //
-    //        self.textContentStorage?.textContainer = textContainer
-    //
-    ////        self.textContentStorage?.primaryTextLayoutManager = self.textLayoutManager
-    //
-    //        self.textContentStorage = textContentStorage
-    //        self.textLayoutManager = textLayoutManager
-    //        self.textContentStorage?.primaryTextLayoutManager = self.textLayoutManager
-    //
-    //        self.textContainer
-    //
-    //    }
-    
+
     /// The `required init?(coder: NSCoder)` is necessary for classes that inherit from `NSView`
     /// (which `NSTextView` does). This initializer is used when the view is loaded from a storyboard or XIB file.
     required init?(coder: NSCoder) {
@@ -132,6 +100,11 @@ public class MarkdownEditor: NSTextView, NSTextContentManagerDelegate, NSTextCon
         // This could involve setting up NSTextViewDelegate methods
         // and using regular expressions to apply attributes
     }
+    
+    
+    
+    
+    
     //
     //    // Override textDidChange to update styling
     //    override func textDidChange(_ notification: Notification) {
@@ -312,19 +285,7 @@ public class MarkdownEditor: NSTextView, NSTextContentManagerDelegate, NSTextCon
         //            // Apply new search term highlights...
         //            // ...
         //        }
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
+
         
     } // END style text
     
@@ -347,7 +308,7 @@ public class MarkdownEditor: NSTextView, NSTextContentManagerDelegate, NSTextCon
     
     public override var intrinsicContentSize: NSSize {
         
-        guard let layoutManager = self.layoutManager, let container = self.textContainer else {
+        guard let textLayoutManager = self.textLayoutManager, let container = self.textContainer else {
             return super.intrinsicContentSize
         }
         container.containerSize = NSSize(width: self.bounds.width, height: CGFloat.greatestFiniteMagnitude)
@@ -365,58 +326,17 @@ public class MarkdownEditor: NSTextView, NSTextContentManagerDelegate, NSTextCon
 
 
 
-extension MarkdownEditor {
-    
-    
-    public override func insertText(_ string: Any, replacementRange: NSRange) {
-        textContentStorage?.performEditingTransaction {
-            super.insertText(string, replacementRange: replacementRange)
-        }
-    }
-    
-    public override func replaceCharacters(in range: NSRange, with string: String) {
-        textContentStorage?.performEditingTransaction {
-            super.replaceCharacters(in: range, with: string)
-        }
-    }
-    
-    
-    
-    nonisolated public func textContentManager(_ textContentManager: NSTextContentManager, textElementAt location: NSTextLocation) -> NSTextElement? {
-        // Implement this method to provide custom text elements if needed
-        return nil
-    }
-    
-    
-    public func textContentStorage(_ textContentStorage: NSTextContentStorage, didProcessEditing editedRange: NSRange, delta: Int) {
-        styler.applyStyles(to: editedRange)
-    }
-    
-    //    public func textContentStorage(_ textContentStorage: NSTextContentStorage, textParagraphWith range: NSRange) -> NSTextParagraph {
-    //        // Implement this method to provide custom paragraph attributes if needed
-    //        return NSTextParagraph(range: range)
-    //    }
-    
-    //    func textContentStorage(_ textContentStorage: NSTextContentStorage, shouldProcessEditing editedRange: NSRange, range: NSRange) -> Bool {
-    //        // Implement this method to control whether editing should be processed
-    //        return true
-    //    }
-    //
-    //    func textContentStorage(_ textContentStorage: NSTextContentStorage, didProcessEditing editedRange: NSRange, delta: Int) {
-    //        // This is where you can apply your Markdown styling
-    //        applyStyles(to: editedRange)
-    //    }
-}
-
-
 
 
 
 extension MarkdownEditor {
-    
+
     public override func didChangeText() {
         super.didChangeText()
         invalidateIntrinsicContentSize()
+        // Clear the cached styled ranges when text changes
+                    lastStyledRanges = []
+                    updateStyling()
     }
     
     public override func draw(_ rect: NSRect) {
@@ -433,3 +353,109 @@ extension MarkdownEditor {
 }
 
 #endif
+
+
+
+//import Cocoa
+
+extension MarkdownEditor {
+
+    func updateStyling() {
+//        guard let layoutManager = self.textLayoutManager else { return }
+        guard let textContentStorage = self.textContentStorage else { return }
+        guard let textStorage = self.textStorage else { return }
+        
+        
+        guard let textLayoutManager = self.textLayoutManager,
+              let textContentManager = textLayoutManager.textContentManager else { return }
+        
+        let visibleTextRange = self.visibleRange()
+        guard let visibleRange = textContentManager.range(for: visibleTextRange) else { return }
+        
+        
+        
+        // Add a buffer to the visible range (e.g., 100 characters on either side)
+        let bufferLength = 100
+        
+        let extendedRange = NSRange(
+                    location: max(0, visibleRange.location - bufferLength),
+                    length: min(textStorage.length - max(0, visibleRange.location - bufferLength),
+                                visibleRange.length + 2 * bufferLength)
+                )
+        
+        
+        
+        // Check if the visible range intersects with any of the last styled ranges
+        let needsUpdate = lastStyledRanges.contains { NSIntersectionRange($0, visibleRange).length > 0 }
+        
+        if needsUpdate {
+            applyMarkdownStyling(in: visibleRange)
+            lastStyledRanges = [visibleRange]
+        }
+
+    }
+    
+    func applyMarkdownStyling(in range: NSRange) {
+            guard let textContentManager = textLayoutManager?.textContentManager,
+                  let textRange = textContentManager.textRange(for: range) else { return }
+            
+            // Example regex for bold markdown
+            let boldPattern = "\\*\\*(.*?)\\*\\*"
+            
+            do {
+                let regex = try NSRegularExpression(pattern: boldPattern, options: [])
+                let text = textContentManager.attributedString().string as NSString
+                
+                // Find matches in the specified range
+                let matches = regex.matches(in: text as String, options: [], range: range)
+                
+                for match in matches {
+                    let boldRange = match.range(at: 1)
+                    
+                    // Apply bold attribute
+                    textContentManager.performEditingTransaction {
+                        if let boldTextRange = textContentManager.textRange(for: boldRange) {
+                            textContentManager.addAttribute(.font, value: NSFont.boldSystemFont(ofSize: 14), range: boldTextRange)
+                        }
+                    }
+                }
+            } catch {
+                print("Error creating regex: \(error)")
+            }
+        }
+    
+    
+    
+    func visibleRange() -> NSTextRange {
+        guard let textLayoutManager = self.textLayoutManager else { return }
+            
+            let visibleRect = self.visibleRect
+            var visibleTextRange = NSTextRange(location: 0)
+            
+            textLayoutManager.enumerateTextLayoutFragments(from: textLayoutManager.documentRange.location, options: [], using: { fragment in
+                if fragment.layoutFragmentFrame.intersects(visibleRect) {
+                    if let fragmentRange = fragment.textElement?.elementRange {
+                        visibleTextRange = visibleTextRange.union(fragmentRange)
+                    }
+                }
+                return fragment.layoutFragmentFrame.maxY > visibleRect.maxY
+            })
+            
+            return visibleTextRange
+        }
+}
+
+extension NSTextContentManager {
+  func range(for textRange: NSTextRange) -> NSRange? {
+    let location = offset(from: documentRange.location, to: textRange.location)
+    let length = offset(from: textRange.location, to: textRange.endLocation)
+    if location == NSNotFound || length == NSNotFound { return nil }
+    return NSRange(location: location, length: length)
+  }
+
+  func textRange(for range: NSRange) -> NSTextRange? {
+    guard let textRangeLocation = location(documentRange.location, offsetBy: range.location),
+          let endLocation = location(textRangeLocation, offsetBy: range.length) else { return nil }
+    return NSTextRange(location: textRangeLocation, end: endLocation)
+  }
+}

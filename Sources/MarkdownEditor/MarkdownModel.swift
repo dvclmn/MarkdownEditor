@@ -19,7 +19,6 @@ extension MarkdownEditorRepresentable {
     func setUpTextViewOptions(for textView: MarkdownEditor) {
         
         guard let textContainer = textView.textContainer else { return }
-        guard let layoutManager = textView.layoutManager else { return }
         
         textContainer.containerSize = CGSize(width: textView.bounds.width, height: .greatestFiniteMagnitude)
         
@@ -56,10 +55,7 @@ extension MarkdownEditorRepresentable {
         
         
         textView.maxSize                 = NSSize(width: self.maxWidth, height: CGFloat.greatestFiniteMagnitude)
-//                textView.minSize                 = NSSize(width: 0, height: contentSize.height)
-        
-//        textContainer.size = NSSize(width: self.maxWidth, height: CGFloat.greatestFiniteMagnitude)
-        layoutManager.ensureLayout(for: textContainer)
+
         
         /// When the text field has an attributed string value, the system ignores the textColor, font, alignment, lineBreakMode, and lineBreakStrategy properties. Set the foregroundColor, font, alignment, lineBreakMode, and lineBreakStrategy properties in the attributed string instead.
         textView.font = NSFont.systemFont(ofSize: configuration?.fontSize ?? MarkdownDefaults.fontSize, weight: MarkdownDefaults.fontWeight)

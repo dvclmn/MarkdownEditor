@@ -184,20 +184,20 @@ public class AutoGrowingTextView: NSTextView {
         fatalError("init(coder:) has not been implemented")
     }
     
-    public override var intrinsicContentSize: NSSize {
-        
-        guard let layoutManager = self.layoutManager, let container = self.textContainer else {
-            return super.intrinsicContentSize
-        }
-        
-        container.containerSize = NSSize(width: self.bounds.width, height: CGFloat.greatestFiniteMagnitude)
-        layoutManager.ensureLayout(for: container)
-        
-        let rect = layoutManager.usedRect(for: container).size
-        
-        return rect
-    }
-    
+//    public override var intrinsicContentSize: NSSize {
+//        
+//        guard let layoutManager = self.layoutManager, let container = self.textContainer else {
+//            return super.intrinsicContentSize
+//        }
+//        
+//        container.containerSize = NSSize(width: self.bounds.width, height: CGFloat.greatestFiniteMagnitude)
+//        layoutManager.ensureLayout(for: container)
+//        
+//        let rect = layoutManager.usedRect(for: container).size
+//        
+//        return rect
+//    }
+//    
     public override func didChangeText() {
         super.didChangeText()
         invalidateIntrinsicContentSize()

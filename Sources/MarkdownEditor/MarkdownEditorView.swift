@@ -80,8 +80,13 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
     /// This function creates the NSView and configures its initial state
     public func makeNSView(context: Context) -> MarkdownEditor {
         
+        let textLayoutManager = NSTextLayoutManager()
+        let textContainer = NSTextContainer(size: NSSize(width: self.width, height: .zero))
+        textLayoutManager.textContainer = textContainer
+        
+        
         let textView = MarkdownEditor(
-            frame: .zero,
+            viewWidth: self.width,
             isShowingFrames: self.isShowingFrames,
             searchText: self.searchText
         )
