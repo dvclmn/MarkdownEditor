@@ -300,9 +300,14 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
     private func sendOutSize(for textView: MarkdownEditor) {
         DispatchQueue.main.async {
             self.output(
-                "Height: \(textView.editorHeight), Width: \(textView.editorWidth)",
+                "Height: \(textView.editorHeight)",
                 textView.editorHeight + (MarkdownDefaults.paddingY * 4))
         }
+        
+        
+//        DispatchQueue.main.async {
+//            self.height = textView.intrinsicContentSize.height
+//        }
     }
     
     //    @MainActor

@@ -17,10 +17,9 @@ import OSLog
 /// https://developer.apple.com/library/archive/documentation/Cocoa/Conceptual/TextLayout/TextLayout.html#//apple_ref/doc/uid/10000158i
 
 @MainActor
-public class MarkdownEditor: NSTextView, NSTextStorageDelegate {
+public class MarkdownEditor: NSTextView, NSTextContentStorageDelegate {
     
     var editorHeight: CGFloat
-    var editorWidth: CGFloat
     
     var configuration: MarkdownEditorConfiguration?
     
@@ -28,7 +27,7 @@ public class MarkdownEditor: NSTextView, NSTextStorageDelegate {
     
     let highlightr = Highlightr()
     
-    let textHighlighter: TextHighlighter
+//    let textHighlighter: TextHighlighter
     
     var searchText: String
     
@@ -40,25 +39,26 @@ public class MarkdownEditor: NSTextView, NSTextStorageDelegate {
     init(
         frame frameRect: NSRect,
         editorHeight: CGFloat = .zero,
-        editorWidth: CGFloat = .zero,
         configuration: MarkdownEditorConfiguration? = nil,
         isShowingFrames: Bool,
         searchText: String
     ) {
         self.editorHeight = editorHeight
-        self.editorWidth = editorWidth
         self.configuration = configuration
         self.isShowingFrames = isShowingFrames
         self.searchText = searchText
         
-        let textStorage = NSTextStorage()
-        let layoutManager = NSLayoutManager()
+        let textContentStorage = NSTextContentStorage()
+        let textLayoutManager = NSTextLayoutManager()
+        
+
         let textContainer = NSTextContainer(size: CGSize(width: frameRect.width, height: CGFloat.greatestFiniteMagnitude))
         
-        textStorage.addLayoutManager(layoutManager)
-        layoutManager.addTextContainer(textContainer)
+        layoutManager.textStorage = textStorage
+        layoutManager.textContainer = textContainer
         
-        self.textHighlighter = TextHighlighter(textStorage: textStorage)
+        
+//        self.textHighlighter = TextHighlighter(textStorage: textStorage)
         
         super.init(frame: frameRect, textContainer: textContainer)
         
@@ -131,11 +131,21 @@ public class MarkdownEditor: NSTextView, NSTextStorageDelegate {
             let endSyntaxLength = min(syntax == .codeBlock ? syntaxCharacterCount + 1 : syntaxCharacterCount, string.count - endSyntaxLocation)
             let endSyntaxRange = NSRange(location: endSyntaxLocation, length: endSyntaxLength)
             
+            
+            
+            
+            //            textStorage.removeAttribute(.backgroundColor, range: contentRange)
+            // Remove all existing styles
+            textStorage.removeAttribute(.font, range: contentRange)
+            textStorage.removeAttribute(.foregroundColor, range: contentRange)
+            
+            // Should we apply any default styling before the syntax-based styles?
+            
+            
             // Apply attributes
             textStorage.addAttributes(syntax.syntaxAttributes, range: startSyntaxRange)
             textStorage.addAttributes(syntax.syntaxAttributes, range: endSyntaxRange)
             
-//            textStorage.removeAttribute(.backgroundColor, range: contentRange)
             textStorage.addAttributes(syntax.contentAttributes, range: contentRange)
 
             if syntax == .codeBlock {
@@ -251,28 +261,6 @@ public class MarkdownEditor: NSTextView, NSTextStorageDelegate {
     } // END style text
     
     
-    
-    
-//    @MainActor
-//    public func findRangesWithBackgroundColor(
-//        color: NSColor,
-//        in attributedString: NSAttributedString
-//    ) -> [NSRange] {
-//        
-//        var rangesWithColor: [NSRange] = []
-//        
-//        attributedString.enumerateAttribute(
-//            .backgroundColor,
-//            in: NSRange(location: 0, length: attributedString.length),
-//            options: []
-//        ) { (attributeValue, range, _) in
-//            if let backgroundColor = attributeValue as? NSColor, backgroundColor == color {
-//                rangesWithColor.append(range)
-//            }
-//        }
-//        
-//        return rangesWithColor
-//    }
 
     public override var intrinsicContentSize: NSSize {
         
@@ -284,14 +272,9 @@ public class MarkdownEditor: NSTextView, NSTextStorageDelegate {
         
         let rect = layoutManager.usedRect(for: container).size
         
-        //        let bufferHeight: CGFloat = 120
-//        let bufferHeight: CGFloat = self.isEditable ? 120 : 0
         let contentSize = NSSize(width: NSView.noIntrinsicMetric, height: rect.height)
         
-//        let contentSize = NSSize(width: NSView.noIntrinsicMetric, height: rect.height + bufferHeight)
-        
         self.editorHeight = contentSize.height
-        self.editorWidth = rect.width
         
         return contentSize
     }
@@ -302,8 +285,6 @@ extension MarkdownEditor {
     public override func didChangeText() {
         super.didChangeText()
         invalidateIntrinsicContentSize()
-//        editorHeight = intrinsicContentSize.height
-//        heightChangeHandler(height)
     }
     
     public override func draw(_ rect: NSRect) {
@@ -317,7 +298,6 @@ extension MarkdownEditor {
             border.stroke()
         }
     }
-    
 }
 
 #endif
