@@ -16,8 +16,23 @@ import OSLog
 /// https://developer.apple.com/library/archive/documentation/TextFonts/Conceptual/CocoaTextArchitecture/TextEditing/TextEditing.html#//apple_ref/doc/uid/TP40009459-CH3-SW16
 /// https://developer.apple.com/library/archive/documentation/Cocoa/Conceptual/TextLayout/TextLayout.html#//apple_ref/doc/uid/10000158i
 
+
+// TextKit 2 Explanation
+
+// 1. NSTextContentStorage vs NSTextStorage
+// NSTextContentStorage doesn't directly replace NSTextStorage. Instead, it's a new class that works alongside NSTextStorage in TextKit 2.
+// - NSTextStorage is still used and remains the core storage for attributed strings.
+// - NSTextContentStorage is a higher-level abstraction that can manage multiple NSTextStorages.
+
+// 2. NSTextLayoutManager vs NSLayoutManager
+// NSTextLayoutManager is indeed the TextKit 2 replacement for NSLayoutManager.
+// It provides more efficient layout and rendering, especially for large documents.
+
+
+// NSTextStorage's edited(_:range:changeInLength:)
+
 @MainActor
-public class MarkdownEditor: NSTextView, NSTextContentStorageDelegate {
+public class MarkdownEditor: NSTextView, NSTextContentManagerDelegate, NSTextContentStorageDelegate {
     
     var editorHeight: CGFloat
     
@@ -27,14 +42,13 @@ public class MarkdownEditor: NSTextView, NSTextContentStorageDelegate {
     
     let highlightr = Highlightr()
     
-//    let textHighlighter: TextHighlighter
+    private var styler: MarkdownStyler
     
     var searchText: String
     
     private var syntaxList: [MarkdownSyntax] = [
         .bold, .boldItalic, .italic, .codeBlock, .inlineCode
     ]
-    
     
     init(
         frame frameRect: NSRect,
@@ -43,27 +57,67 @@ public class MarkdownEditor: NSTextView, NSTextContentStorageDelegate {
         isShowingFrames: Bool,
         searchText: String
     ) {
+        
         self.editorHeight = editorHeight
         self.configuration = configuration
         self.isShowingFrames = isShowingFrames
         self.searchText = searchText
         
+        // Create TextKit 2 stack
         let textContentStorage = NSTextContentStorage()
         let textLayoutManager = NSTextLayoutManager()
+        let textContainer = NSTextContainer(size: frameRect.size)
         
-
-        let textContainer = NSTextContainer(size: CGSize(width: frameRect.width, height: CGFloat.greatestFiniteMagnitude))
+//        let textContainer = NSTextContainer(size: CGSize(width: frameRect.width, height: .greatestFiniteMagnitude))
         
-        layoutManager.textStorage = textStorage
-        layoutManager.textContainer = textContainer
+        textContentStorage.addTextLayoutManager(textLayoutManager)
+        textLayoutManager.textContainer = textContainer
         
-        
-//        self.textHighlighter = TextHighlighter(textStorage: textStorage)
+        self.styler = MarkdownStyler(textContentStorage: textContentStorage)
         
         super.init(frame: frameRect, textContainer: textContainer)
         
-        self.textStorage?.delegate = self
+        // Set up the text view
+        isRichText = false
+        font = NSFont.systemFont(ofSize: 14)
+        
+        // Set up markdown styling
+        setupMarkdownStyling()
     }
+    
+    
+    
+    //    init(
+    //        frame frameRect: NSRect,
+    //        editorHeight: CGFloat = .zero,
+    //        configuration: MarkdownEditorConfiguration? = nil,
+    //        isShowingFrames: Bool,
+    //        searchText: String
+    //    ) {
+    //        self.editorHeight = editorHeight
+    //        self.configuration = configuration
+    //        self.isShowingFrames = isShowingFrames
+    //        self.searchText = searchText
+    //
+    //        let textContainer = NSTextContainer(size: CGSize(width: frameRect.width, height: .greatestFiniteMagnitude))
+    //
+    //        self.styler = MarkdownStyler(textContentStorage: textContentStorage)
+    //
+    //        super.init(frame: frameRect, textContainer: textContainer)
+    //
+    //        self.textContentStorage?.delegate = self
+    //
+    //        self.textContentStorage?.textContainer = textContainer
+    //
+    ////        self.textContentStorage?.primaryTextLayoutManager = self.textLayoutManager
+    //
+    //        self.textContentStorage = textContentStorage
+    //        self.textLayoutManager = textLayoutManager
+    //        self.textContentStorage?.primaryTextLayoutManager = self.textLayoutManager
+    //
+    //        self.textContainer
+    //
+    //    }
     
     /// The `required init?(coder: NSCoder)` is necessary for classes that inherit from `NSView`
     /// (which `NSTextView` does). This initializer is used when the view is loaded from a storyboard or XIB file.
@@ -72,13 +126,27 @@ public class MarkdownEditor: NSTextView, NSTextContentStorageDelegate {
     }
     
     
+    
+    func setupMarkdownStyling() {
+        // Here you would implement your markdown styling logic
+        // This could involve setting up NSTextViewDelegate methods
+        // and using regular expressions to apply attributes
+    }
+    //
+    //    // Override textDidChange to update styling
+    //    override func textDidChange(_ notification: Notification) {
+    //        super.textDidChange(notification)
+    //        // Update markdown styling here
+    //    }
+    //
+    
     public func textStorage(_ textStorage: NSTextStorage, didProcessEditing editedMask: NSTextStorageEditActions, range editedRange: NSRange, changeInLength delta: Int) {
         if editedMask.contains(.editedCharacters) {
             
-//            os_log("Applied styles. Executed from within `func textStorage(_ textStorage: NSTextStorage, didProcessEditing editedMask: NSTextStorageEditActions, range editedRange: NSRange, changeInLength delta: Int)`")
+            //            os_log("Applied styles. Executed from within `func textStorage(_ textStorage: NSTextStorage, didProcessEditing editedMask: NSTextStorageEditActions, range editedRange: NSRange, changeInLength delta: Int)`")
             let extendedRange = NSUnionRange(editedRange, textStorage.editedRange)
             
-                applyStyles(to: extendedRange)
+            applyStyles(to: extendedRange)
             
         }
     }
@@ -147,37 +215,37 @@ public class MarkdownEditor: NSTextView, NSTextContentStorageDelegate {
             textStorage.addAttributes(syntax.syntaxAttributes, range: endSyntaxRange)
             
             textStorage.addAttributes(syntax.contentAttributes, range: contentRange)
-
+            
             if syntax == .codeBlock {
-    
+                
                 if let highlightr = highlightr {
-    
+                    
                     highlightr.setTheme(to: "xcode-dark")
-    
+                    
                     highlightr.theme.setCodeFont(.monospacedSystemFont(ofSize: 14, weight: .medium))
-    
+                    
                     // Extract the substring for the code block
                     
                     textStorage.addAttributes(syntax.syntaxAttributes, range: startSyntaxRange)
                     
                     
                     let codeString = textStorage.attributedSubstring(from: contentRange).string
-    
+                    
                     // Highlight the extracted code string
                     if let highlightedCode = highlightr.highlight(codeString, as: "swift") {
-
+                        
                         textStorage.replaceCharacters(in: contentRange, with: highlightedCode)
-    
+                        
                         let codeBackground: [NSAttributedString.Key : Any] = [.backgroundColor: NSColor.black.withAlphaComponent(MarkdownDefaults.backgroundCodeBlock)]
-
+                        
                         textStorage.addAttributes(codeBackground, range: contentRange)
-    
+                        
                     }
                 } // END highlighter check
-    
+                
             } // end code block check
         } // END range enumeration
-
+        
         
         //    if self.searchText.count > 0 {
         //        textHighlighter.applyHighlights(forSearchTerm: self.searchText)
@@ -261,7 +329,22 @@ public class MarkdownEditor: NSTextView, NSTextContentStorageDelegate {
     } // END style text
     
     
-
+    //
+    //
+    //    public override var intrinsicContentSize: NSSize {
+    //        guard let textLayoutManager = self.textLayoutManager else {
+    //            return super.intrinsicContentSize
+    //        }
+    //
+    //        let usedRect = textLayoutManager.usedRect(for: textContainer)
+    //        let contentSize = NSSize(width: NSView.noIntrinsicMetric, height: usedRect.height)
+    //
+    //        self.editorHeight = contentSize.height
+    //
+    //        return contentSize
+    //    }
+    //
+    
     public override var intrinsicContentSize: NSSize {
         
         guard let layoutManager = self.layoutManager, let container = self.textContainer else {
@@ -279,6 +362,55 @@ public class MarkdownEditor: NSTextView, NSTextContentStorageDelegate {
         return contentSize
     }
 }
+
+
+
+extension MarkdownEditor {
+    
+    
+    public override func insertText(_ string: Any, replacementRange: NSRange) {
+        textContentStorage?.performEditingTransaction {
+            super.insertText(string, replacementRange: replacementRange)
+        }
+    }
+    
+    public override func replaceCharacters(in range: NSRange, with string: String) {
+        textContentStorage?.performEditingTransaction {
+            super.replaceCharacters(in: range, with: string)
+        }
+    }
+    
+    
+    
+    nonisolated public func textContentManager(_ textContentManager: NSTextContentManager, textElementAt location: NSTextLocation) -> NSTextElement? {
+        // Implement this method to provide custom text elements if needed
+        return nil
+    }
+    
+    
+    public func textContentStorage(_ textContentStorage: NSTextContentStorage, didProcessEditing editedRange: NSRange, delta: Int) {
+        styler.applyStyles(to: editedRange)
+    }
+    
+    //    public func textContentStorage(_ textContentStorage: NSTextContentStorage, textParagraphWith range: NSRange) -> NSTextParagraph {
+    //        // Implement this method to provide custom paragraph attributes if needed
+    //        return NSTextParagraph(range: range)
+    //    }
+    
+    //    func textContentStorage(_ textContentStorage: NSTextContentStorage, shouldProcessEditing editedRange: NSRange, range: NSRange) -> Bool {
+    //        // Implement this method to control whether editing should be processed
+    //        return true
+    //    }
+    //
+    //    func textContentStorage(_ textContentStorage: NSTextContentStorage, didProcessEditing editedRange: NSRange, delta: Int) {
+    //        // This is where you can apply your Markdown styling
+    //        applyStyles(to: editedRange)
+    //    }
+}
+
+
+
+
 
 extension MarkdownEditor {
     

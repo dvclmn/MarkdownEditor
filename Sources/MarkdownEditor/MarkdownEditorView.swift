@@ -10,7 +10,7 @@
 import Foundation
 import SwiftUI
 import OSLog
-import AsyncAlgorithms
+//import AsyncAlgorithms
 
 public struct MarkdownEditorConfiguration {
     public var fontSize: Double
