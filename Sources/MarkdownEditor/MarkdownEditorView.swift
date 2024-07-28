@@ -33,7 +33,9 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
     
     @Binding public var text: String
     //    @Binding public var height: CGFloat
+    public var maxWidth: CGFloat
     public var width: CGFloat
+    
     
     public var searchText: String
     public var configuration: MarkdownEditorConfiguration?
@@ -48,8 +50,8 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
     
     public init(
         text: Binding<String>,
-        
-        width: CGFloat,
+        maxWidth: CGFloat = 540,
+        width: CGFloat = .zero,
         searchText: String = "",
         configuration: MarkdownEditorConfiguration? = nil,
         id: String? = nil,
@@ -62,7 +64,7 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
         
     ) {
         self._text = text
-        
+        self.maxWidth = maxWidth
         self.width = width
         self.searchText = searchText
         self.configuration = configuration
@@ -118,9 +120,6 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
         /// - Possibly pressing any syntax key(s)
         
         
-        
-        
-        
         // Update text if changed
         if textView.string != self.text {
             let oldLength = textView.string.utf16.count
@@ -132,11 +131,10 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
             textView.applyStyles(to: changedRange)
         }
         
-        let currentWidth = self.width
+
         // Update width if changed
-        //                if abs(textView.frame.width - self.width) > 0.1 {  // Use a small threshold to avoid floating point issues
-        if currentWidth != self.width {
-            //                    context.coordinator.widthConstraint?.constant = self.width
+        if abs(textView.frame.width - self.width) > 0.1 {  // Use a small threshold to avoid floating point issues
+            
             textView.invalidateIntrinsicContentSize()
             self.sendOutSize(for: textView)
         }
@@ -151,15 +149,15 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
         }
         
         if abs(context.coordinator.lastKnownWidth - width) > 0.1 {
-                context.coordinator.lastKnownWidth = width
+            context.coordinator.lastKnownWidth = width
             textView.invalidateIntrinsicContentSize()
-//            textView.needsLayout = true
-//            textView.needsDisplay = true
+            //            textView.needsLayout = true
+            //            textView.needsDisplay = true
             print("This is actually being fired")
             
             self.sendOutSize(for: textView)
-//                context.coordinator.widthChangeContinuation?.yield(width)
-            }
+            //                context.coordinator.widthChangeContinuation?.yield(width)
+        }
         
         
         
@@ -247,17 +245,17 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
         var parent: MarkdownEditorRepresentable
         
         var lastKnownWidth: CGFloat = 0
-//        let widthChangeSubject = AsyncStream<CGFloat>.makeStream()
-//        var widthChangeContinuation: AsyncStream<CGFloat>.Continuation?
-//        var debounceTask: Task<Void, Never>?
+        //        let widthChangeSubject = AsyncStream<CGFloat>.makeStream()
+        //        var widthChangeContinuation: AsyncStream<CGFloat>.Continuation?
+        //        var debounceTask: Task<Void, Never>?
         //        var widthConstraint: NSLayoutConstraint?
         
         
         public init(_ parent: MarkdownEditorRepresentable) {
             self.parent = parent
             super.init()
-//            self.widthChangeContinuation = widthChangeSubject.continuation
-//            setupDebounce()
+            //            self.widthChangeContinuation = widthChangeSubject.continuation
+            //            setupDebounce()
         }
         
         /// Try `scrollRangeToVisible_` for when scroll jumps to top when pasting
@@ -274,39 +272,38 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
         } // END Text did change
         
         
-//        func setupDebounce() {
-//            self.debounceTask = Task {
-//                for await width in widthChangeSubject.debounce(for: .milliseconds(100)) {
-//                    await handleWidthChange(width: width)
-//                }
-//            }
-//        }
+        //        func setupDebounce() {
+        //            self.debounceTask = Task {
+        //                for await width in widthChangeSubject.debounce(for: .milliseconds(100)) {
+        //                    await handleWidthChange(width: width)
+        //                }
+        //            }
+        //        }
         
         
         
-//        deinit {
-//            debounceTask?.cancel()
-//            widthChangeContinuation?.finish()
-//        }
+        //        deinit {
+        //            debounceTask?.cancel()
+        //            widthChangeContinuation?.finish()
+        //        }
         
     } // END coordinator
     
-//    @MainActor
-//    func handleWidthChange(width: CGFloat, textView: MarkdownTextView) {
-//        
-//        textView.invalidateIntrinsicContentSize()
-//        self.parent.output("Width changed to \(width)", textView.frame.height)
-//    }
+    //    @MainActor
+    //    func handleWidthChange(width: CGFloat, textView: MarkdownTextView) {
+    //
+    //        textView.invalidateIntrinsicContentSize()
+    //        self.parent.output("Width changed to \(width)", textView.frame.height)
+    //    }
     
     
     private func sendOutSize(for textView: MarkdownEditor) {
         DispatchQueue.main.async {
             self.output(
                 "Height: \(textView.editorHeight), Width: \(textView.editorWidth)",
-                textView.editorHeight)
+                textView.editorHeight + (MarkdownDefaults.paddingY * 4))
         }
     }
-    
     
     //    @MainActor
     //    private func outputEditorHeight(for textView: MarkdownEditor, withReason: String) {

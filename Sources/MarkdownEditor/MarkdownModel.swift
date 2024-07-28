@@ -18,16 +18,19 @@ extension MarkdownEditorRepresentable {
     
     func setUpTextViewOptions(for textView: MarkdownEditor) {
         
-        textView.textContainer?.containerSize = CGSize(width: textView.bounds.width, height: .greatestFiniteMagnitude)
+        guard let textContainer = textView.textContainer else { return }
+        guard let layoutManager = textView.layoutManager else { return }
+        
+        textContainer.containerSize = CGSize(width: textView.bounds.width, height: .greatestFiniteMagnitude)
         
         /// If this is set to false, then the text tends to be allowed to run off the right edge,
         /// and less width-related calculations seem to be neccesary
-        textView.textContainer?.widthTracksTextView = true
-        textView.textContainer?.heightTracksTextView = false
+        textContainer.widthTracksTextView = true
+        textContainer.heightTracksTextView = false
         
         textView.isVerticallyResizable = true
         textView.isHorizontallyResizable = false
-        //        textView.autoresizingMask = [.width]
+                textView.autoresizingMask = [.width]
         
         textView.isAutomaticSpellingCorrectionEnabled = true
         textView.isAutomaticTextCompletionEnabled = true
@@ -48,11 +51,19 @@ extension MarkdownEditorRepresentable {
         
         textView.usesFindBar = true
         
-        textView.textContainer?.lineFragmentPadding = configuration?.paddingX ?? 30
-        textView.textContainerInset = NSSize(width: 0, height: configuration?.paddingY ?? 30)
+        textContainer.lineFragmentPadding = configuration?.paddingX ?? MarkdownDefaults.paddingX
+        textView.textContainerInset = NSSize(width: 0, height: configuration?.paddingY ?? MarkdownDefaults.paddingY)
+        
+        
+        textView.maxSize                 = NSSize(width: self.maxWidth, height: CGFloat.greatestFiniteMagnitude)
+//                textView.minSize                 = NSSize(width: 0, height: contentSize.height)
+        
+//        textContainer.size = NSSize(width: self.maxWidth, height: CGFloat.greatestFiniteMagnitude)
+        layoutManager.ensureLayout(for: textContainer)
         
         /// When the text field has an attributed string value, the system ignores the textColor, font, alignment, lineBreakMode, and lineBreakStrategy properties. Set the foregroundColor, font, alignment, lineBreakMode, and lineBreakStrategy properties in the attributed string instead.
-        textView.font = NSFont.systemFont(ofSize: configuration?.fontSize ?? MarkdownDefaults.fontSize, weight: .medium)
+        textView.font = NSFont.systemFont(ofSize: configuration?.fontSize ?? MarkdownDefaults.fontSize, weight: MarkdownDefaults.fontWeight)
+        
         textView.textColor = NSColor.textColor.withAlphaComponent(MarkdownDefaults.fontOpacity)
         
         textView.isEditable = self.isEditable
@@ -71,18 +82,22 @@ public struct MarkdownDefaults {
     
     public static let defaultFont =               NSFont.systemFont(ofSize: MarkdownDefaults.fontSize, weight: MarkdownDefaults.fontWeight)
     public static let fontSize:                 Double = 15
-    public static let fontWeight:               NSFont.Weight = .medium
-    public static let fontOpacity:              Double = 0.88
+    public static let fontWeight:               NSFont.Weight = .regular
+    public static let fontOpacity:              Double = 0.85
     
     public static let headerSyntaxSize:         Double = 20
-    public static let fontSizeMono:             Double = 14
+    
+    public static let fontSizeMono:             Double = 14.5
     
     public static let syntaxAlpha:              Double = 0.3
     public static let backgroundInlineCode:     Double = 0.2
     public static let backgroundCodeBlock:      Double = 0.4
     
-    public static let lineSpacing:              Double = 4
+    public static let lineSpacing:              Double = 6
     public static let paragraphSpacing:         Double = 0
+    
+    public static let paddingX: Double = 30
+    public static let paddingY: Double = 30
     
 }
 

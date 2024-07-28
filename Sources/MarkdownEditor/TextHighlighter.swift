@@ -22,7 +22,7 @@ class TextHighlighter {
 
     func applyHighlights(forSearchTerm searchTerm: String) {
         guard let textStorage = textStorage else { return }
-        let fullRange = NSRange(location: 0, length: textStorage.length)
+//        let fullRange = NSRange(location: 0, length: textStorage.length)
         let highlightColour = NSColor.orange
 
         // Clear previous highlights and restore original attributes

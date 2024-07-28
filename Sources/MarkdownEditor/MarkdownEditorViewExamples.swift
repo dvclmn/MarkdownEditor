@@ -16,7 +16,8 @@ struct MarkdownExampleView: View {
     
     @State private var isStreaming: Bool = false
     
-    @State private var text: String = TestStrings.paragraphs[1]
+    @State private var text: String = ""
+//    @State private var text: String = TestStrings.paragraphs[1]
     
     @State private var editorHeight: CGFloat = .zero
     @State private var editorWidth: CGFloat = .zero
@@ -40,15 +41,15 @@ struct MarkdownExampleView: View {
                 .border(Color.green.opacity(0.3))
                 .frame(height: editorHeight + 60)
             }
-            .readSize { size in
-                editorWidth = size.width
-            }
-                            .resizable(
-                                isManualMode: $isManualMode,
-                                edge: .trailing,
-                                lengthMin: 100,
-                                lengthMax: 400
-                            )
+//            .readSize { size in
+//                editorWidth = size.width
+//            }
+//                            .resizable(
+//                                isManualMode: $isManualMode,
+//                                edge: .trailing,
+//                                lengthMin: 100,
+//                                lengthMax: 400
+//                            )
             
             .task {
                 if isStreaming {
