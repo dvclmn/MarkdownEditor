@@ -138,10 +138,9 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
         
         if textView.string != self.text {
             textView.string = self.text
-            textView.updateMarkdownStyling()
-            
-            textView.editorHeight = textView.textContainer?.containerSize.height ?? .zero
-//            textView.updateMetrics(with: "Text changed")
+//            textView.updateMarkdownStyling()
+//            textView.editorHeight = textView.calculateEditorHeight()
+
                 }
         
 
@@ -160,90 +159,8 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
         if textView.searchText != self.searchText {
             textView.searchText = self.searchText
         }
-        
-//        if abs(context.coordinator.lastKnownWidth - width) > 0.1 {
-//            context.coordinator.lastKnownWidth = width
-//            textView.invalidateIntrinsicContentSize()
-//                        textView.needsLayout = true
-//                        textView.needsDisplay = true
-//            print("This is actually being fired")
-//            
-//            self.sendOutSize(for: textView)
-//            
-//        }
-        
-        
-        
-        
-        
-        
-        //
-        //        if textView.string != self.text {
-        //            let oldLength = textView.string.utf16.count
-        //            textView.string = text
-        //            let newLength = text.utf16.count
-        //
-        //            // Apply styles only to the changed range
-        //            let changedRange = NSRange(location: 0, length: max(oldLength, newLength))
-        //
-        //            textView.applyStyles(to: changedRange)
-        //
-        //            self.sendOutSize(for: textView)
-        //        }
-        //
-        //        if textView.isShowingFrames != self.isShowingFrames {
-        //            textView.isShowingFrames = self.isShowingFrames
-        //            os_log("Does this ever change? is `textView.isShowingFrames` \(textView.isShowingFrames), ever different from `self.isShowingFrames`? \(self.isShowingFrames)")
-        //        }
-        //
-        //
-        //
-        //        if textView.searchText != self.searchText {
-        //            textView.searchText = self.searchText
-        //            os_log("Does this ever change? is `textView.searchText` \(textView.searchText), ever different from `self.searchText`? \(self.searchText)")
-        //        }
-        //
-        //        //        DispatchQueue.main.async {
-        //        //                    output("Current width \(textView.frame.width)")
-        //        //                }
-        //
-        //        let currentWidth = textView.frame.width
-        //        if currentWidth != textView.frame.width {
-        //            context.coordinator.lastKnownWidth = currentWidth
-        //
-        //            textView.invalidateIntrinsicContentSize()
-        //
-        //            self.sendOutSize(for: textView)
-        //
-        //            output("Current width \(textView.frame.width)")
-        //
-        ////            DispatchQueue.main.async {
-        ////                self.height = textView.editorHeight
-        ////                self.width = textView.editorWidth
-        ////            }
-        //            //                context.coordinator.applyMarkdownStyling(to: textView)
-        //        }
-        //
-        //
-        //        /// THIS WORKS TO FIX HEIGHT, WHEN WIDTH CHANGES — DON'T LOSE THISSSSS
-        //                        if textView.bounds.width != self.width {
-        //
-        //                            self.sendOutSize(for: textView)
-        //
-        //
-        ////                            DispatchQueue.main.async {
-        ////                                output("The width changed")
-        ////                            }
-        //        //                    Task {
-        //        //                        await MainActor.run {
-        //        //
-        //        //                            textView.invalidateIntrinsicContentSize()
-        //        //                            self.output(textView.editorHeight)
-        //        //
-        //        //                        }
-        //        //                    }
-        //                        }
-        //
+
+     
         
     } // END update nsView
     
@@ -261,17 +178,10 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
         
         
         var lastKnownWidth: CGFloat = 0
-        //        let widthChangeSubject = AsyncStream<CGFloat>.makeStream()
-        //        var widthChangeContinuation: AsyncStream<CGFloat>.Continuation?
-        //        var debounceTask: Task<Void, Never>?
-        //        var widthConstraint: NSLayoutConstraint?
-        
-        
+
         public init(_ parent: MarkdownEditorRepresentable) {
             self.parent = parent
 //            super.init()
-            //            self.widthChangeContinuation = widthChangeSubject.continuation
-            //            setupDebounce()
         }
         
         
@@ -293,60 +203,6 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
             //
         } // END Text did change
         
-//        @MainActor
-//        func applyMarkdownStyling(to textView: AutoGrowingTextView) {
-//            
-//            guard let textStorage = textView.textStorage else { return }
-//            
-//            let fullRange = NSRange(location: 0, length: textStorage.length)
-//            let text = textStorage.string
-//            
-//            // Store the current selection
-//            let selectedRanges = textView.selectedRanges
-//            
-//            // Remove all existing styles
-//            textStorage.removeAttribute(.font, range: fullRange)
-//            textStorage.removeAttribute(.foregroundColor, range: fullRange)
-//            
-//            // Apply default style
-//            textStorage.addAttribute(.font, value: NSFont.systemFont(ofSize: 14), range: fullRange)
-//            textStorage.addAttribute(.foregroundColor, value: NSColor.textColor, range: fullRange)
-//            
-//            // Apply bold styling
-//            let boldPattern = try! NSRegularExpression(pattern: "\\*\\*(.+?)\\*\\*")
-//            boldPattern.enumerateMatches(in: text, range: fullRange) { match, _, _ in
-//                if let matchRange = match?.range(at: 1) {
-//                    textStorage.addAttribute(.font, value: NSFont.boldSystemFont(ofSize: 14), range: matchRange)
-//                    textStorage.addAttribute(.foregroundColor, value: NSColor.orange, range: matchRange)
-//                }
-//            }
-//            
-//            // Apply inline code styling
-//            let codePattern = try! NSRegularExpression(pattern: "`(.+?)`")
-//            codePattern.enumerateMatches(in: text, range: fullRange) { match, _, _ in
-//                if let matchRange = match?.range(at: 1) {
-//                    textStorage.addAttribute(.font, value: NSFont.monospacedSystemFont(ofSize: 14, weight: .regular), range: matchRange)
-//                    textStorage.addAttribute(.foregroundColor, value: NSColor.systemRed, range: matchRange)
-//                }
-//            }
-//            
-//            // Restore the selection
-//            textView.selectedRanges = selectedRanges
-//        }
-        //        func setupDebounce() {
-        //            self.debounceTask = Task {
-        //                for await width in widthChangeSubject.debounce(for: .milliseconds(100)) {
-        //                    await handleWidthChange(width: width)
-        //                }
-        //            }
-        //        }
-        
-        
-        
-        //        deinit {
-        //            debounceTask?.cancel()
-        //            widthChangeContinuation?.finish()
-        //        }
         
     } // END coordinator
     
@@ -368,11 +224,7 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
                 """,
                 textView.editorHeight + (MarkdownDefaults.paddingY * 4))
         }
-        
-        
-//        DispatchQueue.main.async {
-//            self.height = textView.intrinsicContentSize.height
-//        }
+
     }
     
     //    @MainActor

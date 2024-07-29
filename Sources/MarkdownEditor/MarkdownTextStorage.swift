@@ -11,6 +11,7 @@ import SwiftUI
 public class MarkdownTextStorage: NSTextStorage {
     
     private var backingStore = NSMutableAttributedString()
+    private var styler: MarkdownStyleManager?
     
     public override var fixesAttributesLazily: Bool { true }
     
@@ -35,4 +36,10 @@ public class MarkdownTextStorage: NSTextStorage {
         edited(.editedAttributes, range: range, changeInLength: 0)
         endEditing()
     }
+    
+//    @MainActor public override func processEditing() {
+//        let editedRange = self.editedRange
+//        super.processEditing()
+//        styler?.applyStyles(to: editedRange)
+//    }
 }

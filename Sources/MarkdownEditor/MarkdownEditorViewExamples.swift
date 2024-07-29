@@ -45,11 +45,6 @@ struct MarkdownExampleView: View {
                 .frame(height: editorHeight + 60)
             } // END scroll view
             
-            
-            
-            //            .overlay {
-            //                PerformanceTrackingTextEditor()
-            //            }
             //            .readSize { size in
             //                editorWidth = size.width
             //            }
@@ -97,8 +92,6 @@ struct MarkdownExampleView: View {
 }
 
 #endif
-
-
 
 
 public struct PerformanceWidget: View {
