@@ -66,8 +66,7 @@ public class MarkdownEditor: NSTextView {
         guard let textContentStorage = self.textContentStorage,
               let textLayoutManager = self.textLayoutManager,
               let textContentManager = textLayoutManager.textContentManager,
-              let textStorage = textContentStorage.textStorage,
-              let visible = self.visibleRange()
+              let textStorage = textContentStorage.textStorage
         else { return }
         
         //        textContentStorage.performEditingTransaction {
@@ -75,7 +74,7 @@ public class MarkdownEditor: NSTextView {
         for syntax in MarkdownSyntax.allCases {
             
 //            styler.applyStyleForPattern(syntax, in: textContentStorage.documentRange, textContentManager: textContentManager, textStorage: textStorage)
-            applyStyleForPattern(syntax, in: visible)
+            applyStyleForPattern(syntax, in: textContentManager.documentRange)
         }
         
         // Update last styled ranges
@@ -174,9 +173,7 @@ public class MarkdownEditor: NSTextView {
     }
     
     
-}
-
-
+} // END markdown editor
 
 
 extension NSTextContentManager {
@@ -238,52 +235,6 @@ extension MarkdownEditor {
     }
 
 } // END Markdown editor extension
-
-
-
-
-
-//import Cocoa
-
-//extension MarkdownEditor {
-
-
-//
-//    func applyMarkdownStyling(in range: NSRange) {
-//            guard let textContentManager = textLayoutManager?.textContentManager,
-//                  let textRange = textContentManager.textRange(for: range) else { return }
-//
-//            // Example regex for bold markdown
-//            let boldPattern = "\\*\\*(.*?)\\*\\*"
-//
-//            do {
-//                let regex = try NSRegularExpression(pattern: boldPattern, options: [])
-//                let text = textContentManager.attributedString().string as NSString
-//
-//                // Find matches in the specified range
-//                let matches = regex.matches(in: text as String, options: [], range: range)
-//
-//                for match in matches {
-//                    let boldRange = match.range(at: 1)
-//
-//                    // Apply bold attribute
-//                    textContentManager.performEditingTransaction {
-//                        if let boldTextRange = textContentManager.textRange(for: boldRange) {
-//                            textContentManager.addAttribute(.font, value: NSFont.boldSystemFont(ofSize: 14), range: boldTextRange)
-//                        }
-//                    }
-//                }
-//            } catch {
-//                print("Error creating regex: \(error)")
-//            }
-//        }
-
-
-
-    
-//} // END extension
-
-
 
 
 #endif
