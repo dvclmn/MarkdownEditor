@@ -22,7 +22,7 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
     
     
     public var searchText: String
-    public var configuration: MarkdownEditorConfiguration?
+    public var configuration: MarkdownEditorConfiguration
     
     public var id: String?
     
@@ -38,7 +38,7 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
         maxWidth: CGFloat = 540,
         width: CGFloat = .zero,
         searchText: String = "",
-        configuration: MarkdownEditorConfiguration? = nil,
+        configuration: MarkdownEditorConfiguration = MarkdownEditorConfiguration(),
         id: String? = nil,
         
         isShowingFrames: Bool = false,
@@ -84,6 +84,8 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
 
         // Create NSTextContentStorage
         let textContentStorage = NSTextContentStorage()
+        let textStorage = MarkdownTextStorage()
+        textContentStorage.textStorage = textStorage
         
         // Create NSTextLayoutManager
         let textLayoutManager = NSTextLayoutManager()
@@ -92,12 +94,12 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
         let containerSize = NSSize(width: self.width, height: .zero)
         let textContainer = NSTextContainer(size: containerSize)
 
-        
         textContentStorage.addTextLayoutManager(textLayoutManager)
         textLayoutManager.textContainer = textContainer
         
         let textView = MarkdownEditor(
             frame: containerSize,
+            configuration: configuration,
             isShowingFrames: self.isShowingFrames,
             isShowingSyntax: self.isShowingSyntax,
             searchText: self.searchText,
@@ -112,9 +114,9 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
         
         setUpTextViewOptions(for: textView)
 
-        self.sendOutSize(for: textView)
-
         textView.updateMarkdownStyling()
+        self.sendOutSize(for: textView)
+        
         
         return textView
     }
@@ -132,6 +134,7 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
         /// - Possibly pressing any syntax key(s)
         
         textView.updateMarkdownStyling()
+        textView.editorHeight = textView.calculateEditorHeight()
         
         if textView.string != self.text {
             textView.string = self.text

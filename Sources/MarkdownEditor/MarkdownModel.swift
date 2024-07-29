@@ -14,6 +14,7 @@ import SwiftUI
 
 public struct MarkdownEditorConfiguration {
     public var fontSize: Double
+    public var fontWeight: NSFont.Weight
     public var insertionPointColour: Color
     public var codeColour: Color
     public var paddingX: Double
@@ -21,12 +22,14 @@ public struct MarkdownEditorConfiguration {
     
     public init(
         fontSize: Double = MarkdownDefaults.fontSize,
-        insertionPointColour: Color,
+        fontWeight: NSFont.Weight = MarkdownDefaults.fontWeight,
+        insertionPointColour: Color = .blue,
         codeColour: Color = .primary.opacity(0.7),
         paddingX: Double = MarkdownDefaults.paddingX,
         paddingY: Double = MarkdownDefaults.paddingY
     ) {
         self.fontSize = fontSize
+        self.fontWeight = fontWeight
         self.insertionPointColour = insertionPointColour
         self.codeColour = codeColour
         self.paddingX = paddingX
@@ -65,21 +68,21 @@ extension MarkdownEditorRepresentable {
         textView.isRichText = false
         textView.importsGraphics = false
         
-        textView.insertionPointColor = NSColor(configuration?.insertionPointColour ?? .blue)
+        textView.insertionPointColor = NSColor(configuration.insertionPointColour)
         
         textView.smartInsertDeleteEnabled = false
         
 //        textView.usesFindBar = true
         
-        textView.textContainer?.lineFragmentPadding = configuration?.paddingX ?? MarkdownDefaults.paddingX
-        textView.textContainerInset = NSSize(width: 0, height: configuration?.paddingY ?? MarkdownDefaults.paddingY)
+        textView.textContainer?.lineFragmentPadding = configuration.paddingX
+        textView.textContainerInset = NSSize(width: 0, height: configuration.paddingY)
         
         
-        textView.maxSize                 = NSSize(width: self.maxWidth, height: CGFloat.greatestFiniteMagnitude)
+//        textView.maxSize = NSSize(width: self.maxWidth, height: CGFloat.greatestFiniteMagnitude)
 
         
         /// When the text field has an attributed string value, the system ignores the textColor, font, alignment, lineBreakMode, and lineBreakStrategy properties. Set the foregroundColor, font, alignment, lineBreakMode, and lineBreakStrategy properties in the attributed string instead.
-        textView.font = NSFont.systemFont(ofSize: configuration?.fontSize ?? MarkdownDefaults.fontSize, weight: MarkdownDefaults.fontWeight)
+        textView.font = NSFont.systemFont(ofSize: configuration.fontSize, weight: configuration.fontWeight)
         
         textView.textColor = NSColor.textColor.withAlphaComponent(MarkdownDefaults.fontOpacity)
         
