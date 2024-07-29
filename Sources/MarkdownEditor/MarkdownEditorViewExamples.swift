@@ -16,7 +16,7 @@ struct MarkdownExampleView: View {
     
     @State private var isStreaming: Bool = false
     
-    @State private var text: String = TestStrings.Markdown.bigText
+    @State private var text: String = TestStrings.Markdown.shortMarkdownBasics
 //    @State private var text: String = TestStrings.Markdown.shortMarkdownBasics
     
     @State private var editorHeight: CGFloat = .zero

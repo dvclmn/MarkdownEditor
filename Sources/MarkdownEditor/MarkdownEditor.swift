@@ -34,6 +34,8 @@ public class MarkdownEditor: NSTextView {
     
     let highlightr = Highlightr()
     
+    let styler = MarkdownStyleManager()
+    
     var editorMetrics: String = ""
     
     
@@ -71,34 +73,23 @@ public class MarkdownEditor: NSTextView {
     func updateMarkdownStyling() {
         
         guard let textContentStorage = self.textContentStorage,
-              let textLayoutManager = self.textLayoutManager else { return }
-//              let viewportRange = textLayoutManager.textViewportLayoutController.viewportRange else { return }
+              let textLayoutManager = self.textLayoutManager,
+              let textContentManager = textLayoutManager.textContentManager,
+              let textStorage = textContentStorage.textStorage
+        else { return }
         
-        //        self.updateMetrics(with: "Viewport range: \(viewportRange.description)")
+        //        textContentStorage.performEditingTransaction {
         
-        // Check if we need to update styling
-        //        let needsUpdate: Bool = lastStyledRanges.contains { range in
-        //
-        //            range.intersects(viewportRange)
-        //        }
-        
-        //        guard needsUpdate || lastStyledRanges.isEmpty else {
-        //            self.updateMetrics(with: "No update needed")
-        //            return
-        //        }
-        
-        
-        
-        textContentStorage.performEditingTransaction {
+        for syntax in MarkdownSyntax.allCases {
             
-            for syntax in MarkdownSyntax.allCases {
-                applyStyleForPattern(syntax, in: textContentStorage.documentRange)
-            }
-            
-            // Update last styled ranges
-//            lastStyledRanges = [viewportRange]
-            
-        } // END performEditingTransaction
+            styler.applyStyleForPattern(syntax, in: textContentStorage.documentRange, textContentManager: textContentManager, textStorage: textStorage)
+//            applyStyleForPattern(syntax, in: textContentStorage.documentRange)
+        }
+        
+        // Update last styled ranges
+        //            lastStyledRanges = [viewportRange]
+        
+        //        } // END performEditingTransaction
     }
     
     
@@ -195,7 +186,7 @@ public class MarkdownEditor: NSTextView {
                 //                textStorage.setAttributes(syntax.syntaxAttributes, range: endSyntaxRange)
                 
                 //            textStorage.removeAttribute(.backgroundColor, range: contentRange)
-//                textStorage.setAttributes(syntax.contentAttributes, range: contentRange)
+                //                textStorage.setAttributes(syntax.contentAttributes, range: contentRange)
             }
             
         }
@@ -443,6 +434,7 @@ class MarkdownStyleManager {
     private var previouslyStyledRanges: [MarkdownSyntax: [NSRange]] = [:]
     
     func applyStyleForPattern(_ syntax: MarkdownSyntax, in range: NSTextRange, textContentManager: NSTextContentManager, textStorage: NSTextStorage) {
+        
         guard let nsRange = textContentManager.range(for: range),
               let documentRange: NSRange = textContentManager.range(for: textContentManager.documentRange) else { return }
         
@@ -465,7 +457,7 @@ class MarkdownStyleManager {
                 
             }
         }
-
+        
         
         // Remove style from ranges no longer matching
         for rangeToUnstyle in rangesToUnstyle {
