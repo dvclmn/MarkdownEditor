@@ -7,6 +7,62 @@
 
 import SwiftUI
 
+
+@MainActor
+class MarkdownStyleManager {
+    
+    private var previouslyStyledRanges: [MarkdownSyntax: [NSRange]] = [:]
+    
+    func applyStyleForPattern(_ syntax: MarkdownSyntax, in range: NSTextRange, textContentManager: NSTextContentManager, textStorage: NSTextStorage) {
+        
+        guard let nsRange = textContentManager.range(for: range),
+              let documentRange: NSRange = textContentManager.range(for: textContentManager.documentRange) else { return }
+        
+        let string = textStorage.string
+        guard let regex = syntax.regex else { return }
+        
+        // Find new matches
+        let matches = regex.matches(in: string, options: [], range: nsRange)
+        let newMatchRanges = matches.map { $0.range }
+        
+        // Get previously styled ranges for this syntax
+        let oldMatchRanges = previouslyStyledRanges[syntax] ?? []
+        
+        // Find ranges to unstyle (old ranges that are not in new ranges)
+        let rangesToUnstyle = oldMatchRanges.filter { oldRange in
+            !newMatchRanges.contains { newRange in
+                
+                let intersection = NSIntersectionRange(oldRange, newRange)
+                return intersection.length == 0
+                
+            }
+        }
+        
+        
+        // Remove style from ranges no longer matching
+        for rangeToUnstyle in rangesToUnstyle {
+            let intersection = rangeToUnstyle.intersection(documentRange)
+            if let validRange = intersection {
+                textStorage.removeAttribute(.backgroundColor, range: validRange)
+                // Remove any other attributes specific to this syntax
+            }
+        }
+        
+        // Apply style to new matches
+        for match in matches {
+            let matchRange = match.range
+            let contentRange = NSRange(location: matchRange.location + syntax.syntaxCharacterCount,
+                                       length: matchRange.length - 2 * syntax.syntaxCharacterCount)
+            
+            textStorage.setAttributes(syntax.contentAttributes, range: contentRange)
+        }
+        
+        // Update previously styled ranges
+        previouslyStyledRanges[syntax] = newMatchRanges
+    }
+}
+
+
 //@MainActor
 //class MarkdownStyler {
 //    private var lastText: String = ""
