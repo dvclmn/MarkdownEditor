@@ -16,8 +16,7 @@ struct MarkdownExampleView: View {
     
     @State private var isStreaming: Bool = false
     
-//    @State private var text: String = ""
-    @State private var text: String = TestStrings.paragraphs[1]
+    @State private var text: String = TestStrings.Markdown.shortMarkdownBasics
     
     @State private var editorHeight: CGFloat = .zero
     @State private var editorWidth: CGFloat = 300
@@ -71,11 +70,12 @@ struct MarkdownExampleView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         .border(Color.purple.opacity(0.3))
         .overlay(alignment: .trailing) {
-            VStack {
-                Text("Metrics: \(editorMetrics)")
+            VStack(alignment: .leading) {
+                Text("\(editorMetrics)")
                 Text("Height: \(editorHeight)")
                 Text("Width: \(editorWidth)")
             }
+            .padding()
             .background(.blue.opacity(0.6))
             .font(.caption)
         }

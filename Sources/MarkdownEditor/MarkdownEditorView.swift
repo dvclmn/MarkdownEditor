@@ -63,6 +63,8 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
     
     private let isPrinting: Bool = true
     
+    @State private var nsViewMetrics: String = ""
+    
     
     /// This function creates the NSView and configures its initial state
     public func makeNSView(context: Context) -> MarkdownEditor {
@@ -87,17 +89,15 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
         let textLayoutManager = NSTextLayoutManager()
         
         // Create NSTextContainer
-        let containerSize = NSSize(width: self.width, height: CGFloat.greatestFiniteMagnitude)
+        let containerSize = NSSize(width: self.width, height: .zero)
         let textContainer = NSTextContainer(size: containerSize)
+
         
-        
-        // Important: Keep a reference to text storage since NSTextView weakly references it.
-//        var textContentStorage = NSTextContentStorage()
         textContentStorage.addTextLayoutManager(textLayoutManager)
         textLayoutManager.textContainer = textContainer
         
         let textView = MarkdownEditor(
-            viewWidth: self.width,
+            frame: containerSize,
             isShowingFrames: self.isShowingFrames,
             isShowingSyntax: self.isShowingSyntax,
             searchText: self.searchText,
@@ -111,19 +111,10 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
         context.coordinator.textContentStorage = textContentStorage
         
         setUpTextViewOptions(for: textView)
-        
-//        textView.applyStyles(to: NSRange(location: 0, length: text.utf16.count))
-        
-        // Set up width constraint
-        //                let widthConstraint = textView.widthAnchor.constraint(equalToConstant: width)
-        //                widthConstraint.isActive = true
-        //                context.coordinator.widthConstraint = widthConstraint
-        
-        // Initial size update
-        
-        
-        
+
         self.sendOutSize(for: textView)
+
+        textView.updateMarkdownStyling()
         
         return textView
     }
@@ -140,17 +131,15 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
         /// - Pressing space key, or return key
         /// - Possibly pressing any syntax key(s)
         
+        textView.updateMarkdownStyling()
         
-        // Update text if changed
         if textView.string != self.text {
-            let oldLength = textView.string.utf16.count
-            textView.string = text
-            let newLength = text.utf16.count
+            textView.string = self.text
+            textView.updateMarkdownStyling()
             
-            // Apply styles only to the changed range
-            let changedRange = NSRange(location: 0, length: max(oldLength, newLength))
-            textView.applyStyles(to: changedRange)
-        }
+            textView.editorHeight = textView.textContainer?.containerSize.height ?? .zero
+//            textView.updateMetrics(with: "Text changed")
+                }
         
 
         // Update width if changed
@@ -169,16 +158,16 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
             textView.searchText = self.searchText
         }
         
-        if abs(context.coordinator.lastKnownWidth - width) > 0.1 {
-            context.coordinator.lastKnownWidth = width
-            textView.invalidateIntrinsicContentSize()
-            //            textView.needsLayout = true
-            //            textView.needsDisplay = true
-            print("This is actually being fired")
-            
-            self.sendOutSize(for: textView)
-            //                context.coordinator.widthChangeContinuation?.yield(width)
-        }
+//        if abs(context.coordinator.lastKnownWidth - width) > 0.1 {
+//            context.coordinator.lastKnownWidth = width
+//            textView.invalidateIntrinsicContentSize()
+//                        textView.needsLayout = true
+//                        textView.needsDisplay = true
+//            print("This is actually being fired")
+//            
+//            self.sendOutSize(for: textView)
+//            
+//        }
         
         
         
@@ -264,7 +253,9 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
     public class Coordinator: NSObject, NSTextViewDelegate {
         
         var parent: MarkdownEditorRepresentable
-        var textContentStorage: NSTextContentStorage?
+        weak var textContentStorage: NSTextContentStorage?
+//        weak var editor: MarkdownEditor?
+        
         
         var lastKnownWidth: CGFloat = 0
         //        let widthChangeSubject = AsyncStream<CGFloat>.makeStream()
@@ -275,10 +266,11 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
         
         public init(_ parent: MarkdownEditorRepresentable) {
             self.parent = parent
-            super.init()
+//            super.init()
             //            self.widthChangeContinuation = widthChangeSubject.continuation
             //            setupDebounce()
         }
+        
         
         /// Try `scrollRangeToVisible_` for when scroll jumps to top when pasting
         public func textDidChange(_ notification: Notification) {
@@ -287,7 +279,12 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
             
             if self.parent.text != textView.string {
                 self.parent.text = textView.string
+                textView.updateMarkdownStyling()
+                
+                
+                
                 self.parent.sendOutSize(for: textView)
+//                self.parent.sendOutSize(for: textView, withMessage: "Updated text")
                 
             }  // END text equality check
             //
@@ -361,7 +358,11 @@ public struct MarkdownEditorRepresentable: NSViewRepresentable {
     private func sendOutSize(for textView: MarkdownEditor) {
         DispatchQueue.main.async {
             self.output(
-                "Height: \(textView.editorHeight)",
+                """
+                
+                Height: \(textView.editorHeight)
+                Editor metrics: \(textView.editorMetrics)
+                """,
                 textView.editorHeight + (MarkdownDefaults.paddingY * 4))
         }
         

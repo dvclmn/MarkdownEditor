@@ -15,14 +15,20 @@ import SwiftUI
 public struct MarkdownEditorConfiguration {
     public var fontSize: Double
     public var insertionPointColour: Color
-    public var defaultCodeColour: Color
+    public var codeColour: Color
     public var paddingX: Double
     public var paddingY: Double
     
-    public init(fontSize: Double, insertionPointColour: Color, defaultCodeColour: Color, paddingX: Double, paddingY: Double) {
+    public init(
+        fontSize: Double = MarkdownDefaults.fontSize,
+        insertionPointColour: Color,
+        codeColour: Color = .primary.opacity(0.7),
+        paddingX: Double = MarkdownDefaults.paddingX,
+        paddingY: Double = MarkdownDefaults.paddingY
+    ) {
         self.fontSize = fontSize
         self.insertionPointColour = insertionPointColour
-        self.defaultCodeColour = defaultCodeColour
+        self.codeColour = codeColour
         self.paddingX = paddingX
         self.paddingY = paddingY
     }
@@ -33,16 +39,16 @@ extension MarkdownEditorRepresentable {
     
     func setUpTextViewOptions(for textView: MarkdownEditor) {
         
-        guard let textContainer = textView.textContainer else { return }
+//        guard let textContainer = textView.textContainer else { return }
         
-        textContainer.containerSize = CGSize(width: textView.bounds.width, height: .greatestFiniteMagnitude)
+//        textContainer.containerSize = CGSize(width: textView.bounds.width, height: .greatestFiniteMagnitude)
         
         /// If this is set to false, then the text tends to be allowed to run off the right edge,
         /// and less width-related calculations seem to be neccesary
-        textContainer.widthTracksTextView = true
-        textContainer.heightTracksTextView = false
+//        textContainer.widthTracksTextView = true
+//        textContainer.heightTracksTextView = false
         
-        textView.isVerticallyResizable = true
+//        textView.isVerticallyResizable = true
         textView.isHorizontallyResizable = false
                 textView.autoresizingMask = [.width]
         
@@ -51,8 +57,8 @@ extension MarkdownEditorRepresentable {
         textView.isAutomaticQuoteSubstitutionEnabled = false
         textView.isAutomaticTextReplacementEnabled = true
         
-        textView.wantsScrollEventsForSwipeTracking(on: .none)
-        textView.wantsForwardedScrollEvents(for: .none)
+//        textView.wantsScrollEventsForSwipeTracking(on: .none)
+//        textView.wantsForwardedScrollEvents(for: .none)
         
         
         
@@ -63,9 +69,9 @@ extension MarkdownEditorRepresentable {
         
         textView.smartInsertDeleteEnabled = false
         
-        textView.usesFindBar = true
+//        textView.usesFindBar = true
         
-        textContainer.lineFragmentPadding = configuration?.paddingX ?? MarkdownDefaults.paddingX
+        textView.textContainer?.lineFragmentPadding = configuration?.paddingX ?? MarkdownDefaults.paddingX
         textView.textContainerInset = NSSize(width: 0, height: configuration?.paddingY ?? MarkdownDefaults.paddingY)
         
         
@@ -81,7 +87,7 @@ extension MarkdownEditorRepresentable {
         
         textView.drawsBackground = false
         textView.allowsUndo = true
-        textView.setNeedsDisplay(textView.bounds)
+//        textView.setNeedsDisplay(textView.bounds)
         //                textView.setNeedsDisplay(NSRect(x: 0, y: 0, width: self.editorWidth ?? 200, height: 200))
     }
     
