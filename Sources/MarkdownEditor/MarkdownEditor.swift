@@ -71,8 +71,8 @@ public class MarkdownEditor: NSTextView {
     func updateMarkdownStyling() {
         
         guard let textContentStorage = self.textContentStorage,
-              let textLayoutManager = self.textLayoutManager,
-              let viewportRange = textLayoutManager.textViewportLayoutController.viewportRange else { return }
+              let textLayoutManager = self.textLayoutManager else { return }
+//              let viewportRange = textLayoutManager.textViewportLayoutController.viewportRange else { return }
         
         //        self.updateMetrics(with: "Viewport range: \(viewportRange.description)")
         
@@ -92,11 +92,11 @@ public class MarkdownEditor: NSTextView {
         textContentStorage.performEditingTransaction {
             
             for syntax in MarkdownSyntax.allCases {
-                applyStyleForPattern(syntax, in: viewportRange)
+                applyStyleForPattern(syntax, in: textContentStorage.documentRange)
             }
             
             // Update last styled ranges
-            lastStyledRanges = [viewportRange]
+//            lastStyledRanges = [viewportRange]
             
         } // END performEditingTransaction
     }
@@ -113,24 +113,26 @@ public class MarkdownEditor: NSTextView {
         
         guard let regex = syntax.regex else { return }
         
+        guard let documentRange: NSRange = textContentStorage.range(for: textContentManager.documentRange) else { return }
+        
         //        let string = textStorage.string
         
         
-//        textContentStorage.performEditingTransaction {
-            
-//            textLayoutManager.setRenderingAttributes(syntax.contentAttributes, for: matchRange)
-            
-//        }
+        //        textContentStorage.performEditingTransaction {
         
-//        textContentManager.performEditingTransaction {
-//            
-//            if let boldTextRange = textContentManager.textRange(for: boldRange) {
-//                textContentManager.addAttribute(.font, value: NSFont.boldSystemFont(ofSize: 14), range: boldTextRange)
-//            }
-//            
-//        }
+        //            textLayoutManager.setRenderingAttributes(syntax.contentAttributes, for: matchRange)
         
-
+        //        }
+        
+        //        textContentManager.performEditingTransaction {
+        //
+        //            if let boldTextRange = textContentManager.textRange(for: boldRange) {
+        //                textContentManager.addAttribute(.font, value: NSFont.boldSystemFont(ofSize: 14), range: boldTextRange)
+        //            }
+        //
+        //        }
+        
+        
         
         
         //        textLayoutManager.enumerateTextLayoutFragments(from: range.location) { fragment in
@@ -165,42 +167,36 @@ public class MarkdownEditor: NSTextView {
         //
         
         
-        //                        let location = offsetFromPosition(beginningOfDocument, toPosition: range.start)
-        //                        let length = offsetFromPosition(range.start, toPosition: range.end)
-        //                        return NSRange(location: location, length: length)
-        
-        
         
         regex.enumerateMatches(in: string, options: [], range: nsRange) { match, _, _ in
+            
             guard let match = match else { return }
             
             let matchRange = match.range
-            let syntaxCharacterCount = syntax.syntaxCharacters.count
-            let isSyntaxSymmetrical = syntax.syntaxSymmetrical
             
-            // Content range
-            let contentLocation = max(0, syntax == .codeBlock ? matchRange.location + syntaxCharacterCount + 1 : matchRange.location + syntaxCharacterCount)
-            let contentLength = min(matchRange.length - (isSyntaxSymmetrical ? 2 : 1) * syntaxCharacterCount, string.count - contentLocation)
-            let contentRange = NSRange(location: contentLocation, length: contentLength)
             
-            // Opening syntax range
-            let startSyntaxLocation = matchRange.location
-            let startSyntaxLength = min(syntax == .codeBlock ? syntaxCharacterCount + 1 : syntaxCharacterCount, string.count - startSyntaxLocation)
-            let startSyntaxRange = NSRange(location: startSyntaxLocation, length: startSyntaxLength)
+            let contentRange = calculateRange(for: syntax, matchRange: matchRange, component: .content, in: string)
             
-            // Closing syntax range
-            let endSyntaxLocation = max(0, matchRange.location + matchRange.length - syntaxCharacterCount)
-            let endSyntaxLength = min(syntax == .codeBlock ? syntaxCharacterCount + 1 : syntaxCharacterCount, string.count - endSyntaxLocation)
-            let endSyntaxRange = NSRange(location: endSyntaxLocation, length: endSyntaxLength)
+            let startSyntaxRange = calculateRange(for: syntax, matchRange: matchRange, component: .open, in: string)
             
-            // Apply attributes
-            textStorage.setAttributes(syntax.syntaxAttributes, range: startSyntaxRange)
-            //            textStorage.addAttributes(syntax.syntaxAttributes, range: startSyntaxRange)
-            textStorage.setAttributes(syntax.syntaxAttributes, range: endSyntaxRange)
+            let endSyntaxRange = calculateRange(for: syntax, matchRange: matchRange, component: .close, in: string)
             
-            //            textStorage.removeAttribute(.backgroundColor, range: contentRange)
-            textStorage.setAttributes(syntax.contentAttributes, range: contentRange)
             
+            
+            textContentStorage.performEditingTransaction {
+                
+                textLayoutManager.addRenderingAttribute(.foregroundColor, value: NSColor.green, for: range)
+                
+                //                textStorage.removeAttribute(.backgroundColor, range: documentRange)
+                
+                // Apply attributes
+                //                textStorage.setAttributes(syntax.syntaxAttributes, range: startSyntaxRange)
+                //            textStorage.addAttributes(syntax.syntaxAttributes, range: startSyntaxRange)
+                //                textStorage.setAttributes(syntax.syntaxAttributes, range: endSyntaxRange)
+                
+                //            textStorage.removeAttribute(.backgroundColor, range: contentRange)
+//                textStorage.setAttributes(syntax.contentAttributes, range: contentRange)
+            }
             
         }
     }
@@ -278,8 +274,42 @@ public class MarkdownEditor: NSTextView {
         updateMarkdownStyling()
     }
     
+    private func calculateRange(
+        for syntax: MarkdownSyntax,
+        matchRange: NSRange,
+        component: SyntaxComponent,
+        in string: String
+    ) -> NSRange {
+        let syntaxCharacterCount = syntax.syntaxCharacterCount
+        let isSyntaxSymmetrical = syntax.isSyntaxSymmetrical
+        let isCodeBlock = syntax == .codeBlock
+        
+        let location: Int
+        let length: Int
+        
+        switch component {
+        case .open:
+            location = matchRange.location
+            length = isCodeBlock ? syntaxCharacterCount + 1 : syntaxCharacterCount
+            
+            
+        case .content:
+            location = isCodeBlock ? matchRange.location + syntaxCharacterCount + 1 : matchRange.location + syntaxCharacterCount
+            length = matchRange.length - (isSyntaxSymmetrical ? 2 : 1) * syntaxCharacterCount
+            
+        case .close:
+            location = matchRange.location + matchRange.length - syntaxCharacterCount
+            length = isCodeBlock ? syntaxCharacterCount + 1 : syntaxCharacterCount
+        }
+        
+        
+        return NSRange(location: max(location, 0), length: min(length, string.count - location))
+    }
+    
     
 }
+
+
 
 
 extension NSTextContentManager {
@@ -405,3 +435,57 @@ extension MarkdownEditor {
 
 
 #endif
+
+
+@MainActor
+class MarkdownStyleManager {
+    
+    private var previouslyStyledRanges: [MarkdownSyntax: [NSRange]] = [:]
+    
+    func applyStyleForPattern(_ syntax: MarkdownSyntax, in range: NSTextRange, textContentManager: NSTextContentManager, textStorage: NSTextStorage) {
+        guard let nsRange = textContentManager.range(for: range),
+              let documentRange: NSRange = textContentManager.range(for: textContentManager.documentRange) else { return }
+        
+        let string = textStorage.string
+        guard let regex = syntax.regex else { return }
+        
+        // Find new matches
+        let matches = regex.matches(in: string, options: [], range: nsRange)
+        let newMatchRanges = matches.map { $0.range }
+        
+        // Get previously styled ranges for this syntax
+        let oldMatchRanges = previouslyStyledRanges[syntax] ?? []
+        
+        // Find ranges to unstyle (old ranges that are not in new ranges)
+        let rangesToUnstyle = oldMatchRanges.filter { oldRange in
+            !newMatchRanges.contains { newRange in
+                
+                let intersection = NSIntersectionRange(oldRange, newRange)
+                return intersection.length == 0
+                
+            }
+        }
+
+        
+        // Remove style from ranges no longer matching
+        for rangeToUnstyle in rangesToUnstyle {
+            let intersection = rangeToUnstyle.intersection(documentRange)
+            if let validRange = intersection {
+                textStorage.removeAttribute(.backgroundColor, range: validRange)
+                // Remove any other attributes specific to this syntax
+            }
+        }
+        
+        // Apply style to new matches
+        for match in matches {
+            let matchRange = match.range
+            let contentRange = NSRange(location: matchRange.location + syntax.syntaxCharacterCount,
+                                       length: matchRange.length - 2 * syntax.syntaxCharacterCount)
+            
+            textStorage.setAttributes(syntax.contentAttributes, range: contentRange)
+        }
+        
+        // Update previously styled ranges
+        previouslyStyledRanges[syntax] = newMatchRanges
+    }
+}

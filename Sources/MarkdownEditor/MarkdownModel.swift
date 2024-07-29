@@ -127,21 +127,19 @@ public enum MarkdownSyntax: String, CaseIterable, Identifiable {
     case h2
     case h3
     case bold
+    case boldAlt
     case italic
+    case italicAlt
     case boldItalic
     case strikethrough
     case inlineCode
     case codeBlock
     
-    public var id: String {
+    nonisolated public var id: String {
         self.rawValue
     }
     
     public var name: String {
-        self.rawValue
-    }
-    
-    public var iconLiterals: String? {
         switch self {
         case .h1:
             "H1"
@@ -150,17 +148,21 @@ public enum MarkdownSyntax: String, CaseIterable, Identifiable {
         case .h3:
             "H3"
         case .bold:
-            "􀅓"
+            "Bold"
+        case .boldAlt:
+            "Bold"
         case .italic:
-            "􀅔"
+            "Italic"
+        case .italicAlt:
+            "Italic"
+        case .boldItalic:
+            "Bold Italic"
         case .strikethrough:
-            "􀅖"
+            "Strikethrough"
         case .inlineCode:
-            "􀙚"
+            "Inline code"
         case .codeBlock:
-            "[]"
-        default:
-            nil
+            "Code block"
         }
     }
     
@@ -169,7 +171,9 @@ public enum MarkdownSyntax: String, CaseIterable, Identifiable {
         .h2: "## (.*)",
         .h3: "### (.*)",
         .bold: "\\*\\*(.*?)\\*\\*",
+        .boldAlt: "\\_\\_(.*?)\\_\\_",
         .italic: "\\*(.*?)\\*",
+        .italicAlt: "\\_(.*?)\\_",
         .boldItalic: "\\*\\*\\*(.*?)\\*\\*\\*",
         .strikethrough: "~~(.*?)~~",
         .inlineCode: "`([^\\n`]+)(?!``)`(?!`)",
@@ -195,23 +199,9 @@ public enum MarkdownSyntax: String, CaseIterable, Identifiable {
     
     public var hideSyntax: Bool {
         switch self {
-        case .h1:
-            true
-        case .h2:
-            false
-        case .h3:
-            false
         case .bold:
-            false
-        case .italic:
-            false
-        case .boldItalic:
-            false
-        case .strikethrough:
-            false
-        case .inlineCode:
-            false
-        case .codeBlock:
+            true
+        default:
             false
         }
     }
@@ -226,8 +216,12 @@ public enum MarkdownSyntax: String, CaseIterable, Identifiable {
             "###"
         case .bold:
             "**"
+        case .boldAlt:
+            "__"
         case .italic:
             "*"
+        case .italicAlt:
+            "_"
         case .boldItalic:
             "***"
         case .strikethrough:
@@ -238,7 +232,12 @@ public enum MarkdownSyntax: String, CaseIterable, Identifiable {
             "```"
         }
     }
-    public var syntaxSymmetrical: Bool {
+    
+    public var syntaxCharacterCount: Int {
+        self.syntaxCharacters.count
+    }
+    
+    public var isSyntaxSymmetrical: Bool {
         switch self {
         case .h1, .h2, .h3:
             false
@@ -255,9 +254,9 @@ public enum MarkdownSyntax: String, CaseIterable, Identifiable {
                 .init("2", modifiers: [.command])
         case .h3:
                 .init("3", modifiers: [.command])
-        case .bold:
+        case .bold, .boldAlt:
                 .init("b", modifiers: [.command])
-        case .italic:
+        case .italic, .italicAlt:
                 .init("i", modifiers: [.command])
         case .boldItalic:
                 .init("b", modifiers: [.command, .shift])
@@ -296,29 +295,34 @@ public enum MarkdownSyntax: String, CaseIterable, Identifiable {
         case .h1:
             return [
                 .font: NSFont.systemFont(ofSize: self.fontSize, weight: .medium),
-                .foregroundColor: self.foreGroundColor
+                .foregroundColor: self.foreGroundColor,
+                .backgroundColor: NSColor.clear
+                    
             ]
             
         case .h2:
             
             return [
                 .font: NSFont.systemFont(ofSize: self.fontSize, weight: .medium),
-                .foregroundColor: self.foreGroundColor
+                .foregroundColor: self.foreGroundColor,
+                .backgroundColor: NSColor.clear
             ]
             
         case .h3:
             return [
                 .font: NSFont.systemFont(ofSize: self.fontSize, weight: .medium),
-                .foregroundColor: self.foreGroundColor
+                .foregroundColor: self.foreGroundColor,
+                .backgroundColor: NSColor.clear
             ]
             
-        case .bold:
+        case .bold, .boldAlt:
             return [
                 .font: NSFont.systemFont(ofSize: self.fontSize, weight: .bold),
-                .foregroundColor: self.foreGroundColor
+                .foregroundColor: self.foreGroundColor,
+                .backgroundColor: NSColor.clear
             ]
             
-        case .italic:
+        case .italic, .italicAlt:
             let bodyDescriptor = NSFontDescriptor.preferredFontDescriptor(forTextStyle: .body)
             let italicDescriptor = bodyDescriptor.withSymbolicTraits(.italic)
             let mediumWeightDescriptor = italicDescriptor.addingAttributes([
@@ -329,7 +333,8 @@ public enum MarkdownSyntax: String, CaseIterable, Identifiable {
             let font = NSFont(descriptor: mediumWeightDescriptor, size: self.fontSize)
             return [
                 .font: font as Any,
-                .foregroundColor: self.foreGroundColor
+                .foregroundColor: self.foreGroundColor,
+                .backgroundColor: NSColor.clear
             ]
             
         case .boldItalic:
@@ -337,14 +342,16 @@ public enum MarkdownSyntax: String, CaseIterable, Identifiable {
             let font = NSFont(descriptor: bodyDescriptor.withSymbolicTraits([.italic, .bold]), size: self.fontSize)
             return [
                 .font: font as Any,
-                .foregroundColor: self.foreGroundColor
+                .foregroundColor: self.foreGroundColor,
+                .backgroundColor: NSColor.clear
             ]
             
         case .strikethrough:
             return [
                 .font: NSFont.systemFont(ofSize: self.fontSize, weight: .medium),
                 .foregroundColor: self.foreGroundColor,
-                .strikethroughStyle: NSUnderlineStyle.single.rawValue
+                .strikethroughStyle: NSUnderlineStyle.single.rawValue,
+                .backgroundColor: NSColor.clear
             ]
             
         case .inlineCode:
@@ -381,7 +388,8 @@ public enum MarkdownSyntax: String, CaseIterable, Identifiable {
         default:
             return [
                 .font: NSFont.monospacedSystemFont(ofSize: self.fontSize, weight: .regular),
-                .foregroundColor: NSColor.textColor.withAlphaComponent(MarkdownDefaults.syntaxAlpha)
+                .foregroundColor: NSColor.textColor.withAlphaComponent(MarkdownDefaults.syntaxAlpha),
+                .backgroundColor: NSColor.clear
             ]
         }
     }
@@ -390,6 +398,12 @@ public enum MarkdownSyntax: String, CaseIterable, Identifiable {
 enum CodeLanguage {
     case swift
     case python
+}
+
+enum SyntaxComponent {
+    case open
+    case content
+    case close
 }
 
 #endif
