@@ -32,35 +32,18 @@ struct MarkdownExampleView: View {
     var body: some View {
         VStack {
             
-            
-//            VStack {
-//                PerformanceTrackingTextViewRepresentable(text: $text)
-//                    .border(Color.green.opacity(0.3))
-//                    .frame(minHeight: 200)
-//                
-//                PerformanceWidget()
-//            }
-//            .padding()
-            
-            
-            //            PerformanceTrackingTextEditor()
-            
-                        ScrollView(.vertical) {
-            
-            
-            
-            
-            
-                            MarkdownEditorRepresentable(
-                                text: $text,
-                                width: editorWidth
-                            ) { metrics, height in
-                                editorMetrics = metrics
-                                editorHeight = height
-                            }
-                            .border(Color.green.opacity(0.3))
-                            .frame(height: editorHeight + 60)
-                        } // END scroll view
+            ScrollView(.vertical) {
+                
+                MarkdownEditorRepresentable(
+                    text: $text,
+                    width: editorWidth
+                ) { metrics, height in
+                    editorMetrics = metrics
+                    editorHeight = height
+                }
+                .border(Color.green.opacity(0.3))
+                .frame(height: editorHeight + 60)
+            } // END scroll view
             
             
             
@@ -77,33 +60,33 @@ struct MarkdownExampleView: View {
             //                                lengthMax: 400
             //                            )
             
-                        .task {
-                            if isStreaming {
-                                do {
-                                    for try await chunk in MockupTextStream.chunks(chunkSize: 1, speed: 300) {
-                                        await MainActor.run {
-                                            text += chunk
-                                        }
-                                    }
-                                } catch {
-                                    print("Error: \(error)")
-                                }
+            .task {
+                if isStreaming {
+                    do {
+                        for try await chunk in MockupTextStream.chunks(chunkSize: 1, speed: 300) {
+                            await MainActor.run {
+                                text += chunk
                             }
                         }
+                    } catch {
+                        print("Error: \(error)")
+                    }
+                }
+            }
             
         } // END vstack
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         .border(Color.purple.opacity(0.3))
-//        .overlay(alignment: .trailing) {
-//            VStack(alignment: .leading) {
-//                Text("\(editorMetrics)")
-//                Text("Height: \(editorHeight)")
-//                Text("Width: \(editorWidth)")
-//            }
-//            .padding()
-//            .background(.blue.opacity(0.6))
-//            .font(.caption)
-//        }
+        //        .overlay(alignment: .trailing) {
+        //            VStack(alignment: .leading) {
+        //                Text("\(editorMetrics)")
+        //                Text("Height: \(editorHeight)")
+        //                Text("Width: \(editorWidth)")
+        //            }
+        //            .padding()
+        //            .background(.blue.opacity(0.6))
+        //            .font(.caption)
+        //        }
     }
 }
 
@@ -159,12 +142,6 @@ public struct PerformanceWidget: View {
         .frame(width: 250)
     }
 }
-
-
-
-
-
-
 
 
 enum TextChunkError: Error {
