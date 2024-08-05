@@ -9,7 +9,7 @@
 import Foundation
 import SwiftUI
 import TestStrings
-//import BaseUtilities
+import APIHandler
 //import Resizable
 
 struct MarkdownExampleView: View {
@@ -72,16 +72,16 @@ struct MarkdownExampleView: View {
         } // END vstack
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         .border(Color.purple.opacity(0.3))
-        //        .overlay(alignment: .trailing) {
-        //            VStack(alignment: .leading) {
-        //                Text("\(editorMetrics)")
-        //                Text("Height: \(editorHeight)")
-        //                Text("Width: \(editorWidth)")
-        //            }
-        //            .padding()
-        //            .background(.blue.opacity(0.6))
-        //            .font(.caption)
-        //        }
+                .overlay(alignment: .trailing) {
+                    VStack(alignment: .leading) {
+                        Text("\(editorMetrics)")
+                        Text("Height: \(editorHeight.formatted())")
+                        Text("Width: \(editorWidth.formatted())")
+                    }
+                    .padding()
+                    .background(.blue.opacity(0.6))
+                    .font(.caption)
+                }
     }
 }
 
@@ -94,47 +94,47 @@ struct MarkdownExampleView: View {
 #endif
 
 
-public struct PerformanceWidget: View {
-    @ObservedObject public var metrics = PerformanceMetrics.shared
-    
-    public init(
-        metrics: PerformanceMetrics = PerformanceMetrics.shared
-    ) {
-        self.metrics = metrics
-    }
-    
-    public var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            Text("Performance Metrics")
-                .font(.headline)
-            
-            ForEach(metrics.metrics.sorted(by: { $0.key < $1.key }), id: \.key) { key, value in
-                HStack {
-                    Text(key)
-                    Spacer()
-                    Text("\(value)")
-                }
-            }
-            
-            Divider()
-            
-            Text("Timings")
-                .font(.headline)
-            
-            ForEach(metrics.timings.sorted(by: { $0.key < $1.key }), id: \.key) { key, value in
-                HStack {
-                    Text(key)
-                    Spacer()
-                    Text(String(format: "%.4f s", value))
-                }
-            }
-        }
-        .padding()
-        .background(Color.gray.opacity(0.1))
-        .cornerRadius(10)
-        .frame(width: 250)
-    }
-}
+//public struct PerformanceWidget: View {
+//    @ObservedObject public var metrics = PerformanceMetrics.shared
+//    
+//    public init(
+//        metrics: PerformanceMetrics = PerformanceMetrics.shared
+//    ) {
+//        self.metrics = metrics
+//    }
+//    
+//    public var body: some View {
+//        VStack(alignment: .leading, spacing: 10) {
+//            Text("Performance Metrics")
+//                .font(.headline)
+//            
+//            ForEach(metrics.metrics.sorted(by: { $0.key < $1.key }), id: \.key) { key, value in
+//                HStack {
+//                    Text(key)
+//                    Spacer()
+//                    Text("\(value)")
+//                }
+//            }
+//            
+//            Divider()
+//            
+//            Text("Timings")
+//                .font(.headline)
+//            
+//            ForEach(metrics.timings.sorted(by: { $0.key < $1.key }), id: \.key) { key, value in
+//                HStack {
+//                    Text(key)
+//                    Spacer()
+//                    Text(String(format: "%.4f s", value))
+//                }
+//            }
+//        }
+//        .padding()
+//        .background(Color.gray.opacity(0.1))
+//        .cornerRadius(10)
+//        .frame(width: 250)
+//    }
+//}
 
 
 enum TextChunkError: Error {

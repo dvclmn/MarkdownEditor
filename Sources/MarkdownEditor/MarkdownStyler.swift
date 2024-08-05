@@ -63,6 +63,87 @@ class MarkdownStyleManager {
 }
 
 
+
+//class CustomBackgroundTextLayoutFragment: NSTextLayoutFragment {
+//    
+//    override func draw(at point: CGPoint, in context: CGContext) {
+//        // Draw the custom background
+//        guard let textLayoutManager = textLayoutManager,
+//           let textContentManager = textLayoutManager.textContentManager else { return }
+//
+//            
+//            textContentManager.enumerateAttribute(.backgroundColor, in: textRange, options: []) { (value, range, stop) in
+//                guard let color = value as? NSColor else { return }
+//                
+//                if let fragmentRange = range.intersection(textRange) {
+//                    let rects = self.rects(forTextRange: fragmentRange)
+//                    
+//                    context.saveGState()
+//                    context.setFillColor(color.cgColor)
+//                    for rect in rects {
+//                        var adjustedRect = rect
+//                        adjustedRect.origin.x += point.x
+//                        adjustedRect.origin.y += point.y
+//                        context.fill(adjustedRect)
+//                    }
+//                    context.restoreGState()
+//                }
+//            }
+//        
+//        
+//        // Draw the text
+//        super.draw(at: point, in: context)
+//    }
+//}
+
+//
+//
+//class CustomBackgroundTextLayoutFragment: NSTextLayoutFragment {
+//    override func draw(at point: CGPoint, in context: CGContext) {
+//        // Draw the custom background
+//        if let textLayoutManager = textLayoutManager,
+//           let textContent = textLayoutManager.textContentManager?.textElement(for: rangeInElement) as? NSTextStorage {
+//            
+//            textContent.enumerateAttribute(.backgroundColor, in: rangeInElement, options: []) { (value, range, stop) in
+//                guard let color = value as? NSColor else { return }
+//                
+//                let fragmentRange = NSRange(location: range.location - rangeInElement.location, length: range.length)
+//                let rects = self.rects(forTextRange: fragmentRange)
+//                
+//                context.saveGState()
+//                context.setFillColor(color.cgColor)
+//                for rect in rects {
+//                    var adjustedRect = rect
+//                    adjustedRect.origin.x += point.x
+//                    adjustedRect.origin.y += point.y
+//                    context.fill(adjustedRect)
+//                }
+//                context.restoreGState()
+//            }
+//        }
+//        
+//        // Draw the text
+//        super.draw(at: point, in: context)
+//    }
+//}
+
+
+//class CustomBackgroundTextLayoutManager: NSTextLayoutManager {
+//    override func textLayoutFragment(for location: NSTextLocation) -> NSTextLayoutFragment {
+//        return CustomBackgroundTextLayoutFragment(range: documentRange)
+//    }
+//}
+
+//class CustomBackgroundTextLayoutManager: NSTextLayoutManager {
+//    override func textLayoutFragment(for location: NSTextLocation) -> NSTextLayoutFragment {
+//        let fragment = CustomBackgroundTextLayoutFragment(range: self.documentRange)
+//        fragment.textLayoutManager = self
+//        return fragment
+//    }
+//}
+
+
+
 //@MainActor
 //class MarkdownStyler {
 //    private var lastText: String = ""

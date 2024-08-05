@@ -10,13 +10,11 @@ import SwiftUI
 
 #if os(macOS)
 
-
-
 class TextHighlighter {
     private var originalAttributes: [NSRange: [NSAttributedString.Key: Any]] = [:]
-    private weak var textStorage: NSTextStorage?
+    weak var textStorage: NSTextStorage?
 
-    init(textStorage: NSTextStorage) {
+    init(textStorage: NSTextStorage? = nil) {
         self.textStorage = textStorage
     }
 

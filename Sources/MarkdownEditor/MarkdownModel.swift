@@ -81,6 +81,7 @@ extension MarkdownEditorRepresentable {
 //        textView.maxSize = NSSize(width: self.maxWidth, height: CGFloat.greatestFiniteMagnitude)
 
         
+        
         /// When the text field has an attributed string value, the system ignores the textColor, font, alignment, lineBreakMode, and lineBreakStrategy properties. Set the foregroundColor, font, alignment, lineBreakMode, and lineBreakStrategy properties in the attributed string instead.
         textView.font = NSFont.systemFont(ofSize: configuration.fontSize, weight: configuration.fontWeight)
         

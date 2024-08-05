@@ -31,6 +31,7 @@ public class MarkdownEditor: NSTextView {
     var isShowingSyntax: Bool
     let highlightr = Highlightr()
     let styler = MarkdownStyleManager()
+    var textHighlighter = TextHighlighter()
     var editorMetrics: String = ""
     var searchText: String
     
@@ -51,6 +52,9 @@ public class MarkdownEditor: NSTextView {
         self.searchText = searchText
         
         super.init(frame: .zero, textContainer: textContainer)
+        
+        self.textHighlighter.textStorage = textContentStorage?.textStorage
+        
     }
     
     
@@ -60,79 +64,239 @@ public class MarkdownEditor: NSTextView {
         fatalError("init(coder:) has not been implemented")
     }
     
+    func applyParagraphStyles(range: NSRange) {
+        
+        guard let textStorage = self.textContentStorage?.textStorage else { return }
+        
+        let globalParagraphStyle = NSMutableParagraphStyle()
+        globalParagraphStyle.lineSpacing = MarkdownDefaults.lineSpacing
+        globalParagraphStyle.paragraphSpacing = MarkdownDefaults.paragraphSpacing
+        
+        //        let attributedString = NSMutableAttributedString(string: textStorage.string, attributes: baseStyles)
+        
+    }
+    
     
     func updateMarkdownStyling() {
         
         guard let textContentStorage = self.textContentStorage,
               let textLayoutManager = self.textLayoutManager,
               let textContentManager = textLayoutManager.textContentManager,
-              let textStorage = textContentStorage.textStorage
+              let textStorage = textContentStorage.textStorage,
+              let documentRange: NSRange = textContentStorage.range(for: textContentManager.documentRange)
         else { return }
         
-        //        textContentStorage.performEditingTransaction {
-        
-        for syntax in MarkdownSyntax.allCases {
+        textContentStorage.performEditingTransaction {
             
-//            styler.applyStyleForPattern(syntax, in: textContentStorage.documentRange, textContentManager: textContentManager, textStorage: textStorage)
-            applyStyleForPattern(syntax, in: textContentManager.documentRange)
-        }
-        
-        // Update last styled ranges
-        //            lastStyledRanges = [viewportRange]
-        
-        //        } // END performEditingTransaction
+            let currentSelectedRange = self.selectedRange()
+            
+            let globalParagraphStyles = NSMutableParagraphStyle()
+                    globalParagraphStyles.lineSpacing = MarkdownDefaults.lineSpacing
+                    globalParagraphStyles.paragraphSpacing = MarkdownDefaults.paragraphSpacing
+                    
+                    let baseStyles: [NSAttributedString.Key : Any] = [
+                        .font: NSFont.systemFont(ofSize: MarkdownDefaults.fontSize, weight: MarkdownDefaults.fontWeight),
+                        .foregroundColor: NSColor.textColor.withAlphaComponent(MarkdownDefaults.fontOpacity),
+                        .paragraphStyle: globalParagraphStyles
+                    ]
+            
+            
+            let attributedString = NSMutableAttributedString(string: textStorage.string, attributes: baseStyles)
+            
+            
+            
+            
+            for syntax in MarkdownSyntax.allCases {
+                
+                //            styler.applyStyleForPattern(syntax, in: textContentStorage.documentRange, textContentManager: textContentManager, textStorage: textStorage)
+                applyStyleForPattern(
+                    syntax,
+                    in: textContentManager.documentRange,
+                    withString: attributedString
+                )
+            }
+            
+            self.setSelectedRange(currentSelectedRange)
+            
+            // Update last styled ranges
+            //            lastStyledRanges = [viewportRange]
+            
+        } // END performEditingTransaction
     }
     
     
-    private func applyStyleForPattern(_ syntax: MarkdownSyntax, in range: NSTextRange) {
+    private func applyStyleForPattern(
+        _ syntax: MarkdownSyntax,
+        in nsTextRange: NSTextRange,
+        withString attributedString: NSMutableAttributedString
+    ) {
         
         guard let textLayoutManager = self.textLayoutManager else { return }
         guard let textContentManager = textLayoutManager.textContentManager else { return }
         guard let textContentStorage = self.textContentStorage else { return }
         guard let textStorage = textContentStorage.textStorage else { return }
         
-        guard let nsRange = textContentManager.range(for: range) else { return }
+        guard let range = textContentManager.range(for: nsTextRange) else { return }
         
         guard let regex = syntax.regex else { return }
         
         guard let documentRange: NSRange = textContentStorage.range(for: textContentManager.documentRange) else { return }
         
-
         
+        let syntaxCharacterCount: Int = syntax.syntaxCharacters.count
+                let isSyntaxSymmetrical: Bool = syntax.isSyntaxSymmetrical
         
-        
-        regex.enumerateMatches(in: string, options: [], range: nsRange) { match, _, _ in
+        regex.enumerateMatches(in: string, options: [], range: range) { match, _, _ in
             
             guard let match = match else { return }
             
             let matchRange = match.range
             
-            let contentRange = calculateRange(for: syntax, matchRange: matchRange, component: .content, in: string)
-            
-            let startSyntaxRange = calculateRange(for: syntax, matchRange: matchRange, component: .open, in: string)
-            
-            let endSyntaxRange = calculateRange(for: syntax, matchRange: matchRange, component: .close, in: string)
-            
+                        
+                        
+                        /// Content range
+            let contentLocation: Int = max(range.location ,syntax == .codeBlock ?  range.location + syntaxCharacterCount + 1 : range.location + syntaxCharacterCount)
+                        let contentLength = min(range.length - (isSyntaxSymmetrical ? 2 : 1) * syntaxCharacterCount, attributedString.length - contentLocation)
+                        let contentRange = NSRange(location: contentLocation, length: contentLength)
+                        
+                        /// Opening syntax range
+                        let startSyntaxLocation = range.location
+                        let startSyntaxLength = min(syntax == .codeBlock ? syntaxCharacterCount + 1 : syntaxCharacterCount, attributedString.length - startSyntaxLocation)
+                        let startSyntaxRange = NSRange(location: startSyntaxLocation, length: startSyntaxLength)
+                        
+                        /// Closing syntax range
+                        let endSyntaxLocation = max(0, range.location + range.length - syntaxCharacterCount)
+                        let endSyntaxLength = min(syntax == .codeBlock ? syntaxCharacterCount + 1 : syntaxCharacterCount, attributedString.length - endSyntaxLocation)
+                        let endSyntaxRange = NSRange(location: endSyntaxLocation, length: endSyntaxLength)
+                        
             
             
             textContentStorage.performEditingTransaction {
                 
-//                textLayoutManager.addRenderingAttribute(.foregroundColor, value: NSColor.green, for: range)
+                
+                
+                        /// Apply attributes to opening and closing syntax
+                        if attributedString.length >= startSyntaxRange.upperBound {
+
+                            attributedString.addAttributes(syntax.syntaxAttributes, range: startSyntaxRange)
+                        }
+                        
+                        if attributedString.length >= endSyntaxRange.upperBound {
+                            attributedString.addAttributes(syntax.syntaxAttributes, range: endSyntaxRange)
+                        }
+                        
+                        /// Apply attributes to content
+                        if attributedString.length >= contentRange.upperBound {
+                            attributedString.addAttributes(syntax.contentAttributes, range: contentRange)
+                            
+                            if syntax == .inlineCode {
+                                
+                                let userCodeColour: [NSAttributedString.Key : Any] = [
+                                    .foregroundColor: NSColor(configuration.codeColour).withAlphaComponent(0.8),
+                                ]
+                                
+
+                                
+                                attributedString.addAttributes(userCodeColour, range: contentRange)
+                            }
+                        }
+                        
+                        if syntax == .codeBlock {
+                            
+                            if let highlightr = highlightr {
+                                
+                                highlightr.setTheme(to: "xcode-dark")
+                                
+                                highlightr.theme.setCodeFont(.monospacedSystemFont(ofSize: 14, weight: .medium))
+                                
+                                // Extract the substring for the code block
+                                let codeString = attributedString.attributedSubstring(from: contentRange).string
+                                
+                                // Highlight the extracted code string
+                                if let highlightedCode = highlightr.highlight(codeString, as: "swift") {
+                                    
+                                    //                        attributedString.replaceCharacters(in: contentRange, with: highlightedCode)
+                                    textStorage.replaceCharacters(in: contentRange, with: highlightedCode)
+                                    
+                                    let codeBackground: [NSAttributedString.Key : Any] = [.backgroundColor: NSColor.black.withAlphaComponent(MarkdownDefaults.backgroundCodeBlock)]
+                                    
+                                    //                        attributedString.addAttributes(codeBackground, range: contentRange)
+                                    attributedString.addAttributes(codeBackground, range: contentRange)
+                                    
+                                }
+                            } // END highlighter check
+                            
+                        } // end code block check
+            
+            
+            
+            
+//                
+//                attributedString.addAttributes(syntax.syntaxAttributes, range: startSyntaxRange)
+//                attributedString.addAttributes(syntax.syntaxAttributes, range: endSyntaxRange)
+//                attributedString.addAttributes(syntax.contentAttributes, range: contentRange)
+                
+                //                textLayoutManager.addRenderingAttribute(.foregroundColor, value: NSColor.green, for: range)
                 
                 //                textStorage.removeAttribute(.backgroundColor, range: documentRange)
                 
                 // Apply attributes
-//                                textStorage.setAttributes(syntax.syntaxAttributes, range: startSyntaxRange)
+                //                                textStorage.setAttributes(syntax.syntaxAttributes, range: startSyntaxRange)
                 //            textStorage.addAttributes(syntax.syntaxAttributes, range: startSyntaxRange)
                 //                textStorage.setAttributes(syntax.syntaxAttributes, range: endSyntaxRange)
                 
                 //            textStorage.removeAttribute(.backgroundColor, range: contentRange)
-                                textStorage.setAttributes(syntax.contentAttributes, range: contentRange)
-            }
+                
+                
+//                if syntax == .codeBlock {
+//                    
+//                    guard let highlightr = highlightr else { return }
+//                    
+//                    highlightr.setTheme(to: "xcode-dark")
+//                    
+//                    highlightr.theme.setCodeFont(.monospacedSystemFont(ofSize: 14, weight: .medium))
+//                    
+//                    // Extract the substring for the code block
+//                    
+//                    textStorage.addAttributes(syntax.syntaxAttributes, range: startSyntaxRange)
+//                    
+//                    
+//                    let codeString = textStorage.attributedSubstring(from: contentRange).string
+//                    
+//                    // Highlight the extracted code string
+//                    if let highlightedCode = highlightr.highlight(codeString, as: "swift") {
+//                        
+//                        textStorage.replaceCharacters(in: contentRange, with: highlightedCode)
+//                        
+//                        let codeBackground: [NSAttributedString.Key : Any] = [.backgroundColor: NSColor.black.withAlphaComponent(MarkdownDefaults.backgroundCodeBlock)]
+//                        
+//                        //                        textStorage.addAttribute(.paragraphStyle, value: globalParagraphStyles, range: range)
+//                        
+//                        //                        textStorage.addAttributes(codeBackground, range: contentRange)
+//                        //                        textStorage.addAttributes(codeBackground, range: contentRange)
+//                        
+//                    }
+//                    
+                    
+//                } // end code block check
+                
+                
+                
+//                textStorage.setAttributes(syntax.contentAttributes, range: contentRange)
+                
+//                textStorage.addAttributes(syntax.syntaxAttributes, range: startSyntaxRange)
+//                textStorage.addAttributes(syntax.syntaxAttributes, range: endSyntaxRange)
+                
+                
+                textStorage.setAttributedString(attributedString)
+                
+            } // END editing transaction
+            
+            
             
         }
     } // END main styling thing
-
+    
     
     public override func viewDidEndLiveResize() {
         super.viewDidEndLiveResize()
@@ -233,7 +397,7 @@ extension MarkdownEditor {
             border.stroke()
         }
     }
-
+    
 } // END Markdown editor extension
 
 
