@@ -1,0 +1,76 @@
+//
+//  TextContentStorageExtras.swift
+//
+//
+//  Created by Manuel M T Chakravarty on 02/10/2023.
+//
+
+import SwiftUI
+
+
+extension NSTextContentStorage {
+
+  /// Convert a text location to a character location within this text content storage.
+  ///
+  /// - Parameter textLocation: The text location to convert.
+  /// - Returns: The corresponding character position in the underlying text storage.
+  ///
+  func location(for textLocation: NSTextLocation) -> Int {
+    offset(from: documentRange.location, to: textLocation)
+  }
+  
+  /// Convert a character location into a text location within this text content storage.
+  ///
+  /// - Parameter location: The character location to convert.
+  /// - Returns: The corresponding text location.
+  /// 
+  func textLocation(for location: Int) -> NSTextLocation? {
+    self.location(documentRange.location, offsetBy: location)
+  }
+
+  /// Convert a text range to a character range within this text content storage.
+  ///
+  /// - Parameter textRange: The text range to convert.
+  /// - Returns: The corresponding character range in the underlying text storage.
+  ///
+  func range(for textRange: NSTextRange) -> NSRange {
+    NSRange(location: offset(from: documentRange.location, to: textRange.location),
+            length: offset(from: textRange.location, to: textRange.endLocation))
+  }
+  
+  /// Convert a character range to a text range within this text content storage.
+  ///
+  /// - Parameter range: The character range to convert.
+  /// - Returns: The corresponding text range in the underlying text storage if there exists a corresponding valid text
+  ///     range.
+  ///
+  func textRange(for range: NSRange) -> NSTextRange? {
+    // NB: `NSTextRange(location:end:)` crashes if `end` is before `start` (instead of returning `nil`).
+    guard range.length >= 0 else { return nil }
+
+    if let start = location(documentRange.location, offsetBy: range.location),
+       let end   = location(start, offsetBy: range.length)
+    {
+      return NSTextRange(location: start, end: end)
+    } else { return nil }
+  }
+    
+    
+}
+
+//
+//extension NSTextContentManager {
+//    func range(for textRange: NSTextRange) -> NSRange? {
+//        let location = offset(from: documentRange.location, to: textRange.location)
+//        let length = offset(from: textRange.location, to: textRange.endLocation)
+//        if location == NSNotFound || length == NSNotFound { return nil }
+//        return NSRange(location: location, length: length)
+//    }
+//    
+//    func textRange(for range: NSRange) -> NSTextRange? {
+//        guard let textRangeLocation = location(documentRange.location, offsetBy: range.location),
+//              let endLocation = location(textRangeLocation, offsetBy: range.length) else { return nil }
+//        return NSTextRange(location: textRangeLocation, end: endLocation)
+//    }
+//}
+//

@@ -34,7 +34,7 @@ struct MarkdownExampleView: View {
             
             ScrollView(.vertical) {
                 
-                MarkdownEditorRepresentable(
+                MarkdownEditor(
                     text: $text,
                     width: editorWidth
                 ) { metrics, height in

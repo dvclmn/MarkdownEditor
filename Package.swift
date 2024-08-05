@@ -16,6 +16,7 @@ let package = Package(
     ],
     dependencies: [
             .package(url: "https://github.com/raspu/Highlightr.git", from: "2.1.2"),
+            .package(url: "https://github.com/ChimeHQ/Rearrange.git", from: "1.8.1"),
 //            .package(url: "https://github.com/apple/swift-async-algorithms.git", from: "1.0.0"),
             .package(name: "TestStrings", path: "../TestStrings"),
             .package(name: "Networking", path: "../Networking")
@@ -24,7 +25,7 @@ let package = Package(
     targets: [
         .target(
             name: "MarkdownEditor",
-            dependencies: ["TestStrings", "Highlightr", "Networking"]
+            dependencies: ["TestStrings", "Highlightr", "Networking", "Rearrange"]
         )
     ]
 )

@@ -11,6 +11,7 @@
 
 import Foundation
 import SwiftUI
+import RegexBuilder
 
 public struct MarkdownEditorConfiguration {
     public var fontSize: Double
@@ -38,30 +39,30 @@ public struct MarkdownEditorConfiguration {
 }
 
 
-extension MarkdownEditorRepresentable {
+extension MarkdownEditor {
     
-    func setUpTextViewOptions(for textView: MarkdownEditor) {
+    func setUpTextViewOptions(for textView: MarkdownTextView) {
         
-//        guard let textContainer = textView.textContainer else { return }
+        //        guard let textContainer = textView.textContainer else { return }
         
-//        textContainer.containerSize = CGSize(width: textView.bounds.width, height: .greatestFiniteMagnitude)
+        //        textContainer.containerSize = CGSize(width: textView.bounds.width, height: .greatestFiniteMagnitude)
         
         /// If this is set to false, then the text tends to be allowed to run off the right edge,
         /// and less width-related calculations seem to be neccesary
-//        textContainer.widthTracksTextView = true
-//        textContainer.heightTracksTextView = false
+        //        textContainer.widthTracksTextView = true
+        //        textContainer.heightTracksTextView = false
         
-//        textView.isVerticallyResizable = true
+        //        textView.isVerticallyResizable = true
         textView.isHorizontallyResizable = false
-                textView.autoresizingMask = [.width]
+        textView.autoresizingMask = [.width]
         
         textView.isAutomaticSpellingCorrectionEnabled = true
         textView.isAutomaticTextCompletionEnabled = true
         textView.isAutomaticQuoteSubstitutionEnabled = false
         textView.isAutomaticTextReplacementEnabled = true
         
-//        textView.wantsScrollEventsForSwipeTracking(on: .none)
-//        textView.wantsForwardedScrollEvents(for: .none)
+        //        textView.wantsScrollEventsForSwipeTracking(on: .none)
+        //        textView.wantsForwardedScrollEvents(for: .none)
         
         
         
@@ -72,14 +73,14 @@ extension MarkdownEditorRepresentable {
         
         textView.smartInsertDeleteEnabled = false
         
-//        textView.usesFindBar = true
+        //        textView.usesFindBar = true
         
         textView.textContainer?.lineFragmentPadding = configuration.paddingX
         textView.textContainerInset = NSSize(width: 0, height: configuration.paddingY)
         
         
-//        textView.maxSize = NSSize(width: self.maxWidth, height: CGFloat.greatestFiniteMagnitude)
-
+        //        textView.maxSize = NSSize(width: self.maxWidth, height: CGFloat.greatestFiniteMagnitude)
+        
         
         
         /// When the text field has an attributed string value, the system ignores the textColor, font, alignment, lineBreakMode, and lineBreakStrategy properties. Set the foregroundColor, font, alignment, lineBreakMode, and lineBreakStrategy properties in the attributed string instead.
@@ -91,7 +92,7 @@ extension MarkdownEditorRepresentable {
         
         textView.drawsBackground = false
         textView.allowsUndo = true
-//        textView.setNeedsDisplay(textView.bounds)
+        //        textView.setNeedsDisplay(textView.bounds)
         //                textView.setNeedsDisplay(NSRect(x: 0, y: 0, width: self.editorWidth ?? 200, height: 200))
     }
     
@@ -123,7 +124,7 @@ public struct MarkdownDefaults {
 }
 
 @MainActor
-public enum MarkdownSyntax: String, CaseIterable, Identifiable {
+public enum MarkdownSyntax: String, CaseIterable, Identifiable, Equatable {
     case h1
     case h2
     case h3
@@ -142,28 +143,28 @@ public enum MarkdownSyntax: String, CaseIterable, Identifiable {
     
     public var name: String {
         switch self {
-        case .h1:
-            "H1"
-        case .h2:
-            "H2"
-        case .h3:
-            "H3"
-        case .bold:
-            "Bold"
-        case .boldAlt:
-            "Bold"
-        case .italic:
-            "Italic"
-        case .italicAlt:
-            "Italic"
-        case .boldItalic:
-            "Bold Italic"
-        case .strikethrough:
-            "Strikethrough"
-        case .inlineCode:
-            "Inline code"
-        case .codeBlock:
-            "Code block"
+            case .h1:
+                "H1"
+            case .h2:
+                "H2"
+            case .h3:
+                "H3"
+            case .bold:
+                "Bold"
+            case .boldAlt:
+                "Bold"
+            case .italic:
+                "Italic"
+            case .italicAlt:
+                "Italic"
+            case .boldItalic:
+                "Bold Italic"
+            case .strikethrough:
+                "Strikethrough"
+            case .inlineCode:
+                "Inline code"
+            case .codeBlock:
+                "Code block"
         }
     }
     
@@ -181,56 +182,103 @@ public enum MarkdownSyntax: String, CaseIterable, Identifiable {
         .codeBlock: "^\\s*```([\\s\\S]*?)^\\s*```"
     ]
     
-    private static let regexCache: [MarkdownSyntax: NSRegularExpression] = {
-        var cache = [MarkdownSyntax: NSRegularExpression]()
-        for (syntax, pattern) in regexPatterns {
-            do {
-                let regex = try NSRegularExpression(pattern: pattern, options: syntax == .codeBlock ? .anchorsMatchLines : [])
-                cache[syntax] = regex
-            } catch {
-                print("Error creating regex for \(syntax): \(error)")
-            }
+    var regex: Regex<Substring> {
+        switch self {
+            case .bold:
+                Regex {
+                    "**"
+                    ZeroOrMore(.reluctant) {
+                        /./
+                    }
+                    "**"
+                }
+                .anchorsMatchLineEndings()
+                .ignoresCase()
+                
+            case .italic:
+                Regex {
+                    "*"
+                    ZeroOrMore(.reluctant) {
+                        /./
+                    }
+                    "*"
+                }
+                .anchorsMatchLineEndings()
+                .ignoresCase()
+            case .inlineCode:
+                Regex {
+                    "`"
+                    ZeroOrMore(.reluctant) {
+                        /./
+                    }
+                    "`"
+                }
+                .anchorsMatchLineEndings()
+                .ignoresCase()
+            case .codeBlock:
+                Regex {
+                    /^/
+                    "```"
+                    ZeroOrMore(.reluctant) {
+                        CharacterClass(
+                            .whitespace,
+                            .whitespace.inverted
+                        )
+                    }
+                    "```"
+                    /$/
+                }
+                .anchorsMatchLineEndings()
+                .ignoresCase()
+                
+            default:
+                Regex {
+                    "`"
+                    ZeroOrMore(.reluctant) {
+                        /./
+                    }
+                    "`"
+                }
+                .anchorsMatchLineEndings()
+                .ignoresCase()
         }
-        return cache
-    }()
-    
-    public var regex: NSRegularExpression? {
-        return MarkdownSyntax.regexCache[self]
+        
+        
     }
     
     public var hideSyntax: Bool {
         switch self {
-        case .bold:
-            true
-        default:
-            false
+            case .bold:
+                true
+            default:
+                false
         }
     }
     
     public var syntaxCharacters: String {
         switch self {
-        case .h1:
-            "#"
-        case .h2:
-            "##"
-        case .h3:
-            "###"
-        case .bold:
-            "**"
-        case .boldAlt:
-            "__"
-        case .italic:
-            "*"
-        case .italicAlt:
-            "_"
-        case .boldItalic:
-            "***"
-        case .strikethrough:
-            "~~"
-        case .inlineCode:
-            "`"
-        case .codeBlock:
-            "```"
+            case .h1:
+                "#"
+            case .h2:
+                "##"
+            case .h3:
+                "###"
+            case .bold:
+                "**"
+            case .boldAlt:
+                "__"
+            case .italic:
+                "*"
+            case .italicAlt:
+                "_"
+            case .boldItalic:
+                "***"
+            case .strikethrough:
+                "~~"
+            case .inlineCode:
+                "`"
+            case .codeBlock:
+                "```"
         }
     }
     
@@ -240,158 +288,158 @@ public enum MarkdownSyntax: String, CaseIterable, Identifiable {
     
     public var isSyntaxSymmetrical: Bool {
         switch self {
-        case .h1, .h2, .h3:
-            false
-        default:
-            true
+            case .h1, .h2, .h3:
+                false
+            default:
+                true
         }
     }
     
     public var shortcut: KeyboardShortcut {
         switch self {
-        case .h1:
-                .init("1", modifiers: [.command])
-        case .h2:
-                .init("2", modifiers: [.command])
-        case .h3:
-                .init("3", modifiers: [.command])
-        case .bold, .boldAlt:
-                .init("b", modifiers: [.command])
-        case .italic, .italicAlt:
-                .init("i", modifiers: [.command])
-        case .boldItalic:
-                .init("b", modifiers: [.command, .shift])
-        case .strikethrough:
-                .init("u", modifiers: [.command])
-        case .inlineCode:
-                .init("c", modifiers: [.command, .option])
-        case .codeBlock:
-                .init("k", modifiers: [.command, .shift])
+            case .h1:
+                    .init("1", modifiers: [.command])
+            case .h2:
+                    .init("2", modifiers: [.command])
+            case .h3:
+                    .init("3", modifiers: [.command])
+            case .bold, .boldAlt:
+                    .init("b", modifiers: [.command])
+            case .italic, .italicAlt:
+                    .init("i", modifiers: [.command])
+            case .boldItalic:
+                    .init("b", modifiers: [.command, .shift])
+            case .strikethrough:
+                    .init("u", modifiers: [.command])
+            case .inlineCode:
+                    .init("c", modifiers: [.command, .option])
+            case .codeBlock:
+                    .init("k", modifiers: [.command, .shift])
         }
     }
     
     public var fontSize: Double {
         switch self {
-        case .h1:
-            28
-        case .h2:
-            24
-        case .h3:
-            18
-        case .inlineCode, .codeBlock:
-            14
-        default: MarkdownDefaults.fontSize
+            case .h1:
+                28
+            case .h2:
+                24
+            case .h3:
+                18
+            case .inlineCode, .codeBlock:
+                14
+            default: MarkdownDefaults.fontSize
         }
     }
     public var foreGroundColor: NSColor {
         switch self {
-        default:
-                .textColor.withAlphaComponent(0.85)
+            default:
+                    .textColor.withAlphaComponent(0.85)
         }
     }
     
     public var contentAttributes: [NSAttributedString.Key : Any] {
         
         switch self {
-        case .h1:
-            return [
-                .font: NSFont.systemFont(ofSize: self.fontSize, weight: .medium),
-                .foregroundColor: self.foreGroundColor,
-                .backgroundColor: NSColor.clear
+            case .h1:
+                return [
+                    .font: NSFont.systemFont(ofSize: self.fontSize, weight: .medium),
+                    .foregroundColor: self.foreGroundColor,
+                    .backgroundColor: NSColor.clear
                     
-            ]
-            
-        case .h2:
-            
-            return [
-                .font: NSFont.systemFont(ofSize: self.fontSize, weight: .medium),
-                .foregroundColor: self.foreGroundColor,
-                .backgroundColor: NSColor.clear
-            ]
-            
-        case .h3:
-            return [
-                .font: NSFont.systemFont(ofSize: self.fontSize, weight: .medium),
-                .foregroundColor: self.foreGroundColor,
-                .backgroundColor: NSColor.clear
-            ]
-            
-        case .bold, .boldAlt:
-            return [
-                .font: NSFont.systemFont(ofSize: self.fontSize, weight: .bold),
-                .foregroundColor: self.foreGroundColor,
-                .backgroundColor: NSColor.clear
-            ]
-            
-        case .italic, .italicAlt:
-            let bodyDescriptor = NSFontDescriptor.preferredFontDescriptor(forTextStyle: .body)
-            let italicDescriptor = bodyDescriptor.withSymbolicTraits(.italic)
-            let mediumWeightDescriptor = italicDescriptor.addingAttributes([
-                .traits: [
-                    NSFontDescriptor.TraitKey.weight: NSFont.Weight.medium
                 ]
-            ])
-            let font = NSFont(descriptor: mediumWeightDescriptor, size: self.fontSize)
-            return [
-                .font: font as Any,
-                .foregroundColor: self.foreGroundColor,
-                .backgroundColor: NSColor.clear
-            ]
-            
-        case .boldItalic:
-            let bodyDescriptor = NSFontDescriptor.preferredFontDescriptor(forTextStyle: .body)
-            let font = NSFont(descriptor: bodyDescriptor.withSymbolicTraits([.italic, .bold]), size: self.fontSize)
-            return [
-                .font: font as Any,
-                .foregroundColor: self.foreGroundColor,
-                .backgroundColor: NSColor.clear
-            ]
-            
-        case .strikethrough:
-            return [
-                .font: NSFont.systemFont(ofSize: self.fontSize, weight: .medium),
-                .foregroundColor: self.foreGroundColor,
-                .strikethroughStyle: NSUnderlineStyle.single.rawValue,
-                .backgroundColor: NSColor.clear
-            ]
-            
-        case .inlineCode:
-            return [
-                .font: NSFont.monospacedSystemFont(ofSize: self.fontSize, weight: .medium),
-                .foregroundColor: self.foreGroundColor,
-                .backgroundColor: NSColor.black.withAlphaComponent(MarkdownDefaults.backgroundInlineCode)
-            ]
-        case .codeBlock:
-            return [
-                .font: NSFont.monospacedSystemFont(ofSize: self.fontSize, weight: .medium),
-                .foregroundColor: self.foreGroundColor,
-                .backgroundColor: NSColor.black.withAlphaComponent(MarkdownDefaults.backgroundCodeBlock)
-            ]
+                
+            case .h2:
+                
+                return [
+                    .font: NSFont.systemFont(ofSize: self.fontSize, weight: .medium),
+                    .foregroundColor: self.foreGroundColor,
+                    .backgroundColor: NSColor.clear
+                ]
+                
+            case .h3:
+                return [
+                    .font: NSFont.systemFont(ofSize: self.fontSize, weight: .medium),
+                    .foregroundColor: self.foreGroundColor,
+                    .backgroundColor: NSColor.clear
+                ]
+                
+            case .bold, .boldAlt:
+                return [
+                    .font: NSFont.systemFont(ofSize: self.fontSize, weight: .bold),
+                    .foregroundColor: self.foreGroundColor,
+                    .backgroundColor: NSColor.clear
+                ]
+                
+            case .italic, .italicAlt:
+                let bodyDescriptor = NSFontDescriptor.preferredFontDescriptor(forTextStyle: .body)
+                let italicDescriptor = bodyDescriptor.withSymbolicTraits(.italic)
+                let mediumWeightDescriptor = italicDescriptor.addingAttributes([
+                    .traits: [
+                        NSFontDescriptor.TraitKey.weight: NSFont.Weight.medium
+                    ]
+                ])
+                let font = NSFont(descriptor: mediumWeightDescriptor, size: self.fontSize)
+                return [
+                    .font: font as Any,
+                    .foregroundColor: self.foreGroundColor,
+                    .backgroundColor: NSColor.clear
+                ]
+                
+            case .boldItalic:
+                let bodyDescriptor = NSFontDescriptor.preferredFontDescriptor(forTextStyle: .body)
+                let font = NSFont(descriptor: bodyDescriptor.withSymbolicTraits([.italic, .bold]), size: self.fontSize)
+                return [
+                    .font: font as Any,
+                    .foregroundColor: self.foreGroundColor,
+                    .backgroundColor: NSColor.clear
+                ]
+                
+            case .strikethrough:
+                return [
+                    .font: NSFont.systemFont(ofSize: self.fontSize, weight: .medium),
+                    .foregroundColor: self.foreGroundColor,
+                    .strikethroughStyle: NSUnderlineStyle.single.rawValue,
+                    .backgroundColor: NSColor.clear
+                ]
+                
+            case .inlineCode:
+                return [
+                    .font: NSFont.monospacedSystemFont(ofSize: self.fontSize, weight: .medium),
+                    .foregroundColor: self.foreGroundColor,
+                    .backgroundColor: NSColor.black.withAlphaComponent(MarkdownDefaults.backgroundInlineCode)
+                ]
+            case .codeBlock:
+                return [
+                    .font: NSFont.monospacedSystemFont(ofSize: self.fontSize, weight: .medium),
+                    .foregroundColor: self.foreGroundColor,
+                    .backgroundColor: NSColor.black.withAlphaComponent(MarkdownDefaults.backgroundCodeBlock)
+                ]
         }
     } // END content attributes
     
     public var syntaxAttributes: [NSAttributedString.Key : Any]  {
         
         switch self {
-            
-        case .inlineCode:
-            return [
-                .font: NSFont.monospacedSystemFont(ofSize: self.fontSize, weight: .regular),
-                .foregroundColor: NSColor.textColor.withAlphaComponent(MarkdownDefaults.syntaxAlpha),
-                .backgroundColor: NSColor.black.withAlphaComponent(MarkdownDefaults.backgroundInlineCode)
-            ]
-        case .codeBlock:
-            return [
-                .font: NSFont.monospacedSystemFont(ofSize: self.fontSize, weight: .regular),
-                .foregroundColor: NSColor.textColor.withAlphaComponent(MarkdownDefaults.syntaxAlpha),
-                .backgroundColor: NSColor.black.withAlphaComponent(MarkdownDefaults.backgroundCodeBlock)
-            ]
-        default:
-            return [
-                .font: NSFont.monospacedSystemFont(ofSize: self.fontSize, weight: .regular),
-                .foregroundColor: NSColor.textColor.withAlphaComponent(MarkdownDefaults.syntaxAlpha),
-                .backgroundColor: NSColor.clear
-            ]
+                
+            case .inlineCode:
+                return [
+                    .font: NSFont.monospacedSystemFont(ofSize: self.fontSize, weight: .regular),
+                    .foregroundColor: NSColor.textColor.withAlphaComponent(MarkdownDefaults.syntaxAlpha),
+                    .backgroundColor: NSColor.black.withAlphaComponent(MarkdownDefaults.backgroundInlineCode)
+                ]
+            case .codeBlock:
+                return [
+                    .font: NSFont.monospacedSystemFont(ofSize: self.fontSize, weight: .regular),
+                    .foregroundColor: NSColor.textColor.withAlphaComponent(MarkdownDefaults.syntaxAlpha),
+                    .backgroundColor: NSColor.black.withAlphaComponent(MarkdownDefaults.backgroundCodeBlock)
+                ]
+            default:
+                return [
+                    .font: NSFont.monospacedSystemFont(ofSize: self.fontSize, weight: .regular),
+                    .foregroundColor: NSColor.textColor.withAlphaComponent(MarkdownDefaults.syntaxAlpha),
+                    .backgroundColor: NSColor.clear
+                ]
         }
     }
 }
