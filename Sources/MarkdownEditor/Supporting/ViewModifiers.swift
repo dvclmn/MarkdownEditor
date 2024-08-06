@@ -55,3 +55,27 @@ extension View {
     clipShape(RectWithRoundedCornersOnTheLeft(cornerRadius: cornerRadius))
   }
 }
+
+
+extension NSView {
+
+  /// Add a subview such that it is layered below its siblings.
+  ///
+  /// - Parameter view: The subview to add.
+  ///
+  func addBackgroundSubview(_ view: NSView) {
+    addSubview(view, positioned: .below, relativeTo: nil)
+  }
+  
+  /// Imitate UIKit interface.
+  ///
+  func insertSubview(_ view: NSView, aboveSubview siblingSubview: NSView) {
+    addSubview(view, positioned: .above, relativeTo: siblingSubview)
+  }
+
+  /// Imitate UIKit interface.
+  ///
+  func insertSubview(_ view: NSView, belowSubview siblingSubview: NSView) {
+    addSubview(view, positioned: .below, relativeTo: siblingSubview)
+  }
+}

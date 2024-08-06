@@ -14,42 +14,32 @@ import RegexBuilder
 
 
 
-public struct MarkdownDefaults {
+public struct LineToken {
     
-    public static let defaultFont =               NSFont.systemFont(ofSize: MarkdownDefaults.fontSize, weight: MarkdownDefaults.fontWeight)
-    public static let fontSize:                 Double = 15
-    public static let fontWeight:               NSFont.Weight = .regular
-    public static let fontOpacity:              Double = 0.85
-    
-    public static let headerSyntaxSize:         Double = 20
-    
-    public static let fontSizeMono:             Double = 14.5
-    
-    public static let syntaxAlpha:              Double = 0.3
-    public static let backgroundInlineCode:     Double = 0.2
-    public static let backgroundCodeBlock:      Double = 0.4
-    
-    public static let lineSpacing:              Double = 6
-    public static let paragraphSpacing:         Double = 0
-    
-    public static let paddingX: Double = 30
-    public static let paddingY: Double = 30
-    
-}
-
-
-public struct Token {
-    let type: MarkdownSyntax
+    /// Token range, relative to the start of the document.
+    ///
     let range: NSRange
+    
+    /// Token start position, relative to the line on which the token is located.
+    ///
+    let column: Int
+    
+    /// The kind of token.
+    ///
+    let type: MarkdownSyntax
+
 }
 
-public struct LineInfo {
-    var tokens: [Token]
-    var blockType: BlockType
+
+
+public enum LayoutType {
+    case any
+    case line
+    case block
 }
 
-@MainActor
 public enum MarkdownSyntax: String, CaseIterable, Identifiable, Equatable {
+    case body
     case h1
     case h2
     case h3
@@ -69,6 +59,8 @@ public enum MarkdownSyntax: String, CaseIterable, Identifiable, Equatable {
     
     public var name: String {
         switch self {
+            case .body:
+                "Body"
             case .h1:
                 "H1"
             case .h2:
@@ -159,12 +151,14 @@ public enum MarkdownSyntax: String, CaseIterable, Identifiable, Equatable {
         
     }
     
-    public var isBlock: Bool {
+    public var layoutType: LayoutType {
         switch self {
+            case .h1, .h2, .h3:
+                    .line
             case .codeBlock, .quoteBlock:
-                true
+                    .block
             default:
-                false
+                    .any
         }
     }
     
@@ -177,8 +171,10 @@ public enum MarkdownSyntax: String, CaseIterable, Identifiable, Equatable {
         }
     }
     
-    public var syntaxCharacters: String {
+    public var syntaxCharacters: String? {
         switch self {
+            case .body:
+                nil
             case .h1:
                 "#"
             case .h2:
@@ -206,8 +202,8 @@ public enum MarkdownSyntax: String, CaseIterable, Identifiable, Equatable {
         }
     }
     
-    public var syntaxCharacterCount: Int {
-        self.syntaxCharacters.count
+    public var syntaxCharacterCount: Int? {
+        self.syntaxCharacters?.count
     }
     
     public var isSyntaxSymmetrical: Bool {
@@ -219,7 +215,7 @@ public enum MarkdownSyntax: String, CaseIterable, Identifiable, Equatable {
         }
     }
     
-    public var shortcut: KeyboardShortcut {
+    public var shortcut: KeyboardShortcut? {
         switch self {
             case .h1:
                     .init("1", modifiers: [.command])
@@ -239,8 +235,8 @@ public enum MarkdownSyntax: String, CaseIterable, Identifiable, Equatable {
                     .init("c", modifiers: [.command, .option])
             case .codeBlock:
                     .init("k", modifiers: [.command, .shift])
-            case .quoteBlock:
-                    .init("q", modifiers: [.command, .shift])
+            default:
+                nil
         }
     }
     
@@ -267,6 +263,13 @@ public enum MarkdownSyntax: String, CaseIterable, Identifiable, Equatable {
     public var contentAttributes: [NSAttributedString.Key : Any] {
         
         switch self {
+                
+            case .body:
+                return [
+                    .font: NSFont.systemFont(ofSize: self.fontSize, weight: .medium),
+                    .foregroundColor: self.foreGroundColor,
+                    .backgroundColor: NSColor.clear
+                ]
             case .h1:
                 return [
                     .font: NSFont.systemFont(ofSize: self.fontSize, weight: .medium),
@@ -415,6 +418,32 @@ public struct MarkdownEditorConfiguration {
         self.paddingX = paddingX
         self.paddingY = paddingY
     }
+}
+
+
+
+
+
+public struct MarkdownDefaults {
+    
+    public static let defaultFont =               NSFont.systemFont(ofSize: MarkdownDefaults.fontSize, weight: MarkdownDefaults.fontWeight)
+    public static let fontSize:                 Double = 15
+    public static let fontWeight:               NSFont.Weight = .regular
+    public static let fontOpacity:              Double = 0.85
+    
+    public static let headerSyntaxSize:         Double = 20
+    
+    public static let fontSizeMono:             Double = 14.5
+    
+    public static let syntaxAlpha:              Double = 0.3
+    public static let backgroundInlineCode:     Double = 0.2
+    public static let backgroundCodeBlock:      Double = 0.4
+    
+    public static let lineSpacing:              Double = 6
+    public static let paragraphSpacing:         Double = 0
+    
+    public static let paddingX: Double = 30
+    public static let paddingY: Double = 30
 }
 
 

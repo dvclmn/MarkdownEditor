@@ -43,7 +43,7 @@ class MDTextViewDelegate: NSObject, NSTextViewDelegate {
 
 /// Custom view for background highlights.
 ///
-final class CodeBackgroundHighlightView: NSBox {
+final class BackgroundHighlightView: NSBox {
     
     /// The background colour displayed by this view.
     ///

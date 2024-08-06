@@ -1,6 +1,6 @@
 //
 //  File.swift
-//  
+//
 //
 //  Created by Dave Coleman on 5/8/2024.
 //
@@ -13,14 +13,15 @@ import SwiftUI
 
 class MDTextContentStorage: NSTextContentStorage {
     
-    override func processEditing(for textStorage: NSTextStorage,
-                                 edited editMask: EditActions,
-                                 range newCharRange: NSRange,
-                                 changeInLength delta: Int,
-                                 invalidatedRange invalidatedCharRange: NSRange)
+    override func processEditing(
+        for textStorage: NSTextStorage,
+        edited editMask: NSTextStorageEditActions,
+        range newCharRange: NSRange,
+        changeInLength delta: Int,
+        invalidatedRange invalidatedCharRange: NSRange)
     {
         
-
+        
         super.processEditing(for: textStorage,
                              edited: editMask,
                              range: newCharRange,

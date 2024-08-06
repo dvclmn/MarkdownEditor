@@ -119,7 +119,7 @@ public struct MarkdownEditor: NSViewRepresentable {
        
         
         // Create NSTextContentStorage
-        let textContentStorage = NSTextContentStorage()
+        let textContentStorage = MDTextContentStorage()
         let textStorage = MDTextStorage()
         textContentStorage.textStorage = textStorage
         
@@ -127,11 +127,17 @@ public struct MarkdownEditor: NSViewRepresentable {
         let textLayoutManager = NSTextLayoutManager()
         
         // Create NSTextContainer
-        let containerSize = NSSize(width: self.width, height: .zero)
-        let textContainer = NSTextContainer(size: containerSize)
+        let containerSize = NSRect(x: 0, y: 0, width: self.width, height: .zero)
+        let textContainer = MDTextContainer(size: containerSize.size)
+//        let textContainer = NSTextContainer(size: containerSize.size)
         
         textContentStorage.addTextLayoutManager(textLayoutManager)
+        textContentStorage.primaryTextLayoutManager = textLayoutManager
+        
         textLayoutManager.textContainer = textContainer
+        
+//        textStorage.delegate = markdownTextStorageDelegate
+        
         
         let textView = MDTextView(
             frame: containerSize,
@@ -139,27 +145,38 @@ public struct MarkdownEditor: NSViewRepresentable {
             isShowingFrames: self.isShowingFrames,
             isShowingSyntax: self.isShowingSyntax,
             searchText: self.searchText,
-            textContainer: textContainer
+            textContainer: textContainer,
             setText: setText(_:)
         )
         
+        textContainer.textView = textView
         
-        
-        if let delegate = textView.delegate as? MDTextViewDelegate {
-            
-            // The property `delegate.textDidChange` is expected to already have been set during initialisation of the
-            // `MDTextView`. Hence, we add to it; instead of just overwriting it.
-            let currentTextDidChange = delegate.textDidChange
-            delegate.textDidChange = { [currentTextDidChange] textView in
-                context.coordinator.textDidChange(textView)
-                currentTextDidChange?(textView)
-            }
-            delegate.selectionDidChange = { textView in
-                selectionDidChange(textView)
-                context.coordinator.selectionDidChange(textView)
-            }
-            
+        textLayoutManager.renderingAttributesValidator = { (textLayoutManager, layoutFragment) in
+            guard let textContentStorage = textLayoutManager.textContentManager as? NSTextContentStorage else { return }
+            textStorage.setHighlightingAttributes(
+                for: textContentStorage.range(for: layoutFragment.rangeInElement),
+                in: textLayoutManager
+            )
         }
+        
+//        if let delegate = textView.delegate as? MDTextViewDelegate {
+//
+//          // The property `delegate.textDidChange` is expected to alreayd have been set during initialisation of the
+//          // `CodeView`. Hence, we add to it; instead of just overwriting it.
+//          let currentTextDidChange = delegate.textDidChange
+//          delegate.textDidChange = { [currentTextDidChange] mdTextView in
+//            context.coordinator.textDidChange(mdTextView)
+//            currentTextDidChange?(mdTextView)
+//          }
+//          delegate.selectionDidChange = { mdTextView in
+//            selectionDidChange(mdTextView)
+//            context.coordinator.selectionDidChange(mdTextView)
+//          }
+//
+//        }
+        
+        
+        
         textView.selectedRanges = position.selections.map{ NSValue(range: $0) }
         
         
@@ -212,7 +229,6 @@ public struct MarkdownEditor: NSViewRepresentable {
         /// - Pressing space key, or return key
         /// - Possibly pressing any syntax key(s)
         
-        textView.updateMarkdownStyling()
         textView.editorHeight = textView.calculateEditorHeight()
         
         if textView.string != self.text {
@@ -279,7 +295,7 @@ public struct MarkdownEditor: NSViewRepresentable {
             if let observer = boundsChangedNotificationObserver { NotificationCenter.default.removeObserver(observer) }
         }
         
-        // Update of `self.text` happens in `CodeStorageDelegate` — see [Note Propagating text changes into SwiftUI].
+        // Update of `self.text` happens in `MDTextStorageDelegate` — see [Note Propagating text changes into SwiftUI].
         func textDidChange(_ textView: NSTextView) { }
         
         func selectionDidChange(_ textView: NSTextView) {

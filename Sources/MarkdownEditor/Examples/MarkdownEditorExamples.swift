@@ -16,8 +16,10 @@ struct MarkdownExampleView: View {
     
     @State private var isStreaming: Bool = false
     
-    @State private var text: String = TestStrings.paragraphsWithCode[1]
+    @State private var text: String = ""
     //    @State private var text: String = TestStrings.Markdown.shortMarkdownBasics
+    
+    @State private var position = MarkdownEditor.Position()
     
     @State private var editorHeight: CGFloat = .zero
     @State private var editorWidth: CGFloat = 400
@@ -36,7 +38,7 @@ struct MarkdownExampleView: View {
                 
                 MarkdownEditor(
                     text: $text, 
-//                    position: <#Binding<MarkdownEditor.Position>#>,
+                    position: $position,
                     width: editorWidth
                 ) { metrics, height in
                     editorMetrics = metrics
