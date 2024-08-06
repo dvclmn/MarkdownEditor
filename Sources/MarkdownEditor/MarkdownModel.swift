@@ -8,95 +8,9 @@
 #if os(macOS)
 
 
-
 import Foundation
 import SwiftUI
 import RegexBuilder
-
-public struct MarkdownEditorConfiguration {
-    public var fontSize: Double
-    public var fontWeight: NSFont.Weight
-    public var insertionPointColour: Color
-    public var codeColour: Color
-    public var paddingX: Double
-    public var paddingY: Double
-    
-    public init(
-        fontSize: Double = MarkdownDefaults.fontSize,
-        fontWeight: NSFont.Weight = MarkdownDefaults.fontWeight,
-        insertionPointColour: Color = .blue,
-        codeColour: Color = .primary.opacity(0.7),
-        paddingX: Double = MarkdownDefaults.paddingX,
-        paddingY: Double = MarkdownDefaults.paddingY
-    ) {
-        self.fontSize = fontSize
-        self.fontWeight = fontWeight
-        self.insertionPointColour = insertionPointColour
-        self.codeColour = codeColour
-        self.paddingX = paddingX
-        self.paddingY = paddingY
-    }
-}
-
-
-extension MarkdownEditor {
-    
-    func setUpTextViewOptions(for textView: MarkdownTextView) {
-        
-        //        guard let textContainer = textView.textContainer else { return }
-        
-        //        textContainer.containerSize = CGSize(width: textView.bounds.width, height: .greatestFiniteMagnitude)
-        
-        /// If this is set to false, then the text tends to be allowed to run off the right edge,
-        /// and less width-related calculations seem to be neccesary
-        //        textContainer.widthTracksTextView = true
-        //        textContainer.heightTracksTextView = false
-        
-        //        textView.isVerticallyResizable = true
-        textView.isHorizontallyResizable = false
-        textView.autoresizingMask = [.width]
-        
-        textView.isAutomaticSpellingCorrectionEnabled = true
-        textView.isAutomaticTextCompletionEnabled = true
-        textView.isAutomaticQuoteSubstitutionEnabled = false
-        textView.isAutomaticTextReplacementEnabled = true
-        
-        //        textView.wantsScrollEventsForSwipeTracking(on: .none)
-        //        textView.wantsForwardedScrollEvents(for: .none)
-        
-        
-        
-        textView.isRichText = false
-        textView.importsGraphics = false
-        
-        textView.insertionPointColor = NSColor(configuration.insertionPointColour)
-        
-        textView.smartInsertDeleteEnabled = false
-        
-        //        textView.usesFindBar = true
-        
-        textView.textContainer?.lineFragmentPadding = configuration.paddingX
-        textView.textContainerInset = NSSize(width: 0, height: configuration.paddingY)
-        
-        
-        //        textView.maxSize = NSSize(width: self.maxWidth, height: CGFloat.greatestFiniteMagnitude)
-        
-        
-        
-        /// When the text field has an attributed string value, the system ignores the textColor, font, alignment, lineBreakMode, and lineBreakStrategy properties. Set the foregroundColor, font, alignment, lineBreakMode, and lineBreakStrategy properties in the attributed string instead.
-        textView.font = NSFont.systemFont(ofSize: configuration.fontSize, weight: configuration.fontWeight)
-        
-        textView.textColor = NSColor.textColor.withAlphaComponent(MarkdownDefaults.fontOpacity)
-        
-        textView.isEditable = self.isEditable
-        
-        textView.drawsBackground = false
-        textView.allowsUndo = true
-        //        textView.setNeedsDisplay(textView.bounds)
-        //                textView.setNeedsDisplay(NSRect(x: 0, y: 0, width: self.editorWidth ?? 200, height: 200))
-    }
-    
-}
 
 
 
@@ -123,6 +37,17 @@ public struct MarkdownDefaults {
     
 }
 
+
+public struct Token {
+    let type: MarkdownSyntax
+    let range: NSRange
+}
+
+public struct LineInfo {
+    var tokens: [Token]
+    var blockType: BlockType
+}
+
 @MainActor
 public enum MarkdownSyntax: String, CaseIterable, Identifiable, Equatable {
     case h1
@@ -136,6 +61,7 @@ public enum MarkdownSyntax: String, CaseIterable, Identifiable, Equatable {
     case strikethrough
     case inlineCode
     case codeBlock
+    case quoteBlock
     
     nonisolated public var id: String {
         self.rawValue
@@ -165,22 +91,10 @@ public enum MarkdownSyntax: String, CaseIterable, Identifiable, Equatable {
                 "Inline code"
             case .codeBlock:
                 "Code block"
+            case .quoteBlock:
+                "Quote block"
         }
     }
-    
-    private static let regexPatterns: [MarkdownSyntax: String] = [
-        .h1: "# (.*)",
-        .h2: "## (.*)",
-        .h3: "### (.*)",
-        .bold: "\\*\\*(.*?)\\*\\*",
-        .boldAlt: "\\_\\_(.*?)\\_\\_",
-        .italic: "\\*(.*?)\\*",
-        .italicAlt: "\\_(.*?)\\_",
-        .boldItalic: "\\*\\*\\*(.*?)\\*\\*\\*",
-        .strikethrough: "~~(.*?)~~",
-        .inlineCode: "`([^\\n`]+)(?!``)`(?!`)",
-        .codeBlock: "^\\s*```([\\s\\S]*?)^\\s*```"
-    ]
     
     var regex: Regex<Substring> {
         switch self {
@@ -243,7 +157,15 @@ public enum MarkdownSyntax: String, CaseIterable, Identifiable, Equatable {
                 .ignoresCase()
         }
         
-        
+    }
+    
+    public var isBlock: Bool {
+        switch self {
+            case .codeBlock, .quoteBlock:
+                true
+            default:
+                false
+        }
     }
     
     public var hideSyntax: Bool {
@@ -279,6 +201,8 @@ public enum MarkdownSyntax: String, CaseIterable, Identifiable, Equatable {
                 "`"
             case .codeBlock:
                 "```"
+            case .quoteBlock:
+                ">"
         }
     }
     
@@ -288,7 +212,7 @@ public enum MarkdownSyntax: String, CaseIterable, Identifiable, Equatable {
     
     public var isSyntaxSymmetrical: Bool {
         switch self {
-            case .h1, .h2, .h3:
+            case .h1, .h2, .h3, .quoteBlock:
                 false
             default:
                 true
@@ -315,6 +239,8 @@ public enum MarkdownSyntax: String, CaseIterable, Identifiable, Equatable {
                     .init("c", modifiers: [.command, .option])
             case .codeBlock:
                     .init("k", modifiers: [.command, .shift])
+            case .quoteBlock:
+                    .init("q", modifiers: [.command, .shift])
         }
     }
     
@@ -415,6 +341,13 @@ public enum MarkdownSyntax: String, CaseIterable, Identifiable, Equatable {
                     .foregroundColor: self.foreGroundColor,
                     .backgroundColor: NSColor.black.withAlphaComponent(MarkdownDefaults.backgroundCodeBlock)
                 ]
+                
+            case .quoteBlock:
+                return [
+                    .font: NSFont.monospacedSystemFont(ofSize: self.fontSize, weight: .medium),
+                    .foregroundColor: self.foreGroundColor,
+                    .backgroundColor: NSColor.black.withAlphaComponent(MarkdownDefaults.backgroundCodeBlock)
+                ]
         }
     } // END content attributes
     
@@ -454,5 +387,36 @@ enum SyntaxComponent {
     case content
     case close
 }
+
+
+
+
+
+public struct MarkdownEditorConfiguration {
+    public var fontSize: Double
+    public var fontWeight: NSFont.Weight
+    public var insertionPointColour: Color
+    public var codeColour: Color
+    public var paddingX: Double
+    public var paddingY: Double
+    
+    public init(
+        fontSize: Double = MarkdownDefaults.fontSize,
+        fontWeight: NSFont.Weight = MarkdownDefaults.fontWeight,
+        insertionPointColour: Color = .blue,
+        codeColour: Color = .primary.opacity(0.7),
+        paddingX: Double = MarkdownDefaults.paddingX,
+        paddingY: Double = MarkdownDefaults.paddingY
+    ) {
+        self.fontSize = fontSize
+        self.fontWeight = fontWeight
+        self.insertionPointColour = insertionPointColour
+        self.codeColour = codeColour
+        self.paddingX = paddingX
+        self.paddingY = paddingY
+    }
+}
+
+
 
 #endif

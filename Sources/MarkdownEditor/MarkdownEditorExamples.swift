@@ -35,7 +35,8 @@ struct MarkdownExampleView: View {
             ScrollView(.vertical) {
                 
                 MarkdownEditor(
-                    text: $text,
+                    text: $text, 
+//                    position: <#Binding<MarkdownEditor.Position>#>,
                     width: editorWidth
                 ) { metrics, height in
                     editorMetrics = metrics

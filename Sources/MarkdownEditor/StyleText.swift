@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-extension MarkdownTextView {
+extension MDTextView {
     
     //    func applyStyles(to range: NSRange) {
     //        guard let textStorage = self.textStorage else { return }

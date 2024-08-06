@@ -9,80 +9,56 @@ import SwiftUI
 
 
 struct LineInfo {
-    /// The tokens extracted from the text on this line.
-    ///
-    /// NB: The ranges contained in the tokens are relative to the *start of the line* and 0-based.
-    ///
-//    var tokens: [LanguageConfiguration.Tokeniser.Token]
+    var tokens: [LineToken]
+        var blockType: BlockType?
+        
+        enum BlockType {
+            case codeBlock
+            case blockQuote
+            case list
+        }
 }
 
 
 // MARK: -
 // MARK: Delegate class
 
-class MarkdownTextStorageDelegate: NSObject, NSTextStorageDelegate {
+class MDTextStorageDelegate: NSObject, NSTextStorageDelegate {
     
-
-//    private var tokeniser: LanguageConfiguration.Tokeniser?  // cache the tokeniser
+    private(set) var markdownConfiguration: MarkdownConfiguration
+       
+    
+    private var tokeniser: Tokeniser
     
     /// Hook to propagate changes to the text store upwards in the view hierarchy.
     ///
     let setText: (String) -> Void
     
+
+    
     private(set) var lineMap = LineMap<LineInfo>(string: "")
     
-    /// If the last text change was a one-character addition, which completed a token, then that token is remembered here
-    /// together with its range until the next text change.
-    ///
-//    private var lastTypedToken: LanguageConfiguration.Tokeniser.Token?
-    
-    /// Indicates whether the current editing round is for a wholesale replacement of the text.
-    ///
-    private(set) var processingStringReplacement: Bool = false
-    
-    
-    /// Indicates whether the current editing round is for a one-character addition to the text.
-    ///
-    private(set) var processingOneCharacterAddition: Bool = false
-    
-    /// Contains the range of characters whose token information was invalidated by the last editing operation.
-    ///
-    private(set) var tokenInvalidationRange: NSRange? = nil
-    
-    
-    /// Contains the number of lines affected by `tokenInvalidationRange`.
-    ///
-    private(set) var tokenInvalidationLines: Int? = nil
+    private(set) var lastInvalidatedLineIndices: [Int] = []
+        
+        private var lastTypedToken: LineToken?
+        
+        var skipNextChangeNotificationToRenderer: Bool = false
+        
+        private(set) var processingStringReplacement: Bool = false
+        private(set) var processingOneCharacterAddition: Bool = false
+        
+        private(set) var tokenInvalidationRange: NSRange? = nil
+        private(set) var tokenInvalidationLines: Int? = nil
+        
+        init(with configuration: MarkdownConfiguration, setText: @escaping (String) -> Void) {
+            self.markdownConfiguration = configuration
+            self.tokeniser = Tokeniser(configuration: configuration)
+            self.setText = setText
+            super.init()
+        }
     
     
-    // MARK: Initialisers
-    
-    init(
-        setText: @escaping (String) -> Void
-    ) {
 
-//        self.tokeniser = Tokeniser(for: LanguageConfiguration.markdown().tokenDictionary)
-//        self.tokeniser = Tokeniser(for: language.tokenDictionary)
-        self.setText = setText
-        super.init()
-    }
-    
-    
-    // MARK: Updates
-    
-    /// Change the language for a specific range in the code storage.
-    ///
-    /// - Parameters:
-    ///   - language: The new language configuration.
-    ///   - codeStorage: The code storage to update.
-    ///   - range: The range to apply the new language to.
-//    func change(language: LanguageConfiguration, for codeStorage: MarkdownTextStorage, in range: NSRange) async throws {
-//        
-//        codeBlockManager?.updateCodeBlock(at: range, newLanguage: language)
-//        
-//        self.tokeniser = Tokeniser(for: language.tokenDictionary)
-//        let _ = tokenise(range: NSRange(location: 0, length: codeStorage.length), in: codeStorage)
-//    }
     
     
     // MARK: Delegate methods
@@ -93,53 +69,57 @@ class MarkdownTextStorageDelegate: NSObject, NSTextStorageDelegate {
         range editedRange: NSRange,
         changeInLength delta: Int
     ) {
-        tokenInvalidationRange = nil
-        tokenInvalidationLines = nil
-        guard let codeStorage = textStorage as? MarkdownTextStorage else { return }
-        
-        // If only attributes change, the line map and syntax highlighting remains the same => nothing for us to do
         guard editedMask.contains(.editedCharacters) else { return }
-        
-        lineMap.updateAfterEditing(string: textStorage.string, range: editedRange, changeInLength: delta)
-        var (affectedRange: highlightingRange, lines: highlightingLines) = tokenise(range: editedRange, in: textStorage)
-        
-        processingStringReplacement = editedRange == NSRange(location: 0, length: textStorage.length)
-        
-        // If a single character was added, process token-level completion steps (and remember that we are processing a
-        // one character addition).
-        processingOneCharacterAddition = delta == 1 && editedRange.length == 1
-        
-        var editedRange = editedRange
-        var delta       = delta
-        
-        // The range within which highlighting has to be re-rendered.
-        tokenInvalidationRange = highlightingRange
-        tokenInvalidationLines = highlightingLines
-        
-//        if visualDebugging {
-//            textStorage.addAttribute(.backgroundColor, value: visualDebuggingEditedColour, range: editedRange)
-//        }
-        
-        // MARK: [Note Propagating text changes into SwiftUI]
-        // We need to trigger the propagation of text changes via the binding passed to the `CodeEditor` view here and *not*
-        // in the `NSTextViewDelegate` or `UITextViewDelegate`. The reason for this is the composition of characters with
-        // diacritics using muliple key strokes. Until the composition is complete, the already entered composing characters
-        // are indicated by marked text and do *not* lead to the signaling of text changes by `NSTextViewDelegate` or
-        // `UITextViewDelegate`, although they *do* alter the text storage. However, the methods of `NSTextStorageDelegate`
-        // are invoked at each step of the composition process, faithfully representing the state changes of the text
-        // storage.
-        //
-        // Why is this important? Because `CodeEditor.updateNSView(_:context:)` and `CodeEditor.updateUIView(_:context:)`
-        // compare the current contents of the text binding with the current contents of the text storage to determine
-        // whether the latter needs to be updated. If the text storage changes without propagating the change to the
-        // binding, this check inside `CodeEditor.updateNSView(_:context:)` and `CodeEditor.updateUIView(_:context:)` will
-        // suggest that the text storage needs to be overwritten by the contents of the binding, incorrectly removing any
-        // entered composing characters (i.e., the marked text).
-        
+               
+               processingOneCharacterAddition = delta == 1 && editedRange.length == 1
+               processingStringReplacement = editedRange.length > 1 || delta != 1
+               
+               updateLineMap(for: textStorage, editedRange: editedRange, changeInLength: delta)
+               retokenizeAffectedLines(in: textStorage, editedRange: editedRange)
+               
+               if !skipNextChangeNotificationToRenderer {
+                   // Notify renderer of changes
+                   // This would be implemented based on your rendering mechanism
+               }
+               
+               skipNextChangeNotificationToRenderer = false
+               processingOneCharacterAddition = false
+               processingStringReplacement = false
         setText(textStorage.string)
         
     }
     
+    
+    private func updateLineMap(for textStorage: NSTextStorage, editedRange: NSRange, changeInLength delta: Int) {
+            let affectedLines = lineMap.linesAffected(by: editedRange, changeInLength: delta)
+            lineMap.updateAfterEditing(string: textStorage.string, range: editedRange, changeInLength: delta)
+            
+            lastInvalidatedLineIndices = Array(affectedLines)
+            tokenInvalidationRange = editedRange
+            tokenInvalidationLines = affectedLines.count
+        }
+        
+        private func retokenizeAffectedLines(in textStorage: NSTextStorage, editedRange: NSRange) {
+            let affectedLines = lineMap.linesAffected(by: editedRange, changeInLength: editedRange.length)
+            
+            for lineIndex in affectedLines {
+                guard let lineRange = lineMap.lookup(line: lineIndex)?.range else { continue }
+                let lineString = (textStorage.string as NSString).substring(with: lineRange)
+                let tokens = tokeniser.tokenise(lineString)
+                
+                var lineInfo = LineInfo(tokens: tokens)
+                lineInfo.blockType = determineBlockType(for: lineString)
+                
+                lineMap.setInfoOf(line: lineIndex, to: lineInfo)
+            }
+        }
+        
+        private func determineBlockType(for line: String) -> LineInfo.BlockType? {
+            if line.hasPrefix("```") { return .codeBlock }
+            if line.hasPrefix(">") { return .blockQuote }
+            if line.hasPrefix("- ") || line.hasPrefix("* ") || line.hasPrefix("+ ") || line.matches(of: /^\d+\.\s/).count > 0 { return .list }
+            return nil
+        }
     
 }
 
@@ -148,7 +128,7 @@ class MarkdownTextStorageDelegate: NSObject, NSTextStorageDelegate {
 // MARK: -
 // MARK: Tokenisation
 
-extension MarkdownTextStorageDelegate {
+extension MDTextStorageDelegate {
     
     /// Tokenise the substring of the given text storage that contains the specified lines and store tokens as part of the
     /// line information.

@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-class MarkdownTextViewDelegate: NSObject, NSTextViewDelegate {
+class MDTextViewDelegate: NSObject, NSTextViewDelegate {
     
     var textDidChange:      ((NSTextView) -> ())?
     var selectionDidChange: ((NSTextView) -> ())?
@@ -18,7 +18,7 @@ class MarkdownTextViewDelegate: NSObject, NSTextViewDelegate {
         toCharacterRanges newSelectedCharRanges: [NSValue]
     ) -> [NSValue] {
         
-        guard let markdownTextStorageDelegate = textView.textStorage?.delegate as? MarkdownTextStorageDelegate
+        guard let markdownTextStorageDelegate = textView.textStorage?.delegate as? MDTextStorageDelegate
         else { return newSelectedCharRanges }
         
         if let selectionRange = newSelectedCharRanges.first as? NSRange, selectionRange.length == 0 {

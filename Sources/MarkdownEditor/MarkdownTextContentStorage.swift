@@ -11,7 +11,7 @@ import SwiftUI
 // MARK: -
 // MARK: Text content storage
 
-class MarkdownTextContentStorage: NSTextContentStorage {
+class MDTextContentStorage: NSTextContentStorage {
     
     override func processEditing(for textStorage: NSTextStorage,
                                  edited editMask: EditActions,
@@ -34,7 +34,7 @@ class MarkdownTextContentStorage: NSTextContentStorage {
         
         // NB: We need to wait until after the content storage has processed the edit before text locations (and ranges)
         //     match characters counts in the backing store again. Hence, the placement after the super call.
-        if let markdownTextStorageDelegate = textStorage.delegate as? MarkdownTextStorageDelegate,
+        if let markdownTextStorageDelegate = textStorage.delegate as? MDTextStorageDelegate,
            let invalidationRange = markdownTextStorageDelegate.tokenInvalidationRange,
            let invalidationLines = markdownTextStorageDelegate.tokenInvalidationLines
         {

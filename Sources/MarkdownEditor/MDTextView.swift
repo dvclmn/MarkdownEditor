@@ -23,15 +23,15 @@ import OSLog
 /// `let containerLayoutManager = textView.textContainer. layoutManager`
 
 @MainActor
-public class MarkdownTextView: NSTextView {
+public class MDTextView: NSTextView {
     
     
     
     
     
     // Delegates
-    fileprivate let markdownTextViewDelegate =                 MarkdownTextViewDelegate()
-    fileprivate var markdownTextStorageDelegate:               MarkdownTextStorageDelegate
+    fileprivate let markdownTextViewDelegate =                 MDTextViewDelegate()
+    fileprivate var markdownTextStorageDelegate:               MDTextStorageDelegate
     
     
     
@@ -54,9 +54,9 @@ public class MarkdownTextView: NSTextView {
         // Use custom components that are gutter-aware and support code-specific editing actions and highlighting.
         let textLayoutManager = NSTextLayoutManager()
         let codeContainer = CodeContainer(size: frame.size)
-        let codeStorage = MarkdownTextStorage(theme: theme)
+        let codeStorage = MDTextStorage(theme: theme)
         
-        let textContentStorage = MarkdownTextContentStorage()
+        let textContentStorage = MDTextContentStorage()
         
         textLayoutManager.textContainer = codeContainer
         textContentStorage.addTextLayoutManager(textLayoutManager)
@@ -64,7 +64,7 @@ public class MarkdownTextView: NSTextView {
         textContentStorage.textStorage = codeStorage
         
         
-        markdownTextStorageDelegate = MarkdownTextStorageDelegate(codeBlockManager: nil, setText: setText)
+        markdownTextStorageDelegate = MDTextStorageDelegate(codeBlockManager: nil, setText: setText)
         
         super.init(frame: frame, textContainer: codeContainer)
         
@@ -146,7 +146,7 @@ public class MarkdownTextView: NSTextView {
     
     // MARK: Overrides
     
-    override func setSelectedRanges(
+    public override func setSelectedRanges(
         _ ranges: [NSValue],
         affinity: NSSelectionAffinity,
         stillSelecting stillSelectingFlag: Bool
@@ -157,7 +157,6 @@ public class MarkdownTextView: NSTextView {
         // Updates only if there is an actual selection change.
         if oldSelectedRanges != selectedRanges {
             
-            minimapView?.selectedRanges = selectedRanges    // minimap mirrors the selection of the main code view
             
             updateBackgroundFor(oldSelection: combinedRanges(ranges: oldSelectedRanges),
                                 newSelection: combinedRanges(ranges: ranges))
@@ -165,14 +164,10 @@ public class MarkdownTextView: NSTextView {
         }
     }
     
-    override func layout() {
-        tile()
-        adjustScrollPositionOfMinimap()
-        super.layout()
-        gutterView?.needsDisplay        = true
-        minimapGutterView?.needsDisplay = true
-    }
-    
+//    override func layout() {
+//        super.layout()
+//    }
+//    
     
     
     
@@ -187,7 +182,6 @@ public class MarkdownTextView: NSTextView {
     var isShowingFrames: Bool
     var isShowingSyntax: Bool
     let highlightr = Highlightr()
-    let styler = MarkdownStyleManager()
     var textHighlighter = TextHighlighter()
     var editorMetrics: String = ""
     var searchText: String
@@ -499,7 +493,7 @@ public class MarkdownTextView: NSTextView {
 
 
 
-extension MarkdownTextView {
+extension MDTextView {
     
     public override func didChangeText() {
         super.didChangeText()
@@ -553,7 +547,7 @@ extension MarkdownTextView {
 // MARK: -
 // MARK: Shared code
 
-extension MarkdownTextView {
+extension MDTextView {
     
     // MARK: Background highlights
     
@@ -883,9 +877,9 @@ final class CodeContainer: NSTextContainer {
                                                     remaining: remainingRect),
             calculatedRect = CGRect(x: 0, y: superRect.minY, width: size.width, height: superRect.height)
         
-        guard let codeView    = textView as? MarkdownTextView,
+        guard let codeView    = textView as? MDTextView,
               let codeStorage = codeView.optMarkdownTextStorage,
-              let delegate    = codeStorage.delegate as? MarkdownTextStorageDelegate,
+              let delegate    = codeStorage.delegate as? MDTextStorageDelegate,
               let line        = delegate.lineMap.lineOf(index: characterIndex),
               let oneLine     = delegate.lineMap.lookup(line: line),
               characterIndex == oneLine.range.location     // do the following only for the first line fragment of a line
@@ -924,3 +918,64 @@ private func combinedRanges(ranges: [NSValue]) -> NSRange {
         NSUnionRange($0, $1)
     }
 }
+
+
+extension MarkdownEditor {
+    
+    func setUpTextViewOptions(for textView: MDTextView) {
+        
+        //        guard let textContainer = textView.textContainer else { return }
+        
+        //        textContainer.containerSize = CGSize(width: textView.bounds.width, height: .greatestFiniteMagnitude)
+        
+        /// If this is set to false, then the text tends to be allowed to run off the right edge,
+        /// and less width-related calculations seem to be neccesary
+        //        textContainer.widthTracksTextView = true
+        //        textContainer.heightTracksTextView = false
+        
+        //        textView.isVerticallyResizable = true
+        textView.isHorizontallyResizable = false
+        textView.autoresizingMask = [.width]
+        
+        textView.isAutomaticSpellingCorrectionEnabled = true
+        textView.isAutomaticTextCompletionEnabled = true
+        textView.isAutomaticQuoteSubstitutionEnabled = false
+        textView.isAutomaticTextReplacementEnabled = true
+        
+        //        textView.wantsScrollEventsForSwipeTracking(on: .none)
+        //        textView.wantsForwardedScrollEvents(for: .none)
+        
+        
+        
+        textView.isRichText = false
+        textView.importsGraphics = false
+        
+        textView.insertionPointColor = NSColor(configuration.insertionPointColour)
+        
+        textView.smartInsertDeleteEnabled = false
+        
+        //        textView.usesFindBar = true
+        
+        textView.textContainer?.lineFragmentPadding = configuration.paddingX
+        textView.textContainerInset = NSSize(width: 0, height: configuration.paddingY)
+        
+        
+        //        textView.maxSize = NSSize(width: self.maxWidth, height: CGFloat.greatestFiniteMagnitude)
+        
+        
+        
+        /// When the text field has an attributed string value, the system ignores the textColor, font, alignment, lineBreakMode, and lineBreakStrategy properties. Set the foregroundColor, font, alignment, lineBreakMode, and lineBreakStrategy properties in the attributed string instead.
+        textView.font = NSFont.systemFont(ofSize: configuration.fontSize, weight: configuration.fontWeight)
+        
+        textView.textColor = NSColor.textColor.withAlphaComponent(MarkdownDefaults.fontOpacity)
+        
+        textView.isEditable = self.isEditable
+        
+        textView.drawsBackground = false
+        textView.allowsUndo = true
+        //        textView.setNeedsDisplay(textView.bounds)
+        //                textView.setNeedsDisplay(NSRect(x: 0, y: 0, width: self.editorWidth ?? 200, height: 200))
+    }
+    
+}
+

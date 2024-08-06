@@ -271,7 +271,7 @@ extension NSTextLayoutManager {
     /// - Returns: A KVO object that needs to be retained until this validator is no longer needed.
     ///
     func setSafeRenderingAttributesValidator(
-        with markdownTextViewDelegate: MarkdownTextViewDelegate,
+        with markdownTextViewDelegate: MDTextViewDelegate,
         _ renderingAttributesValidator: @escaping (NSTextLayoutManager, NSTextLayoutFragment) -> Void) -> NSKeyValueObservation? {
             guard let textContentManager else {
                 self.renderingAttributesValidator = renderingAttributesValidator
@@ -286,7 +286,7 @@ extension NSTextLayoutManager {
                 // We delay setting attributes, except if the entire text has been replaced by a new one. In that case, it is
                 // fine to set the attributes right away.
                 if let textContentStorage  = textLayoutManager.textContentManager as? NSTextContentStorage,
-                   let markdownTextStorageDelegate = textContentStorage.textStorage?.delegate as? MarkdownTextStorageDelegate,
+                   let markdownTextStorageDelegate = textContentStorage.textStorage?.delegate as? MDTextStorageDelegate,
                    markdownTextStorageDelegate.processingStringReplacement
                 {
                     renderingAttributesValidator(textLayoutManager, textLayoutFragment)

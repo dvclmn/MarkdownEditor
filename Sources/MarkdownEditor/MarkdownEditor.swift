@@ -103,7 +103,7 @@ public struct MarkdownEditor: NSViewRepresentable {
     
     
     /// This function creates the NSView and configures its initial state
-    public func makeNSView(context: Context) -> MarkdownTextView {
+    public func makeNSView(context: Context) -> MDTextView {
         
         
         func setText(_ text: String) {
@@ -120,7 +120,7 @@ public struct MarkdownEditor: NSViewRepresentable {
         
         // Create NSTextContentStorage
         let textContentStorage = NSTextContentStorage()
-        let textStorage = MarkdownTextStorage()
+        let textStorage = MDTextStorage()
         textContentStorage.textStorage = textStorage
         
         // Create NSTextLayoutManager
@@ -133,7 +133,7 @@ public struct MarkdownEditor: NSViewRepresentable {
         textContentStorage.addTextLayoutManager(textLayoutManager)
         textLayoutManager.textContainer = textContainer
         
-        let textView = MarkdownTextView(
+        let textView = MDTextView(
             frame: containerSize,
             configuration: configuration,
             isShowingFrames: self.isShowingFrames,
@@ -145,10 +145,10 @@ public struct MarkdownEditor: NSViewRepresentable {
         
         
         
-        if let delegate = textView.delegate as? MarkdownTextViewDelegate {
+        if let delegate = textView.delegate as? MDTextViewDelegate {
             
             // The property `delegate.textDidChange` is expected to already have been set during initialisation of the
-            // `MarkdownTextView`. Hence, we add to it; instead of just overwriting it.
+            // `MDTextView`. Hence, we add to it; instead of just overwriting it.
             let currentTextDidChange = delegate.textDidChange
             delegate.textDidChange = { [currentTextDidChange] textView in
                 context.coordinator.textDidChange(textView)
@@ -175,7 +175,7 @@ public struct MarkdownEditor: NSViewRepresentable {
         
         setUpTextViewOptions(for: textView)
         
-//        textView.updateMarkdownStyling()
+//        textView.updateMDStyling()
         //        self.sendOutSize(for: textView)
         
         
@@ -185,7 +185,7 @@ public struct MarkdownEditor: NSViewRepresentable {
     /// This function is to communicate updates **from** SwiftUI, back **to** the NSView
     /// It is not for sending updates back up to SwiftUI
     /// This *will* update any time a `@Binding` property is mutated from SwiftUI
-    public func updateNSView(_ textView: MarkdownTextView, context: Context) {
+    public func updateNSView(_ textView: MDTextView, context: Context) {
         
         
         context.coordinator.updatingView = true
