@@ -13,17 +13,6 @@ struct LineInfo {
     var tokens: [Tokeniser.Token]
 }
 
-//struct LineMap {
-//    
-//    struct Line {
-//        let range: NSRange
-//        var type: MarkdownSyntax
-//    }
-//    private var lines: [Line] = []
-//    
-//}
-
-
 /// Keeps track of the character ranges and parametric `LineInfo` for all lines in a string.
 ///
 struct LineMap<LineInfo> {
