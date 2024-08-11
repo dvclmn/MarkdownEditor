@@ -11,22 +11,34 @@ let package = Package(
     products: [
         .library(
             name: "MarkdownEditor",
-            targets: ["MarkdownEditor"]
+            targets: [
+              "MarkdownEditor",
+              "Syntax"
+            ]
         )
     ],
     dependencies: [
-            .package(url: "https://github.com/raspu/Highlightr.git", from: "2.1.2"),
-            .package(url: "https://github.com/ChimeHQ/Rearrange.git", from: "1.8.1"),
-//            .package(url: "https://github.com/apple/swift-async-algorithms.git", from: "1.0.0"),
+//            .package(url: "https://github.com/raspu/Highlightr.git", from: "2.1.2"),
+//            .package(url: "https://github.com/ChimeHQ/Rearrange.git", from: "1.8.1"),
             .package(name: "TestStrings", path: "../TestStrings"),
-            .package(name: "Networking", path: "../Networking")
+//            .package(name: "Networking", path: "../Networking"),
+//            .package(name: "Utilities", path: "/Users/dvclmn/Apps/_ Swift Packages/Utilities"),
+            .package(name: "Helpers", path: "/Users/dvclmn/Apps/_ Swift Packages/Helpers")
             
         ],
     targets: [
         .target(
             name: "MarkdownEditor",
-            dependencies: ["TestStrings", "Highlightr", "Networking", "Rearrange"]
-        )
+            dependencies: ["TestStrings", "Syntax", "Helpers"]
+        ),
+        .target(
+          name: "Syntax",
+          dependencies: []
+        ),
+        .testTarget(
+          name: "MarkdownEditorTests",
+          dependencies: ["MarkdownEditor", "Syntax"]),
+
     ]
 )
 
