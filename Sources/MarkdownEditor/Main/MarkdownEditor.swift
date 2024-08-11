@@ -199,9 +199,7 @@ public struct MarkdownEditor: NSViewRepresentable {
         return textView
     }
     
-    /// This function is to communicate updates **from** SwiftUI, back **to** the NSView
-    /// It is not for sending updates back up to SwiftUI
-    /// This *will* update any time a `@Binding` property is mutated from SwiftUI
+    
     public func updateNSView(_ textView: MDTextView, context: Context) {
         
         
@@ -260,8 +258,7 @@ public struct MarkdownEditor: NSViewRepresentable {
     } // END update nsView
     
     
-    /// It is the Coordinator that is responsible for sending information back **to** SwiftUI, from the NSView
-    ///
+
     public func makeCoordinator() -> Coordinator {
         return Coordinator(
             text: $text,
