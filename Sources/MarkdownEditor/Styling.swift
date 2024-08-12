@@ -59,14 +59,14 @@ extension MarkdownEditor {
     ]
     
     for syntax in orderedSyntax {
-      applyStyles(for: syntax, to: highlightedString, in: all)
+      applyStylesToContent(for: syntax, to: highlightedString, in: all)
     }
     
     return highlightedString
   }
   
   
-  private static func applyStyles(
+  private static func applyStylesToContent(
     for syntax: MarkdownSyntax,
     to attributedString: NSMutableAttributedString,
     in range: NSRange
@@ -90,7 +90,30 @@ extension MarkdownEditor {
 //              attributedString.addCodeBlockBackground(to: range)
 //      }
       
-      applySyntaxCharacterAttributes(for: syntax, to: attributedString, in: matchRange)
+      let characters = syntax.syntaxCharacters
+      
+      //    if syntax.isSyntaxSymmetrical {
+      //
+      //    }
+      
+      /// What questions are we asking
+      /// 1. How many syntax characters
+      /// 2. Are they on the left or the right
+      /// 3. Is this a block, line or inline type of syntax
+      
+      /// Process syntax characters on the left
+      ///
+      let syntaxRange = NSRange(location: matchRange.location, length: characters.count + 1)
+      
+      applySyntaxAttributes(for: syntax, to: attributedString, in: syntaxRange)
+      
+      /// Process syntax characters on the right
+      ///
+      if characters.count > 1 {
+        let closingStart = matchRange.location + matchRange.length - characters.count
+        let closingRange = NSRange(location: closingStart, length: characters.count)
+        applySyntaxAttributes(for: syntax, to: attributedString, in: closingRange)
+      }
     }
     
   } // END
@@ -98,39 +121,6 @@ extension MarkdownEditor {
   
   /// Style syntax characters
   ///
-  private static func applySyntaxCharacterAttributes(
-    for syntax: MarkdownSyntax,
-    to attributedString: NSMutableAttributedString,
-    in matchRange: NSRange
-  ) {
-    let characters = syntax.syntaxCharacters
-    
-//    if syntax.isSyntaxSymmetrical {
-//
-//    }
-    
-    /// What questions are we asking
-    /// 1. How many syntax characters
-    /// 2. Are they on the left or the right
-    /// 3. Is this a block, line or inline type of syntax
-    
-    /// Process syntax characters on the left
-    ///
-    let syntaxRange = NSRange(location: matchRange.location, length: characters.count + 1)
-    
-    applySyntaxAttributes(for: syntax, to: attributedString, in: syntaxRange)
-    
-    /// Process syntax characters on the right
-    ///
-    if characters.count > 1 {
-      let closingStart = matchRange.location + matchRange.length - characters.count
-      let closingRange = NSRange(location: closingStart, length: characters.count)
-      applySyntaxAttributes(for: syntax, to: attributedString, in: closingRange)
-    }
-    
-  }
-  
-  
   private static func applySyntaxAttributes(
     for syntax: MarkdownSyntax,
     to attributedString: NSMutableAttributedString,
@@ -142,4 +132,16 @@ extension MarkdownEditor {
     }
   }
   
+//  
+//  func addAttributes(
+//    for syntax: MarkdownSyntax,
+//    to type: SyntaxType
+//    to attributedString: NSMutableAttributedString,
+//    in range: NSRange
+//  ) {
+//    
+//  }
+  
 }
+
+

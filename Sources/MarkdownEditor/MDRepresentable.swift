@@ -67,20 +67,20 @@ public struct MarkdownEditor: NSViewRepresentable {
     
     
     
-//    let textView = nsView.textView
+    let textView = nsView.textView
     
-//    let typingAttributes = textView.typingAttributes
+    let typingAttributes = textView.typingAttributes
     
 //    os_log("`updateNSView`. `typingAttributes`: \(typingAttributes)")
     
-//    let highlightedText = MarkdownEditor.getHighlightedText(
-//      text: text
-//    )
+    let highlightedText = MarkdownEditor.getHighlightedText(
+      text: self.text
+    )
     
-    nsView.attributedText = NSAttributedString(string: self.text)
+    nsView.attributedText = highlightedText
     
     nsView.selectedRanges = context.coordinator.selectedRanges
-//    nsView.textView.typingAttributes = typingAttributes
+    nsView.textView.typingAttributes = typingAttributes
     
     context.coordinator.updatingNSView = false
   }

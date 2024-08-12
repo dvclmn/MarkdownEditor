@@ -11,40 +11,130 @@ import SwiftUI
 import RegexBuilder
 import BaseStyles
 
+
+/// Syntax:
+/// - A finite list (so should be enum)
+/// - Characters that can be used to give different meanings to bits of text
+///
+///
+
+
+
+
+public struct MarkdownFragment {
+  let syntax: MarkdownSyntax
+  let range: NSRange
+  let content: String?  // Optional, as some elements (like horizontal rules) might not have content
+}
+
+
+
+
+public class MarkdownDocument {
+  private var elements: [MarkdownFragment] = []
+  private var visibleElements: [MarkdownFragment] = []
+  
+  public var text: String {
+    didSet {
+      updateElements()
+    }
+  }
+  
+  public var visibleRange: NSRange {
+    didSet {
+      updateVisibleElements()
+    }
+  }
+  
+  init(text: String) {
+    self.text = text
+    self.visibleRange = NSRange(location: 0, length: 0)
+    updateElements()
+  }
+  
+  private func updateElements() {
+    // Parse the entire text and update the elements array
+    // This would involve your Markdown parsing logic
+  }
+  
+  private func updateVisibleElements() {
+    visibleElements = elements.filter { NSIntersectionRange($0.range, visibleRange).length > 0 }
+  }
+  
+  public func elementsInRange(_ range: NSRange) -> [MarkdownFragment] {
+    return elements.filter { NSIntersectionRange($0.range, range).length > 0 }
+  }
+  
+  public func elementAt(_ location: Int) -> MarkdownFragment? {
+    return elements.first { NSLocationInRange(location, $0.range) }
+  }
+  
+  public func applyStyle(for element: MarkdownFragment) -> [NSAttributedString.Key: Any] {
+    // Return appropriate style attributes based on the element
+    
+    return [:]
+  }
+  
+  public func toggleSyntax(_ syntax: MarkdownSyntax, in range: NSRange) {
+    // Logic to add or remove syntax in the given range
+  }
+}
+
+
+/// A brief overview of the supported Markdown syntax
+///
+/// ## Headings
+///
+/// ```md
+/// # Example heading 1
+/// ## Example heading 2
+/// ### Example heading 3
+/// ```
+///
+/// Considered for possible future support:
+/// ```md
+/// Heading
+/// =======
+///
+/// Sub-heading
+/// -----------
+/// ```
+///
+///
+/// ## Bold and italic
+/// ```md
+/// **bold text**
+/// __bold text__
+///
+/// *italic text*
+/// _italic text_
+///
+/// ***bold italic text***
+/// ___bold italic text___
+///```
+///
+/// ## Other inline styles
+/// ```md
+/// `inline code`
+/// ~~strike-through text~~
+/// ==highlighted text==
+/// ```
+///
+///
+/// Block styles:
+/// ```swift
+/// var count: Int = 0
+/// ```
+/// > Quoted text
+///
+///
+/// Links and images:
+/// [link text](http://link.url)
+/// ![image label](http://image.url)
+/// ```
+///
 public enum MarkdownSyntax: Identifiable, Equatable, Hashable, Sendable {
   
-  /// Headings:
-  /// # Example heading 1
-  /// ## Example heading 2
-  /// ### Example heading 3
-  ///
-  ///
-  /// Bold and italic:
-  /// **bold text**
-  /// __bold text__
-  /// *italic text*
-  /// _italic text_
-  /// ***bold italic text***
-  /// ___bold italic text___
-  ///
-  ///
-  /// Other inline styles:
-  /// `inline code`
-  /// ~~strike-through text~~
-  /// ==highlighted text==
-  ///
-  ///
-  /// Block styles:
-  /// ```swift
-  /// var count: Int = 0
-  /// ```
-  /// > Quoted text
-  ///
-  ///
-  /// Links and images:
-  /// [link text](http://link.url)
-  /// ![image label](http://image.url)
-  ///
   case h1
   case h2
   case h3
@@ -163,7 +253,7 @@ public enum MarkdownSyntax: Identifiable, Equatable, Hashable, Sendable {
     }
   }
   
-  public var type: SyntaxType {
+  public var layoutType: LayoutType {
     switch self {
       case .h1, .h2, .h3:
           .line
@@ -239,14 +329,14 @@ public enum MarkdownSyntax: Identifiable, Equatable, Hashable, Sendable {
     self.syntaxCharacters.count
   }
   
-     public var isSyntaxSymmetrical: Bool {
-        switch self {
-          case .h1, .h2, .h3, .quoteBlock:
-              false
-           default:
-              true
-        }
-     }
+  public var isSyntaxSymmetrical: Bool {
+    switch self {
+      case .h1, .h2, .h3, .quoteBlock:
+        false
+      default:
+        true
+    }
+  }
   
   public var shortcut: KeyboardShortcut? {
     switch self {
@@ -358,7 +448,7 @@ public enum MarkdownSyntax: Identifiable, Equatable, Hashable, Sendable {
         return [
           .font: NSFont.monospacedSystemFont(ofSize: self.fontSize, weight: .medium),
           .foregroundColor: self.foreGroundColor,
-//          .backgroundColor: NSColor.black.withAlphaComponent(MarkdownDefaults.backgroundCodeBlock)
+          //          .backgroundColor: NSColor.black.withAlphaComponent(MarkdownDefaults.backgroundCodeBlock)
         ]
         
       case .quoteBlock:
@@ -401,23 +491,35 @@ public enum MarkdownSyntax: Identifiable, Equatable, Hashable, Sendable {
     }
   }
 }
-
-enum CodeLanguage {
-  case swift
-  case python
-}
-
-enum SyntaxComponent {
-  case open
-  case content
-  case close
-}
-
-public enum SyntaxType {
-  case block
-  case line
-  case inline
-}
+//
+//public extension MarkdownSyntax {
+//
+//  enum Fragment {
+//    case syntax(SyntaxComponent)
+//    case content
+//
+//  }
+//
+//  enum SyntaxComponent {
+//    case open
+//    case close
+//  }
+//
+//}
+//
+//
+//public enum SyntaxType {
+//  case block
+//  case line
+//  case inline
+//}
+//
+//
+//
+//enum CodeLanguage {
+//  case swift
+//  case python
+//}
 
 public struct MarkdownEditorConfiguration: Sendable {
   public var fontSize: Double
@@ -468,3 +570,25 @@ public struct MarkdownDefaults: Sendable {
   public static let paddingY: Double = 30
 }
 
+
+
+
+
+
+extension MarkdownSyntax {
+  
+  public enum LayoutType {
+    case block
+    case line
+    case inline
+  }
+  
+  
+  public enum Boundary {
+    case opening
+    case closing
+    case single // For syntax that doesn't have separate opening and closing (like horizontal rules)
+  }
+
+  
+}
