@@ -14,7 +14,6 @@ public final class MarkdownView: NSView {
   
   var attributedText: NSAttributedString {
     didSet {
-      
       textContentStorage.performEditingTransaction {
         textContentStorage.textStorage?.setAttributedString(attributedText)
       }
@@ -65,7 +64,7 @@ public final class MarkdownView: NSView {
   /// `self.textView.font`
   ///
   private lazy var textLayoutManager: NSTextLayoutManager = {
-    let layoutManager = MarkdownLayoutManager()
+    let layoutManager = NSTextLayoutManager()
     return layoutManager
   }()
   
@@ -77,14 +76,14 @@ public final class MarkdownView: NSView {
     return container
   }()
   
-  private lazy var textContentStorage: NSTextContentStorage = {
+  lazy var textContentStorage: NSTextContentStorage = {
     let storage = NSTextContentStorage()
     storage.addTextLayoutManager(textLayoutManager)
     return storage
   }()
   
   public lazy var textView: NSTextView = {
-    let textView = MDTextView(frame: bounds, textContainer: textContainer)
+    let textView = NSTextView(frame: bounds, textContainer: textContainer)
     textView.isEditable = true
     textView.isSelectable = true
     textView.allowsUndo = true
@@ -140,12 +139,11 @@ public final class MarkdownView: NSView {
   }
   
   
-  
   // MARK: - Life cycle
   
   override public func viewWillDraw() {
     super.viewWillDraw()
-
+    setupViews()
     self.editorHeight = self.textView.intrinsicContentSize.height
   }
 

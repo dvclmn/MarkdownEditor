@@ -65,6 +65,8 @@ public struct MarkdownEditor: NSViewRepresentable {
     
     context.coordinator.updatingNSView = true
     
+    
+    
 //    let textView = nsView.textView
     
 //    let typingAttributes = textView.typingAttributes
@@ -124,15 +126,18 @@ public extension MarkdownEditor {
     }
     
     public func textDidChange(_ notification: Notification) {
-      guard let textView = notification.object as? NSTextView else { return }
-//      let content = String(textView.textStorage?.string ?? "")
+      guard let textView = notification.object as? NSTextView,
+            let markdownView = textView.superview?.superview as? MarkdownView
+      else { return }
       
-      if let string = textView.textContentStorage?.attributedString?.string {
+
+      if let string = markdownView.textContentStorage.attributedString?.string {
         parent.text = string
       }
       selectedRanges = textView.selectedRanges
       
       self.parent.editorHeight(textView.frame.height)
+
     }
     
     public func textViewDidChangeSelection(_ notification: Notification) {
