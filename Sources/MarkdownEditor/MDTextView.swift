@@ -11,17 +11,17 @@ public class MDTextView: NSTextView {
   
   
   
-  public override var intrinsicContentSize: NSSize {
-    
-    guard let layoutManager = self.layoutManager,
-          let textContainer = self.textContainer
-    else { return .zero }
-    
-    layoutManager.ensureLayout(for: textContainer)
-    
-    return layoutManager.usedRect(for: textContainer).size
-    
-  }
+//  public override var intrinsicContentSize: NSSize {
+//    
+//    guard let textLayoutManager = self.textla,
+//          let textContainer = self.textContainer
+//    else { return .zero }
+//    
+//    layoutManager.ensureLayout(for: textContainer)
+//    
+//    return layoutManager.usedRect(for: textContainer).size
+//    
+//  }
 
 //  public override func didChangeText() {
 //    super.didChangeText()

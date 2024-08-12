@@ -12,22 +12,22 @@ import Shortcuts
 
 extension MarkdownEditor {
   
-  func setCodeBlockBackgrounds(for textView: MDTextView) {
+//  func setCodeBlockBackgrounds(for textView: MDTextView) {
     
-    let ranges = [NSRange]()
+//    let ranges = [NSRange]()
     
     
     
     // Clear previous highlights
-    textView.codeBlockLayer?.highlightRects = []
+//    textView.codeBlockLayer?.highlightRects = []
     
     // Update highlights for each code block
-    for range in ranges {
-      updateCodeBlockHighlight(for: range)
-    }
+//    for range in ranges {
+//      updateCodeBlockHighlight(for: range)
+//    }
     
     
-  }
+//  }
   
   
   static func getHighlightedText(

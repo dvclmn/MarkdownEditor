@@ -56,7 +56,6 @@ public struct MarkdownEditor: NSViewRepresentable {
     let nsView = MarkdownView()
     nsView.delegate = context.coordinator
     
-    
     self.sendOutEditorHeight(for: nsView)
 
     return nsView
@@ -66,20 +65,20 @@ public struct MarkdownEditor: NSViewRepresentable {
     
     context.coordinator.updatingNSView = true
     
-    let textView = nsView.textView
+//    let textView = nsView.textView
     
-    let typingAttributes = textView.typingAttributes
+//    let typingAttributes = textView.typingAttributes
     
-    os_log("`updateNSView`. `typingAttributes`: \(typingAttributes)")
+//    os_log("`updateNSView`. `typingAttributes`: \(typingAttributes)")
     
-    let highlightedText = MarkdownEditor.getHighlightedText(
-      text: text
-    )
+//    let highlightedText = MarkdownEditor.getHighlightedText(
+//      text: text
+//    )
     
-    nsView.attributedText = highlightedText
+    nsView.attributedText = NSAttributedString(string: self.text)
     
     nsView.selectedRanges = context.coordinator.selectedRanges
-    nsView.textView.typingAttributes = typingAttributes
+//    nsView.textView.typingAttributes = typingAttributes
     
     context.coordinator.updatingNSView = false
   }
@@ -126,9 +125,11 @@ public extension MarkdownEditor {
     
     public func textDidChange(_ notification: Notification) {
       guard let textView = notification.object as? NSTextView else { return }
-      let content = String(textView.textStorage?.string ?? "")
+//      let content = String(textView.textStorage?.string ?? "")
       
-      parent.text = content
+      if let string = textView.textContentStorage?.attributedString?.string {
+        parent.text = string
+      }
       selectedRanges = textView.selectedRanges
       
       self.parent.editorHeight(textView.frame.height)
