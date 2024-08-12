@@ -9,6 +9,8 @@ import SwiftUI
 
 public class MDTextView: NSTextView {
   
+  
+  
   public override var intrinsicContentSize: NSSize {
     
     guard let layoutManager = self.layoutManager,
@@ -20,6 +22,28 @@ public class MDTextView: NSTextView {
     return layoutManager.usedRect(for: textContainer).size
     
   }
+
+//  public override func didChangeText() {
+//    super.didChangeText()
+//    
+    
+    // Assuming you have a way to detect markdown code blocks
+//    let codeBlockRanges = detectCodeBlocks(in: self.string)
+    
+    
+    
+    
+//  }
+  
+//  func drawCodeBlockBackground(in ranges: [NSRange]) {
+//
+//  }
+  
+//  // Implement your code block detection logic here
+//  func detectCodeBlocks(in string: String) -> [NSRange] {
+//    // Your implementation to detect code blocks
+//    // Return an array of NSRanges representing code blocks
+//  }
   
   //   var wrappingConfigs: [WrappingConfig] = []
   

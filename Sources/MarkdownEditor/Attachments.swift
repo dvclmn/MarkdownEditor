@@ -42,7 +42,7 @@ class CodeBlockBackgroundAttachmentCell: NSTextAttachmentCell {
   }
   
   override func cellSize() -> NSSize {
-    return .zero  // Size will be determined by the text it's attached to
+    return .zero
   }
 }
 

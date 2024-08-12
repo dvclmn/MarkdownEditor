@@ -13,50 +13,64 @@ import BaseStyles
 
 public enum MarkdownSyntax: Identifiable, Equatable, Hashable, Sendable {
   
+  /// Headings:
   /// # Example heading 1
-  case h1
   /// ## Example heading 2
-  case h2
   /// ### Example heading 3
-  case h3
-  
+  ///
+  ///
+  /// Bold and italic:
   /// **bold text**
-  case bold
-  
   /// __bold text__
-  case boldAlt
-  
   /// *italic text*
-  case italic
   /// _italic text_
-  case italicAlt
-  
   /// ***bold italic text***
-  case boldItalic
   /// ___bold italic text___
-  case boldItalicAlt
-  
-  /// ~~strike-through text~~
-  case strikethrough
-  
-  /// ==highlighted text==
-  case highlight
-  
+  ///
+  ///
+  /// Other inline styles:
   /// `inline code`
-  case inlineCode
-  
+  /// ~~strike-through text~~
+  /// ==highlighted text==
+  ///
+  ///
+  /// Block styles:
   /// ```swift
   /// var count: Int = 0
   /// ```
+  /// > Quoted text
+  ///
+  ///
+  /// Links and images:
+  /// [link text](http://link.url)
+  /// ![image label](http://image.url)
+  ///
+  case h1
+  case h2
+  case h3
+  
+  case bold
+  
+  case boldAlt
+  
+  case italic
+  case italicAlt
+  
+  case boldItalic
+  case boldItalicAlt
+  
+  case strikethrough
+  
+  case highlight
+  
+  case inlineCode
+  
   case codeBlock
   
-  /// > Quoted text
   case quoteBlock
   
-  /// [link text](http://link.url)
   case link
   
-  /// ![image label](http://image.url)
   case image
   
   nonisolated public var id: String {
@@ -344,7 +358,7 @@ public enum MarkdownSyntax: Identifiable, Equatable, Hashable, Sendable {
         return [
           .font: NSFont.monospacedSystemFont(ofSize: self.fontSize, weight: .medium),
           .foregroundColor: self.foreGroundColor,
-          .backgroundColor: NSColor.black.withAlphaComponent(MarkdownDefaults.backgroundCodeBlock)
+//          .backgroundColor: NSColor.black.withAlphaComponent(MarkdownDefaults.backgroundCodeBlock)
         ]
         
       case .quoteBlock:
@@ -382,8 +396,7 @@ public enum MarkdownSyntax: Identifiable, Equatable, Hashable, Sendable {
       default:
         return [
           .font: NSFont.monospacedSystemFont(ofSize: self.fontSize, weight: .regular),
-          .foregroundColor: NSColor.textColor.withAlphaComponent(MarkdownDefaults.syntaxAlpha),
-          .backgroundColor: NSColor.clear
+          .foregroundColor: NSColor.textColor.withAlphaComponent(MarkdownDefaults.syntaxAlpha)
         ]
     }
   }

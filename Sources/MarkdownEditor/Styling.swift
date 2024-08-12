@@ -12,6 +12,24 @@ import Shortcuts
 
 extension MarkdownEditor {
   
+  func setCodeBlockBackgrounds(for textView: MDTextView) {
+    
+    let ranges = [NSRange]()
+    
+    
+    
+    // Clear previous highlights
+    textView.codeBlockLayer?.highlightRects = []
+    
+    // Update highlights for each code block
+    for range in ranges {
+      updateCodeBlockHighlight(for: range)
+    }
+    
+    
+  }
+  
+  
   static func getHighlightedText(
     text: String
   ) -> NSMutableAttributedString {
@@ -54,7 +72,7 @@ extension MarkdownEditor {
     in range: NSRange
   ) {
     
-    print("Let's apply the highlight rules")
+    print("Let's apply the highlight syntaxes")
     let text = attributedString.string
     
     let regex = syntax.regex
@@ -67,6 +85,11 @@ extension MarkdownEditor {
         attributedString.addAttribute(key, value: value, range: matchRange)
       }
       
+//      if syntax == .codeBlock {
+        
+//              attributedString.addCodeBlockBackground(to: range)
+//      }
+      
       applySyntaxCharacterAttributes(for: syntax, to: attributedString, in: matchRange)
     }
     
@@ -76,34 +99,45 @@ extension MarkdownEditor {
   /// Style syntax characters
   ///
   private static func applySyntaxCharacterAttributes(
-    for rule: MarkdownSyntax,
+    for syntax: MarkdownSyntax,
     to attributedString: NSMutableAttributedString,
     in matchRange: NSRange
   ) {
-    let syntaxChars = rule.syntaxCharacters
+    let characters = syntax.syntaxCharacters
     
-    /// Different Markdown syntax has different structure and placement of syntax characters
+//    if syntax.isSyntaxSymmetrical {
+//
+//    }
+    
+    /// What questions are we asking
+    /// 1. How many syntax characters
+    /// 2. Are they on the left or the right
+    /// 3. Is this a block, line or inline type of syntax
+    
+    /// Process syntax characters on the left
     ///
+    let syntaxRange = NSRange(location: matchRange.location, length: characters.count + 1)
     
-    let syntaxRange = NSRange(location: matchRange.location, length: syntaxChars.count + 1)
-    applySyntaxAttributes(for: rule, to: attributedString, in: syntaxRange)
+    applySyntaxAttributes(for: syntax, to: attributedString, in: syntaxRange)
     
-    if syntaxChars.count > 1 {
-      let closingStart = matchRange.location + matchRange.length - syntaxChars.count
-      let closingRange = NSRange(location: closingStart, length: syntaxChars.count)
-      applySyntaxAttributes(for: rule, to: attributedString, in: closingRange)
+    /// Process syntax characters on the right
+    ///
+    if characters.count > 1 {
+      let closingStart = matchRange.location + matchRange.length - characters.count
+      let closingRange = NSRange(location: closingStart, length: characters.count)
+      applySyntaxAttributes(for: syntax, to: attributedString, in: closingRange)
     }
     
   }
   
   
   private static func applySyntaxAttributes(
-    for rule: MarkdownSyntax,
+    for syntax: MarkdownSyntax,
     to attributedString: NSMutableAttributedString,
     in range: NSRange
   ) {
     
-    for (key, value) in rule.syntaxAttributes {
+    for (key, value) in syntax.syntaxAttributes {
       attributedString.addAttribute(key, value: value, range: range)
     }
   }

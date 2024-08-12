@@ -16,6 +16,7 @@ struct ExampleView: View {
     MarkdownEditor(text: $text)
       .background(.black.opacity(0.5))
       .background(.purple.opacity(0.1))
+      .frame(width: 400, height: 700)
   }
 }
 
@@ -49,5 +50,5 @@ extension ExampleView {
 
 #Preview {
   ExampleView()
-    .frame(height: 700)
+    
 }

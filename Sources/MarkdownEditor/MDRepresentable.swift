@@ -65,7 +65,10 @@ public struct MarkdownEditor: NSViewRepresentable {
   public func updateNSView(_ nsView: MarkdownView, context: Context) {
     
     context.coordinator.updatingNSView = true
-    let typingAttributes = nsView.textView.typingAttributes
+    
+    let textView = nsView.textView
+    
+    let typingAttributes = textView.typingAttributes
     
     os_log("`updateNSView`. `typingAttributes`: \(typingAttributes)")
     
