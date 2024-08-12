@@ -58,15 +58,7 @@ public struct MarkdownEditor: NSViewRepresentable {
     
     
     self.sendOutEditorHeight(for: nsView)
-//    let wrappingConfigs = [
-//      WrappingConfig(syntax: .inlineCode, triggerKey: "`", shortcut: .init("e", modifiers: [.command])),
-//      WrappingConfig(syntax: .bold, triggerKey: "*", shortcut: .init("b", modifiers: [.command])),
-//      WrappingConfig(syntax: .italic, triggerKey: "_", shortcut: .init("i", modifiers: [.command])),
-//      WrappingConfig(syntax: .strikethrough, shortcut: .init("e", modifiers: [.command, .shift]))
-//    ]
-//    nsView.textView.configureWrappingSyntax(wrappingConfigs)
-    
-    
+
     return nsView
   }
   

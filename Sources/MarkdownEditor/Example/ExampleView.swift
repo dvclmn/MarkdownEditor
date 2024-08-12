@@ -6,20 +6,21 @@
 //
 
 import SwiftUI
-
+//import Networking
 
 struct ExampleView: View {
-   
-   @State private var text: String = Self.exampleMarkdown
-   
-   var body: some View {
-      MarkdownEditor(text: $text)
-         .background(.red.opacity(0.2))
-   }
+  
+  @State private var text: String = Self.exampleMarkdown
+  
+  var body: some View {
+    MarkdownEditor(text: $text)
+      .background(.black.opacity(0.5))
+      .background(.purple.opacity(0.1))
+  }
 }
 
 extension ExampleView {
-   static let exampleMarkdown: String = """
+  static let exampleMarkdown: String = """
    # Markdown samples
    ## Overview of the sample
    Usually, `NSTextView` manages the *layout* process inside **the viewport** interacting ~~with its delegate~~.
@@ -42,11 +43,11 @@ extension ExampleView {
    
    > This *brief* block quote, with ==text contents==, lines `advance expanding` the view in the current writing direction.ExampleView
    
-
+   
    """
 }
 
 #Preview {
-   ExampleView()
-      .frame(height: 700)
+  ExampleView()
+    .frame(height: 700)
 }

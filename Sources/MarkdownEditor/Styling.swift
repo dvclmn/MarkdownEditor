@@ -9,25 +9,8 @@ import SwiftUI
 import Syntax
 import Shortcuts
 
-//struct WrappingConfig {
-//  let syntax: WrappableSyntax
-//  let triggerKey: String?
-//  let shortcut: Keyboard.Shortcut?
-//  
-//  init(syntax: WrappableSyntax, triggerKey: String? = nil, shortcut: Keyboard.Shortcut? = nil) {
-//    self.syntax = syntax
-//    self.triggerKey = triggerKey
-//    self.shortcut = shortcut
-//  }
-//}
-
-
-let defaultEditorFont = NSFont.systemFont(ofSize: 15)
-let defaultEditorTextColor = NSColor.labelColor
-
 
 extension MarkdownEditor {
-  var placeholderFont: NSColor { NSColor() }
   
   static func getHighlightedText(
     text: String
@@ -38,11 +21,11 @@ extension MarkdownEditor {
     let highlightedString = NSMutableAttributedString(string: text)
     let all = NSRange(location: 0, length: text.utf16.count)
     
-    highlightedString.addAttribute(.font, value: defaultEditorFont, range: all)
-    highlightedString.addAttribute(.foregroundColor, value: defaultEditorTextColor, range: all)
+    highlightedString.addAttribute(.font, value: NSFont.systemFont(ofSize: MarkdownDefaults.fontSize), range: all)
+    highlightedString.addAttribute(.foregroundColor, value: NSColor.labelColor, range: all)
     
     /// Defining the order manually here, but should test to make sure that this actually makes a difference
-    let orderedRules: [MarkdownSyntax] = [
+    let orderedSyntax: [MarkdownSyntax] = [
       .boldItalic,
       .boldItalicAlt,
       .bold,
@@ -50,22 +33,23 @@ extension MarkdownEditor {
       .italic,
       .italicAlt,
       .inlineCode,
+      .h1,
+      .h2,
+      .h3,
       .codeBlock,
       .quoteBlock
     ]
     
-    for rule in orderedRules {
-      
-      applyHighlightRule(rule, to: highlightedString, in: all)
-      
+    for syntax in orderedSyntax {
+      applyStyles(for: syntax, to: highlightedString, in: all)
     }
     
     return highlightedString
   }
   
   
-  private static func applyHighlightRule(
-    _ rule: MarkdownSyntax,
+  private static func applyStyles(
+    for syntax: MarkdownSyntax,
     to attributedString: NSMutableAttributedString,
     in range: NSRange
   ) {
@@ -73,23 +57,24 @@ extension MarkdownEditor {
     print("Let's apply the highlight rules")
     let text = attributedString.string
     
-    let regex = rule.regex
+    let regex = syntax.regex
     
     regex.enumerateMatches(in: text, options: [], range: range) { match, _, _ in
       
       guard let matchRange = match?.range else { return }
       
-      for (key, value) in rule.contentAttributes {
+      for (key, value) in syntax.contentAttributes {
         attributedString.addAttribute(key, value: value, range: matchRange)
       }
       
-      applySyntaxCharacterAttributes(for: rule, to: attributedString, in: matchRange)
-      
-
+      applySyntaxCharacterAttributes(for: syntax, to: attributedString, in: matchRange)
     }
     
-  } // END applyHighlightRule
+  } // END
   
+  
+  /// Style syntax characters
+  ///
   private static func applySyntaxCharacterAttributes(
     for rule: MarkdownSyntax,
     to attributedString: NSMutableAttributedString,
@@ -97,7 +82,10 @@ extension MarkdownEditor {
   ) {
     let syntaxChars = rule.syntaxCharacters
     
-    let syntaxRange = NSRange(location: matchRange.location, length: syntaxChars.count)
+    /// Different Markdown syntax has different structure and placement of syntax characters
+    ///
+    
+    let syntaxRange = NSRange(location: matchRange.location, length: syntaxChars.count + 1)
     applySyntaxAttributes(for: rule, to: attributedString, in: syntaxRange)
     
     if syntaxChars.count > 1 {

@@ -20,16 +20,15 @@ let package = Package(
     dependencies: [
 //            .package(url: "https://github.com/raspu/Highlightr.git", from: "2.1.2"),
 //            .package(url: "https://github.com/ChimeHQ/Rearrange.git", from: "1.8.1"),
-            .package(name: "TestStrings", path: "../TestStrings"),
-//            .package(name: "Networking", path: "../Networking"),
-//            .package(name: "Utilities", path: "/Users/dvclmn/Apps/_ Swift Packages/Utilities"),
-            .package(name: "Helpers", path: "/Users/dvclmn/Apps/_ Swift Packages/Helpers")
+            .package(name: "Styles", path: "../Styles"),
+            .package(name: "Networking", path: "../Networking"),
+            .package(name: "Helpers", path: "../Helpers")
             
         ],
     targets: [
         .target(
             name: "MarkdownEditor",
-            dependencies: ["TestStrings", "Syntax", "Helpers"]
+            dependencies: ["Helpers", "Styles", "Syntax", "Networking"]
         ),
         .target(
           name: "Syntax",
