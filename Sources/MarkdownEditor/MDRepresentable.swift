@@ -129,52 +129,52 @@ public extension MarkdownEditor {
       return true
     }
     
-    @MainActor
-    public func textDidBeginEditing(_ notification: Notification) {
-      guard let textView = notification.object as? NSTextView else {
-        return
-      }
-      
-      parent.text = textView.string
-      parent.onEditingChanged()
-    }
-    
-    @MainActor public func textDidChange(_ notification: Notification) {
-      guard let textView = notification.object as? NSTextView,
-            let markdownView = textView.superview?.superview as? MarkdownView
-      else { return }
-      
-
-      if let string = markdownView.textContentStorage.attributedString?.string {
-        parent.text = string
-      }
-      selectedRanges = textView.selectedRanges
-      
-      self.parent.editorHeight(textView.frame.height)
-
-    }
-    
-    @MainActor
-    public func textViewDidChangeSelection(_ notification: Notification) {
-      guard let textView = notification.object as? NSTextView,
-            !updatingNSView,
-            let ranges = textView.selectedRanges as? [NSRange]
-      else { return }
-      selectedRanges = textView.selectedRanges
-      DispatchQueue.main.async {
-        self.parent.onSelectionChange(ranges)
-      }
-    }
-    
-    @MainActor
-    public func textDidEndEditing(_ notification: Notification) {
-      guard let textView = notification.object as? NSTextView else {
-        return
-      }
-      
-      parent.text = textView.string
-      parent.onCommit()
-    }
+//    @MainActor
+//    public func textDidBeginEditing(_ notification: Notification) {
+//      guard let textView = notification.object as? NSTextView else {
+//        return
+//      }
+//      
+//      parent.text = textView.string
+//      parent.onEditingChanged()
+//    }
+//    
+//    @MainActor public func textDidChange(_ notification: Notification) {
+//      guard let textView = notification.object as? NSTextView,
+//            let markdownView = textView.superview?.superview as? MarkdownView
+//      else { return }
+//      
+//
+//      if let string = markdownView.textContentStorage.attributedString?.string {
+//        parent.text = string
+//      }
+//      selectedRanges = textView.selectedRanges
+//      
+//      self.parent.editorHeight(textView.frame.height)
+//
+//    }
+//    
+//    @MainActor
+//    public func textViewDidChangeSelection(_ notification: Notification) {
+//      guard let textView = notification.object as? NSTextView,
+//            !updatingNSView,
+//            let ranges = textView.selectedRanges as? [NSRange]
+//      else { return }
+//      selectedRanges = textView.selectedRanges
+//      DispatchQueue.main.async {
+//        self.parent.onSelectionChange(ranges)
+//      }
+//    }
+//    
+//    @MainActor
+//    public func textDidEndEditing(_ notification: Notification) {
+//      guard let textView = notification.object as? NSTextView else {
+//        return
+//      }
+//      
+//      parent.text = textView.string
+//      parent.onCommit()
+//    }
   }
 }
 

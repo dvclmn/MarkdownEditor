@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-public class MDTextView: NSTextView {
+public class MarkdownTextView: NSTextView {
   
   
   
