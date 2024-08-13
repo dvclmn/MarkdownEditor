@@ -8,10 +8,10 @@
 import SwiftUI
 import STTextKitPlus
 
-extension MarkdownView {
+extension MarkdownTextView {
   
   public func selectedTextRange() -> NSTextRange? {
-    textLayoutManager.textSelections.last?.textRanges.last
+    textLayoutManager?.textSelections.last?.textRanges.last
   }
   
   public func setSelectedTextRange(_ textRange: NSTextRange) {
@@ -19,26 +19,33 @@ extension MarkdownView {
   }
   
   internal func setSelectedTextRange(_ textRange: NSTextRange, updateLayout: Bool) {
-    guard isSelectable, textRange.endLocation <= textLayoutManager.documentRange.endLocation else {
-      return
-    }
+    
+    guard let textLayoutManager = textLayoutManager,
+          isSelectable,
+          textRange.endLocation <= textLayoutManager.documentRange.endLocation
+    else { return }
     
     textLayoutManager.textSelections = [
       NSTextSelection(range: textRange, affinity: .downstream, granularity: .character)
     ]
     
-    updateTypingAttributes(at: textRange.location)
+//    updateTypingAttributes(at: textRange.location)
     
     if updateLayout {
       needsLayout = true
     }
   }
   
-  public func setSelectedRange(_ range: NSRange) {
-    guard let textRange = NSTextRange(range, in: textContentManager) else {
+  public override func setSelectedRange(_ range: NSRange) {
+    
+    guard let contentManager = textLayoutManager?.textContentManager else { return }
+    
+    guard let textRange = NSTextRange(range, in: contentManager) else {
       preconditionFailure("Invalid range \(range)")
     }
     setSelectedTextRange(textRange)
   }
   
 }
+
+

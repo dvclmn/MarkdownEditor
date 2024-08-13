@@ -71,18 +71,18 @@ public struct MarkdownEditor: NSViewRepresentable {
     
     
     
-    let textView = nsView.textView
-    var storage = nsView.textContentStorage
+//    let textView = nsView.textView
+//    var storage = nsView.textContentStorage
     
-    let typingAttributes = textView.typingAttributes
-    
-    if storage.attributedString?.string != self.text {
-      
-      storage.performEditingTransaction {
-        storage.textStorage?.replaceCharacters(in: storage.documentRange, with: self.text)
-      }
-      
-    }
+//    let typingAttributes = textView.typingAttributes
+//    
+//    if storage.attributedString?.string != self.text {
+//      
+//      storage.performEditingTransaction {
+//        storage.textStorage?.replaceCharacters(in: storage.documentRange, with: self.text)
+//      }
+//      
+//    }
     
 //    os_log("`updateNSView`. `typingAttributes`: \(typingAttributes)")
     
@@ -92,8 +92,8 @@ public struct MarkdownEditor: NSViewRepresentable {
     
 //    nsView.attributedText = highlightedText
     
-    nsView.selectedRanges = context.coordinator.selectedRanges
-    nsView.textView.typingAttributes = typingAttributes
+//    nsView.selectedRanges = context.coordinator.selectedRanges
+//    nsView.textView.typingAttributes = typingAttributes
     
     context.coordinator.updatingNSView = false
   }
