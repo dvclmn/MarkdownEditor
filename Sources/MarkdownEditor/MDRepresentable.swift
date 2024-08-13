@@ -20,6 +20,8 @@ public struct MarkdownEditor: NSViewRepresentable {
       onTextChange(text)
     }
   }
+  
+//  var attributedString: NSAttributedString = NSAttributedString(string: "")
 
   var onEditingChanged: () -> Void
   var onCommit: () -> Void
@@ -53,6 +55,8 @@ public struct MarkdownEditor: NSViewRepresentable {
     
     os_log("Made `ScrollableTextView` with `makeNSView`")
     
+//    let parser = MarkdownParser(text: self.text)
+    
     let nsView = MarkdownView()
     nsView.delegate = context.coordinator
     
@@ -68,16 +72,25 @@ public struct MarkdownEditor: NSViewRepresentable {
     
     
     let textView = nsView.textView
+    var storage = nsView.textContentStorage
     
     let typingAttributes = textView.typingAttributes
     
+    if storage.attributedString?.string != self.text {
+      
+      storage.performEditingTransaction {
+        storage.textStorage?.replaceCharacters(in: storage.documentRange, with: self.text)
+      }
+      
+    }
+    
 //    os_log("`updateNSView`. `typingAttributes`: \(typingAttributes)")
     
-    let highlightedText = MarkdownEditor.getHighlightedText(
-      text: self.text
-    )
+//    let highlightedText = MarkdownEditor.getHighlightedText(
+//      text: self.text
+//    )
     
-    nsView.attributedText = highlightedText
+//    nsView.attributedText = highlightedText
     
     nsView.selectedRanges = context.coordinator.selectedRanges
     nsView.textView.typingAttributes = typingAttributes
@@ -99,7 +112,7 @@ public struct MarkdownEditor: NSViewRepresentable {
 }
 
 public extension MarkdownEditor {
-  final class Coordinator: NSObject, NSTextViewDelegate {
+  final class Coordinator: NSObject, NSTextContentStorageDelegate {
     var parent: MarkdownEditor
     var selectedRanges: [NSValue] = []
     var updatingNSView = false
@@ -116,6 +129,7 @@ public extension MarkdownEditor {
       return true
     }
     
+    @MainActor
     public func textDidBeginEditing(_ notification: Notification) {
       guard let textView = notification.object as? NSTextView else {
         return
@@ -125,7 +139,7 @@ public extension MarkdownEditor {
       parent.onEditingChanged()
     }
     
-    public func textDidChange(_ notification: Notification) {
+    @MainActor public func textDidChange(_ notification: Notification) {
       guard let textView = notification.object as? NSTextView,
             let markdownView = textView.superview?.superview as? MarkdownView
       else { return }
@@ -140,6 +154,7 @@ public extension MarkdownEditor {
 
     }
     
+    @MainActor
     public func textViewDidChangeSelection(_ notification: Notification) {
       guard let textView = notification.object as? NSTextView,
             !updatingNSView,
@@ -151,6 +166,7 @@ public extension MarkdownEditor {
       }
     }
     
+    @MainActor
     public func textDidEndEditing(_ notification: Notification) {
       guard let textView = notification.object as? NSTextView else {
         return
