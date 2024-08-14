@@ -43,7 +43,7 @@ extension MarkdownEditor {
 //    highlightedString.addAttribute(.foregroundColor, value: NSColor.labelColor, range: all)
 //    
 //    /// Defining the order manually here, but should test to make sure that this actually makes a difference
-//    let orderedSyntax: [MarkdownSyntax] = [
+//    let orderedSyntax: [Markdown.Syntax] = [
 //      .boldItalic,
 //      .boldItalicAlt,
 //      .bold,
@@ -67,7 +67,7 @@ extension MarkdownEditor {
   
   
 //  private static func applyStylesToContent(
-//    for syntax: MarkdownSyntax,
+//    for syntax: Markdown.Syntax,
 //    to attributedString: NSMutableAttributedString,
 //    in range: NSRange
 //  ) {
@@ -122,7 +122,7 @@ extension MarkdownEditor {
   /// Style syntax characters
   ///
   private static func applySyntaxAttributes(
-    for syntax: MarkdownSyntax,
+    for syntax: Markdown.Syntax,
     to attributedString: NSMutableAttributedString,
     in range: NSRange
   ) {
@@ -134,7 +134,7 @@ extension MarkdownEditor {
   
 //  
 //  func addAttributes(
-//    for syntax: MarkdownSyntax,
+//    for syntax: Markdown.Syntax,
 //    to type: SyntaxType
 //    to attributedString: NSMutableAttributedString,
 //    in range: NSRange

@@ -50,7 +50,7 @@ class InlineCodeLayoutFragment: NSTextLayoutFragment {
 }
 
 public struct MarkdownFragment {
-  let syntax: MarkdownSyntax
+  let syntax: Markdown.Syntax
   let range: NSTextRange
   let content: String?  // Optional, as some elements (like horizontal rules) might not have content
 }
@@ -100,7 +100,7 @@ public struct MarkdownFragment {
 //    return [:]
 //  }
 //  
-//  public func toggleSyntax(_ syntax: MarkdownSyntax, in range: NSRange) {
+//  public func toggleSyntax(_ syntax: Markdown.Syntax, in range: NSRange) {
 //    // Logic to add or remove syntax in the given range
 //  }
 //}

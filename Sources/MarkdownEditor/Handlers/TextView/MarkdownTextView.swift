@@ -10,25 +10,13 @@ import STTextKitPlus
 
 
 public class MarkdownTextView: NSTextView {
-  
-  var editorHeight: CGFloat {
-    
-    guard let tlm = self.textLayoutManager
-    else { return .zero }
-    
-    let documentRange = tlm.documentRange
-    
-    let typographicBounds: CGFloat = tlm.typographicBounds(in: documentRange)?.height ?? .zero
-    
-    let height = (textInsets * 2) + typographicBounds
-    
-    return height
-    
-  }
+
   var isShowingFrames: Bool
   var textInsets: CGFloat
   
-  var inlineCodeElements: [InlineCodeElement] = []
+//  var inlineCodeElements: [InlineCodeElement] = []
+  
+  var markdownBlocks: [MarkdownBlock] = []
   
   public typealias OnEvent = (_ event: NSEvent, _ action: () -> Void) -> Void
   
@@ -41,7 +29,6 @@ public class MarkdownTextView: NSTextView {
   public var onFlagsChanged: OnEvent = { $1() }
   public var onMouseDown: OnEvent = { $1() }
   
-
   public var onTextChange: MarkdownEditor.TextInfo = { _ in }
   public var onSelectionChange: MarkdownEditor.SelectionInfo = { _ in }
   public var onEditorHeightChange: MarkdownEditor.EditorHeight = { _ in }
@@ -98,7 +85,7 @@ public class MarkdownTextView: NSTextView {
   //    inlineCodeElements.removeAll()
   //
   ////    let fullRange = NSRange(location: 0, length: string.utf16.count)
-  //    let regex = MarkdownSyntax.inlineCode.regex
+  //    let regex = Markdown.Syntax.inlineCode.regex
   //
   //    regex.
   //
@@ -162,7 +149,18 @@ extension Notification.Name {
 
 extension MarkdownTextView {
   
-//  
+  
+  var editorHeight: CGFloat {
+    
+    guard let tlm = self.textLayoutManager
+    else { return .zero }
+    let documentRange = tlm.documentRange
+    let typographicBounds: CGFloat = tlm.typographicBounds(in: documentRange)?.height ?? .zero
+    let height = (textInsets * 2) + typographicBounds
+    
+    return height
+  }
+//
 //  func updateEditorHeight() {
 //    
 ////    let height = textLayoutManager?.textContainer?.size.height ?? .zero

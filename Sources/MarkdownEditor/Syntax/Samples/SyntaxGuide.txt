@@ -1,4 +1,69 @@
 
+/// Syntax:
+/// - A finite list (so should be enum)
+/// - Characters that can be used to give different meanings to bits of text
+///
+///
+
+
+
+
+/// A brief overview of the supported Markdown syntax
+///
+/// ## Headings
+///
+/// ```md
+/// # Example heading 1
+/// ## Example heading 2
+/// ### Example heading 3
+/// ```
+///
+/// Considered for possible future support:
+/// ```md
+/// Heading
+/// =======
+///
+/// Sub-heading
+/// -----------
+/// ```
+///
+///
+/// ## Bold and italic
+/// ```md
+/// **bold text**
+/// __bold text__
+///
+/// *italic text*
+/// _italic text_
+///
+/// ***bold italic text***
+/// ___bold italic text___
+///```
+///
+/// ## Other inline styles
+/// ```md
+/// `inline code`
+/// ~~strike-through text~~
+/// ==highlighted text==
+/// ```
+///
+///
+/// Block styles:
+/// ```swift
+/// var count: Int = 0
+/// ```
+/// > Quoted text
+///
+///
+/// Links and images:
+/// [link text](http://link.url)
+/// ![image label](http://image.url)
+/// ```
+///
+
+
+
+
 
 *Italic*	_Italic_	Italic
 

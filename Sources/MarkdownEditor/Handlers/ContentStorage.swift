@@ -9,23 +9,21 @@ import SwiftUI
 import STTextKitPlus
 
 final class MarkdownContentStorage: NSTextContentStorage {
-  
-  
-  
-  
-  
+
 }
 
-class InlineCodeElement: NSTextElement {
+class MarkdownBlock: NSTextElement {
+  
   let range: NSTextRange
+  let syntax: Markdown.Syntax
   
-  init(range: NSTextRange) {
+  init(
+    range: NSTextRange,
+    syntax: Markdown.Syntax
+  ) {
     self.range = range
+    self.syntax = syntax
     super.init()
-  }
-  
-  required init?(coder: NSCoder) {
-    fatalError("init(coder:) has not been implemented")
   }
 }
 

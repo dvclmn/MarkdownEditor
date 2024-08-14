@@ -38,6 +38,7 @@ extension MarkdownTextView {
       editorHeight: self.editorHeight,
       characterCount: self.string.count,
       textElementCount: textElementCount,
+      codeBlocks: self.markdownBlocks.filter {$0.syntax == .codeBlock},
       documentRange: documentRange
     )
   }

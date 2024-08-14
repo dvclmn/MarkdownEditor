@@ -17,39 +17,41 @@ struct ExampleView: View {
   
   var body: some View {
     
-    ScrollView(.vertical) {
-      MarkdownEditor(
-        text: $text,
-        isShowingFrames: true,
-        textInfo: { self.textInfo = $0 },
-        selectionInfo: { self.selectionInfo = $0 },
-        editorHeight: { self.editorHeight = $0 }
-      )
-      .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
-      //        .frame(maxWidth: .infinity, maxHeight: .infinity)
-    }
-    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
     
-//    
-//    VStack(spacing: 0) {
-//      
-//      Spacer()
-//      
-//      
-//
-//      HStack {
-//        Text(self.selectionInfo?.summary ?? "nil")
-//        Spacer()
-//        Text(self.textInfo?.summary ?? "nil")
-//      }
-//      .frame(maxWidth: .infinity, alignment: .leading)
-//      .padding(.horizontal, 30)
-//      .padding(.top, 10)
-//      .padding(.bottom, 14)
-//      .background(.black.opacity(0.5))
-//    }
-    .overlay {
-      Text(self.editorHeight.description)
+    
+    VStack(spacing: 0) {
+      
+      Spacer()
+      
+      ScrollView(.vertical) {
+        MarkdownEditor(
+          text: $text,
+          isShowingFrames: false,
+          textInfo: { self.textInfo = $0 },
+          selectionInfo: { self.selectionInfo = $0 },
+          editorHeight: { self.editorHeight = $0 }
+        )
+        .frame(height: self.editorHeight)
+        //        .frame(maxWidth: .infinity, maxHeight: .infinity)
+      }
+      .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
+
+      HStack(alignment: .bottom) {
+        Text(self.selectionInfo?.summary ?? "nil")
+        Spacer()
+        Text(self.textInfo?.summary ?? "nil")
+      }
+      .foregroundStyle(.secondary)
+      .frame(maxWidth: .infinity, alignment: .leading)
+      .padding(.horizontal, 30)
+      .padding(.top, 10)
+      .padding(.bottom, 14)
+      .background(.black.opacity(0.5))
+    }
+    .overlay(alignment: .topTrailing) {
+      Text("Local editor height \(self.editorHeight.description)")
+        .allowsHitTesting(false)
+        .foregroundStyle(.secondary)
     }
     .background(.black.opacity(0.5))
     .background(.purple.opacity(0.1))
