@@ -9,7 +9,7 @@ import SwiftUI
 import STTextKitPlus
 
 
-extension MarkdownView {
+//extension MarkdownView {
 
 //  public func replaceCharacters(in range: NSTextRange, with string: String) {
 //    replaceCharacters(in: range, with: string, useTypingAttributes: true, allowsTypingCoalescing: false)
@@ -82,4 +82,4 @@ extension MarkdownView {
 //    }
 //    undoManager.endUndoGrouping()
 //    }
-}
+//}

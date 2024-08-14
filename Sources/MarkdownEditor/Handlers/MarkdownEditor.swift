@@ -9,11 +9,8 @@
  *  MIT license
  */
 
-import AppKit
 import SwiftUI
 import OSLog
-
-//import Shortcuts
 
 public struct MarkdownEditor: NSViewRepresentable {
   
@@ -31,38 +28,27 @@ public struct MarkdownEditor: NSViewRepresentable {
     self.editorHeight = editorHeight
   }
   
-  
-  public func makeNSView(context: Context) -> MarkdownView {
+  public func makeNSView(context: Context) -> MarkdownTextView {
     
-    os_log("Made `ScrollableTextView` with `makeNSView`")
+    let textView = MarkdownTextView()
+    textView.delegate = context.coordinator
     
-    let nsView = MarkdownView()
-    nsView.delegate = context.coordinator
+    self.sendOutMetrics(for: textView)
+    self.sendOutEditorHeight(for: textView)
     
-    
-    
-    self.sendOutMetrics(for: nsView)
-    self.sendOutEditorHeight(for: nsView)
-    
-    return nsView
+    return textView
   }
   
-  public func updateNSView(_ nsView: MarkdownView, context: Context) {
+  public func updateNSView(_ textView: MarkdownTextView, context: Context) {
     
     context.coordinator.updatingNSView = true
     
-    
-    let textView = nsView.textView
-    
-    
-    
-    
-    
     if textView.string != self.text {
-      
       textView.string = self.text
       
+      textView.assembleMetrics()
       
+      //      self.sendOutMetrics(for: nsView)
       
     }
     
@@ -92,33 +78,43 @@ public struct MarkdownEditor: NSViewRepresentable {
   }
   
   @MainActor
-  private func sendOutEditorHeight(for nsView: MarkdownView) {
+  private func sendOutEditorHeight(for textView: MarkdownTextView) {
     DispatchQueue.main.async {
-      let height = nsView.textView.intrinsicContentSize.height + 80
-      nsView.textView.invalidateIntrinsicContentSize()
+      let height = textView.intrinsicContentSize.height + 80
+      textView.invalidateIntrinsicContentSize()
       self.editorHeight(height)
     }
   }
   
   @MainActor
-  private func sendOutMetrics(for nsView: MarkdownView) {
-
-    let textView = nsView.textView
-    let string = textView.string
-    let exampleSyntax = MarkdownSyntax.inlineCode
+  private func sendOutMetrics(for textView: MarkdownTextView) {
     
-//    guard let documentRange = textView.textLayoutManager?.documentRange else { return }
     
-//    let elements = textView.textContentStorage?.textElements(for: documentRange)
-    
-//    textView.textLayoutManager
-
     DispatchQueue.main.async {
-      
-      
-      let metrics = nsView.textView.parser.elements.debugDescription
-      self.metrics(metrics)
+      self.metrics(textView.editorMetrics)
     }
+    //    let exampleSyntax = MarkdownSyntax.inlineCode
+    //
+    //    guard let documentRange = textView.textLayoutManager?.documentRange else { return }
+    //
+    //    var textElementCount: Int = 0
+    //
+    //    textView.textLayoutManager?.textContentManager?.enumerateTextElements(from: documentRange.location, using: { _ in
+    //      textElementCount += 1
+    //      return true
+    //    })
+    //
+    //    DispatchQueue.main.async {
+    //
+    //      let finalMetrics: String = """
+    //      Editor height: \(textView.intrinsicContentSize.height.description)
+    //      Character count: \(textView.string.count)
+    //      Text elements: \(textElementCount.description)
+    //      Document range: \(documentRange.description)
+    //      """
+    //
+    //      self.metrics(finalMetrics)
+    //    }
   }
   
   public func makeCoordinator() -> Coordinator {
@@ -129,7 +125,7 @@ public struct MarkdownEditor: NSViewRepresentable {
 }
 
 public extension MarkdownEditor {
-  final class Coordinator: NSObject, NSTextContentStorageDelegate {
+  final class Coordinator: NSObject, NSTextViewDelegate, NSTextContentStorageDelegate {
     var parent: MarkdownEditor
     var selectedRanges: [NSValue] = []
     var updatingNSView = false
@@ -138,50 +134,51 @@ public extension MarkdownEditor {
       self.parent = parent
     }
     
-    public func textView(
-      _ textView: NSTextView,
-      shouldChangeTextIn affectedCharRange: NSRange,
-      replacementString: String?
-    ) -> Bool {
-      return true
-    }
-    
-    @MainActor
-    public func textDidBeginEditing(_ notification: Notification) {
-      guard let textView = notification.object as? NSTextView else {
-        return
-      }
+    //
+    @MainActor public func textDidChange(_ notification: Notification) {
+      
+      guard let textView = notification.object as? MarkdownTextView,
+            !updatingNSView
+      else { return }
       
       parent.text = textView.string
+      textView.assembleMetrics()
+      
+      //      if self.parent.text != textView.string {
+      //        parent.text = textView.string
+      //      }
+      //      if self.selectedRanges != textView.selectedRanges {
+      //        self.selectedRanges = textView.selectedRanges
+      //      }
+      //
+      //      self.parent.sendOutEditorHeight(for: nsView)
+      //      self.parent.sendOutMetrics(for: nsView)
+      
+      
       
     }
+    
+    //    @objc func metricsDidChange(_ notification: Notification) {
+    //      guard let textView = notification.object as? MarkdownTextView,
+    //            let nsView = textView.superview as? MarkdownView else { return }
     //
-    //    @MainActor public func textDidChange(_ notification: Notification) {
-    //      guard let textView = notification.object as? NSTextView,
-    //            let markdownView = textView.superview?.superview as? MarkdownView
-    //      else { return }
-    //
-    //
-    //      if let string = markdownView.textContentStorage.attributedString?.string {
-    //        parent.text = string
-    //      }
-    //      selectedRanges = textView.selectedRanges
-    //
-    //      self.parent.editorHeight(textView.frame.height)
-    //
+    //      nsView.editorMetrics = textView.editorMetrics
+    //      parent.metrics(nsView.editorMetrics)
     //    }
+    
+    
+    
     //
-    //    @MainActor
-    //    public func textViewDidChangeSelection(_ notification: Notification) {
-    //      guard let textView = notification.object as? NSTextView,
-    //            !updatingNSView,
-    //            let ranges = textView.selectedRanges as? [NSRange]
-    //      else { return }
-    //      selectedRanges = textView.selectedRanges
-    //      DispatchQueue.main.async {
-    //        self.parent.onSelectionChange(ranges)
-    //      }
-    //    }
+    @MainActor
+    public func textViewDidChangeSelection(_ notification: Notification) {
+      guard let textView = notification.object as? MarkdownTextView,
+            !updatingNSView
+      else { return }
+      
+      selectedRanges = textView.selectedRanges
+      
+      
+    }
     //
     //    @MainActor
     //    public func textDidEndEditing(_ notification: Notification) {
@@ -194,3 +191,24 @@ public extension MarkdownEditor {
     //    }
   }
 }
+
+
+//extension MarkdownEditor {
+//  func setupScrollView(for scrollView: NSScrollView) {
+//    
+//    scrollView.hasVerticalScroller = true
+//    scrollView.hasHorizontalScroller = false
+//    scrollView.autohidesScrollers = true
+//    scrollView.borderType = .noBorder
+//    scrollView.translatesAutoresizingMaskIntoConstraints = false
+//    scrollView.drawsBackground = false
+//    
+//    NSLayoutConstraint.activate([
+//      scrollView.topAnchor.constraint(equalTo: .),
+//      scrollView.leadingAnchor.constraint(equalTo: leadingAnchor),
+//      scrollView.trailingAnchor.constraint(equalTo: trailingAnchor),
+//      scrollView.bottomAnchor.constraint(equalTo: bottomAnchor)
+//    ])
+//    
+//  }
+//}

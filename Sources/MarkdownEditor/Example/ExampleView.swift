@@ -16,13 +16,18 @@ struct ExampleView: View {
   
   var body: some View {
     VStack {
-      MarkdownEditor(
-        text: $text,
-        metrics: { metrics in
-        self.editorMetrics = metrics
-      }, editorHeight: { height in
-        self.editorHeight = height
-      })
+      ScrollView {
+        MarkdownEditor(
+          text: $text,
+          metrics: { metrics in
+          self.editorMetrics = metrics
+        }, editorHeight: { height in
+          self.editorHeight = height
+        })
+        .frame(height: self.editorHeight, alignment: .top)
+        .border(Color.green.opacity(0.3))
+        
+      }
       
       Text(self.editorMetrics)
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -34,7 +39,6 @@ struct ExampleView: View {
     .background(.black.opacity(0.5))
     .background(.purple.opacity(0.1))
     .frame(width: 400, height: 700)
-    .border(Color.green.opacity(0.3))
   }
 }
 

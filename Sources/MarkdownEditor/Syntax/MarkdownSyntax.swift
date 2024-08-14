@@ -149,7 +149,45 @@ public enum MarkdownSyntax: Identifiable, Equatable, Hashable, Sendable {
     }
   }
   
-  public static let regexPatterns: [MarkdownSyntax: NSRegularExpression] = {
+  public static let regexPatterns: [MarkdownSyntax: Regex<AnyRegexOutput>] = {
+    
+    var patterns = [MarkdownSyntax: Regex<AnyRegexOutput>]()
+    
+    patterns[.inlineCode] = try! Regex("`([^`\n]+?)`")
+//    patterns[.h1] = try! NSRegularExpression(pattern: "^#\\s.*$", options: [.anchorsMatchLines])
+//    patterns[.h2] = try! NSRegularExpression(pattern: "^##\\s.*$", options: [.anchorsMatchLines])
+//    patterns[.h3] = try! NSRegularExpression(pattern: "^###\\s.*$", options: [.anchorsMatchLines])
+//    
+//    patterns[.boldItalic] = try! NSRegularExpression(pattern: "\\*\\*\\*(.+?)\\*\\*\\*", options: [])
+//    patterns[.boldItalicAlt] = try! NSRegularExpression(pattern: "___(.+?)___", options: [])
+//    
+//    patterns[.bold] = try! NSRegularExpression(pattern: "(?<!\\*)\\*\\*(?!\\*)(.+?)(?<!\\*)\\*\\*(?!\\*)", options: [])
+//    patterns[.boldAlt] = try! NSRegularExpression(pattern: "(?<!_)__(?!_)(.+?)(?<!_)__(?!_)", options: [])
+//    
+//    patterns[.italic] = try! NSRegularExpression(pattern: "(?<!\\*)\\*(?!\\*)(.+?)(?<!\\*)\\*(?!\\*)", options: [])
+//    patterns[.italicAlt] = try! NSRegularExpression(pattern: "(?<!_)_(?!_)(.+?)(?<!_)_(?!_)", options: [])
+//    
+//    
+//    
+//    patterns[.strikethrough] = try! NSRegularExpression(pattern: "(~)((?!\\1).)+\\1", options: [.anchorsMatchLines])
+//    patterns[.highlight] = try! NSRegularExpression(pattern: "(==)((?!\\1).)+?\\1", options: [.anchorsMatchLines])
+//    
+//    patterns[.inlineCode] = try! NSRegularExpression(pattern: "`([^`\n]+?)`", options: [])
+//    
+//    patterns[.codeBlock] = try! NSRegularExpression(pattern: "^```(\\w+)?[\\s\\S]*?```$", options: [.anchorsMatchLines])
+//    patterns[.quoteBlock] = try! NSRegularExpression(pattern: "^>.*", options: [.anchorsMatchLines])
+//    
+//    patterns[.link] = try! NSRegularExpression(pattern: "!?\\[([^\\[\\]]*)\\]\\((.*?)\\)", options: [])
+//    patterns[.image] = try! NSRegularExpression(pattern: "!?\\[([^\\[\\]]*)\\]\\((.*?)\\)", options: [])
+    
+    return patterns
+  }()
+  
+  public var regex: Regex<AnyRegexOutput> {
+    return MarkdownSyntax.regexPatterns[self]!
+  }
+  
+  public static let nsRegexPatterns: [MarkdownSyntax: NSRegularExpression] = {
     
     var patterns = [MarkdownSyntax: NSRegularExpression]()
     
@@ -182,8 +220,8 @@ public enum MarkdownSyntax: Identifiable, Equatable, Hashable, Sendable {
     return patterns
   }()
   
-  public var regex: NSRegularExpression {
-    return MarkdownSyntax.regexPatterns[self]!
+  public var nsRegex: NSRegularExpression {
+    return MarkdownSyntax.nsRegexPatterns[self]!
   }
   
   public var isWrappable: Bool {

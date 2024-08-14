@@ -9,10 +9,53 @@ import SwiftUI
 import STTextKitPlus
 
 
+extension Notification.Name {
+  static let metricsDidChange = Notification.Name("metricsDidChange")
+}
+
+
+extension MarkdownTextView: NSTextContentStorageDelegate {
+  
+  
+  
+  public func textContentStorage(_ textContentStorage: NSTextContentStorage, textParagraphWith range: NSRange) -> NSTextParagraph? {
+    guard let attributedString = textContentStorage.attributedString else { return nil }
+    
+    let paragraphString = attributedString.attributedSubstring(from: range)
+    let inlineCodeRanges = findInlineCodeRanges(in: paragraphString)
+    
+    if !inlineCodeRanges.isEmpty {
+      let textRange = textContentStorage.textRange(for: range)
+      return MarkdownParagraph(attributedString: paragraphString, textContentManager: textContentStorage, elementRange: textRange, inlineCodeRanges: inlineCodeRanges)
+    }
+    
+    return nil
+  }
+  
+  private func findInlineCodeRanges(in attributedString: NSAttributedString) -> [NSRange] {
+    let fullRange = NSRange(location: 0, length: attributedString.length)
+    let regex = try! NSRegularExpression(pattern: "`[^`\n]+`")
+    let matches = regex.matches(in: attributedString.string, options: [], range: fullRange)
+    return matches.map { $0.range }
+  }
+}
+
+extension MarkdownTextView: NSTextLayoutManagerDelegate {
+  public func textLayoutManager(_ textLayoutManager: NSTextLayoutManager, textLayoutFragmentFor location: NSTextLocation, in textElement: NSTextElement) -> NSTextLayoutFragment {
+    if let markdownParagraph = textElement as? MarkdownParagraph {
+      return InlineCodeLayoutFragment(textElement: markdownParagraph, range: markdownParagraph.elementRange)
+    }
+    return NSTextLayoutFragment(textElement: textElement, range: textElement.elementRange)
+  }
+}
+
+
 
 public class MarkdownTextView: NSTextView {
   
+  var inlineCodeElements: [InlineCodeElement] = []
   
+  var editorMetrics: String = ""
   
   public typealias OnEvent = (_ event: NSEvent, _ action: () -> Void) -> Void
   
@@ -23,7 +66,7 @@ public class MarkdownTextView: NSTextView {
   public var onFlagsChanged: OnEvent = { $1() }
   public var onMouseDown: OnEvent = { $1() }
   
-  let parser: MarkdownParser
+  //  let parser: MarkdownParser
   
   
   
@@ -34,35 +77,28 @@ public class MarkdownTextView: NSTextView {
   public var continuousSelectionNotifications: Bool = false
   
   public override init(
-    frame frameRect: NSRect,
-    textContainer container: NSTextContainer?
+    frame frameRect: NSRect = .zero,
+    textContainer container: NSTextContainer? = nil
   ) {
-    let effectiveContainer = container ?? NSTextContainer()
+    //    self.parser = MarkdownParser()
     
-    self.parser = MarkdownParser()
+    let container = NSTextContainer()
     
-    if effectiveContainer.textLayoutManager == nil {
-      let textLayoutManager = NSTextLayoutManager()
-      
-      textLayoutManager.textContainer = effectiveContainer
-      
-      let textContentStorage = NSTextContentStorage()
-      
-      textContentStorage.addTextLayoutManager(textLayoutManager)
-      textContentStorage.primaryTextLayoutManager = textLayoutManager
-      
-    }
+    let textLayoutManager = MarkdownLayoutManager()
     
-    super.init(frame: frameRect, textContainer: effectiveContainer)
+    textLayoutManager.textContainer = container
+    
+    let textContentStorage = MarkdownContentStorage()
+    
+    textContentStorage.addTextLayoutManager(textLayoutManager)
+    textContentStorage.primaryTextLayoutManager = textLayoutManager
+    
+    super.init(frame: frameRect, textContainer: container)
     
     self.textViewSetup()
     
-    self.parser.text = self.string
+    //    self.parser.text = self.string
     
-  }
-  
-  public convenience init() {
-    self.init(frame: .zero, textContainer: nil)
   }
   
   @available(*, unavailable)
@@ -70,9 +106,37 @@ public class MarkdownTextView: NSTextView {
     fatalError("init(coder:) has not been implemented")
   }
   
+  
+  //
+  //  func parseInlineCode() {
+  //    guard let textContentManager = self.textLayoutManager?.textContentManager else { return }
+  //
+  //    inlineCodeElements.removeAll()
+  //
+  ////    let fullRange = NSRange(location: 0, length: string.utf16.count)
+  //    let regex = MarkdownSyntax.inlineCode.regex
+  //
+  //    regex.
+  //
+  //    regex.enumerateMatches(in: string, options: [], range: fullRange) { match, _, _ in
+  //      if let matchRange = match?.range {
+  //        let element = InlineCodeElement(range: matchRange)
+  //        inlineCodeElements.append(element)
+  //
+  //        textContentManager.performEditingTransaction {
+  //          textContentManager.addTextElement(element, for: NSTextRange(matchRange, in: textContentManager))
+  //        }
+  //      }
+  //    }
+  //
+  //    print("Found \(inlineCodeElements.count) inline code elements")
+  //  }
+  //
+  //
+  
+  
   public override var layoutManager: NSLayoutManager? {
     assertionFailure("TextKit 1 is not supported by this type")
-    
     return nil
   }
   
@@ -81,41 +145,52 @@ public class MarkdownTextView: NSTextView {
     textLayoutManager?.usageBoundsForTextContainer.size ?? .zero
   }
   
-  private func textViewSetup() {
+  func assembleMetrics() {
+    guard let documentRange = self.textLayoutManager?.documentRange else { return }
     
-    self.smartInsertDeleteEnabled = false
-    self.autoresizingMask = .width
-    self.textContainer?.widthTracksTextView = true
-    self.textContainer?.heightTracksTextView = false
-    self.drawsBackground = false
-    self.isHorizontallyResizable = false
-    self.isVerticallyResizable = true
-    self.allowsUndo = true
-    self.isRichText = false
-    self.textContainer?.lineFragmentPadding = 30
-    self.textContainerInset = NSSize(width: 0, height: 30)
-    self.font = NSFont.systemFont(ofSize: 15, weight: .regular)
-    self.textColor = NSColor.textColor
-//    self.textContainerInset = CGSize(width: 5.0, height: 5.0)
+    var textElementCount: Int = 0
+    
+    textLayoutManager?.textContentManager?.enumerateTextElements(from: documentRange.location, using: { _ in
+      textElementCount += 1
+      return true
+    })
+    
+//    DispatchQueue.main.async {
+      self.editorMetrics = """
+      Editor height: \(self.intrinsicContentSize.height.description)
+      Character count: \(self.string.count)
+      Text elements: \(textElementCount.description)
+      Document range: \(documentRange.description)
+      """
+//    }
+    NotificationCenter.default.post(name: .metricsDidChange, object: self)
+    
   }
-  
   
 }
 
 extension MarkdownTextView {
-  open override func keyDown(with event: NSEvent) {
+  
+  public override func didChangeText() {
+    super.didChangeText()
+    assembleMetrics()
+    //    parseInlineCode()
+    
+  }
+  
+  public override func keyDown(with event: NSEvent) {
     onKeyDown(event) {
       super.keyDown(with: event)
     }
   }
   
-  open override func flagsChanged(with event: NSEvent) {
+  public override func flagsChanged(with event: NSEvent) {
     onFlagsChanged(event) {
       super.flagsChanged(with: event)
     }
   }
   
-  open override func mouseDown(with event: NSEvent) {
+  public override func mouseDown(with event: NSEvent) {
     onMouseDown(event) {
       super.mouseDown(with: event)
     }
