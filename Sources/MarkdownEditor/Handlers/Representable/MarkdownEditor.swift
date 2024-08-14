@@ -12,11 +12,12 @@
 import SwiftUI
 import OSLog
 
-public typealias TextInfo = (_ info: EditorInfo.Text) -> Void
-public typealias SelectionInfo = (_ info: EditorInfo.Selection) -> Void
-public typealias EditorHeight = (_ height: CGFloat) -> Void
 
 public struct MarkdownEditor: NSViewRepresentable {
+  
+  public typealias TextInfo = (_ info: EditorInfo.Text) -> Void
+  public typealias SelectionInfo = (_ info: EditorInfo.Selection) -> Void
+  public typealias EditorHeight = (_ height: CGFloat) -> Void
   
   @Binding var text: String
   var isShowingFrames: Bool

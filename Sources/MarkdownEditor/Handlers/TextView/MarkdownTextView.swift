@@ -42,9 +42,9 @@ public class MarkdownTextView: NSTextView {
   public var onMouseDown: OnEvent = { $1() }
   
 
-  public var onTextChange: TextInfo = { _ in }
-  public var onSelectionChange: SelectionInfo = { _ in }
-  public var onEditorHeightChange: EditorHeight = { _ in }
+  public var onTextChange: MarkdownEditor.TextInfo = { _ in }
+  public var onSelectionChange: MarkdownEditor.SelectionInfo = { _ in }
+  public var onEditorHeightChange: MarkdownEditor.EditorHeight = { _ in }
   
   
   //  let parser: MarkdownParser

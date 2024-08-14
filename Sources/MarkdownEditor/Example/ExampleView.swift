@@ -10,14 +10,14 @@ import SwiftUI
 
 struct ExampleView: View {
   
-  @State private var text: String = Self.shortSample
+  @State private var text: String = Self.exampleMarkdown
   @State private var textInfo: EditorInfo.Text? = nil
   @State private var selectionInfo: EditorInfo.Selection? = nil
   @State private var editorHeight: CGFloat = .zero
   
   var body: some View {
-    VStack {
-      
+    
+    ScrollView(.vertical) {
       MarkdownEditor(
         text: $text,
         isShowingFrames: true,
@@ -25,27 +25,31 @@ struct ExampleView: View {
         selectionInfo: { self.selectionInfo = $0 },
         editorHeight: { self.editorHeight = $0 }
       )
-      .frame(height: self.editorHeight)
-      .frame(maxWidth: .infinity, maxHeight: .infinity)
-
-      HStack {
-        Text(self.selectionInfo?.summary ?? "nil")
-        Spacer()
-        Text(self.textInfo?.summary ?? "nil")
-      }
-      .frame(maxWidth: .infinity, alignment: .leading)
-      .padding(.horizontal, 30)
-      .padding(.top, 10)
-      .padding(.bottom, 14)
-      .background(.black.opacity(0.5))
+      .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
+      //        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
-    .overlay(alignment: .top) {
-      Text("Editor height indicator")
-        .foregroundStyle(Color.green.opacity(0.3))
-        .frame(height: self.editorHeight + 20)
-        .frame(maxWidth: .infinity)
-        .border(Color.green.opacity(0.3))
-        .allowsHitTesting(false)
+    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
+    
+//    
+//    VStack(spacing: 0) {
+//      
+//      Spacer()
+//      
+//      
+//
+//      HStack {
+//        Text(self.selectionInfo?.summary ?? "nil")
+//        Spacer()
+//        Text(self.textInfo?.summary ?? "nil")
+//      }
+//      .frame(maxWidth: .infinity, alignment: .leading)
+//      .padding(.horizontal, 30)
+//      .padding(.top, 10)
+//      .padding(.bottom, 14)
+//      .background(.black.opacity(0.5))
+//    }
+    .overlay {
+      Text(self.editorHeight.description)
     }
     .background(.black.opacity(0.5))
     .background(.purple.opacity(0.1))
