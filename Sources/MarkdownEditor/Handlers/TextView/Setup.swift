@@ -11,9 +11,10 @@ import SwiftUI
 extension MarkdownTextView {
   func textViewSetup() {
     
+    self.autoresizingMask = [.width, .height]
     self.isEditable = true
     self.smartInsertDeleteEnabled = false
-    self.autoresizingMask = .width
+//    self.autoresizingMask = .width
     self.textContainer?.widthTracksTextView = true
     self.textContainer?.heightTracksTextView = false
     self.drawsBackground = false

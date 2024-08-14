@@ -20,15 +20,15 @@ let package = Package(
 //            .package(url: "https://github.com/raspu/Highlightr.git", from: "2.1.2"),
 //            .package(url: "https://github.com/ChimeHQ/Rearrange.git", from: "1.8.1"),
             .package(url: "https://github.com/krzyzanowskim/STTextKitPlus.git", from: "0.1.4"),
-            .package(name: "Styles", path: "../Styles"),
-            .package(name: "Networking", path: "../Networking"),
-            .package(name: "Helpers", path: "../Helpers")
+//            .package(name: "Styles", path: "../Styles"),
+//            .package(name: "Networking", path: "../Networking"),
+//            .package(name: "Helpers", path: "../Helpers")
             
         ],
     targets: [
         .target(
             name: "MarkdownEditor",
-            dependencies: ["Helpers", "Styles", "Networking", "STTextKitPlus"]
+            dependencies: ["STTextKitPlus"]
         ),
 //        .target(
 //          name: "Syntax",

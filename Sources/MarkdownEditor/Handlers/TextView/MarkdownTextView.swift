@@ -10,11 +10,14 @@ import STTextKitPlus
 
 
 public class MarkdownTextView: NSTextView {
-
+  
+  private var viewportLayoutController: NSTextViewportLayoutController?
+  private var viewportDelegate: CustomViewportDelegate?
+  
   var isShowingFrames: Bool
   var textInsets: CGFloat
   
-//  var inlineCodeElements: [InlineCodeElement] = []
+  //  var inlineCodeElements: [InlineCodeElement] = []
   
   var markdownBlocks: [MarkdownBlock] = []
   
@@ -160,27 +163,114 @@ extension MarkdownTextView {
     
     return height
   }
-//
-//  func updateEditorHeight() {
-//    
-////    let height = textLayoutManager?.textContainer?.size.height ?? .zero
-//    
-//    self.editorHeight = 200
-//    
-//    
-////        self.invalidateIntrinsicContentSize()
-//    //    self.needsLayout = true
-//    //    self.needsDisplay = true
-//    
-//  }
-//  
-//  
+  
+  func countCodeBlocks() {
+    //    guard let self.textLayoutManager
+    
+    
+  }
+  
+  private func setupViewportLayoutController() {
+    guard let textLayoutManager = self.textLayoutManager else { return }
+    
+    viewportDelegate = CustomViewportDelegate()
+    viewportDelegate?.textView = self
+    
+    viewportLayoutController = NSTextViewportLayoutController(textLayoutManager: textLayoutManager)
+    viewportLayoutController?.delegate = viewportDelegate
+    
+    // Set the initial viewport
+    //    viewportLayoutController?.viewportRange = self.visibleRange
+  }
+  
+  //  private func updateViewport() {
+  //    viewportLayoutController?.viewportRange = self.visibleRange
+  //  }
+  
+  public override func scrollWheel(with event: NSEvent) {
+    super.scrollWheel(with: event)
+    //    updateViewport()
+  }
+  
+  func testStyles() {
+    
+    guard let tlm = self.textLayoutManager,
+          let tcm = tlm.textContentManager,
+          let tcs = self.textContentStorage
+            //          let visible = tlm.textViewportLayoutController.viewportRange
+    else { return }
+    
+    let testAttrs: [NSAttributedString.Key: Any] = [
+      .foregroundColor: NSColor.yellow
+    ]
+    
+    let documentRange = tlm.documentRange
+    
+    let nsRange = NSRange(documentRange, in: tcm)
+    
+    //    guard let fullString = tcs.attributedString(in: documentRange)?.string else { return }
+    
+    tcm.performEditingTransaction {
+      
+      
+      
+      var ranges: [NSTextRange] = []
+      
+      for match in self.string.matches(of: Markdown.Syntax.inlineCode.regex) {
+        
+        // Convert String.Index to integer offset
+        let startOffset = self.string.distance(from: self.string.startIndex, to: match.startIndex)
+        let endOffset = self.string.distance(from: self.string.startIndex, to: match.endIndex)
+        
+        // Use these offsets to create NSTextLocation
+        if let startLocation = tcm.location(documentRange.location, offsetBy: startOffset),
+           let endLocation = tcm.location(documentRange.location, offsetBy: endOffset),
+           let textRange = NSTextRange(location: startLocation, end: endLocation) {
+          ranges.append(textRange)
+
+        
+//        
+//        //        print(match)
+//        
+//        if let startIndex = tcm.offset(from: documentRange.location, to: match.startIndex),
+//           let endIndex = tcm.offset(from: documentRange.location, to: match.endIndex),
+//           let textRange = NSTextRange(location: startIndex, end: endIndex) {
+//          ranges.append(textRange)
+          //        }
+        }
+        
+//        tcs.textStorage?.addAttributes(testAttrs, range: nsRange)
+      }
+      
+      for range in ranges {
+        
+        tcs.textStorage?.setAttributes(testAttrs, range: nsRange)
+
+        
+      }
+      
+    }
+  }
+  
   public override func viewDidMoveToWindow() {
     super.viewDidMoveToWindow()
     self.onTextChange(calculateTextInfo())
     self.onEditorHeightChange(self.editorHeight)
-
+    
+    self.countCodeBlocks()
+    
+    setupViewportLayoutController()
+    
+    self.testStyles()
+    
   }
+  
+  public override func layout() {
+    super.layout()
+    //    updateViewport()
+  }
+  
+  
   
   public override func keyDown(with event: NSEvent) {
     onKeyDown(event) {

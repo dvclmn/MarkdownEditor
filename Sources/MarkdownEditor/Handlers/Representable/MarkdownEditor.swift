@@ -74,6 +74,7 @@ public struct MarkdownEditor: NSViewRepresentable {
   
   public func updateNSView(_ textView: MarkdownTextView, context: Context) {
     
+    
     context.coordinator.parent = self
     
 //    let textView = scrollView.documentView as! MarkdownTextView

@@ -7,8 +7,6 @@
 
 import SwiftUI
 
-import Shortcuts
-
 
 extension MarkdownEditor {
   

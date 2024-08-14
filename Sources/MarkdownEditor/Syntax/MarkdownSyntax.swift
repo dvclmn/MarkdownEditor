@@ -113,11 +113,17 @@ extension Markdown {
       }
     }
     
-    public static let regexPatterns: [Markdown.Syntax: Regex<AnyRegexOutput>] = {
+    public static let regexPatterns: [Markdown.Syntax: Regex<Substring>] = {
       
-      var patterns = [Markdown.Syntax: Regex<AnyRegexOutput>]()
+      var patterns = [Markdown.Syntax: Regex<Substring>]()
       
-      patterns[.inlineCode] = try! Regex("`([^`\n]+?)`")
+      patterns[.inlineCode] = /`[^`\n]+?`/
+      patterns[.codeBlock] = /^```\w*[\s\S]*?```$/
+      
+
+//      patterns[.inlineCode] = try! Regex("`([^`\n]+?)`")
+//      patterns[.codeBlock] = try! Regex("^```(\\w+)?[\\s\\S]*?```$")
+      
   //    patterns[.h1] = try! NSRegularExpression(pattern: "^#\\s.*$", options: [.anchorsMatchLines])
   //    patterns[.h2] = try! NSRegularExpression(pattern: "^##\\s.*$", options: [.anchorsMatchLines])
   //    patterns[.h3] = try! NSRegularExpression(pattern: "^###\\s.*$", options: [.anchorsMatchLines])
@@ -147,7 +153,7 @@ extension Markdown {
       return patterns
     }()
     
-    public var regex: Regex<AnyRegexOutput> {
+    public var regex: Regex<Substring> {
       return Markdown.Syntax.regexPatterns[self]!
     }
     

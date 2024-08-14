@@ -55,7 +55,7 @@ struct ExampleView: View {
     }
     .background(.black.opacity(0.5))
     .background(.purple.opacity(0.1))
-    .frame(width: 400, height: 700)
+    .frame(width: 400, height: 500)
   }
 }
 
