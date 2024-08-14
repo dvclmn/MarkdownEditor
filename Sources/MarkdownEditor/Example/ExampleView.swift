@@ -11,25 +11,24 @@ import SwiftUI
 struct ExampleView: View {
   
   @State private var text: String = Self.exampleMarkdown
-  @State private var editorMetrics: String = "nil"
-  @State private var editorHeight: CGFloat = .zero
+  @State private var textInfo: EditorInfo.Text? = nil
+  @State private var selectionInfo: EditorInfo.Selection? = nil
+
   
   var body: some View {
     VStack {
       ScrollView {
         MarkdownEditor(
           text: $text,
-          metrics: { metrics in
-          self.editorMetrics = metrics
-        }, editorHeight: { height in
-          self.editorHeight = height
-        })
-        .frame(height: self.editorHeight, alignment: .top)
+          textInfo: { self.textInfo = $0 },
+          selectionInfo: { self.selectionInfo = $0 }
+        )
+        .frame(height: self.textInfo?.editorHeight, alignment: .top)
         .border(Color.green.opacity(0.3))
         
       }
       
-      Text(self.editorMetrics)
+      Text(self.selectionInfo?.summary ?? "nil")
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.horizontal, 30)
         .padding(.top, 10)

@@ -15,17 +15,24 @@ import OSLog
 public struct MarkdownEditor: NSViewRepresentable {
   
   @Binding var text: String
-  var metrics: (_ metrics: String) -> Void
-  var editorHeight: (_ height: CGFloat) -> Void
+  
+  public typealias TextInfo = (_ info: EditorInfo.Text) -> Void
+  public typealias SelectionInfo = (_ info: EditorInfo.Selection) -> Void
+  
+  var textInfo: TextInfo
+  var selectionInfo: SelectionInfo
+//  var editorHeight: (_ height: CGFloat) -> Void
   
   public init(
     text: Binding<String>,
-    metrics: @escaping (_ metrics: String) -> Void = { _ in },
-    editorHeight: @escaping (_ height: CGFloat) -> Void = { _ in }
+    textInfo: @escaping TextInfo = { _ in },
+    selectionInfo: @escaping SelectionInfo = { _ in }
+//    editorHeight: @escaping (_ height: CGFloat) -> Void = { _ in }
   ) {
     self._text = text
-    self.metrics = metrics
-    self.editorHeight = editorHeight
+    self.textInfo = textInfo
+    self.selectionInfo = selectionInfo
+//    self.editorHeight = editorHeight
   }
   
   public func makeNSView(context: Context) -> MarkdownTextView {
@@ -33,9 +40,18 @@ public struct MarkdownEditor: NSViewRepresentable {
     let textView = MarkdownTextView()
     textView.delegate = context.coordinator
     
-    self.sendOutMetrics(for: textView)
-    self.sendOutEditorHeight(for: textView)
+    textView.onSelectionChange = { info in
+      DispatchQueue.main.async {
+        self.selectionInfo(info)
+      }
+    }
     
+    textView.onTextChange = { info in
+      DispatchQueue.main.async {
+        self.textInfo(info)
+      }
+    }
+
     return textView
   }
   
@@ -45,8 +61,6 @@ public struct MarkdownEditor: NSViewRepresentable {
     
     if textView.string != self.text {
       textView.string = self.text
-      
-      self.sendOutMetrics(for: textView)
       
     }
     
@@ -75,139 +89,7 @@ public struct MarkdownEditor: NSViewRepresentable {
     context.coordinator.updatingNSView = false
   }
   
-  @MainActor
-  private func sendOutEditorHeight(for textView: MarkdownTextView) {
-    DispatchQueue.main.async {
-      let height = textView.intrinsicContentSize.height + 80
-      textView.invalidateIntrinsicContentSize()
-      self.editorHeight(height)
-    }
-  }
-  
-  @MainActor
-  private func sendOutMetrics(for textView: MarkdownTextView) {
-    
-    DispatchQueue.main.async {
-      
-      self.metrics(textView.editorMetrics)
-      
-    }
-    //    let exampleSyntax = MarkdownSyntax.inlineCode
-    //
-    //    guard let documentRange = textView.textLayoutManager?.documentRange else { return }
-    //
-    //    var textElementCount: Int = 0
-    //
-    //    textView.textLayoutManager?.textContentManager?.enumerateTextElements(from: documentRange.location, using: { _ in
-    //      textElementCount += 1
-    //      return true
-    //    })
-    //
-    //    DispatchQueue.main.async {
-    //
-    //      let finalMetrics: String = """
-    //      Editor height: \(textView.intrinsicContentSize.height.description)
-    //      Character count: \(textView.string.count)
-    //      Text elements: \(textElementCount.description)
-    //      Document range: \(documentRange.description)
-    //      """
-    //
-    //      self.metrics(finalMetrics)
-    //    }
-  }
-  
   public func makeCoordinator() -> Coordinator {
     Coordinator(self)
   }
-  
-  
 }
-
-public extension MarkdownEditor {
-  final class Coordinator: NSObject, NSTextViewDelegate, NSTextContentStorageDelegate {
-    var parent: MarkdownEditor
-    var selectedRanges: [NSValue] = []
-    var updatingNSView = false
-    
-    init(_ parent: MarkdownEditor) {
-      self.parent = parent
-    }
-    
-    //
-    @MainActor public func textDidChange(_ notification: Notification) {
-      
-      guard let textView = notification.object as? MarkdownTextView,
-            !updatingNSView
-      else { return }
-      
-      self.parent.text = textView.string
-      self.parent.sendOutMetrics(for: textView)
-      
-      //      if self.parent.text != textView.string {
-      //        parent.text = textView.string
-      //      }
-      //      if self.selectedRanges != textView.selectedRanges {
-      //        self.selectedRanges = textView.selectedRanges
-      //      }
-      //
-      //      self.parent.sendOutEditorHeight(for: nsView)
-      //      self.parent.sendOutMetrics(for: nsView)
-      
-      
-      
-    }
-    
-    //    @objc func metricsDidChange(_ notification: Notification) {
-    //      guard let textView = notification.object as? MarkdownTextView,
-    //            let nsView = textView.superview as? MarkdownView else { return }
-    //
-    //      nsView.editorMetrics = textView.editorMetrics
-    //      parent.metrics(nsView.editorMetrics)
-    //    }
-    
-    
-    
-    //
-    @MainActor
-    public func textViewDidChangeSelection(_ notification: Notification) {
-      guard let textView = notification.object as? MarkdownTextView,
-            !updatingNSView
-      else { return }
-      
-      selectedRanges = textView.selectedRanges
-      
-      
-    }
-    //
-    //    @MainActor
-    //    public func textDidEndEditing(_ notification: Notification) {
-    //      guard let textView = notification.object as? NSTextView else {
-    //        return
-    //      }
-    //
-    //      parent.text = textView.string
-    //      parent.onCommit()
-    //    }
-  }
-}
-
-
-//extension MarkdownEditor {
-//  func setupScrollView(for scrollView: NSScrollView) {
-//    
-//    scrollView.hasVerticalScroller = true
-//    scrollView.hasHorizontalScroller = false
-//    scrollView.autohidesScrollers = true
-//    scrollView.borderType = .noBorder
-//    scrollView.translatesAutoresizingMaskIntoConstraints = false
-//    scrollView.drawsBackground = false
-//    
-//    NSLayoutConstraint.activate([
-//      scrollView.topAnchor.constraint(equalTo: .),
-//      scrollView.leadingAnchor.constraint(equalTo: leadingAnchor),
-//      scrollView.trailingAnchor.constraint(equalTo: trailingAnchor),
-//      scrollView.bottomAnchor.constraint(equalTo: bottomAnchor)
-//    ])
-//    
-//  }
-//}
