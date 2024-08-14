@@ -31,7 +31,7 @@ public class MarkdownTextView: NSTextView {
   public var onTextChange: TextChangeHandler = { _ in }
   
   //  let parser: MarkdownParser
-
+  
   /// Deliver `NSTextView.didChangeSelectionNotification` for all selection changes.
   ///
   /// See the documenation for `setSelectedRanges(_:affinity:stillSelecting:)` for details.
@@ -106,27 +106,27 @@ public class MarkdownTextView: NSTextView {
     textLayoutManager?.usageBoundsForTextContainer.size ?? .zero
   }
   
-//  func assembleMetrics() {
-//    guard let documentRange = self.textLayoutManager?.documentRange else { return }
-//    
-//    var textElementCount: Int = 0
-//    
-//    textLayoutManager?.textContentManager?.enumerateTextElements(from: documentRange.location, using: { _ in
-//      textElementCount += 1
-//      return true
-//    })
-//    
-////    DispatchQueue.main.async {
-//      self.editorMetrics = """
-//      Editor height: \(self.intrinsicContentSize.height.description)
-//      Character count: \(self.string.count)
-//      Text elements: \(textElementCount.description)
-//      Document range: \(documentRange.description)
-//      """
-////    }
-//    NotificationCenter.default.post(name: .metricsDidChange, object: self)
-//    
-//  }
+  //  func assembleMetrics() {
+  //    guard let documentRange = self.textLayoutManager?.documentRange else { return }
+  //
+  //    var textElementCount: Int = 0
+  //
+  //    textLayoutManager?.textContentManager?.enumerateTextElements(from: documentRange.location, using: { _ in
+  //      textElementCount += 1
+  //      return true
+  //    })
+  //
+  ////    DispatchQueue.main.async {
+  //      self.editorMetrics = """
+  //      Editor height: \(self.intrinsicContentSize.height.description)
+  //      Character count: \(self.string.count)
+  //      Text elements: \(textElementCount.description)
+  //      Document range: \(documentRange.description)
+  //      """
+  ////    }
+  //    NotificationCenter.default.post(name: .metricsDidChange, object: self)
+  //
+  //  }
   
 }
 
@@ -158,31 +158,29 @@ public struct EditorInfo {
     let selectedRange: NSRange
     let lineNumber: Int
     let columnNumber: Int
-    let selectedText: String
     
     public var summary: String {
-            """
-            Selected Range: \(selectedRange)
-            Line: \(lineNumber), Column: \(columnNumber)
-            Selected Text: "\(selectedText)"
-            """
+      """
+      Selected Range: \(selectedRange)
+      Line: \(lineNumber), Column: \(columnNumber)
+      """
     }
     
     public static func summaryFor(selection: Selection) -> String {
       selection.summary
     }
-
-
+    
+    
   }
   
   public static func fullSummary(text: Text, selection: Selection) -> String {
-        """
-        Text Info:
-        \(text.summary)
-        
-        Selection Info:
-        \(selection.summary)
-        """
+    """
+    Text Info:
+    \(text.summary)
+    
+    Selection Info:
+    \(selection.summary)
+    """
   }
   
 }
@@ -220,13 +218,12 @@ extension MarkdownTextView {
     let lineStart = lineRange.location
     let columnNumber = selectedRange.location - lineStart + 1
     
-    let selectedText = fullString.substring(with: selectedRange)
+    //    let selectedText = fullString.substring(with: selectedRange)
     
     return EditorInfo.Selection(
       selectedRange: selectedRange,
       lineNumber: lineNumber,
-      columnNumber: columnNumber,
-      selectedText: selectedText
+      columnNumber: columnNumber
     )
   }
   
@@ -252,7 +249,7 @@ extension MarkdownTextView {
       onSelectionChange(selectionInfo)
     }
   }
-
+  
   
   
   public override func keyDown(with event: NSEvent) {

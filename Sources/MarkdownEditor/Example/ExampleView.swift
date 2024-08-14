@@ -28,7 +28,11 @@ struct ExampleView: View {
         
       }
       
-      Text(self.selectionInfo?.summary ?? "nil")
+      HStack {
+        Text(self.selectionInfo?.summary ?? "nil")
+        Spacer()
+        Text(self.textInfo?.summary ?? "nil")
+      }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.horizontal, 30)
         .padding(.top, 10)
