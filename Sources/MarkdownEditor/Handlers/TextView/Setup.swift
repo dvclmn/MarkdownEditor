@@ -21,8 +21,8 @@ extension MarkdownTextView {
     self.isVerticallyResizable = true
     self.allowsUndo = true
     self.isRichText = false
-    self.textContainer?.lineFragmentPadding = 30
-    self.textContainerInset = NSSize(width: 0, height: 30)
+    self.textContainer?.lineFragmentPadding = self.textInsets
+    self.textContainerInset = NSSize(width: 0, height: self.textInsets)
     self.font = NSFont.systemFont(ofSize: 15, weight: .regular)
     self.textColor = NSColor.textColor
   }

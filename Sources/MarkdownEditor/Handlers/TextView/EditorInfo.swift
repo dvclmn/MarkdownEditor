@@ -12,14 +12,14 @@ public struct EditorInfo {
   public struct Text {
     let editorHeight: CGFloat
     let characterCount: Int
-    let textElementCount: Int
+    let textElementCount: Int // TextElement seems to equate to a paragraph
     let documentRange: NSTextRange
     
     public var summary: String {
       """
       Editor height: \(editorHeight)
-      Character Count: \(characterCount)
-      Text Element Count: \(textElementCount)
+      Characters: \(characterCount)
+      Paragraphs: \(textElementCount)
       Document Range: \(documentRange)
       """
     }

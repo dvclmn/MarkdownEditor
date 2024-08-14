@@ -11,8 +11,22 @@ import STTextKitPlus
 
 public class MarkdownTextView: NSTextView {
   
-  var editorHeight: CGFloat = .zero
+  var editorHeight: CGFloat {
+    
+    guard let tlm = self.textLayoutManager
+    else { return .zero }
+    
+    let documentRange = tlm.documentRange
+    
+    let typographicBounds: CGFloat = tlm.typographicBounds(in: documentRange)?.height ?? .zero
+    
+    let height = (textInsets * 2) + typographicBounds
+    
+    return height
+    
+  }
   var isShowingFrames: Bool
+  var textInsets: CGFloat
   
   var inlineCodeElements: [InlineCodeElement] = []
   
@@ -27,13 +41,12 @@ public class MarkdownTextView: NSTextView {
   public var onFlagsChanged: OnEvent = { $1() }
   public var onMouseDown: OnEvent = { $1() }
   
-  public typealias TextChangeHandler = (_ textInfo: EditorInfo.Text) -> Void
-  public var onTextChange: TextChangeHandler = { _ in }
 
-  public typealias SelectionChangeHandler = (_ selectionInfo: EditorInfo.Selection) -> Void
-  public var onSelectionChange: SelectionChangeHandler = { _ in }
+  public var onTextChange: TextInfo = { _ in }
+  public var onSelectionChange: SelectionInfo = { _ in }
+  public var onEditorHeightChange: EditorHeight = { _ in }
   
-
+  
   //  let parser: MarkdownParser
   
   /// Deliver `NSTextView.didChangeSelectionNotification` for all selection changes.
@@ -42,12 +55,15 @@ public class MarkdownTextView: NSTextView {
   public var continuousSelectionNotifications: Bool = false
   
   public init(
-    frame frameRect: NSRect = .zero,
-    textContainer container: NSTextContainer? = nil,
-    isShowingFrames: Bool = false
+    frame frameRect: NSRect,
+    textContainer container: NSTextContainer?,
+    isShowingFrames: Bool,
+    textInsets: CGFloat
   ) {
     
     self.isShowingFrames = isShowingFrames
+    self.textInsets = textInsets
+    
     //    self.parser = MarkdownParser()
     
     let container = NSTextContainer()
@@ -109,10 +125,10 @@ public class MarkdownTextView: NSTextView {
   }
   
   
-//  public override var intrinsicContentSize: NSSize {
-//    textLayoutManager?.usageBoundsForTextContainer.size ?? .zero
-//  }
-//  
+  //  public override var intrinsicContentSize: NSSize {
+  //    textLayoutManager?.usageBoundsForTextContainer.size ?? .zero
+  //  }
+  //
   //  func assembleMetrics() {
   //    guard let documentRange = self.textLayoutManager?.documentRange else { return }
   //
@@ -146,41 +162,26 @@ extension Notification.Name {
 
 extension MarkdownTextView {
   
-
- 
-  public override var intrinsicContentSize: NSSize {
-    
-    guard let textLayoutManager = self.textLayoutManager,
-            let container = self.textContainer else {
-      return super.intrinsicContentSize
-    }
-//    container.containerSize = NSSize(width: self.bounds.width, height: CGFloat.greatestFiniteMagnitude)
-    textLayoutManager.ensureLayout(for: textLayoutManager.documentRange)
-    
-    let rect = textLayoutManager.usageBoundsForTextContainer
-    
-    let bufferHeight: CGFloat = self.isEditable ? 120 : 0
-    let contentSize = NSSize(width: NSView.noIntrinsicMetric, height: rect.height + bufferHeight)
-    
-//    self.editorHeight = bounds.height
-    
-    return contentSize
-  }
-  
-  func updateEditorHeight() {
-//    self.invalidateIntrinsicContentSize()
-//    self.needsLayout = true
-//    self.needsDisplay = true
-    
-    
-    
-  }
-  
-  
+//  
+//  func updateEditorHeight() {
+//    
+////    let height = textLayoutManager?.textContainer?.size.height ?? .zero
+//    
+//    self.editorHeight = 200
+//    
+//    
+////        self.invalidateIntrinsicContentSize()
+//    //    self.needsLayout = true
+//    //    self.needsDisplay = true
+//    
+//  }
+//  
+//  
   public override func viewDidMoveToWindow() {
     super.viewDidMoveToWindow()
     self.onTextChange(calculateTextInfo())
-    self.updateEditorHeight()
+    self.onEditorHeightChange(self.editorHeight)
+
   }
   
   public override func keyDown(with event: NSEvent) {

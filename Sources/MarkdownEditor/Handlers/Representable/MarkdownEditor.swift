@@ -12,67 +12,84 @@
 import SwiftUI
 import OSLog
 
+public typealias TextInfo = (_ info: EditorInfo.Text) -> Void
+public typealias SelectionInfo = (_ info: EditorInfo.Selection) -> Void
+public typealias EditorHeight = (_ height: CGFloat) -> Void
+
 public struct MarkdownEditor: NSViewRepresentable {
   
   @Binding var text: String
-  @Binding var editorHeight: CGFloat
   var isShowingFrames: Bool
-  
-  public typealias TextInfo = (_ info: EditorInfo.Text) -> Void
-  public typealias SelectionInfo = (_ info: EditorInfo.Selection) -> Void
-  
+  var textInsets: CGFloat
   var textInfo: TextInfo
   var selectionInfo: SelectionInfo
+  var editorHeight: EditorHeight
   
   public init(
     text: Binding<String>,
-    editorHeight: Binding<CGFloat>,
     isShowingFrames: Bool = false,
+    textInsets: CGFloat = 30,
     textInfo: @escaping TextInfo = { _ in },
-    selectionInfo: @escaping SelectionInfo = { _ in }
+    selectionInfo: @escaping SelectionInfo = { _ in },
+    editorHeight: @escaping EditorHeight = { _ in }
   ) {
     self._text = text
-    self._editorHeight = editorHeight
     self.isShowingFrames = isShowingFrames
+    self.textInsets = textInsets
     self.textInfo = textInfo
     self.selectionInfo = selectionInfo
+    self.editorHeight = editorHeight
   }
   
-  public func makeNSView(context: Context) -> MarkdownTextView {
+  public func makeNSView(context: Context) -> NSScrollView {
     
-    
+    let scrollView = NSScrollView()
     
     let textView = MarkdownTextView(
-      isShowingFrames: self.isShowingFrames
+      frame: .zero,
+      textContainer: nil,
+      isShowingFrames: isShowingFrames,
+      textInsets: textInsets
     )
     textView.delegate = context.coordinator
     
+    scrollView.documentView = textView
+    
     textView.onSelectionChange = { info in
-      DispatchQueue.main.async {
-        self.selectionInfo(info)
-      }
+      DispatchQueue.main.async { self.selectionInfo(info) }
     }
     
     textView.onTextChange = { info in
-      DispatchQueue.main.async {
-        self.textInfo(info)
-      }
+      DispatchQueue.main.async { self.textInfo(info) }
     }
     
-//    self.editorHeight = textView.editorHeight
+    textView.onEditorHeightChange = { height in
+      DispatchQueue.main.async { self.editorHeight(height) }
+    }
     
-    return textView
+    
+    return scrollView
   }
   
-  public func updateNSView(_ textView: MarkdownTextView, context: Context) {
+  public func updateNSView(_ scrollView: NSScrollView, context: Context) {
+    
+    context.coordinator.parent = self
+    
+    let textView = scrollView.documentView as! MarkdownTextView
     
     context.coordinator.updatingNSView = true
     
     if textView.string != self.text {
       textView.string = self.text
-//      self.editorHeight = textView.editorHeight
     }
-  
+    
+    if textView.isShowingFrames != self.isShowingFrames {
+      textView.isShowingFrames = self.isShowingFrames
+    }
+    
+    textView.needsLayout = true
+    textView.needsDisplay = true
+    
     context.coordinator.updatingNSView = false
   }
   

@@ -17,29 +17,35 @@ struct ExampleView: View {
   
   var body: some View {
     VStack {
-//      ScrollView {
-        MarkdownEditor(
-          text: $text,
-          editorHeight: $editorHeight,
-          isShowingFrames: true,
-          textInfo: { self.textInfo = $0 },
-          selectionInfo: { self.selectionInfo = $0 }
-        )
-        .frame(height: self.editorHeight, alignment: .top)
-        .border(Color.green.opacity(0.3))
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-//      }
-        .padding()
+      
+      MarkdownEditor(
+        text: $text,
+        isShowingFrames: true,
+        textInfo: { self.textInfo = $0 },
+        selectionInfo: { self.selectionInfo = $0 },
+        editorHeight: { self.editorHeight = $0 }
+      )
+      .frame(height: self.editorHeight)
+      .frame(maxWidth: .infinity, maxHeight: .infinity)
+
       HStack {
         Text(self.selectionInfo?.summary ?? "nil")
         Spacer()
         Text(self.textInfo?.summary ?? "nil")
       }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(.horizontal, 30)
-        .padding(.top, 10)
-        .padding(.bottom, 14)
-        .background(.black.opacity(0.5))
+      .frame(maxWidth: .infinity, alignment: .leading)
+      .padding(.horizontal, 30)
+      .padding(.top, 10)
+      .padding(.bottom, 14)
+      .background(.black.opacity(0.5))
+    }
+    .overlay(alignment: .top) {
+      Text("Editor height indicator")
+        .foregroundStyle(Color.green.opacity(0.3))
+        .frame(height: self.editorHeight + 20)
+        .frame(maxWidth: .infinity)
+        .border(Color.green.opacity(0.3))
+        .allowsHitTesting(false)
     }
     .background(.black.opacity(0.5))
     .background(.purple.opacity(0.1))

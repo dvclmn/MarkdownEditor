@@ -14,11 +14,12 @@ extension MarkdownTextView {
     
     if self.string != lastTextValue {
 
-      updateEditorHeight()
 
       lastTextValue = self.string
       onTextChange(calculateTextInfo())
     }
+    
+    self.onEditorHeightChange(self.editorHeight)
     
   }
   
