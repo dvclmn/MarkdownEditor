@@ -15,29 +15,36 @@ import OSLog
 public struct MarkdownEditor: NSViewRepresentable {
   
   @Binding var text: String
+  @Binding var editorHeight: CGFloat
+  var isShowingFrames: Bool
   
   public typealias TextInfo = (_ info: EditorInfo.Text) -> Void
   public typealias SelectionInfo = (_ info: EditorInfo.Selection) -> Void
   
   var textInfo: TextInfo
   var selectionInfo: SelectionInfo
-//  var editorHeight: (_ height: CGFloat) -> Void
   
   public init(
     text: Binding<String>,
+    editorHeight: Binding<CGFloat>,
+    isShowingFrames: Bool = false,
     textInfo: @escaping TextInfo = { _ in },
     selectionInfo: @escaping SelectionInfo = { _ in }
-//    editorHeight: @escaping (_ height: CGFloat) -> Void = { _ in }
   ) {
     self._text = text
+    self._editorHeight = editorHeight
+    self.isShowingFrames = isShowingFrames
     self.textInfo = textInfo
     self.selectionInfo = selectionInfo
-//    self.editorHeight = editorHeight
   }
   
   public func makeNSView(context: Context) -> MarkdownTextView {
     
-    let textView = MarkdownTextView()
+    
+    
+    let textView = MarkdownTextView(
+      isShowingFrames: self.isShowingFrames
+    )
     textView.delegate = context.coordinator
     
     textView.onSelectionChange = { info in
@@ -51,7 +58,9 @@ public struct MarkdownEditor: NSViewRepresentable {
         self.textInfo(info)
       }
     }
-
+    
+//    self.editorHeight = textView.editorHeight
+    
     return textView
   }
   
@@ -61,31 +70,9 @@ public struct MarkdownEditor: NSViewRepresentable {
     
     if textView.string != self.text {
       textView.string = self.text
-      
+//      self.editorHeight = textView.editorHeight
     }
-    
-    
-    //    let typingAttributes = textView.typingAttributes
-    //
-    //    if storage.attributedString?.string != self.text {
-    //
-    //      storage.performEditingTransaction {
-    //        storage.textStorage?.replaceCharacters(in: storage.documentRange, with: self.text)
-    //      }
-    //
-    //    }
-    
-    //    os_log("`updateNSView`. `typingAttributes`: \(typingAttributes)")
-    
-    //    let highlightedText = MarkdownEditor.getHighlightedText(
-    //      text: self.text
-    //    )
-    
-    //    nsView.attributedText = highlightedText
-    
-    //    nsView.selectedRanges = context.coordinator.selectedRanges
-    //    nsView.textView.typingAttributes = typingAttributes
-    
+  
     context.coordinator.updatingNSView = false
   }
   

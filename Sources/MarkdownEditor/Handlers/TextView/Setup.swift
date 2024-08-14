@@ -11,6 +11,7 @@ import SwiftUI
 extension MarkdownTextView {
   func textViewSetup() {
     
+    self.isEditable = true
     self.smartInsertDeleteEnabled = false
     self.autoresizingMask = .width
     self.textContainer?.widthTracksTextView = true
@@ -24,6 +25,5 @@ extension MarkdownTextView {
     self.textContainerInset = NSSize(width: 0, height: 30)
     self.font = NSFont.systemFont(ofSize: 15, weight: .regular)
     self.textColor = NSColor.textColor
-    //    self.textContainerInset = CGSize(width: 5.0, height: 5.0)
   }
 }

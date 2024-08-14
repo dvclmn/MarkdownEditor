@@ -11,25 +11,29 @@ import STTextKitPlus
 
 public class MarkdownTextView: NSTextView {
   
+  var editorHeight: CGFloat = .zero
+  var isShowingFrames: Bool
+  
   var inlineCodeElements: [InlineCodeElement] = []
   
   public typealias OnEvent = (_ event: NSEvent, _ action: () -> Void) -> Void
   
   private var activeScrollValue: (NSRange, CGSize)?
   
-  private var lastSelectionValue = [NSValue]()
-  private var lastTextValue = String()
+  var lastSelectionValue = [NSValue]()
+  var lastTextValue = String()
   
   public var onKeyDown: OnEvent = { $1() }
   public var onFlagsChanged: OnEvent = { $1() }
   public var onMouseDown: OnEvent = { $1() }
   
+  public typealias TextChangeHandler = (_ textInfo: EditorInfo.Text) -> Void
+  public var onTextChange: TextChangeHandler = { _ in }
+
   public typealias SelectionChangeHandler = (_ selectionInfo: EditorInfo.Selection) -> Void
   public var onSelectionChange: SelectionChangeHandler = { _ in }
   
-  public typealias TextChangeHandler = (_ textInfo: EditorInfo.Text) -> Void
-  public var onTextChange: TextChangeHandler = { _ in }
-  
+
   //  let parser: MarkdownParser
   
   /// Deliver `NSTextView.didChangeSelectionNotification` for all selection changes.
@@ -37,10 +41,13 @@ public class MarkdownTextView: NSTextView {
   /// See the documenation for `setSelectedRanges(_:affinity:stillSelecting:)` for details.
   public var continuousSelectionNotifications: Bool = false
   
-  public override init(
+  public init(
     frame frameRect: NSRect = .zero,
-    textContainer container: NSTextContainer? = nil
+    textContainer container: NSTextContainer? = nil,
+    isShowingFrames: Bool = false
   ) {
+    
+    self.isShowingFrames = isShowingFrames
     //    self.parser = MarkdownParser()
     
     let container = NSTextContainer()
@@ -102,10 +109,10 @@ public class MarkdownTextView: NSTextView {
   }
   
   
-  public override var intrinsicContentSize: NSSize {
-    textLayoutManager?.usageBoundsForTextContainer.size ?? .zero
-  }
-  
+//  public override var intrinsicContentSize: NSSize {
+//    textLayoutManager?.usageBoundsForTextContainer.size ?? .zero
+//  }
+//  
   //  func assembleMetrics() {
   //    guard let documentRange = self.textLayoutManager?.documentRange else { return }
   //
@@ -135,122 +142,46 @@ extension Notification.Name {
 }
 
 
-public struct EditorInfo {
-  
-  
-  public struct Text {
-    let editorHeight: CGFloat
-    let characterCount: Int
-    let textElementCount: Int
-    let documentRange: NSTextRange
-    
-    public var summary: String {
-            """
-            Editor Height: \(String(format: "%.2f", editorHeight))
-            Character Count: \(characterCount)
-            Text Element Count: \(textElementCount)
-            Document Range: \(documentRange)
-            """
-    }
-  }
-  
-  public struct Selection {
-    let selectedRange: NSRange
-    let lineNumber: Int
-    let columnNumber: Int
-    
-    public var summary: String {
-      """
-      Selected Range: \(selectedRange)
-      Line: \(lineNumber), Column: \(columnNumber)
-      """
-    }
-    
-    public static func summaryFor(selection: Selection) -> String {
-      selection.summary
-    }
-    
-    
-  }
-  
-  public static func fullSummary(text: Text, selection: Selection) -> String {
-    """
-    Text Info:
-    \(text.summary)
-    
-    Selection Info:
-    \(selection.summary)
-    """
-  }
-  
-}
-
 
 
 extension MarkdownTextView {
   
-  private func calculateTextInfo() -> EditorInfo.Text? {
+
+ 
+  public override var intrinsicContentSize: NSSize {
     
-    guard let documentRange = self.textLayoutManager?.documentRange else { return nil }
-    
-    var textElementCount: Int = 0
-    
-    textLayoutManager?.textContentManager?.enumerateTextElements(from: documentRange.location, using: { _ in
-      textElementCount += 1
-      return true
-    })
-    
-    return EditorInfo.Text(
-      editorHeight: self.intrinsicContentSize.height + 120,
-      characterCount: self.string.count,
-      textElementCount: textElementCount,
-      documentRange: documentRange
-    )
-  }
-  
-  private func calculateSelectionInfo() -> EditorInfo.Selection {
-    let selectedRange = self.selectedRange()
-    let fullString = self.string as NSString
-    let substring = fullString.substring(to: selectedRange.location)
-    let lineNumber = substring.components(separatedBy: .newlines).count
-    
-    let lineRange = fullString.lineRange(for: NSRange(location: selectedRange.location, length: 0))
-    let lineStart = lineRange.location
-    let columnNumber = selectedRange.location - lineStart + 1
-    
-    //    let selectedText = fullString.substring(with: selectedRange)
-    
-    return EditorInfo.Selection(
-      selectedRange: selectedRange,
-      lineNumber: lineNumber,
-      columnNumber: columnNumber
-    )
-  }
-  
-  
-  public override func didChangeText() {
-    super.didChangeText()
-    self.invalidateIntrinsicContentSize()
-    
-    if self.string != lastTextValue {
-      lastTextValue = self.string
-      guard let textInfo = calculateTextInfo() else { return }
-      onTextChange(textInfo)
+    guard let textLayoutManager = self.textLayoutManager,
+            let container = self.textContainer else {
+      return super.intrinsicContentSize
     }
+//    container.containerSize = NSSize(width: self.bounds.width, height: CGFloat.greatestFiniteMagnitude)
+    textLayoutManager.ensureLayout(for: textLayoutManager.documentRange)
+    
+    let rect = textLayoutManager.usageBoundsForTextContainer
+    
+    let bufferHeight: CGFloat = self.isEditable ? 120 : 0
+    let contentSize = NSSize(width: NSView.noIntrinsicMetric, height: rect.height + bufferHeight)
+    
+//    self.editorHeight = bounds.height
+    
+    return contentSize
+  }
+  
+  func updateEditorHeight() {
+//    self.invalidateIntrinsicContentSize()
+//    self.needsLayout = true
+//    self.needsDisplay = true
+    
+    
     
   }
   
-  public override func setSelectedRanges(_ ranges: [NSValue], affinity: NSSelectionAffinity, stillSelecting: Bool) {
-    super.setSelectedRanges(ranges, affinity: affinity, stillSelecting: stillSelecting)
-    
-    if ranges != lastSelectionValue {
-      lastSelectionValue = ranges
-      let selectionInfo = calculateSelectionInfo()
-      onSelectionChange(selectionInfo)
-    }
+  
+  public override func viewDidMoveToWindow() {
+    super.viewDidMoveToWindow()
+    self.onTextChange(calculateTextInfo())
+    self.updateEditorHeight()
   }
-  
-  
   
   public override func keyDown(with event: NSEvent) {
     onKeyDown(event) {
@@ -267,6 +198,18 @@ extension MarkdownTextView {
   public override func mouseDown(with event: NSEvent) {
     onMouseDown(event) {
       super.mouseDown(with: event)
+    }
+  }
+  
+  public override func draw(_ rect: NSRect) {
+    super.draw(rect)
+    
+    if isShowingFrames {
+      let border:NSBezierPath = NSBezierPath(rect: bounds)
+      let borderColor = NSColor.red.withAlphaComponent(0.08)
+      borderColor.set()
+      border.lineWidth = 1.0
+      border.fill()
     }
   }
 }

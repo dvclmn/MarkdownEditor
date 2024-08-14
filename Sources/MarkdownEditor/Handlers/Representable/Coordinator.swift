@@ -26,6 +26,7 @@ public extension MarkdownEditor {
       
       self.parent.text = textView.string
       self.selectedRanges = textView.selectedRanges
+      self.parent.editorHeight = textView.editorHeight
       
     }
     

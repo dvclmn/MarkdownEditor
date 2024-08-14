@@ -10,24 +10,26 @@ import SwiftUI
 
 struct ExampleView: View {
   
-  @State private var text: String = Self.exampleMarkdown
+  @State private var text: String = Self.shortSample
   @State private var textInfo: EditorInfo.Text? = nil
   @State private var selectionInfo: EditorInfo.Selection? = nil
-
+  @State private var editorHeight: CGFloat = .zero
   
   var body: some View {
     VStack {
-      ScrollView {
+//      ScrollView {
         MarkdownEditor(
           text: $text,
+          editorHeight: $editorHeight,
+          isShowingFrames: true,
           textInfo: { self.textInfo = $0 },
           selectionInfo: { self.selectionInfo = $0 }
         )
-        .frame(height: self.textInfo?.editorHeight, alignment: .top)
+        .frame(height: self.editorHeight, alignment: .top)
         .border(Color.green.opacity(0.3))
-        
-      }
-      
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+//      }
+        .padding()
       HStack {
         Text(self.selectionInfo?.summary ?? "nil")
         Spacer()
@@ -46,6 +48,9 @@ struct ExampleView: View {
 }
 
 extension ExampleView {
+  
+  static let shortSample: String = "This *brief* block quote, with ==text contents==, lines `advance expanding` the view in the current writing direction.ExampleView"
+  
   static let exampleMarkdown: String = """
    # Markdown samples
    ## Overview of the sample
