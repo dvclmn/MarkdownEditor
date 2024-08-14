@@ -46,9 +46,7 @@ public struct MarkdownEditor: NSViewRepresentable {
     if textView.string != self.text {
       textView.string = self.text
       
-      textView.assembleMetrics()
-      
-      //      self.sendOutMetrics(for: nsView)
+      self.sendOutMetrics(for: textView)
       
     }
     
@@ -89,9 +87,10 @@ public struct MarkdownEditor: NSViewRepresentable {
   @MainActor
   private func sendOutMetrics(for textView: MarkdownTextView) {
     
-    
     DispatchQueue.main.async {
+      
       self.metrics(textView.editorMetrics)
+      
     }
     //    let exampleSyntax = MarkdownSyntax.inlineCode
     //
@@ -141,8 +140,8 @@ public extension MarkdownEditor {
             !updatingNSView
       else { return }
       
-      parent.text = textView.string
-      textView.assembleMetrics()
+      self.parent.text = textView.string
+      self.parent.sendOutMetrics(for: textView)
       
       //      if self.parent.text != textView.string {
       //        parent.text = textView.string
