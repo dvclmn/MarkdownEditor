@@ -6,7 +6,7 @@
 //
 
 import SwiftUI
-import Syntax
+
 
 public struct MarkdownFragment {
   let syntax: MarkdownSyntax
@@ -15,8 +15,8 @@ public struct MarkdownFragment {
 }
 
 public class MarkdownParser {
-  private var elements: [MarkdownFragment] = []
-  private var visibleElements: [MarkdownFragment] = []
+  var elements: [MarkdownFragment] = []
+  var visibleElements: [MarkdownFragment] = []
   
   public var text: String {
     didSet {
@@ -30,7 +30,7 @@ public class MarkdownParser {
     }
   }
   
-  init(text: String) {
+  init(text: String = "") {
     self.text = text
     self.visibleRange = NSRange(location: 0, length: 0)
     updateElements()

@@ -12,8 +12,7 @@ let package = Package(
         .library(
             name: "MarkdownEditor",
             targets: [
-              "MarkdownEditor",
-              "Syntax"
+              "MarkdownEditor"
             ]
         )
     ],
@@ -29,15 +28,15 @@ let package = Package(
     targets: [
         .target(
             name: "MarkdownEditor",
-            dependencies: ["Helpers", "Styles", "Syntax", "Networking", "STTextKitPlus"]
+            dependencies: ["Helpers", "Styles", "Networking", "STTextKitPlus"]
         ),
-        .target(
-          name: "Syntax",
-          dependencies: []
-        ),
+//        .target(
+//          name: "Syntax",
+//          dependencies: []
+//        ),
         .testTarget(
           name: "MarkdownEditorTests",
-          dependencies: ["MarkdownEditor", "Syntax"]),
+          dependencies: ["MarkdownEditor"]),
 
     ]
 )

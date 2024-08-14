@@ -6,7 +6,7 @@
 //
 
 import SwiftUI
-import Syntax
+
 import Shortcuts
 
 

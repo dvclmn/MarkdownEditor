@@ -13,30 +13,6 @@ import STTextKitPlus
 public class MarkdownTextView: NSTextView {
   
   
-//  
-//
-//  
-//  internal func setString(_ string: Any?) {
-//    undoManager?.disableUndoRegistration()
-//    defer {
-//      undoManager?.enableUndoRegistration()
-//    }
-//    
-//    switch string {
-//      case let string as String:
-//        textView.replaceCharacters(in: textLayoutManager.documentRange, with: string)
-//      case let attributedString as NSAttributedString:
-//        textView.replaceCharacters(in: textLayoutManager.documentRange, with: attributedString)
-//      case .none:
-//        textView.replaceCharacters(in: textLayoutManager.documentRange, with: "")
-//      default:
-//        return assertionFailure()
-//    }
-//  }
-//  
-//  
-//  
-  
   
   public typealias OnEvent = (_ event: NSEvent, _ action: () -> Void) -> Void
   
@@ -46,6 +22,11 @@ public class MarkdownTextView: NSTextView {
   public var onKeyDown: OnEvent = { $1() }
   public var onFlagsChanged: OnEvent = { $1() }
   public var onMouseDown: OnEvent = { $1() }
+  
+  let parser: MarkdownParser
+  
+  
+  
   
   /// Deliver `NSTextView.didChangeSelectionNotification` for all selection changes.
   ///
@@ -57,6 +38,8 @@ public class MarkdownTextView: NSTextView {
     textContainer container: NSTextContainer?
   ) {
     let effectiveContainer = container ?? NSTextContainer()
+    
+    self.parser = MarkdownParser()
     
     if effectiveContainer.textLayoutManager == nil {
       let textLayoutManager = NSTextLayoutManager()
@@ -72,7 +55,10 @@ public class MarkdownTextView: NSTextView {
     
     super.init(frame: frameRect, textContainer: effectiveContainer)
     
-    self.textContainerInset = CGSize(width: 5.0, height: 5.0)
+    self.textViewSetup()
+    
+    self.parser.text = self.string
+    
   }
   
   public convenience init() {
@@ -89,12 +75,29 @@ public class MarkdownTextView: NSTextView {
     
     return nil
   }
-
+  
   
   public override var intrinsicContentSize: NSSize {
     textLayoutManager?.usageBoundsForTextContainer.size ?? .zero
   }
   
+  private func textViewSetup() {
+    
+    self.smartInsertDeleteEnabled = false
+    self.autoresizingMask = .width
+    self.textContainer?.widthTracksTextView = true
+    self.textContainer?.heightTracksTextView = false
+    self.drawsBackground = false
+    self.isHorizontallyResizable = false
+    self.isVerticallyResizable = true
+    self.allowsUndo = true
+    self.isRichText = false
+    self.textContainer?.lineFragmentPadding = 30
+    self.textContainerInset = NSSize(width: 0, height: 30)
+    self.font = NSFont.systemFont(ofSize: 15, weight: .regular)
+    self.textColor = NSColor.textColor
+//    self.textContainerInset = CGSize(width: 5.0, height: 5.0)
+  }
   
   
 }

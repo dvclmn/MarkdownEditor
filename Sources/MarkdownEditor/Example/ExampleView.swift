@@ -11,13 +11,30 @@ import SwiftUI
 struct ExampleView: View {
   
   @State private var text: String = Self.exampleMarkdown
+  @State private var editorMetrics: String = "nil"
+  @State private var editorHeight: CGFloat = .zero
   
   var body: some View {
-    MarkdownEditor(text: $text)
-      .background(.black.opacity(0.5))
-      .background(.purple.opacity(0.1))
-      .frame(width: 400, height: 700)
-      .border(Color.green.opacity(0.3))
+    VStack {
+      MarkdownEditor(
+        text: $text,
+        metrics: { metrics in
+        self.editorMetrics = metrics
+      }, editorHeight: { height in
+        self.editorHeight = height
+      })
+      
+      Text(self.editorMetrics)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.horizontal, 30)
+        .padding(.top, 10)
+        .padding(.bottom, 14)
+        .background(.black.opacity(0.5))
+    }
+    .background(.black.opacity(0.5))
+    .background(.purple.opacity(0.1))
+    .frame(width: 400, height: 700)
+    .border(Color.green.opacity(0.3))
   }
 }
 
@@ -51,5 +68,5 @@ extension ExampleView {
 
 #Preview {
   ExampleView()
-    
+  
 }

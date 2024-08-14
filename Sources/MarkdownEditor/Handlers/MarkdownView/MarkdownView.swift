@@ -34,9 +34,7 @@ public final class MarkdownView: NSView {
     }
   }
   
-  
 
-  
   /// The text color of the text view.
   dynamic var textColor: NSColor? {
     get {
@@ -49,28 +47,28 @@ public final class MarkdownView: NSView {
   }
   
   /// Sets the text color of characters within the specified range to the specified color.
-  func setTextColor(_ color: NSColor?, range: NSRange) {
-    if let color {
-      addAttributes([.foregroundColor: color], range: range)
-    } else {
-      removeAttribute(.foregroundColor, range: range)
-    }
-  }
+//  func setTextColor(_ color: NSColor?, range: NSRange) {
+//    if let color {
+//      addAttributes([.foregroundColor: color], range: range)
+//    } else {
+//      removeAttribute(.foregroundColor, range: range)
+//    }
+//  }
   
   /// The receiver’s default paragraph style.
-  dynamic public var defaultParagraphStyle: NSParagraphStyle? {
-    didSet {
-      textView.typingAttributes[.paragraphStyle] = defaultParagraphStyle ?? .default
-    }
-  }
-  
-  var defaultTypingAttributes: [NSAttributedString.Key: Any] {
-    [
-      .paragraphStyle: self.defaultParagraphStyle ?? NSParagraphStyle.default,
-      .font: NSFont.userFont(ofSize: 0) ?? .preferredFont(forTextStyle: .body),
-      .foregroundColor: NSColor.textColor
-    ]
-  }
+//  dynamic public var defaultParagraphStyle: NSParagraphStyle? {
+//    didSet {
+//      textView.typingAttributes[.paragraphStyle] = defaultParagraphStyle ?? .default
+//    }
+//  }
+//  
+//  var defaultTypingAttributes: [NSAttributedString.Key: Any] {
+//    [
+//      .paragraphStyle: self.defaultParagraphStyle ?? NSParagraphStyle.default,
+//      .font: NSFont.userFont(ofSize: 0) ?? .preferredFont(forTextStyle: .body),
+//      .foregroundColor: NSColor.textColor
+//    ]
+//  }
   
   
   
@@ -145,7 +143,6 @@ public final class MarkdownView: NSView {
   init(
     
   ) {
-    
     textView = MarkdownTextView()
     super.init(frame: .zero)
     
@@ -167,6 +164,7 @@ public final class MarkdownView: NSView {
     addSubview(scrollView)
     scrollView.translatesAutoresizingMaskIntoConstraints = false
     scrollView.documentView = textView
+    scrollView.drawsBackground = false
     
     NSLayoutConstraint.activate([
       scrollView.topAnchor.constraint(equalTo: topAnchor),
@@ -175,18 +173,7 @@ public final class MarkdownView: NSView {
       scrollView.bottomAnchor.constraint(equalTo: bottomAnchor)
     ])
     
-    /// Text view
-    ///
-    textView.autoresizingMask = .width
-    textView.backgroundColor = NSColor.textBackgroundColor
-    textView.drawsBackground = false
-    textView.isHorizontallyResizable = false
-    textView.isVerticallyResizable = true
-    textView.maxSize = NSSize(width: CGFloat.greatestFiniteMagnitude, height: CGFloat.greatestFiniteMagnitude)
-    textView.allowsUndo = true
-    textView.isRichText = false
-    textView.textContainer?.lineFragmentPadding = 30
-    textView.textContainerInset = NSSize(width: 0, height: 30)
+
   }
   
   
@@ -196,6 +183,7 @@ public final class MarkdownView: NSView {
     super.viewWillDraw()
     setupViews()
     self.editorHeight = self.textView.intrinsicContentSize.height
+    
   }
   
 }
