@@ -29,22 +29,18 @@ extension MarkdownTextView {
     } else {
       stopTimer()
     }
-    
-    //    Task { @MainActor in
-    //      if window != nil {
-    //        await scrollOffsetMonitor.startMonitoring(for: self)
-    //      } else {
-    //        await scrollOffsetMonitor.stopMonitoring()
-    //      }
-    //    }
-    
+
   }
   
+
   func startTimer() {
     Task { @MainActor in
       await timerActor.startTimer(interval: 0.2) { [weak self] count in
         
-        self?.onTimerTick?(count)
+        let info = EditorInfo.Scroll(
+          summary: count.description
+        )
+        self?.onScrollChange(info)
         
       }
     }
@@ -55,32 +51,6 @@ extension MarkdownTextView {
       await timerActor.stopTimer()
     }
   }
-  
-  
-  //  @MainActor
-  //  func startTimer() {
-  //    timer?.invalidate() // Stop any existing timer
-  //    timer = Timer.scheduledTimer(withTimeInterval: 0.2, repeats: true) { [weak self] _ in
-  //      guard let self = self else { return }
-  //      self.tickCount += 1
-  //      self.onTimerTick?(self.tickCount)
-  //    }
-  //  }
-  //
-  //  func stopTimer() {
-  //    timer?.invalidate()
-  //    timer = nil
-  //  }
-  
-  
-  
-  //  func reportScrollChange(_ offset: CGPoint) {
-  //    onScrollChange?(offset)
-  //  }
-  
-  //  deinit {
-  //    scrollOffsetMonitor.stopMonitoring()
-  //  }
   
 }
 

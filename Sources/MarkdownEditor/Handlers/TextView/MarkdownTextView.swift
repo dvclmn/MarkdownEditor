@@ -19,18 +19,8 @@ public class MarkdownTextView: NSTextView {
   var textInsets: CGFloat
   
   let timerActor = TimerActor()
-  public var onTimerTick: ((Int) -> Void)?
-
-//  var timer: Timer?
 //  public var onTimerTick: ((Int) -> Void)?
-//  var tickCount = 0
 
-//  var onScrollChange: ((CGPoint) -> Void)?
-//  let scrollOffsetMonitor = ScrollOffsetMonitor()
-
-  
-  //  var inlineCodeElements: [InlineCodeElement] = []
-  
   var markdownBlocks: [MarkdownBlock] = []
   
   public typealias OnEvent = (_ event: NSEvent, _ action: () -> Void) -> Void
@@ -46,7 +36,7 @@ public class MarkdownTextView: NSTextView {
   public var onTextChange: MarkdownEditor.TextInfo = { _ in }
   public var onSelectionChange: MarkdownEditor.SelectionInfo = { _ in }
   public var onEditorHeightChange: MarkdownEditor.EditorHeight = { _ in }
-  public var onScrollChange: MarkdownEditor.ScrollOffset = { _ in }
+  public var onScrollChange: MarkdownEditor.ScrollInfo = { _ in }
   
   public init(
     frame frameRect: NSRect,

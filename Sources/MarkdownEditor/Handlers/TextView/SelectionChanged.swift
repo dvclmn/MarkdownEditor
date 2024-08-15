@@ -124,6 +124,7 @@ extension MarkdownTextView {
   
   
   
+  
   //  func getMarkdownBlock(for range: NSTextRange, in blocks: [MarkdownBlock]) -> MarkdownBlock? {
   //    // First, check if the range intersects with any block
   //    if let intersectingBlock = blocks.first(where: { $0.range.intersects(range) }) {

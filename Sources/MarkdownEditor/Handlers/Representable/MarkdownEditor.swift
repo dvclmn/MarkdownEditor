@@ -13,8 +13,8 @@ public struct MarkdownEditor: NSViewRepresentable {
   
   public typealias TextInfo = (_ info: EditorInfo.Text) -> Void
   public typealias SelectionInfo = (_ info: EditorInfo.Selection) -> Void
+  public typealias ScrollInfo = (_ info: EditorInfo.Scroll) -> Void
   public typealias EditorHeight = (_ height: CGFloat) -> Void
-  public typealias ScrollOffset = (_ info: EditorInfo.Scroll) -> Void
   
   @Binding var text: String
   var scrollOffsetIn: CGFloat
@@ -22,8 +22,8 @@ public struct MarkdownEditor: NSViewRepresentable {
   var textInsets: CGFloat
   var textInfo: TextInfo
   var selectionInfo: SelectionInfo
+  var scrollInfo: ScrollInfo
   var editorHeight: EditorHeight
-  var scrollOffsetOut: ScrollOffset
   
   public init(
     text: Binding<String>,
@@ -32,8 +32,8 @@ public struct MarkdownEditor: NSViewRepresentable {
     textInsets: CGFloat = 30,
     textInfo: @escaping TextInfo = { _ in },
     selectionInfo: @escaping SelectionInfo = { _ in },
-    editorHeight: @escaping EditorHeight = { _ in },
-    scrollOffsetOut: @escaping ScrollOffset = { _ in }
+    scrollInfo: @escaping ScrollInfo = { _ in },
+    editorHeight: @escaping EditorHeight = { _ in }
   ) {
     self._text = text
     self.scrollOffsetIn = scrollOffsetIn
@@ -41,8 +41,8 @@ public struct MarkdownEditor: NSViewRepresentable {
     self.textInsets = textInsets
     self.textInfo = textInfo
     self.selectionInfo = selectionInfo
+    self.scrollInfo = scrollInfo
     self.editorHeight = editorHeight
-    self.scrollOffsetOut = scrollOffsetOut
   }
   
   public func makeNSView(context: Context) -> MarkdownTextView {
@@ -69,7 +69,7 @@ public struct MarkdownEditor: NSViewRepresentable {
     }
     
     textView.onScrollChange = { info in
-      DispatchQueue.main.async { self.scrollOffsetOut(info) }
+      DispatchQueue.main.async { self.scrollInfo(info) }
     }
     
     return textView
@@ -80,22 +80,22 @@ public struct MarkdownEditor: NSViewRepresentable {
     context.coordinator.parent = self
     context.coordinator.updatingNSView = true
     
-    textView.string ?= self.text
-    textView.scrollOffset ?= self.scrollOffsetIn
-    textView.isShowingFrames ?= self.isShowingFrames
+//    textView.string ?= self.text
+//    textView.scrollOffset ?= self.scrollOffsetIn
+//    textView.isShowingFrames ?= self.isShowingFrames
+//    
+
+    if textView.string != self.text {
+      textView.string = self.text
+    }
     
-//
-//    if textView.string != self.text {
-//      textView.string = self.text
-//    }
-//    
-//    if textView.scrollOffset != self.scrollOffsetIn {
-//      textView.scrollOffset = self.scrollOffsetIn
-//    }
-//    
-//    if textView.isShowingFrames != self.isShowingFrames {
-//      textView.isShowingFrames = self.isShowingFrames
-//    }
+    if textView.scrollOffset != self.scrollOffsetIn {
+      textView.scrollOffset = self.scrollOffsetIn
+    }
+    
+    if textView.isShowingFrames != self.isShowingFrames {
+      textView.isShowingFrames = self.isShowingFrames
+    }
     
     textView.needsLayout = true
     textView.needsDisplay = true
