@@ -55,7 +55,7 @@ struct ExampleView: View {
     }
     .background(.black.opacity(0.5))
     .background(.purple.opacity(0.1))
-    .frame(width: 400, height: 500)
+    .frame(width: 400, height: 700)
   }
 }
 
@@ -72,6 +72,11 @@ extension ExampleView {
    - By configuring the container, we can set, replace, and merge
    - A large number of attributes for a string (or fragment) at once.
    
+   ```python
+   // There is also some basic code
+   var x = y
+   ```
+
    ### Markdown syntax summary
    A `viewport` is a _rectangular_ area within a ==flipped coordinate system== expanding along the y-axis, with __bold alternate__, as well as ***bold italic*** emphasis.
    
@@ -79,13 +84,8 @@ extension ExampleView {
    2. Despite the implementation details under the hood
    3. They can only speculate, but perhaps OpenGL here is useful
    
-   ```python
-   // There is also some basic code
-   var x = y
-   ```
    
    > This *brief* block quote, with ==text contents==, lines `advance expanding` the view in the current writing direction.ExampleView
-   
    
    """
 }

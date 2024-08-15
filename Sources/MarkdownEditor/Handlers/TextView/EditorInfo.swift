@@ -13,7 +13,7 @@ public struct EditorInfo {
     let editorHeight: CGFloat
     let characterCount: Int
     let textElementCount: Int // TextElement seems to equate to a paragraph
-    let codeBlocks: [MarkdownBlock]
+    let codeBlocks: Int
     let documentRange: NSTextRange
     
     public var summary: String {

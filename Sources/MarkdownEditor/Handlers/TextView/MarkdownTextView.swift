@@ -6,7 +6,7 @@
 //
 
 import SwiftUI
-import STTextKitPlus
+//import STTextKitPlus
 
 
 public class MarkdownTextView: NSTextView {
@@ -206,48 +206,46 @@ extension MarkdownTextView {
     
     let documentRange = tlm.documentRange
     
+    var codeBlockCount = 0
+
+    
     let nsRange = NSRange(documentRange, in: tcm)
+    
+    // Enumerate through text paragraphs
+    tcm.enumerateTextElements(from: documentRange.location, options: []) { textElement in
+      guard let paragraph = textElement as? NSTextParagraph else { return true }
+      
+      // Get the content of the paragraph
+      let paragraphRange = paragraph.elementRange
+      guard let content = tcm.attributedString(in: paragraphRange)?.string else { return true }
+      
+      // Check if the paragraph starts with three backticks
+      if content.hasPrefix("```") {
+        codeBlockCount += 1
+      }
+      
+      return true
+    }
+    
+//    self.string.range
     
     //    guard let fullString = tcs.attributedString(in: documentRange)?.string else { return }
     
     tcm.performEditingTransaction {
       
-      
-      
-      var ranges: [NSTextRange] = []
-      
-      for match in self.string.matches(of: Markdown.Syntax.inlineCode.regex) {
         
-        // Convert String.Index to integer offset
-        let startOffset = self.string.distance(from: self.string.startIndex, to: match.startIndex)
-        let endOffset = self.string.distance(from: self.string.startIndex, to: match.endIndex)
-        
-        // Use these offsets to create NSTextLocation
-        if let startLocation = tcm.location(documentRange.location, offsetBy: startOffset),
-           let endLocation = tcm.location(documentRange.location, offsetBy: endOffset),
-           let textRange = NSTextRange(location: startLocation, end: endLocation) {
-          ranges.append(textRange)
+      
 
-        
-//        
-//        //        print(match)
-//        
-//        if let startIndex = tcm.offset(from: documentRange.location, to: match.startIndex),
-//           let endIndex = tcm.offset(from: documentRange.location, to: match.endIndex),
-//           let textRange = NSTextRange(location: startIndex, end: endIndex) {
-//          ranges.append(textRange)
-          //        }
-        }
-        
-//        tcs.textStorage?.addAttributes(testAttrs, range: nsRange)
-      }
+//      var ranges: [NSTextRange] = []
       
-      for range in ranges {
+      
+      
+//      for range in ranges {
         
-        tcs.textStorage?.setAttributes(testAttrs, range: nsRange)
-
+        //        tcs.textStorage?.setAttributes(testAttrs, range: nsRange)
         
-      }
+        
+//      }
       
     }
   }
@@ -262,6 +260,8 @@ extension MarkdownTextView {
     setupViewportLayoutController()
     
     self.testStyles()
+    
+    self.highlightCodeBlocks()
     
   }
   
