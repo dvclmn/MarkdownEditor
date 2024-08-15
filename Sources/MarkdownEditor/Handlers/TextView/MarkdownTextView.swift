@@ -14,10 +14,10 @@ public class MarkdownTextView: NSTextView {
   private var viewportLayoutController: NSTextViewportLayoutController?
   private var viewportDelegate: CustomViewportDelegate?
   
+  
   var scrollOffset: CGFloat = .zero {
     didSet {
       if scrollOffset != oldValue {
-//        testScrollString += "butts"
         didChangeScroll()
       }
     }
@@ -48,6 +48,10 @@ public class MarkdownTextView: NSTextView {
   public var onSelectionChange: MarkdownEditor.SelectionInfo = { _ in }
   public var onEditorHeightChange: MarkdownEditor.EditorHeight = { _ in }
   public var onScrollChange: MarkdownEditor.ScrollInfo = { _ in }
+  
+//  public var onScrollChange: @MainActor (EditorInfo.Scroll) -> Void = { _ in }
+  
+
   
   public init(
     frame frameRect: NSRect,
@@ -149,6 +153,8 @@ extension MarkdownTextView {
     self.testStyles()
     
     self.markdownBlocks = self.processMarkdownBlocks(highlight: true)
+    
+    self.didChangeScroll() // Just to nudge it
     
   }
   

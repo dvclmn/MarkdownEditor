@@ -9,76 +9,59 @@ import SwiftUI
 
 extension MarkdownTextView {
   
-  
-//  func didChangeScroll() {
-//    
-//    
-//    
-//    Task {
-//      await scrollHandler.updateScrollOffset(scrollOffset) { [weak self] scrollInfo in
-//        guard let self = self else { return }
-//        DispatchQueue.main.async {
-//          
-//          if let info = self.calculateScrollInfo() {
-//            self.onScrollChange(info)
-//          }
-//        }
-//      }
-//    }
-//  }
-  
   func didChangeScroll() {
     Task {
-      await scrollHandler.processScroll {
-        if let info = self.calculateScrollInfo() {
-          self.onScrollChange(info)
+      await scrollHandler.processScroll { [weak self] in
+        guard let self = self else { return }
+        if let info = await self.calculateScrollInfo() {
+          await MainActor.run {
+            self.onScrollChange(info)
+          }
         }
       }
     }
   }
   
-  func calculateScrollInfo() -> EditorInfo.Scroll? {
+  private func calculateScrollInfo() async -> EditorInfo.Scroll? {
+    
+    guard let tlm = self.textLayoutManager,
+          let tcm = tlm.textContentManager,
+          let viewportRange = tlm.textViewportLayoutController.viewportRange
+    else { return nil }
+    
+    let visibleRange = tlm.documentRange.intersection(viewportRange)
+    
+    let visibleString = tcm.attributedString(in: visibleRange)
+    
+    
+    
     return EditorInfo.Scroll(
-      summary: "Hello!"
+      summary: """
+      Scroll offset: \(scrollOffset)
+      Characters
+      Visible: \(visibleString?.string.count ?? 0), Total: \(self.string.count)
+      
+      """
     )
   }
+
   
 }
 
 actor ScrollHandler {
-  
-  private(set) var lastScrollOffset: CGFloat = .zero
-  //  private var onScrollChange: ((EditorInfo.Scroll) -> Void)?
   private var debounceTask: Task<Void, Never>?
   
-  var action: () -> Void
-  
-  
-  
-  //  func updateScrollOffset(_ newOffset: CGFloat, onScrollChange: @escaping (EditorInfo.Scroll) -> Void) {
-  //    if newOffset != lastScrollOffset {
-  //      lastScrollOffset = newOffset
-  //      self.onScrollChange = onScrollChange
-  //      debounceScrollChange()
-  //    }
-  //  }
-  
-  private func debounceScrollChange() {
+  func processScroll(action: @escaping @Sendable () async -> Void) {
     debounceTask?.cancel()
-    debounceTask = Task {
+    debounceTask = Task { [action] in
       do {
-        try await Task.sleep(nanoseconds: 300_000_000) // 0.3 seconds
+        try await Task.sleep(for: .seconds(0.2))
         if !Task.isCancelled {
-          action()
+          await action()
         }
       } catch {
         // Handle cancellation or other errors
       }
     }
   }
-  
-  //  private func processScrollChange() {
-  //    let scrollInfo = EditorInfo.Scroll(summary: "Scrolled to offset: \(lastScrollOffset)")
-  //    onScrollChange?(scrollInfo)
-  //  }
 }

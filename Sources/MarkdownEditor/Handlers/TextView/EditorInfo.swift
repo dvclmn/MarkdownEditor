@@ -9,16 +9,16 @@ import SwiftUI
 
 public struct EditorInfo: Sendable {
   
-  public struct Text {
+  public struct Text: Sendable {
     let editorHeight: CGFloat
     let characterCount: Int
     let textElementCount: Int // TextElement seems to equate to a paragraph
     let codeBlocks: Int
-    let documentRange: NSTextRange
-    let viewportRange: NSTextRange
+    let documentRange: String
+    let viewportRange: String
   }
   
-  public struct Selection {
+  public struct Selection: Sendable {
     let selection: String
 //    let selectedRange: NSTextRange?
     let selectedSyntax: [Markdown.Syntax]
@@ -26,7 +26,7 @@ public struct EditorInfo: Sendable {
     let columnNumber: Int?
   }
   
-  public struct Scroll {
+  public struct Scroll: Sendable {
     let summary: String
   }
   

@@ -46,8 +46,8 @@ extension MarkdownTextView {
       characterCount: self.string.count,
       textElementCount: textElementCount,
       codeBlocks: self.countCodeBlocks(),
-      documentRange: documentRange,
-      viewportRange: viewportRange
+      documentRange: documentRange.description,
+      viewportRange: viewportRange.description
     )
   }
   
