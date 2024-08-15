@@ -19,48 +19,101 @@ extension MarkdownTextView {
       let selectionInfo = calculateSelectionInfo()
       onSelectionChange(selectionInfo)
     }
+    
   }
+//  
+//  func selectedTextRange() -> NSTextRange? {
+//    let selectedTextRange = self.textLayoutManager?.textSelections
+//    return selectedTextRange?.first?.textRanges.first
+//  }
+//  
+//  
+//  func getMarkdownBlock(for range: NSTextRange, in blocks: [MarkdownBlock]) -> MarkdownBlock? {
+//    guard let currentBlock = blocks.first(where: { $0.range.intersects(range) }) else { return nil }
+//    return currentBlock
+//  }
+//  
+//  
+//  func getSelectedMarkdownBlocks() -> [MarkdownBlock] {
+//    guard let range = self.selectedTextRange() else { return [] }
+//    
+//    return self.markdownBlocks.filter({ $0.range.intersects(range) })
+//
+//  }
+//  
+//  
+  
+  
   
   func selectedTextRange() -> NSTextRange? {
-    let selectedTextRange = self.textLayoutManager?.textSelections
-    return selectedTextRange?.first?.textRanges.first
+    guard let textSelections = self.textLayoutManager?.textSelections else { return nil }
+    
+    guard let firstRange = textSelections.first?.textRanges.first else { return nil }
+    
+    return firstRange
   }
   
   
-  func getCurrentMarkdownBlock(for range: NSTextRange, in blocks: [MarkdownBlock]) -> MarkdownBlock? {
+  func selectedTextLocation() -> NSTextLocation? {
     guard let tlm = self.textLayoutManager,
-          let tcm = tlm.textContentManager
+          let selection = tlm.textSelections.first
     else { return nil }
     
-    // First, check if the range is directly within any block
-    if let directBlock = blocks.first(where: { $0.range.intersects(range) }) {
-      return directBlock
+    let resolvedLocation = tlm.textSelectionNavigation.resolvedInsertionLocation(for: selection, writingDirection: .leftToRight)
+    
+    return resolvedLocation
+    
+  }
+  
+  func getSelectedMarkdownBlocks() -> [MarkdownBlock] {
+    guard let tlm = self.textLayoutManager else { return [] }
+    
+    let selection = tlm.textSelections
+    
+    if let firstSelection = selection.first {
+      /// Non-zero selection
+      
+      guard let range = firstSelection.textRanges.first else { return [] }
+      
+      return self.markdownBlocks.filter { $0.range.intersects(range) }
+      
     } else {
-      return nil
+      /// Zero-length selection
+      
+      guard let range = firstSelection.textRanges.first else { return [] }
+      
+      return self.markdownBlocks.filter { $0.range.contains(<#T##location: any NSTextLocation##any NSTextLocation#>) }
     }
     
-    // If not within any block, find the nearest block
-//    var nearestBlock: MarkdownBlock?
-//    var smallestDistance = Int.max
-    
-//    for block in blocks {
-//      // Check if range is before the block
-//      let offsetBefore = tcm.offset(from: range.endLocation, to: block.range.location)
-//      if offsetBefore > 0 && offsetBefore < smallestDistance {
-//        smallestDistance = offsetBefore
-//        nearestBlock = block
-//      }
-//      
-//      // Check if range is after the block
-//      let offsetAfter = tcm.offset(from: block.range.endLocation, to: range.location)
-//      if offsetAfter > 0 && offsetAfter < smallestDistance {
-//        smallestDistance = offsetAfter
-//        nearestBlock = block
-//      }
-//    }
-    
-//    return nearestBlock
   }
+  
+  
+//  func getMarkdownBlock(for range: NSTextRange, in blocks: [MarkdownBlock]) -> MarkdownBlock? {
+//    // First, check if the range intersects with any block
+//    if let intersectingBlock = blocks.first(where: { $0.range.intersects(range) }) {
+//      return intersectingBlock
+//    }
+//    
+//    // If not, find the block that contains the range's start location
+//    return blocks.first(where: { $0.range.contains(range.location) })
+//  }
+//  
+//  func getSelectedMarkdownBlocks() -> [MarkdownBlock] {
+//    guard let range = self.selectedTextRange() else { return [] }
+//    
+//    if range.isEmpty {
+//      // For a single insertion point, return the block containing that point
+//      if let block = getMarkdownBlock(for: range, in: self.markdownBlocks) {
+//        return [block]
+//      }
+//    } else {
+//      // For a non-empty selection, return all intersecting blocks
+//      return self.markdownBlocks.filter { $0.range.intersects(range) }
+//    }
+//    
+//    return []
+//  }
+
   
   //
   //  func getCurrentMarkdownBlock(for range: NSTextRange, in blocks: [MarkdownBlock]) -> MarkdownBlock? {
@@ -101,21 +154,10 @@ extension MarkdownTextView {
   private func calculateSelectionInfo() -> EditorInfo.Selection {
     let selectedRange = self.selectedRange()
     
-    
-    
-//    guard let textLayoutManager = self.textLayoutManager else { return nil }
-//    
-//    if let selectedRange = textLayoutManager.textSelectionNavigation.selectedTextRange {
-//      // Use this selectedRange (it's an NSTextRange)
-//      // ...
-//    }
-    
-    var currentSyntaxSelection: MarkdownBlock? = nil
-    
-    if let range = self.selectedTextRange() {
-      currentSyntaxSelection = self.getCurrentMarkdownBlock(for: range, in: self.markdownBlocks)
+
+    let selectedSyntax = self.getSelectedMarkdownBlocks().map { block in
+      block.syntax
     }
-    
     
     let fullString = self.string as NSString
     let substring = fullString.substring(to: selectedRange.location)
@@ -127,7 +169,7 @@ extension MarkdownTextView {
     
     return EditorInfo.Selection(
       selectedRange: selectedRange,
-      selectedSyntax: currentSyntaxSelection?.syntax,
+      selectedSyntax: selectedSyntax,
       lineNumber: lineNumber,
       columnNumber: columnNumber
     )
