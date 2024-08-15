@@ -50,6 +50,7 @@ struct ExampleView: View {
         Text(self.textInfo?.summary ?? "nil")
       }
       .foregroundStyle(.secondary)
+      .font(.callout)
       .frame(maxWidth: .infinity, alignment: .leading)
       .padding(.horizontal, 30)
       .padding(.top, 10)

@@ -7,10 +7,11 @@
 
 import SwiftUI
 
-class CustomViewportDelegate: NSObject, NSTextViewportLayoutControllerDelegate {
+
+class CustomViewportDelegate: NSObject, @preconcurrency  NSTextViewportLayoutControllerDelegate {
     weak var textView: MarkdownTextView?
 
-    func viewportBounds(for textViewportLayoutController: NSTextViewportLayoutController) -> CGRect {
+  @MainActor func viewportBounds(for textViewportLayoutController: NSTextViewportLayoutController) -> CGRect {
         guard let textView = textView else { return .zero }
         return textView.visibleRect
     }
