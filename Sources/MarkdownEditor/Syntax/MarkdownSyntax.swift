@@ -11,6 +11,24 @@ import SwiftUI
 import RegexBuilder
 
 
+class MarkdownBlock: NSTextElement {
+  var range: NSTextRange
+  let syntax: Markdown.Syntax
+  var isComplete: Bool
+
+  init(
+    _ textContentManager: NSTextContentManager,
+    range: NSTextRange,
+    syntax: Markdown.Syntax,
+    isComplete: Bool = true
+  ) {
+    self.range = range
+    self.syntax = syntax
+    self.isComplete = isComplete
+    super.init(textContentManager: textContentManager)
+  }
+}
+
 
 extension Markdown.Syntax {
   
@@ -28,12 +46,9 @@ extension Markdown.Syntax {
   
 }
 
-
-
 public struct Markdown {
   
 }
-
 
 extension Markdown {
 

@@ -20,6 +20,7 @@ extension MarkdownTextView {
     }
     
     self.onEditorHeightChange(self.editorHeight)
+    self.markdownBlocks = self.processMarkdownBlocks(highlight: true)
     
   }
   
@@ -40,83 +41,139 @@ extension MarkdownTextView {
       editorHeight: self.editorHeight,
       characterCount: self.string.count,
       textElementCount: textElementCount,
-      codeBlocks: self.calculateCodeBlocks() ?? 0,
-      //      codeBlocks: self.markdownBlocks.filter {$0.syntax == .codeBlock}.count,
+      codeBlocks: self.countCodeBlocks(),
       documentRange: documentRange
     )
   }
   
+  func countCodeBlocks() -> Int {
+    
+    let codeblocks = self.markdownBlocks.filter { $0.syntax == .codeBlock }
+    
+    return codeblocks.count
+    
+  }
   
-  func calculateCodeBlocks() -> Int? {
-    guard let tlm = self.textLayoutManager,
-          let tcm = tlm.textContentManager
-            //          let tcs = self.textContentStorage
-            //          let visible = tlm.textViewportLayoutController.viewportRange
-    else { return nil }
-    
-    let documentRange = tlm.documentRange
-    
-    var codeBlockCount = 0
-    
-    //    let nsRange = NSRange(documentRange, in: tcm)
-    
-    // Enumerate through text paragraphs
-    tcm.enumerateTextElements(from: documentRange.location, options: []) { textElement in
-      guard let paragraph = textElement as? NSTextParagraph else { return true }
-      
-      // Get the content of the paragraph
-      let paragraphRange = paragraph.elementRange
-      guard let content = tcm.attributedString(in: paragraphRange)?.string else { return true }
-      
-      // Check if the paragraph starts with three backticks
-      if content.hasPrefix("```") {
-        codeBlockCount += 1
-      }
-      
-      return true
-    }
-    
-    return codeBlockCount
-  } // END calc code blocks
-  
-  
-  func highlightCodeBlocks() {
+  func processMarkdownBlocks(highlight: Bool = false) -> [MarkdownBlock] {
     guard let tlm = self.textLayoutManager,
           let tcm = tlm.textContentManager,
           let tcs = self.textContentStorage else {
-      return
+      return []
     }
     
     let documentRange = tlm.documentRange
-    var codeBlockRanges: [NSTextRange] = []
+    var markdownBlocks: [MarkdownBlock] = []
+    var currentCodeBlock: MarkdownBlock?
     
     tcm.enumerateTextElements(from: documentRange.location, options: []) { textElement in
-      
       guard let paragraph = textElement as? NSTextParagraph,
-            let paragraphRange = paragraph.elementRange
-      else { return true }
-      
-      guard let content = tcm.attributedString(in: paragraphRange)?.string else { return true }
+            let paragraphRange = paragraph.elementRange,
+            let content = tcm.attributedString(in: paragraphRange)?.string else {
+        return true
+      }
       
       if content.hasPrefix("```") {
-        codeBlockRanges.append(paragraphRange)
+        if let currentBlock = currentCodeBlock {
+          currentBlock.isComplete = true
+          if let fullRange = NSTextRange(location: currentBlock.range.location, end: paragraphRange.endLocation) {
+            currentBlock.range = fullRange
+          }
+          markdownBlocks.append(currentBlock)
+          currentCodeBlock = nil
+        } else {
+          currentCodeBlock = MarkdownBlock(tcm, range: paragraphRange, syntax: .codeBlock, isComplete: false)
+        }
       }
       
       return true
     }
     
-    tcm.performEditingTransaction {
-      for range in codeBlockRanges {
+    // Handle case where document ends without closing code block
+    if let currentBlock = currentCodeBlock {
+      markdownBlocks.append(currentBlock)
+    }
+    
+    if highlight {
+      for block in markdownBlocks where block.syntax == .codeBlock {
         
-        
-        
-        tcs.textStorage?.addAttributes(.highlighter, range: NSRange(range, in: tcm))
-        
-        
-        
+        self.addStyle(for: block)
+
       }
     }
+    
+    return markdownBlocks
   }
+  
+  //  func calculateCodeBlocks() -> Int? {
+  //    guard let tlm = self.textLayoutManager,
+  //          let tcm = tlm.textContentManager
+  //            //          let tcs = self.textContentStorage
+  //            //          let visible = tlm.textViewportLayoutController.viewportRange
+  //    else { return nil }
+  //
+  //    let documentRange = tlm.documentRange
+  //
+  //    var codeBlockCount = 0
+  //
+  //    //    let nsRange = NSRange(documentRange, in: tcm)
+  //
+  //    // Enumerate through text paragraphs
+  //    tcm.enumerateTextElements(from: documentRange.location, options: []) { textElement in
+  //      guard let paragraph = textElement as? NSTextParagraph else { return true }
+  //
+  //      // Get the content of the paragraph
+  //      let paragraphRange = paragraph.elementRange
+  //      guard let content = tcm.attributedString(in: paragraphRange)?.string else { return true }
+  //
+  //      // Check if the paragraph starts with three backticks
+  //      if content.hasPrefix("```") {
+  //        codeBlockCount += 1
+  //      }
+  //
+  //      return true
+  //    }
+  //
+  //    return codeBlockCount
+  //  } // END calc code blocks
+  //
+  //
+  //  func highlightCodeBlocks() {
+  //    guard let tlm = self.textLayoutManager,
+  //          let tcm = tlm.textContentManager,
+  //          let tcs = self.textContentStorage else {
+  //      return
+  //    }
+  //
+  //    let documentRange = tlm.documentRange
+  //    var codeBlockRanges: [NSTextRange] = []
+  //
+  //    tcm.enumerateTextElements(from: documentRange.location, options: []) { textElement in
+  //
+  //      guard let paragraph = textElement as? NSTextParagraph,
+  //            let paragraphRange = paragraph.elementRange
+  //      else { return true }
+  //
+  //      guard let content = tcm.attributedString(in: paragraphRange)?.string else { return true }
+  //
+  //      if content.hasPrefix("```") {
+  //        codeBlockRanges.append(paragraphRange)
+  //      }
+  //
+  //      return true
+  //    }
+  //
+  //    tcm.performEditingTransaction {
+  //      for range in codeBlockRanges {
+  //
+  //
+  //
+  //        tcs.textStorage?.addAttributes(.highlighter, range: NSRange(range, in: tcm))
+  //
+  //
+  //
+  //      }
+  //    }
+  //  }
   
 }
 

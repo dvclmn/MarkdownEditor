@@ -19,6 +19,7 @@ public struct EditorInfo {
   
   public struct Selection {
     let selectedRange: NSRange
+    let selectedSyntax: Markdown.Syntax?
     let lineNumber: Int
     let columnNumber: Int
   }
@@ -39,6 +40,7 @@ extension EditorInfo.Text {
 extension EditorInfo.Selection {
   public var summary: String {
       """
+      Selected Syntax: \(selectedSyntax?.name ?? "nil")
       Selected Range: \(selectedRange)
       Line: \(lineNumber), Column: \(columnNumber)
       """

@@ -7,6 +7,25 @@
 
 import SwiftUI
 import Foundation
+
+
+extension MarkdownTextView {
+  
+  // TODO: This of course needs to be expanded to support *actual* styles, just placeholder yellow colour for now
+  func addStyle(for block: MarkdownBlock) {
+    guard let tlm = self.textLayoutManager,
+          let tcm = tlm.textContentManager,
+          let tcs = self.textContentStorage
+           else { return }
+    
+    tcm.performEditingTransaction {
+        let nsRange = NSRange(block.range, in: tcm)
+        tcs.textStorage?.addAttributes(.highlighter, range: nsRange)
+    }
+  } // END addStyle
+  
+}
+
 //
 //public class CodeBlockHighlightLayer: CALayer {
 //  var highlightRects: [CGRect] = []

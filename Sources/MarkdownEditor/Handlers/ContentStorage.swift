@@ -12,17 +12,3 @@ final class MarkdownContentStorage: NSTextContentStorage {
 
 }
 
-class MarkdownBlock: NSTextElement {
-  
-  let range: NSTextRange
-  let syntax: Markdown.Syntax
-  
-  init(
-    range: NSTextRange,
-    syntax: Markdown.Syntax
-  ) {
-    self.range = range
-    self.syntax = syntax
-    super.init()
-  }
-}

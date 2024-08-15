@@ -206,7 +206,7 @@ extension MarkdownTextView {
     
     self.testStyles()
     
-    self.highlightCodeBlocks()
+    self.markdownBlocks = self.processMarkdownBlocks(highlight: true)
     
   }
   
