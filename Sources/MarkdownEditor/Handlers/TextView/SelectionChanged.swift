@@ -14,12 +14,9 @@ extension MarkdownTextView {
   public override func setSelectedRanges(_ ranges: [NSValue], affinity: NSSelectionAffinity, stillSelecting: Bool) {
     super.setSelectedRanges(ranges, affinity: affinity, stillSelecting: stillSelecting)
     
-    if ranges != lastSelectionValue {
-      lastSelectionValue = ranges
-      let selectionInfo = calculateSelectionInfo()
-      onSelectionChange(selectionInfo)
-    }
-    
+    let selectionInfo = calculateSelectionInfo()
+    onSelectionChange(selectionInfo)
+
   }
 //  
 //  func selectedTextRange() -> NSTextRange? {
@@ -152,7 +149,9 @@ extension MarkdownTextView {
   //
   //
   private func calculateSelectionInfo() -> EditorInfo.Selection {
-    let selectedRange = self.selectedRange()
+    
+//    let selectedRange = self.selectedRange()
+    let selectedRange = self.selectedTextRange()
     
 
     let selectedSyntax = self.getSelectedMarkdownBlocks().map { block in
@@ -160,6 +159,11 @@ extension MarkdownTextView {
     }
     
     let fullString = self.string as NSString
+    
+    let tcs = self.textContentStorage
+    
+
+    
     let substring = fullString.substring(to: selectedRange.location)
     let lineNumber = substring.components(separatedBy: .newlines).count
     
@@ -174,7 +178,6 @@ extension MarkdownTextView {
       columnNumber: columnNumber
     )
   }
-  
   
   
 }

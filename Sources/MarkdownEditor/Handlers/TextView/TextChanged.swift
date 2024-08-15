@@ -14,7 +14,6 @@ extension MarkdownTextView {
     
     if self.string != lastTextValue {
       
-      
       lastTextValue = self.string
       onTextChange(calculateTextInfo())
     }

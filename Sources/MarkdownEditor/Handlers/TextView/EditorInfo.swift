@@ -18,7 +18,7 @@ public struct EditorInfo {
   }
   
   public struct Selection {
-    let selectedRange: NSRange
+    let selectedRange: NSTextRange
     let selectedSyntax: [Markdown.Syntax]
     let lineNumber: Int
     let columnNumber: Int

@@ -25,7 +25,6 @@ public class MarkdownTextView: NSTextView {
   
   private var activeScrollValue: (NSRange, CGSize)?
   
-  var lastSelectionValue = [NSValue]()
   var lastTextValue = String()
   
   public var onKeyDown: OnEvent = { $1() }
@@ -47,7 +46,7 @@ public class MarkdownTextView: NSTextView {
     self.textInsets = textInsets
         
     let textLayoutManager = MarkdownLayoutManager()
-    let textContentStorage = MarkdownContentStorage()
+    let textContentStorage = NSTextContentStorage()
     let container = NSTextContainer()
     
     textLayoutManager.textContainer = container
