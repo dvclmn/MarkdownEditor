@@ -44,8 +44,6 @@ public struct MarkdownEditor: NSViewRepresentable {
   
   public func makeNSView(context: Context) -> MarkdownTextView {
     
-//    let scrollView = NSScrollView()
-    
     let textView = MarkdownTextView(
       frame: .zero,
       textContainer: nil,
@@ -53,8 +51,6 @@ public struct MarkdownEditor: NSViewRepresentable {
       textInsets: textInsets
     )
     textView.delegate = context.coordinator
-    
-//    scrollView.documentView = textView
     
     textView.onSelectionChange = { info in
       DispatchQueue.main.async { self.selectionInfo(info) }
@@ -74,11 +70,7 @@ public struct MarkdownEditor: NSViewRepresentable {
   
   public func updateNSView(_ textView: MarkdownTextView, context: Context) {
     
-    
     context.coordinator.parent = self
-    
-//    let textView = scrollView.documentView as! MarkdownTextView
-    
     context.coordinator.updatingNSView = true
     
     if textView.string != self.text {
@@ -93,9 +85,5 @@ public struct MarkdownEditor: NSViewRepresentable {
     textView.needsDisplay = true
     
     context.coordinator.updatingNSView = false
-  }
-  
-  public func makeCoordinator() -> Coordinator {
-    Coordinator(self)
   }
 }

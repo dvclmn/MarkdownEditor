@@ -110,7 +110,7 @@ extension MarkdownTextView {
         
         
         
-        tcs.textStorage?.addAttributes(Markdown.Syntax.codeBlock.contentAttributes, range: NSRange(range, in: tcm))
+        tcs.textStorage?.addAttributes(.highlighter, range: NSRange(range, in: tcm))
         
         
         

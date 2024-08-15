@@ -36,14 +36,6 @@ public class MarkdownTextView: NSTextView {
   public var onSelectionChange: MarkdownEditor.SelectionInfo = { _ in }
   public var onEditorHeightChange: MarkdownEditor.EditorHeight = { _ in }
   
-  
-  //  let parser: MarkdownParser
-  
-  /// Deliver `NSTextView.didChangeSelectionNotification` for all selection changes.
-  ///
-  /// See the documenation for `setSelectedRanges(_:affinity:stillSelecting:)` for details.
-  public var continuousSelectionNotifications: Bool = false
-  
   public init(
     frame frameRect: NSRect,
     textContainer container: NSTextContainer?,
@@ -53,26 +45,19 @@ public class MarkdownTextView: NSTextView {
     
     self.isShowingFrames = isShowingFrames
     self.textInsets = textInsets
-    
-    //    self.parser = MarkdownParser()
-    
+        
+    let textLayoutManager = MarkdownLayoutManager()
+    let textContentStorage = MarkdownContentStorage()
     let container = NSTextContainer()
     
-    let textLayoutManager = MarkdownLayoutManager()
-    
     textLayoutManager.textContainer = container
-    
-    let textContentStorage = MarkdownContentStorage()
-    
     textContentStorage.addTextLayoutManager(textLayoutManager)
     textContentStorage.primaryTextLayoutManager = textLayoutManager
     
     super.init(frame: frameRect, textContainer: container)
     
     self.textViewSetup()
-    
-    //    self.parser.text = self.string
-    
+
   }
   
   @available(*, unavailable)
@@ -113,34 +98,7 @@ public class MarkdownTextView: NSTextView {
     assertionFailure("TextKit 1 is not supported by this type")
     return nil
   }
-  
-  
-  //  public override var intrinsicContentSize: NSSize {
-  //    textLayoutManager?.usageBoundsForTextContainer.size ?? .zero
-  //  }
-  //
-  //  func assembleMetrics() {
-  //    guard let documentRange = self.textLayoutManager?.documentRange else { return }
-  //
-  //    var textElementCount: Int = 0
-  //
-  //    textLayoutManager?.textContentManager?.enumerateTextElements(from: documentRange.location, using: { _ in
-  //      textElementCount += 1
-  //      return true
-  //    })
-  //
-  ////    DispatchQueue.main.async {
-  //      self.editorMetrics = """
-  //      Editor height: \(self.intrinsicContentSize.height.description)
-  //      Character count: \(self.string.count)
-  //      Text elements: \(textElementCount.description)
-  //      Document range: \(documentRange.description)
-  //      """
-  ////    }
-  //    NotificationCenter.default.post(name: .metricsDidChange, object: self)
-  //
-  //  }
-  
+
 }
 
 extension Notification.Name {
@@ -148,10 +106,7 @@ extension Notification.Name {
 }
 
 
-
-
 extension MarkdownTextView {
-  
   
   var editorHeight: CGFloat {
     
@@ -164,12 +119,6 @@ extension MarkdownTextView {
     return height
   }
   
-  func countCodeBlocks() {
-    //    guard let self.textLayoutManager
-    
-    
-  }
-  
   private func setupViewportLayoutController() {
     guard let textLayoutManager = self.textLayoutManager else { return }
     
@@ -180,7 +129,7 @@ extension MarkdownTextView {
     viewportLayoutController?.delegate = viewportDelegate
     
     // Set the initial viewport
-    //    viewportLayoutController?.viewportRange = self.visibleRange
+//        viewportLayoutController?.viewportRange = self.visibleRange
   }
   
   //  private func updateViewport() {
@@ -197,19 +146,17 @@ extension MarkdownTextView {
     guard let tlm = self.textLayoutManager,
           let tcm = tlm.textContentManager,
           let tcs = self.textContentStorage
-            //          let visible = tlm.textViewportLayoutController.viewportRange
     else { return }
     
-    let testAttrs: [NSAttributedString.Key: Any] = [
-      .foregroundColor: NSColor.yellow
-    ]
-    
+//    let testAttrs: [NSAttributedString.Key: Any] = [
+//      .foregroundColor: NSColor.yellow
+//    ]
+//    
     let documentRange = tlm.documentRange
     
     var codeBlockCount = 0
-
     
-    let nsRange = NSRange(documentRange, in: tcm)
+//    let nsRange = NSRange(documentRange, in: tcm)
     
     // Enumerate through text paragraphs
     tcm.enumerateTextElements(from: documentRange.location, options: []) { textElement in
@@ -254,8 +201,6 @@ extension MarkdownTextView {
     super.viewDidMoveToWindow()
     self.onTextChange(calculateTextInfo())
     self.onEditorHeightChange(self.editorHeight)
-    
-    self.countCodeBlocks()
     
     setupViewportLayoutController()
     

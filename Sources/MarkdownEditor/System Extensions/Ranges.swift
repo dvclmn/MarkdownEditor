@@ -7,10 +7,6 @@
 
 import SwiftUI
 
-
-
-
-
 extension NSTextContentManager {
   func range(for textRange: NSTextRange) -> NSRange? {
     let location = offset(from: documentRange.location, to: textRange.location)

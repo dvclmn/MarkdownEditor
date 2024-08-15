@@ -9,6 +9,11 @@ import SwiftUI
 
 
 public extension MarkdownEditor {
+  
+  func makeCoordinator() -> Coordinator {
+    Coordinator(self)
+  }
+  
   final class Coordinator: NSObject, NSTextViewDelegate, NSTextContentStorageDelegate {
     var parent: MarkdownEditor
     var selectedRanges: [NSValue] = []

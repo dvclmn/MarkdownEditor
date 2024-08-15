@@ -19,8 +19,6 @@ extension MarkdownTextView {
     let lineStart = lineRange.location
     let columnNumber = selectedRange.location - lineStart + 1
     
-    //    let selectedText = fullString.substring(with: selectedRange)
-    
     return EditorInfo.Selection(
       selectedRange: selectedRange,
       lineNumber: lineNumber,

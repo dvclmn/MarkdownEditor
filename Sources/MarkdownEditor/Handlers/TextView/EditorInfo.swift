@@ -15,8 +15,17 @@ public struct EditorInfo {
     let textElementCount: Int // TextElement seems to equate to a paragraph
     let codeBlocks: Int
     let documentRange: NSTextRange
-    
-    public var summary: String {
+  }
+  
+  public struct Selection {
+    let selectedRange: NSRange
+    let lineNumber: Int
+    let columnNumber: Int
+  }
+}
+
+extension EditorInfo.Text {
+  public var summary: String {
       """
       Editor height: \(editorHeight)
       Characters: \(characterCount)
@@ -24,28 +33,23 @@ public struct EditorInfo {
       Code blocks: \(codeBlocks)
       Document Range: \(documentRange)
       """
-    }
   }
-  
-  public struct Selection {
-    let selectedRange: NSRange
-    let lineNumber: Int
-    let columnNumber: Int
-    
-    public var summary: String {
+}
+
+extension EditorInfo.Selection {
+  public var summary: String {
       """
       Selected Range: \(selectedRange)
       Line: \(lineNumber), Column: \(columnNumber)
       """
-    }
-    
-    public static func summaryFor(selection: Selection) -> String {
-      selection.summary
-    }
-    
-    
   }
   
+  public static func summaryFor(selection: EditorInfo.Selection) -> String {
+    selection.summary
+  }
+}
+
+extension EditorInfo {
   public static func fullSummary(text: Text, selection: Selection) -> String {
     """
     Text Info:
@@ -55,5 +59,4 @@ public struct EditorInfo {
     \(selection.summary)
     """
   }
-  
 }
