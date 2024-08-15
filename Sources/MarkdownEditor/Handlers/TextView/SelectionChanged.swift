@@ -17,11 +17,13 @@ import STTextKitPlus
 extension MarkdownTextView {
   
   
+  
+  
   public override func setSelectedRanges(_ ranges: [NSValue], affinity: NSSelectionAffinity, stillSelecting: Bool) {
     super.setSelectedRanges(ranges, affinity: affinity, stillSelecting: stillSelecting)
     
-    if let selectionInfo = calculateSelectionInfo() {
-      onSelectionChange(selectionInfo)
+    if let info = calculateSelectionInfo() {
+      onSelectionChange(info)
     }
 
   }

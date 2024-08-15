@@ -1,45 +1,48 @@
-
-/**
- *  MacEditorTextView
- *  Copyright (c) Thiago Holanda 2020
- *  https://twitter.com/tholanda
- *
- *  Modified by Kyle Nazario 2020
- *
- *  MIT license
- */
+//
+//  File.swift
+//
+//
+//  Created by Dave Coleman on 10/8/2024.
+//
 
 import SwiftUI
 import OSLog
-
+import BaseHelpers
 
 public struct MarkdownEditor: NSViewRepresentable {
   
   public typealias TextInfo = (_ info: EditorInfo.Text) -> Void
   public typealias SelectionInfo = (_ info: EditorInfo.Selection) -> Void
   public typealias EditorHeight = (_ height: CGFloat) -> Void
+  public typealias ScrollOffset = (_ info: EditorInfo.Scroll) -> Void
   
   @Binding var text: String
+  var scrollOffsetIn: CGFloat
   var isShowingFrames: Bool
   var textInsets: CGFloat
   var textInfo: TextInfo
   var selectionInfo: SelectionInfo
   var editorHeight: EditorHeight
+  var scrollOffsetOut: ScrollOffset
   
   public init(
     text: Binding<String>,
+    scrollOffsetIn: CGFloat,
     isShowingFrames: Bool = false,
     textInsets: CGFloat = 30,
     textInfo: @escaping TextInfo = { _ in },
     selectionInfo: @escaping SelectionInfo = { _ in },
-    editorHeight: @escaping EditorHeight = { _ in }
+    editorHeight: @escaping EditorHeight = { _ in },
+    scrollOffsetOut: @escaping ScrollOffset = { _ in }
   ) {
     self._text = text
+    self.scrollOffsetIn = scrollOffsetIn
     self.isShowingFrames = isShowingFrames
     self.textInsets = textInsets
     self.textInfo = textInfo
     self.selectionInfo = selectionInfo
     self.editorHeight = editorHeight
+    self.scrollOffsetOut = scrollOffsetOut
   }
   
   public func makeNSView(context: Context) -> MarkdownTextView {
@@ -47,6 +50,7 @@ public struct MarkdownEditor: NSViewRepresentable {
     let textView = MarkdownTextView(
       frame: .zero,
       textContainer: nil,
+      scrollOffset: scrollOffsetIn,
       isShowingFrames: isShowingFrames,
       textInsets: textInsets
     )
@@ -64,6 +68,9 @@ public struct MarkdownEditor: NSViewRepresentable {
       DispatchQueue.main.async { self.editorHeight(height) }
     }
     
+    textView.onScrollChange = { info in
+      DispatchQueue.main.async { self.scrollOffsetOut(info) }
+    }
     
     return textView
   }
@@ -73,13 +80,22 @@ public struct MarkdownEditor: NSViewRepresentable {
     context.coordinator.parent = self
     context.coordinator.updatingNSView = true
     
-    if textView.string != self.text {
-      textView.string = self.text
-    }
+    textView.string ?= self.text
+    textView.scrollOffset ?= self.scrollOffsetIn
+    textView.isShowingFrames ?= self.isShowingFrames
     
-    if textView.isShowingFrames != self.isShowingFrames {
-      textView.isShowingFrames = self.isShowingFrames
-    }
+//
+//    if textView.string != self.text {
+//      textView.string = self.text
+//    }
+//    
+//    if textView.scrollOffset != self.scrollOffsetIn {
+//      textView.scrollOffset = self.scrollOffsetIn
+//    }
+//    
+//    if textView.isShowingFrames != self.isShowingFrames {
+//      textView.isShowingFrames = self.isShowingFrames
+//    }
     
     textView.needsLayout = true
     textView.needsDisplay = true
@@ -87,3 +103,4 @@ public struct MarkdownEditor: NSViewRepresentable {
     context.coordinator.updatingNSView = false
   }
 }
+

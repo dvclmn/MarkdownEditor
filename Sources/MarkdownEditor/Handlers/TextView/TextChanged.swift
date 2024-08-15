@@ -15,7 +15,10 @@ extension MarkdownTextView {
     if self.string != lastTextValue {
       
       lastTextValue = self.string
-      onTextChange(calculateTextInfo())
+      
+      if let info = calculateTextInfo() {
+        onTextChange(info)
+      }
     }
     
     self.onEditorHeightChange(self.editorHeight)
@@ -23,9 +26,11 @@ extension MarkdownTextView {
     
   }
   
-  func calculateTextInfo() -> EditorInfo.Text {
+  func calculateTextInfo() -> EditorInfo.Text? {
     
-    
+    guard let tlm = self.textLayoutManager,
+          let viewportRange = tlm.textViewportLayoutController.viewportRange
+    else { return nil }
     
     let documentRange = self.textLayoutManager!.documentRange
     
@@ -41,7 +46,8 @@ extension MarkdownTextView {
       characterCount: self.string.count,
       textElementCount: textElementCount,
       codeBlocks: self.countCodeBlocks(),
-      documentRange: documentRange
+      documentRange: documentRange,
+      viewportRange: viewportRange
     )
   }
   

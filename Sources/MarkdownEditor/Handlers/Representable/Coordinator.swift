@@ -19,9 +19,26 @@ public extension MarkdownEditor {
     var selectedRanges: [NSValue] = []
     var updatingNSView = false
     
+//    private var debouncedScrollTask: Task<Void, Never>?
+    
     init(_ parent: MarkdownEditor) {
       self.parent = parent
     }
+    
+    
+//    func debouncedScrollChange(_ newOffset: CGPoint) {
+//      debouncedScrollTask?.cancel()
+//      debouncedScrollTask = Task {
+//        try? await Task.sleep(nanoseconds: 300_000_000) // 0.3 second debounce
+//        if !Task.isCancelled {
+//          // Handle debounced scroll change here
+//          // You can call parent.textInfo, parent.selectionInfo, etc.
+//          print("Debounced scroll offset changed to: \(newOffset)")
+//        }
+//      }
+//    }
+    
+    
     
     @MainActor public func textDidChange(_ notification: Notification) {
       

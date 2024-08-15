@@ -7,6 +7,7 @@
 
 import SwiftUI
 //import Networking
+import Scrolling
 
 struct ExampleView: View {
   
@@ -14,6 +15,9 @@ struct ExampleView: View {
   @State private var textInfo: EditorInfo.Text? = nil
   @State private var selectionInfo: EditorInfo.Selection? = nil
   @State private var editorHeight: CGFloat = .zero
+  @State private var scrollOffset: CGFloat = .zero
+  
+  @State private var scrollInfo: EditorInfo.Scroll? = nil
   
   var body: some View {
     
@@ -23,21 +27,28 @@ struct ExampleView: View {
       
       Spacer()
       
-      ScrollView(.vertical) {
+      VStack {
         MarkdownEditor(
           text: $text,
+          scrollOffsetIn: scrollOffset,
           isShowingFrames: false,
           textInfo: { self.textInfo = $0 },
           selectionInfo: { self.selectionInfo = $0 },
-          editorHeight: { self.editorHeight = $0 }
+          editorHeight: { self.editorHeight = $0 },
+          scrollOffsetOut: { self.scrollInfo = $0 }
         )
         .frame(height: self.editorHeight)
-        //        .frame(maxWidth: .infinity, maxHeight: .infinity)
       }
-      .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
+//      .frame(maxWidth: .infinity, maxHeight: .infinity)
+      .scrollWithOffset { offset in
+        self.scrollOffset = offset.y
+      }
+//      .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
       
       HStack(alignment: .bottom) {
         Text(self.selectionInfo?.summary ?? "nil")
+        Spacer()
+        Text(self.scrollInfo?.summary ?? "nil")
         Spacer()
         Text(self.textInfo?.summary ?? "nil")
       }
@@ -49,13 +60,16 @@ struct ExampleView: View {
       .background(.black.opacity(0.5))
     }
     .overlay(alignment: .topTrailing) {
-      Text("Local editor height \(self.editorHeight.description)")
-        .allowsHitTesting(false)
-        .foregroundStyle(.secondary)
+      VStack {
+        Text("Local editor height \(self.editorHeight.description)")
+        //        Text("Local scroll offset \(self.scrollOffset.y)")
+      }
+      .allowsHitTesting(false)
+      .foregroundStyle(.secondary)
     }
     .background(.black.opacity(0.5))
     .background(.purple.opacity(0.1))
-    .frame(width: 400, height: 700)
+    .frame(width: 500, height: 700)
   }
 }
 

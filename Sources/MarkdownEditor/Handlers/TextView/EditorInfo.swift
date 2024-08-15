@@ -15,6 +15,7 @@ public struct EditorInfo {
     let textElementCount: Int // TextElement seems to equate to a paragraph
     let codeBlocks: Int
     let documentRange: NSTextRange
+    let viewportRange: NSTextRange
   }
   
   public struct Selection {
@@ -24,6 +25,12 @@ public struct EditorInfo {
     let lineNumber: Int?
     let columnNumber: Int?
   }
+  
+  public struct Scroll {
+    let summary: String
+  }
+  
+  
 }
 
 extension EditorInfo.Text {
@@ -34,6 +41,7 @@ extension EditorInfo.Text {
       Paragraphs: \(textElementCount)
       Code blocks: \(codeBlocks)
       Document Range: \(documentRange)
+      Viewport Range: \(viewportRange)
       """
   }
 }
