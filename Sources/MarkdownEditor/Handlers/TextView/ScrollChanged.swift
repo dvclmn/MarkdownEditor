@@ -23,88 +23,42 @@ extension MarkdownTextView {
     self.testStyles()
     
     self.markdownBlocks = self.processMarkdownBlocks(highlight: true)
-    
-    if window != nil {
-      startTimer()
-    } else {
-      stopTimer()
-    }
 
   }
-  
 
-  func startTimer() {
-    Task { @MainActor in
-      await timerActor.startTimer(interval: 0.2) { [weak self] count in
-        
-        let info = EditorInfo.Scroll(
-          summary: count.description
-        )
-        self?.onScrollChange(info)
-        
-      }
-    }
-  }
-  
-  func stopTimer() {
-    Task { @MainActor in
-      await timerActor.stopTimer()
-    }
-  }
   
 }
 
-actor TimerActor {
+actor ScrollHandler {
   private var timer: Timer?
-  private var tickCount = 0
-  private var onTimerTick: ((Int) -> Void)?
+  private(set) var lastScrollOffset: CGFloat = .zero
+  private var onScrollChange: ((EditorInfo.Scroll) -> Void)?
   
-  func startTimer(interval: TimeInterval, onTick: @escaping (Int) -> Void) {
-    stopTimer()
-    onTimerTick = onTick
-    timer = Timer.scheduledTimer(withTimeInterval: interval, repeats: true) { [weak self] _ in
+  func updateScrollOffset(_ newOffset: CGFloat, onScrollChange: @escaping (EditorInfo.Scroll) -> Void) {
+    if newOffset != lastScrollOffset {
+      lastScrollOffset = newOffset
+      self.onScrollChange = onScrollChange
+      debounceScrollChange()
+    }
+  }
+  
+  private func debounceScrollChange() {
+    timer?.invalidate()
+    timer = Timer.scheduledTimer(withTimeInterval: 0.3, repeats: false) { [weak self] _ in
       Task { [weak self] in
-        await self?.timerTicked()
+        await self?.processScrollChange()
       }
     }
   }
   
-  func stopTimer() {
-    timer?.invalidate()
-    timer = nil
-    tickCount = 0
-  }
-  
-  private func timerTicked() {
-    tickCount += 1
-    onTimerTick?(tickCount)
+  private func processScrollChange() {
+    // Here you can perform any calculations needed for EditorInfo.Scroll
+    let scrollInfo = EditorInfo.Scroll(summary: "Scrolled to offset: \(lastScrollOffset)")
+    onScrollChange?(scrollInfo)
   }
   
   deinit {
-    stopTimer()
+    timer?.invalidate()
   }
 }
 
-
-//actor ScrollOffsetMonitor {
-//  private var lastReportedOffset: CGPoint = .zero
-//  private var task: Task<Void, Never>?
-//
-//  func startMonitoring(for textView: MarkdownTextView) async {
-//    task = Task {
-//      while !Task.isCancelled {
-//        let currentOffset = await textView.visibleRect.origin
-//        if currentOffset != lastReportedOffset {
-//          lastReportedOffset = currentOffset
-//          await textView.reportScrollChange(currentOffset)
-//        }
-//        try? await Task.sleep(nanoseconds: 100_000_000) // 0.1 second
-//      }
-//    }
-//  }
-//
-//  func stopMonitoring() {
-//    task?.cancel()
-//    task = nil
-//  }
-//}

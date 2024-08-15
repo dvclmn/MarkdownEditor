@@ -14,13 +14,33 @@ public class MarkdownTextView: NSTextView {
   private var viewportLayoutController: NSTextViewportLayoutController?
   private var viewportDelegate: CustomViewportDelegate?
   
-  var scrollOffset: CGFloat
+  var scrollOffset: CGFloat = .zero {
+    didSet {
+      didChangeScroll()
+//      if scrollOffset != oldValue {
+//      }
+      
+      
+    }
+  }
+  
   var isShowingFrames: Bool
   var textInsets: CGFloat
   
-  let timerActor = TimerActor()
-//  public var onTimerTick: ((Int) -> Void)?
-
+  
+  private let scrollHandler = ScrollHandler()
+  
+  
+  private func didChangeScroll() {
+    Task {
+      await scrollHandler.updateScrollOffset(scrollOffset) { [weak self] scrollInfo in
+        DispatchQueue.main.async {
+          self?.onScrollChange(scrollInfo)
+        }
+      }
+    }
+  }
+  
   var markdownBlocks: [MarkdownBlock] = []
   
   public typealias OnEvent = (_ event: NSEvent, _ action: () -> Void) -> Void
@@ -48,7 +68,7 @@ public class MarkdownTextView: NSTextView {
     self.scrollOffset = scrollOffset
     self.isShowingFrames = isShowingFrames
     self.textInsets = textInsets
-        
+    
     let textLayoutManager = MarkdownLayoutManager()
     let textContentStorage = NSTextContentStorage()
     let container = NSTextContainer()
@@ -60,7 +80,7 @@ public class MarkdownTextView: NSTextView {
     super.init(frame: frameRect, textContainer: container)
     
     self.textViewSetup()
-
+    
   }
   
   @available(*, unavailable)
@@ -101,7 +121,7 @@ public class MarkdownTextView: NSTextView {
     assertionFailure("TextKit 1 is not supported by this type")
     return nil
   }
-
+  
 }
 
 extension Notification.Name {
@@ -132,7 +152,7 @@ extension MarkdownTextView {
     self.viewportLayoutController?.delegate = viewportDelegate
     
     
-//        viewportLayoutController?.viewportRange
+    //        viewportLayoutController?.viewportRange
   }
   
   public override func scrollWheel(with event: NSEvent) {
@@ -147,15 +167,15 @@ extension MarkdownTextView {
           let tcs = self.textContentStorage
     else { return }
     
-//    let testAttrs: [NSAttributedString.Key: Any] = [
-//      .foregroundColor: NSColor.yellow
-//    ]
-//    
+    //    let testAttrs: [NSAttributedString.Key: Any] = [
+    //      .foregroundColor: NSColor.yellow
+    //    ]
+    //
     let documentRange = tlm.documentRange
     
     var codeBlockCount = 0
     
-//    let nsRange = NSRange(documentRange, in: tcm)
+    //    let nsRange = NSRange(documentRange, in: tcm)
     
     // Enumerate through text paragraphs
     tcm.enumerateTextElements(from: documentRange.location, options: []) { textElement in
@@ -173,30 +193,30 @@ extension MarkdownTextView {
       return true
     }
     
-//    self.string.range
+    //    self.string.range
     
     //    guard let fullString = tcs.attributedString(in: documentRange)?.string else { return }
     
     tcm.performEditingTransaction {
       
-        
-      
-
-//      var ranges: [NSTextRange] = []
       
       
       
-//      for range in ranges {
-        
-        //        tcs.textStorage?.setAttributes(testAttrs, range: nsRange)
-        
-        
-//      }
+      //      var ranges: [NSTextRange] = []
+      
+      
+      
+      //      for range in ranges {
+      
+      //        tcs.textStorage?.setAttributes(testAttrs, range: nsRange)
+      
+      
+      //      }
       
     }
   }
   
-
+  
   
   public override func layout() {
     super.layout()

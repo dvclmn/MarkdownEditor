@@ -78,6 +78,7 @@ public struct MarkdownEditor: NSViewRepresentable {
   public func updateNSView(_ textView: MarkdownTextView, context: Context) {
     
     context.coordinator.parent = self
+    
     context.coordinator.updatingNSView = true
     
 //    textView.string ?= self.text
@@ -97,6 +98,7 @@ public struct MarkdownEditor: NSViewRepresentable {
       textView.isShowingFrames = self.isShowingFrames
     }
     
+//    textView.invalidateIntrinsicContentSize()
     textView.needsLayout = true
     textView.needsDisplay = true
     
