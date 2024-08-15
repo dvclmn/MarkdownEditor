@@ -16,31 +16,22 @@ public class MarkdownTextView: NSTextView {
   
   var scrollOffset: CGFloat = .zero {
     didSet {
-      didChangeScroll()
-//      if scrollOffset != oldValue {
-//      }
-      
-      
+      if scrollOffset != oldValue {
+//        testScrollString += "butts"
+        didChangeScroll()
+      }
     }
   }
+  
+//  var testScrollString: String = ""
   
   var isShowingFrames: Bool
   var textInsets: CGFloat
   
   
-  private let scrollHandler = ScrollHandler()
+  let scrollHandler = ScrollHandler()
   
-  
-  private func didChangeScroll() {
-    Task {
-      await scrollHandler.updateScrollOffset(scrollOffset) { [weak self] scrollInfo in
-        DispatchQueue.main.async {
-          self?.onScrollChange(scrollInfo)
-        }
-      }
-    }
-  }
-  
+
   var markdownBlocks: [MarkdownBlock] = []
   
   public typealias OnEvent = (_ event: NSEvent, _ action: () -> Void) -> Void
@@ -87,6 +78,7 @@ public class MarkdownTextView: NSTextView {
   public required init?(coder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
+  
   
   
   //
@@ -141,6 +133,25 @@ extension MarkdownTextView {
     
     return height
   }
+  
+  
+  public override func viewDidMoveToWindow() {
+    
+    super.viewDidMoveToWindow()
+    
+    if let info = self.calculateTextInfo() {
+      self.onTextChange(info)
+    }
+    self.onEditorHeightChange(self.editorHeight)
+    
+    setupViewportLayoutController()
+    
+    self.testStyles()
+    
+    self.markdownBlocks = self.processMarkdownBlocks(highlight: true)
+    
+  }
+  
   
   func setupViewportLayoutController() {
     guard let textLayoutManager = self.textLayoutManager else { return }

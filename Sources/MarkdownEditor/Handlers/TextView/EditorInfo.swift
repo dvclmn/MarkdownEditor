@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-public struct EditorInfo {
+public struct EditorInfo: Sendable {
   
   public struct Text {
     let editorHeight: CGFloat
