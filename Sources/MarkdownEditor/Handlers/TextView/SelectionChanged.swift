@@ -8,6 +8,12 @@
 import SwiftUI
 import STTextKitPlus
 
+//extension NSTextSelection {
+//  func displayString() -> String {
+//    self.
+//  }
+//}
+
 extension MarkdownTextView {
   
   
@@ -87,32 +93,61 @@ extension MarkdownTextView {
   }
   
   
-//  func getMarkdownBlock(for range: NSTextRange, in blocks: [MarkdownBlock]) -> MarkdownBlock? {
-//    // First, check if the range intersects with any block
-//    if let intersectingBlock = blocks.first(where: { $0.range.intersects(range) }) {
-//      return intersectingBlock
-//    }
-//    
-//    // If not, find the block that contains the range's start location
-//    return blocks.first(where: { $0.range.contains(range.location) })
-//  }
-//  
-//  func getSelectedMarkdownBlocks() -> [MarkdownBlock] {
-//    guard let range = self.selectedTextRange() else { return [] }
-//    
-//    if range.isEmpty {
-//      // For a single insertion point, return the block containing that point
-//      if let block = getMarkdownBlock(for: range, in: self.markdownBlocks) {
-//        return [block]
-//      }
-//    } else {
-//      // For a non-empty selection, return all intersecting blocks
-//      return self.markdownBlocks.filter { $0.range.intersects(range) }
-//    }
-//    
-//    return []
-//  }
+  func calculateSelectionInfo() -> EditorInfo.Selection? {
+    
+//    let selectedRange = self.selectedRange()
+//    let selectedRange = self.selectedTextRange()
 
+    guard let selectedLocation = self.selectedTextLocation() else { return nil }
+    
+    let selectedSyntax = self.getSelectedMarkdownBlocks().map { block in
+      block.syntax
+    }
+    
+    let selectionDescription: String = ""
+    
+    
+    
+//    let fullString = self.string as NSString
+    
+//    let tcs = self.textContentStorage
+    
+    return EditorInfo.Selection(
+      selection: selectionDescription,
+      selectedSyntax: selectedSyntax,
+      lineNumber: self.getLineAndColumn(for: selectedLocation)?.0,
+      columnNumber: self.getLineAndColumn(for: selectedLocation)?.1
+    )
+  }
+  
+  
+  
+  //  func getMarkdownBlock(for range: NSTextRange, in blocks: [MarkdownBlock]) -> MarkdownBlock? {
+  //    // First, check if the range intersects with any block
+  //    if let intersectingBlock = blocks.first(where: { $0.range.intersects(range) }) {
+  //      return intersectingBlock
+  //    }
+  //
+  //    // If not, find the block that contains the range's start location
+  //    return blocks.first(where: { $0.range.contains(range.location) })
+  //  }
+  //
+  //  func getSelectedMarkdownBlocks() -> [MarkdownBlock] {
+  //    guard let range = self.selectedTextRange() else { return [] }
+  //
+  //    if range.isEmpty {
+  //      // For a single insertion point, return the block containing that point
+  //      if let block = getMarkdownBlock(for: range, in: self.markdownBlocks) {
+  //        return [block]
+  //      }
+  //    } else {
+  //      // For a non-empty selection, return all intersecting blocks
+  //      return self.markdownBlocks.filter { $0.range.intersects(range) }
+  //    }
+  //
+  //    return []
+  //  }
+  
   
   //
   //  func getCurrentMarkdownBlock(for range: NSTextRange, in blocks: [MarkdownBlock]) -> MarkdownBlock? {
@@ -150,28 +185,6 @@ extension MarkdownTextView {
   //  }
   //
   //
-  func calculateSelectionInfo() -> EditorInfo.Selection? {
-    
-//    let selectedRange = self.selectedRange()
-    let selectedRange = self.selectedTextRange()
-
-    guard let selectedLocation = self.selectedTextLocation() else { return nil }
-    
-    let selectedSyntax = self.getSelectedMarkdownBlocks().map { block in
-      block.syntax
-    }
-    
-//    let fullString = self.string as NSString
-    
-//    let tcs = self.textContentStorage
-    
-    return EditorInfo.Selection(
-      selectedRange: selectedRange,
-      selectedSyntax: selectedSyntax,
-      lineNumber: self.getLineAndColumn(for: selectedLocation).0,
-      columnNumber: self.getLineAndColumn(for: selectedLocation).1
-    )
-  }
   
   
 }
