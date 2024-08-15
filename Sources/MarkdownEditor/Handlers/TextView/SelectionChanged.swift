@@ -14,8 +14,9 @@ extension MarkdownTextView {
   public override func setSelectedRanges(_ ranges: [NSValue], affinity: NSSelectionAffinity, stillSelecting: Bool) {
     super.setSelectedRanges(ranges, affinity: affinity, stillSelecting: stillSelecting)
     
-    let selectionInfo = calculateSelectionInfo()
-    onSelectionChange(selectionInfo)
+    if let selectionInfo = calculateSelectionInfo() {
+      onSelectionChange(selectionInfo)
+    }
 
   }
 //  
@@ -77,9 +78,10 @@ extension MarkdownTextView {
     } else {
       /// Zero-length selection
       
-      guard let range = firstSelection.textRanges.first else { return [] }
+      return []
+//      guard let range = firstSelection.textRanges.first else { return [] }
       
-      return self.markdownBlocks.filter { $0.range.contains(<#T##location: any NSTextLocation##any NSTextLocation#>) }
+//      return self.markdownBlocks.filter { $0.range.contains(<#T##location: any NSTextLocation##any NSTextLocation#>) }
     }
     
   }
@@ -148,36 +150,34 @@ extension MarkdownTextView {
   //  }
   //
   //
-  private func calculateSelectionInfo() -> EditorInfo.Selection {
+  func calculateSelectionInfo() -> EditorInfo.Selection? {
     
 //    let selectedRange = self.selectedRange()
     let selectedRange = self.selectedTextRange()
-    
 
+    guard let selectedLocation = self.selectedTextLocation() else { return nil }
+    
     let selectedSyntax = self.getSelectedMarkdownBlocks().map { block in
       block.syntax
     }
     
-    let fullString = self.string as NSString
+//    let fullString = self.string as NSString
     
-    let tcs = self.textContentStorage
-    
-
-    
-    let substring = fullString.substring(to: selectedRange.location)
-    let lineNumber = substring.components(separatedBy: .newlines).count
-    
-    let lineRange = fullString.lineRange(for: NSRange(location: selectedRange.location, length: 0))
-    let lineStart = lineRange.location
-    let columnNumber = selectedRange.location - lineStart + 1
+//    let tcs = self.textContentStorage
     
     return EditorInfo.Selection(
       selectedRange: selectedRange,
       selectedSyntax: selectedSyntax,
-      lineNumber: lineNumber,
-      columnNumber: columnNumber
+      lineNumber: self.getLineAndColumn(for: selectedLocation).0,
+      columnNumber: self.getLineAndColumn(for: selectedLocation).1
     )
   }
   
   
 }
+
+//extension NSTextLocation {
+//  static var zero: NSTextLocation {
+//    return NSTextLocation(offset: 0)
+//  }
+//}

@@ -18,7 +18,7 @@ public struct EditorInfo {
   }
   
   public struct Selection {
-    let selectedRange: NSTextRange
+    let selectedRange: NSTextRange?
     let selectedSyntax: [Markdown.Syntax]
     let lineNumber: Int
     let columnNumber: Int
@@ -46,7 +46,7 @@ extension EditorInfo.Selection {
     
     return """
       Selected Syntax: [\(formattedSyntaxNames)]
-      Selected Range: \(selectedRange)
+      Selected Range: \(selectedRange?.description ?? "nil")
       Line: \(lineNumber), Column: \(columnNumber)
       """
   }

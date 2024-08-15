@@ -121,19 +121,15 @@ extension MarkdownTextView {
   private func setupViewportLayoutController() {
     guard let textLayoutManager = self.textLayoutManager else { return }
     
-    viewportDelegate = CustomViewportDelegate()
-    viewportDelegate?.textView = self
+    self.viewportDelegate = CustomViewportDelegate()
+    self.viewportDelegate?.textView = self
     
-    viewportLayoutController = NSTextViewportLayoutController(textLayoutManager: textLayoutManager)
-    viewportLayoutController?.delegate = viewportDelegate
+    self.viewportLayoutController = NSTextViewportLayoutController(textLayoutManager: textLayoutManager)
+    self.viewportLayoutController?.delegate = viewportDelegate
     
-    // Set the initial viewport
-//        viewportLayoutController?.viewportRange = self.visibleRange
+    
+//        viewportLayoutController?.viewportRange
   }
-  
-  //  private func updateViewport() {
-  //    viewportLayoutController?.viewportRange = self.visibleRange
-  //  }
   
   public override func scrollWheel(with event: NSEvent) {
     super.scrollWheel(with: event)
