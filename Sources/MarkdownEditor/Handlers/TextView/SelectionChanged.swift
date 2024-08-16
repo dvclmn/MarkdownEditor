@@ -194,9 +194,3 @@ extension MarkdownTextView {
   
   
 }
-
-//extension NSTextLocation {
-//  static var zero: NSTextLocation {
-//    return NSTextLocation(offset: 0)
-//  }
-//}

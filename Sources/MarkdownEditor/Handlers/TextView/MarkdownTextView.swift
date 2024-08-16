@@ -11,11 +11,11 @@ import SwiftUI
 
 public class MarkdownTextView: NSTextView {
   
+  private let markdownProcessor = MarkdownProcessor()
+  let scrollHandler = ScrollHandler()
+
   private var viewportLayoutController: NSTextViewportLayoutController?
   private var viewportDelegate: CustomViewportDelegate?
-  
-  var markdownBlocks: [MarkdownBlock] = []
-  let scrollHandler = ScrollHandler()
   
   var scrollOffset: CGFloat = .zero {
     didSet {
@@ -25,17 +25,10 @@ public class MarkdownTextView: NSTextView {
     }
   }
   
-//  var testScrollString: String = ""
-  
   var isShowingFrames: Bool
   var textInsets: CGFloat
   
-  public typealias OnEvent = (_ event: NSEvent, _ action: () -> Void) -> Void
-  
-  private var activeScrollValue: (NSRange, CGSize)?
-  
-  var lastTextValue = String()
-  
+  //  public typealias OnEvent = (_ event: NSEvent, _ action: () -> Void) -> Void
 //  public var onKeyDown: OnEvent = { $1() }
 //  public var onFlagsChanged: OnEvent = { $1() }
 //  public var onMouseDown: OnEvent = { $1() }
@@ -146,7 +139,7 @@ extension MarkdownTextView {
     
     self.markdownBlocks = self.processMarkdownBlocks(highlight: true)
     
-//    self.didChangeScroll() // Just to nudge it
+    self.didChangeScroll() // Just to nudge it
     
   }
   

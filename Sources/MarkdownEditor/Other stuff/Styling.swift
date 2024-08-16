@@ -10,6 +10,20 @@ import SwiftUI
 
 extension MarkdownEditor {
   
+  
+  /// Style syntax characters
+  ///
+  private static func applySyntaxAttributes(
+    for syntax: Markdown.Syntax,
+    to attributedString: NSMutableAttributedString,
+    in range: NSRange
+  ) {
+    
+    for (key, value) in syntax.syntaxAttributes {
+      attributedString.addAttribute(key, value: value, range: range)
+    }
+  }
+  
 //  func setCodeBlockBackgrounds(for textView: MDTextView) {
     
 //    let ranges = [NSRange]()
@@ -116,19 +130,7 @@ extension MarkdownEditor {
 //    
 //  } // END
   
-  
-  /// Style syntax characters
-  ///
-  private static func applySyntaxAttributes(
-    for syntax: Markdown.Syntax,
-    to attributedString: NSMutableAttributedString,
-    in range: NSRange
-  ) {
-    
-    for (key, value) in syntax.syntaxAttributes {
-      attributedString.addAttribute(key, value: value, range: range)
-    }
-  }
+ 
   
 //  
 //  func addAttributes(

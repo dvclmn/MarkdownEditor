@@ -10,46 +10,6 @@ import Foundation
 import SwiftUI
 import RegexBuilder
 
-
-class MarkdownBlock: NSTextElement {
-  var range: NSTextRange
-  let syntax: Markdown.Syntax
-  var isComplete: Bool
-
-  init(
-    _ textContentManager: NSTextContentManager,
-    range: NSTextRange,
-    syntax: Markdown.Syntax,
-    isComplete: Bool = true
-  ) {
-    self.range = range
-    self.syntax = syntax
-    self.isComplete = isComplete
-    super.init(textContentManager: textContentManager)
-  }
-}
-
-
-extension Markdown.Syntax {
-  
-  public enum LayoutType {
-    case block
-    case line
-    case inline
-  }
-  
-  public enum Boundary {
-    case opening
-    case closing
-    case single // For syntax that doesn't have separate opening and closing (like horizontal rules)
-  }
-  
-}
-
-public struct Markdown {
-  
-}
-
 extension Markdown {
 
   public enum Syntax: Identifiable, Equatable, Hashable, Sendable {

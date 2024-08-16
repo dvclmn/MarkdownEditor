@@ -12,14 +12,14 @@ extension MarkdownTextView {
   public override func didChangeText() {
     super.didChangeText()
     
-    if self.string != lastTextValue {
+    
       
-      lastTextValue = self.string
+
       
       
-        onTextChange(calculateTextInfo())
+    self.onTextChange(calculateTextInfo())
       
-    }
+    
     
     self.onEditorHeightChange(self.editorHeight)
 //    self.markdownBlocks = self.processMarkdownBlocks(highlight: true)
