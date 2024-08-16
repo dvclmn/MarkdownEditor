@@ -19,8 +19,11 @@ extension MarkdownTextView {
            else { return }
     
     tcm.performEditingTransaction {
+      
         let nsRange = NSRange(block.range, in: tcm)
-        tcs.textStorage?.addAttributes(.highlighter, range: nsRange)
+      
+      tcs.textStorage?.setAttributesButts(.highlighter, range: nsRange, with: self.typingAttributes)
+      
     }
   } // END addStyle
   

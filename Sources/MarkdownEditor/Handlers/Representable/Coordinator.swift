@@ -26,7 +26,9 @@ public extension MarkdownEditor {
       self.parent = parent
     }
     
-    @MainActor public func textDidChange(_ notification: Notification) {
+
+    
+    public func textDidChange(_ notification: Notification) {
       
       guard let textView = notification.object as? MarkdownTextView,
             !updatingNSView
@@ -35,9 +37,16 @@ public extension MarkdownEditor {
       self.parent.text = textView.string
       self.selectedRanges = textView.selectedRanges
       
+      /// I have learned, and need to remember, that this `Coordinator` is
+      /// a delegate, for my ``MarkdownTextView``. Which means I can take
+      /// full advantage of methods here, just like I can with overrides in `MarkdownTextView`. They often have different functionalities to
+      /// experiment with.
+//      Task {
+//        textView.processingTime = await textView.processFullDocumentWithTiming(textView.string)
+//      }
+      
     }
     
-    @MainActor
     public func textViewDidChangeSelection(_ notification: Notification) {
       guard let textView = notification.object as? MarkdownTextView,
             !updatingNSView

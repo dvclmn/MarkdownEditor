@@ -7,13 +7,15 @@
 
 import SwiftUI
 
+public typealias Attributes = [NSAttributedString.Key: Any]
+
 @MainActor
 struct AttributeSet: @preconcurrency ExpressibleByDictionaryLiteral {
   
-  let attributes: [NSAttributedString.Key: Any]
+  let attributes: Attributes
   
   init(
-    dictionaryLiteral elements: (NSAttributedString.Key, Any)...
+    dictionaryLiteral elements: (Attributes.Key, Attributes.Value)...
   ) {
     self.attributes = Dictionary(uniqueKeysWithValues: elements)
   }
@@ -23,7 +25,8 @@ struct AttributeSet: @preconcurrency ExpressibleByDictionaryLiteral {
 extension AttributeSet {
   
   static let highlighter: AttributeSet = [
-    .foregroundColor: NSColor.yellow
+    .foregroundColor: NSColor.yellow,
+    .backgroundColor: NSColor.orange.withAlphaComponent(0.6)
   ]
   
   static let codeBlock: AttributeSet = [
@@ -35,8 +38,22 @@ extension AttributeSet {
 }
 
 extension NSMutableAttributedString {
-  @MainActor func addAttributes(_ attributeSet: AttributeSet, range: NSRange) {
-    addAttributes(attributeSet.attributes, range: range)
+  @MainActor func setAttributesButts(
+    _ attributeSet: AttributeSet,
+    range: NSRange,
+    with typingAttributes: Attributes? = nil
+  ) {
+    
+    if let typingAttributes = typingAttributes {
+      
+//      setAttributes(attributeSet.attributes.merging(typingAttributes, uniquingKeysWith: { key, value in
+//        
+//      }), range: range)
+      setAttributes(attributeSet.attributes, range: range)
+      addAttributes(typingAttributes, range: range)
+    } else {
+      setAttributes(attributeSet.attributes, range: range)
+    }
   }
 }
 

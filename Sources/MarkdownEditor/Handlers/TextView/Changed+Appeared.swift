@@ -18,6 +18,10 @@ extension MarkdownTextView {
     
     setupViewportLayoutController()
     
+#if DEBUG
+    // TODO: This is an expensive operation, and is only here temporarily for debugging.
+    self.processMarkdownBlocks(highlight: true)
+#endif
     
     Task { @MainActor in
       
@@ -30,7 +34,7 @@ extension MarkdownTextView {
         /// when the view is initialised, without waiting for text/selection to change.
         try await Task.sleep(for: .seconds(0.1))
         
-        self.processingTime = await self.processFullDocumentWithTiming(self.string)
+//        self.processingTime = await self.processFullDocumentWithTiming(self.string)
         
         
         

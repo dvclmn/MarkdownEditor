@@ -105,35 +105,14 @@ extension MarkdownTextView {
           let tcs = self.textContentStorage else { return }
     
     let documentRange = tlm.documentRange
-//    var markdownBlocks: [MarkdownBlock] = []
-//    var currentCodeBlock: MarkdownBlock?
-    
-    /// Basics: Enumerating over the text elements provides the opportunity to work with
-    /// each and every `NSTextElement` that matches any filtering performed in
-    /// the `block` closure. (see: `{ textElement in`).
-    ///
-    /// For parameter `textLocation`, I've explicitly
-    /// supplied `documentRange.location`, which also happens to be the default value.
-    ///
-    /// The return type for `block` is `Bool`; provide `false` to stop enumerating
-    ///
-    /// Example:
-    /// ```
-    /// tcm.enumerateTextElements { element in
-    ///   if element.property == something {
-    ///     // do things
-    ///     return true
-    ///   } else {
-    ///     return false
-    ///   }
-    /// }
-    /// ```
+
     tcm.enumerateTextElements(from: documentRange.location, options: []) { textElement in
       guard let paragraph = textElement as? NSTextParagraph,
             let paragraphRange = paragraph.elementRange,
             let content = tcm.attributedString(in: paragraphRange)?.string else {
-        return true
+        return false
       }
+      
       
       if content.hasPrefix("```") {
         

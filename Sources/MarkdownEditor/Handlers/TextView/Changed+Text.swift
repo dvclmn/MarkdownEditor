@@ -7,8 +7,13 @@
 
 import SwiftUI
 
-extension MarkdownTextView {
+extension MarkdownEditor.Coordinator {
   
+  
+  
+}
+
+extension MarkdownTextView {
   
   public override func didChangeText() {
     
@@ -29,14 +34,28 @@ extension MarkdownTextView {
 //        
 //      } // END process scroll
 //    } // END Task
-
-    
     
     Task { @MainActor in
-      
+
       let info = self.generateTextInfo()
       await infoHandler.update(info)
+
     }
+#if DEBUG
+    // TODO: This is an expensive operation, and is only here temporarily for debugging.
+    self.processMarkdownBlocks(highlight: true)
+#endif
+
+//    Task {
+//      
+//      do {
+//        try await Task.sleep(for: .seconds(0.4))
+//        
+//        self.processingTime = await self.processFullDocumentWithTiming(self.string)
+//      } catch {
+//        
+//      }
+//    }
   }
 }
 
@@ -94,7 +113,7 @@ extension MarkdownTextView {
       processingTime: self.processingTime,
       characterCount: self.string.count,
       textElementCount: textElementCount,
-      //      codeBlocks: self.countCodeBlocks(),
+      codeBlocks: self.blocks.filter { $0.syntax == .codeBlock }.count,
       documentRange: documentRange.description,
       viewportRange: viewportRange.description
     )
