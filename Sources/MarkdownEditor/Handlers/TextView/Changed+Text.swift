@@ -9,22 +9,78 @@ import SwiftUI
 
 extension MarkdownTextView {
   
+  
   public override func didChangeText() {
     super.didChangeText()
+    
+    let info = self.generateTextInfo()
+    let height = self.generateEditorHeight()
+    
+    Task { @MainActor in
+      await infoHandler.update(info)
+      await infoHandler.update(height)
+    }
+  }
+}
 
+extension EditorInfo.Text {
+  public var summary: String {
+      """
+      Characters: \(characterCount)
+      Paragraphs: \(textElementCount)
+      Code blocks: \(codeBlocks)
+      Document Range: \(documentRange)
+      Viewport Range: \(viewportRange)
+      """
+  }
+}
+
+
+extension MarkdownTextView {
+  
+  
+  func generateEditorHeight() -> EditorInfo.Frame {
     
+    guard let tlm = self.textLayoutManager
+    else { return .init() }
+    let documentRange = tlm.documentRange
     
-    self.updateTextInfo()
+    tlm.ensureLayout(for: documentRange)
     
-    self.onInfoUpdate(self.editorInfo)
-    
+    let typographicBounds: CGFloat = tlm.typographicBounds(in: documentRange)?.height ?? .zero
+    let height = (configuration.insets * 2) + typographicBounds
+
+    return EditorInfo.Frame(
+      height: height,
+      width: .greatestFiniteMagnitude // Not used currently
+    )
   }
   
-  
-  
-  
-  
-  
+  func generateTextInfo() -> EditorInfo.Text {
+    
+    //    self.editorInfo.text = EditorInfo.Text(/* new values */)
+    
+    guard let tlm = self.textLayoutManager,
+          let viewportRange = tlm.textViewportLayoutController.viewportRange
+    else { return .init() }
+    
+    let documentRange = self.textLayoutManager!.documentRange
+    
+    var textElementCount: Int = 0
+    
+    textLayoutManager?.textContentManager?.enumerateTextElements(from: documentRange.location, using: { _ in
+      textElementCount += 1
+      return true
+    })
+    
+    return EditorInfo.Text(
+      characterCount: self.string.count,
+      textElementCount: textElementCount,
+      //      codeBlocks: self.countCodeBlocks(),
+      documentRange: documentRange.description,
+      viewportRange: viewportRange.description
+    )
+  }
   
   //  func calculateCodeBlocks() -> Int? {
   //    guard let tlm = self.textLayoutManager,

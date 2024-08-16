@@ -7,6 +7,7 @@
 
 import SwiftUI
 import Scrolling
+import Geometry
 
 struct ExampleView: View {
   
@@ -16,6 +17,8 @@ struct ExampleView: View {
 //  @State private var scrollInfo: EditorInfo.Scroll? = nil
 //  @State private var editorHeight: CGFloat = .zero
   
+  @State private var calculatedEditorHeight: CGFloat = .zero
+  
   @State private var scrollOffset: CGFloat = .zero
   
   var body: some View {
@@ -24,14 +27,18 @@ struct ExampleView: View {
       
       Spacer()
       
-      VStack {
-        MarkdownEditor(
-          text: $text,
-          scrollOffsetIn: scrollOffset,
-          info: { self.editorInfo = $0 }
-        )
-        .frame(height: self.editorInfo?.height)
-      }
+        VStack {
+          MarkdownEditor(
+            text: $text,
+            scrollOffsetIn: scrollOffset,
+            info: { self.editorInfo = $0 }
+          )
+//          .readSize { size in
+//            self.calculatedEditorHeight = size.height
+//          }
+          .frame(height: self.editorInfo?.frame.height)
+        }
+      
       .scrollWithOffset { offset in
         self.scrollOffset = offset.y
       }
@@ -54,7 +61,7 @@ struct ExampleView: View {
     }
     .overlay(alignment: .topTrailing) {
       VStack {
-        Text("Local editor height \(self.editorInfo?.height.description ?? "nil")")
+        Text("Local editor height \(self.editorInfo?.frame.height.description ?? "nil")")
         Text("Local scroll offset \(self.scrollOffset)")
       }
       .allowsHitTesting(false)

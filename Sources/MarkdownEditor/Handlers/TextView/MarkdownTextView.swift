@@ -8,15 +8,46 @@
 import SwiftUI
 //import STTextKitPlus
 
+//
+//
+//func didChangeSelection() {
+//  let selectionInfo = self.generateSelectionInfo()
+//  Task { @MainActor in
+//    await infoHandler.update(selectionInfo)
+//  }
+//}
+//
+//func didScroll() {
+//  let scrollInfo = self.generateScrollInfo()
+//  Task { @MainActor in
+//    await infoHandler.update(scrollInfo)
+//  }
+//}
+//
+//func didChangeHeight(_ newHeight: CGFloat) {
+//  Task { @MainActor in
+//    await infoHandler.update(HeightUpdate(height: newHeight))
+//  }
+//}
+//
+//
+
+
 
 public class MarkdownTextView: NSTextView {
   
   let parser = MarkdownParser()
-  let scrollHandler = ScrollHandler()
+  
+  let heightHandler = Debouncer(interval: 0.1)
+  let scrollHandler = Debouncer()
+  
+  
+  let infoHandler = EditorInfoHandler()
 
   var configuration: EditorConfiguration
   
   var editorInfo = EditorInfo()
+  
   
   private var viewportLayoutController: NSTextViewportLayoutController?
   private var viewportDelegate: CustomViewportDelegate?
@@ -74,6 +105,10 @@ public class MarkdownTextView: NSTextView {
     
     self.textViewSetup()
     
+    self.infoHandler.onInfoUpdate = { [weak self] info in
+      self?.onInfoUpdate(info)
+    }
+    
   }
   
   @available(*, unavailable)
@@ -94,17 +129,6 @@ extension Notification.Name {
 
 
 extension MarkdownTextView {
-  
-  func updateEditorHeight() {
-    
-    guard let tlm = self.textLayoutManager
-    else { return }
-    let documentRange = tlm.documentRange
-    let typographicBounds: CGFloat = tlm.typographicBounds(in: documentRange)?.height ?? .zero
-    let height = (configuration.insets * 2) + typographicBounds
-    
-    self.editorInfo.height = height
-  }
 
   func setupViewportLayoutController() {
     guard let textLayoutManager = self.textLayoutManager else { return }

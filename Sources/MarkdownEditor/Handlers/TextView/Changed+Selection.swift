@@ -15,9 +15,13 @@ extension MarkdownTextView {
     
     super.setSelectedRanges(ranges, affinity: affinity, stillSelecting: stillSelecting)
     
-    self.updateSelectionInfo()
-    self.onInfoUpdate(self.editorInfo)
+    let info = self.generateSelectionInfo()
+    Task { @MainActor in
+      await infoHandler.update(info)
+    }
     
+    
+
   }
   //
   //  func selectedTextRange() -> NSTextRange? {
@@ -26,7 +30,7 @@ extension MarkdownTextView {
   //  }
   //
   //
-
+  
   //
   //
   //  func getSelectedMarkdownBlocks() -> [MarkdownBlock] {
@@ -38,6 +42,68 @@ extension MarkdownTextView {
   //
   //
   
+}
+
+extension EditorInfo.Selection {
+  public var summary: String {
+    
+    let formattedSyntaxNames: String = selectedSyntax.map { syntax in
+      syntax.name
+    }.joined(separator: ", ")
+    
+    return """
+      Selection: \(selection)
+      Selected Syntax: [\(formattedSyntaxNames)]
+      Line: \(location?.line.description ?? "nil"), Column: \(location?.column.description ?? "nil")
+      """
+  }
+  
+  public static func summaryFor(selection: EditorInfo.Selection) -> String {
+    selection.summary
+  }
+}
+
+
+extension MarkdownTextView {
+  
+  func generateSelectionInfo() -> EditorInfo.Selection {
+    
+    guard let tlm = self.textLayoutManager else { return .init() }
+    
+    //    let selectedRange = self.selectedRange()
+    let selectedRange = self.selectedTextRange()
+    
+    
+    //    guard let selectedLocation = self.selectedTextLocation(),
+    //          let textSelections = self.textLayoutManager?.textSelections,
+    //          let selectedTextRange = textSelections.first?.textRanges.first,
+    //          let selectionDescription: String = textSelections.first?.textRanges.first?.location.description
+    //    else { return .init() }
+    //
+    //    let selectedSyntax = self.getSelectedMarkdownBlocks().map { block in
+    //      block.syntax
+    //    }
+    //
+    //
+    //    let currentBlock = self.getMarkdownBlock(for: selectedTextRange) ?? .none
+    
+    let selectedString = tlm.textContentManager?.attributedString(in: selectedRange)
+    
+    
+    //    let fullString = self.string as NSString
+    
+    //    let tcs = self.textContentStorage
+    
+    return EditorInfo.Selection(
+      selection: (selectedString?.string.count ?? 0).description,
+      //      selection: currentBlock?.description ?? "nil",
+      selectedSyntax: [],
+      location: EditorInfo.Selection.Location(line: 0, column: 0)
+      //      lineNumber: self.getLineAndColumn(for: selectedLocation)?.0,
+      //      columnNumber: self.getLineAndColumn(for: selectedLocation)?.1
+    )
+    
+  }
   
   
   func selectedTextRange() -> NSTextRange? {
