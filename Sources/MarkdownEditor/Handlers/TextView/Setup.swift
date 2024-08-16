@@ -11,20 +11,23 @@ import SwiftUI
 extension MarkdownTextView {
   func textViewSetup() {
     
-    self.autoresizingMask = [.width, .height]
-    self.isEditable = true
-    self.smartInsertDeleteEnabled = false
-//    self.autoresizingMask = .width
-    self.textContainer?.widthTracksTextView = true
-    self.textContainer?.heightTracksTextView = false
-    self.drawsBackground = false
-    self.isHorizontallyResizable = false
-    self.isVerticallyResizable = true
-    self.allowsUndo = true
-    self.isRichText = false
-    self.textContainer?.lineFragmentPadding = self.configuration.insets
-    self.textContainerInset = NSSize(width: 0, height: self.configuration.insets)
-    self.font = NSFont.systemFont(ofSize: 15, weight: .regular)
-    self.textColor = NSColor.textColor
+    isEditable = true
+    drawsBackground = false
+    allowsUndo = true
+    isRichText = false
+    
+    smartInsertDeleteEnabled = false
+    
+    autoresizingMask = [.width, .height]
+    textContainer?.widthTracksTextView = true
+    textContainer?.heightTracksTextView = false
+    
+    isHorizontallyResizable = false
+    isVerticallyResizable = true
+    
+    textContainer?.lineFragmentPadding = self.configuration.insets
+    textContainerInset = NSSize(width: 0, height: self.configuration.insets)
+    font = NSFont.systemFont(ofSize: 15, weight: .regular)
+    textColor = NSColor.textColor
   }
 }

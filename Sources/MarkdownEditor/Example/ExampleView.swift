@@ -13,13 +13,6 @@ struct ExampleView: View {
   
   @State private var text: String = Self.exampleMarkdown
   @State private var editorInfo: EditorInfo? = nil
-//  @State private var selectionInfo: EditorInfo.Selection? = nil
-//  @State private var scrollInfo: EditorInfo.Scroll? = nil
-//  @State private var editorHeight: CGFloat = .zero
-  
-  @State private var calculatedEditorHeight: CGFloat = .zero
-  
-  @State private var scrollOffset: CGFloat = .zero
   
   var body: some View {
     
@@ -27,24 +20,15 @@ struct ExampleView: View {
       
       Spacer()
       
-        VStack {
-          MarkdownEditor(
-            text: $text,
-            scrollOffsetIn: scrollOffset,
-            configuration: EditorConfiguration(isShowingFrames: true),
-            info: { self.editorInfo = $0 }
-          )
-//          .readSize { size in
-//            self.calculatedEditorHeight = size.height
-//          }
-          .frame(height: self.editorInfo?.frame.height, alignment: .top)
-          .border(Color.green.opacity(0.3))
+      MarkdownEditor(
+        text: $text,
+        configuration: EditorConfiguration(isShowingFrames: true)) { info in
+          self.editorInfo = info
         }
+        .frame(height: 300)
+//        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+        .border(Color.green.opacity(0.3))
       
-      .scrollWithOffset { offset in
-        self.scrollOffset = offset.y
-      }
-      .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
       
       HStack(alignment: .bottom) {
         Text(self.editorInfo?.selection.summary ?? "nil")
@@ -63,8 +47,7 @@ struct ExampleView: View {
     }
     .overlay(alignment: .topTrailing) {
       VStack {
-        Text("Local editor height \(self.editorInfo?.frame.height.description ?? "nil")")
-        Text("Local scroll offset \(self.scrollOffset)")
+        //              Text("Local editor height \(self.editorInfo?.frame.height.description ?? "nil")")
       }
       .allowsHitTesting(false)
       .foregroundStyle(.secondary)
@@ -116,7 +99,7 @@ extension ExampleView {
       @Dependency(.carerDatabase) var carerDatabase
       @Published var chats = [Chat]()
       @Published var messagesByChatId = [Int64: [Message]]()
-
+    
       func loadChatsAndMessages(forCarer carerId: Int64) async {
           do {
               let chats = try await carerDatabase.fetchChatsForCarer(carerId)
@@ -133,9 +116,9 @@ extension ExampleView {
     ```
     
     ### Step 2: Create the SwiftUI View
-
+    
     Now, let's create a SwiftUI view that uses this ViewModel to display the chats and their corresponding messages.
-
+    
     """
 }
 

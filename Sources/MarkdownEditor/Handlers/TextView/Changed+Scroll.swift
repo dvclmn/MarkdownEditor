@@ -46,7 +46,6 @@ extension MarkdownTextView {
     
     return EditorInfo.Scroll(
       summary: """
-      Scroll offset: \(scrollOffset)
       Characters
       Visible: \(visibleString.count), Total: \(self.string.count)
       Visible preview:

@@ -8,31 +8,6 @@
 import SwiftUI
 //import STTextKitPlus
 
-//
-//
-//func didChangeSelection() {
-//  let selectionInfo = self.generateSelectionInfo()
-//  Task { @MainActor in
-//    await infoHandler.update(selectionInfo)
-//  }
-//}
-//
-//func didScroll() {
-//  let scrollInfo = self.generateScrollInfo()
-//  Task { @MainActor in
-//    await infoHandler.update(scrollInfo)
-//  }
-//}
-//
-//func didChangeHeight(_ newHeight: CGFloat) {
-//  Task { @MainActor in
-//    await infoHandler.update(HeightUpdate(height: newHeight))
-//  }
-//}
-//
-//
-
-
 
 public class MarkdownTextView: NSTextView {
   
@@ -57,13 +32,13 @@ public class MarkdownTextView: NSTextView {
     }
   }
   
-  var scrollOffset: CGFloat = .zero {
-    didSet {
-      if scrollOffset != oldValue {
-        didChangeScroll()
-      }
-    }
-  }
+//  var scrollOffset: CGFloat = .zero {
+//    didSet {
+//      if scrollOffset != oldValue {
+//        didChangeScroll()
+//      }
+//    }
+//  }
   
   //  public typealias OnEvent = (_ event: NSEvent, _ action: () -> Void) -> Void
 //  public var onKeyDown: OnEvent = { $1() }
@@ -75,10 +50,8 @@ public class MarkdownTextView: NSTextView {
   public init(
     frame frameRect: NSRect,
     textContainer container: NSTextContainer?,
-    scrollOffset: CGFloat,
     configuration: EditorConfiguration
   ) {
-    self.scrollOffset = scrollOffset
     self.configuration = configuration
 
     /// First, we provide TextKit with a frame
@@ -99,6 +72,7 @@ public class MarkdownTextView: NSTextView {
     textLayoutManager.textContainer = container
     textContentStorage.addTextLayoutManager(textLayoutManager)
     textContentStorage.primaryTextLayoutManager = textLayoutManager
+    container.containerSize = NSSize(width: frameRect.width, height: CGFloat.greatestFiniteMagnitude) 
     
     super.init(frame: frameRect, textContainer: container)
     

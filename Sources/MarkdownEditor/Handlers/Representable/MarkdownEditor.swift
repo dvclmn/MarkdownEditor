@@ -14,40 +14,45 @@ public struct MarkdownEditor: NSViewRepresentable {
   public typealias InfoUpdate = (_ info: EditorInfo) -> Void
   
   @Binding var text: String
-  var scrollOffsetIn: CGFloat
   var configuration: EditorConfiguration
   var info: InfoUpdate
   
   public init(
     text: Binding<String>,
-    scrollOffsetIn: CGFloat,
     configuration: EditorConfiguration = EditorConfiguration(),
     info: @escaping InfoUpdate = { _ in }
   ) {
     self._text = text
-    self.scrollOffsetIn = scrollOffsetIn
     self.configuration = configuration
     self.info = info
   }
   
-  public func makeNSView(context: Context) -> MarkdownTextView {
+  public func makeNSView(context: Context) -> MarkdownScrollView {
+    
+    
+    let scrollView = MarkdownScrollView()
+
+    let textFrame = NSRect(x: 0, y: 0, width: scrollView.contentSize.width, height: scrollView.contentSize.height)
     
     let textView = MarkdownTextView(
-      frame: .zero,
+      frame: textFrame,
       textContainer: nil,
-      scrollOffset: scrollOffsetIn,
       configuration: configuration
     )
     textView.delegate = context.coordinator
+    scrollView.documentView = textView
     
     textView.onInfoUpdate = { info in
       DispatchQueue.main.async { self.info(info) }
     }
     
-    return textView
+    return scrollView
   }
   
-  public func updateNSView(_ textView: MarkdownTextView, context: Context) {
+  public func updateNSView(_ scrollView: MarkdownScrollView, context: Context) {
+    
+    guard let textView = scrollView.documentView as? MarkdownTextView else { return }
+
     
     context.coordinator.parent = self
     
@@ -57,16 +62,12 @@ public struct MarkdownEditor: NSViewRepresentable {
       textView.string = self.text
     }
     
-    if textView.scrollOffset != self.scrollOffsetIn {
-      textView.scrollOffset = self.scrollOffsetIn
-    }
-    
     if textView.configuration != self.configuration {
       textView.configuration = self.configuration
     }
     
-    textView.needsLayout = true
-    textView.needsDisplay = true
+//    textView.needsLayout = true
+//    textView.needsDisplay = true
     
     context.coordinator.updatingNSView = false
   }
