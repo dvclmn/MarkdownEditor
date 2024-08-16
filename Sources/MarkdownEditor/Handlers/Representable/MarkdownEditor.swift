@@ -80,11 +80,6 @@ public struct MarkdownEditor: NSViewRepresentable {
     context.coordinator.parent = self
     
     context.coordinator.updatingNSView = true
-    
-//    textView.string ?= self.text
-//    textView.scrollOffset ?= self.scrollOffsetIn
-//    textView.isShowingFrames ?= self.isShowingFrames
-//    
 
     if textView.string != self.text {
       textView.string = self.text
@@ -98,7 +93,6 @@ public struct MarkdownEditor: NSViewRepresentable {
       textView.isShowingFrames = self.isShowingFrames
     }
     
-//    textView.invalidateIntrinsicContentSize()
     textView.needsLayout = true
     textView.needsDisplay = true
     

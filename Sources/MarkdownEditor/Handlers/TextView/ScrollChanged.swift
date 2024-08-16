@@ -15,29 +15,28 @@ extension MarkdownTextView {
         
         guard let self = self else { return }
         
-        if let textInfo = await self.calculateTextInfo(),
-           let scrollInfo = await self.calculateScrollInfo()
-        {
-          await MainActor.run {
-            self.onTextChange(textInfo)
-            self.onScrollChange(scrollInfo)
-          }
-        }
+        let textInfo = await self.calculateTextInfo()
+        let scrollInfo = await self.calculateScrollInfo()
         
+        await MainActor.run {
+          self.onTextChange(textInfo)
+          self.onScrollChange(scrollInfo)
+        }
+
       } // END process scroll
     } // END Task
   } // END did change scroll
   
-  private func calculateScrollInfo() async -> EditorInfo.Scroll? {
+  private func calculateScrollInfo() async -> EditorInfo.Scroll {
     
     guard let tlm = self.textLayoutManager,
           let tcm = tlm.textContentManager,
           let viewportRange = tlm.textViewportLayoutController.viewportRange
-    else { return nil }
+    else { return .init() }
     
     let visibleRange = tlm.documentRange.intersection(viewportRange)
     
-    guard let visibleString = tcm.attributedString(in: visibleRange)?.string else { return nil }
+    guard let visibleString = tcm.attributedString(in: visibleRange)?.string else { return .init() }
     
     let stringPreviewLength = 20
     let stringStart = visibleString.prefix(stringPreviewLength)

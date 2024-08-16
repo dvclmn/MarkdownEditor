@@ -14,6 +14,8 @@ public class MarkdownTextView: NSTextView {
   private var viewportLayoutController: NSTextViewportLayoutController?
   private var viewportDelegate: CustomViewportDelegate?
   
+  var markdownBlocks: [MarkdownBlock] = []
+  let scrollHandler = ScrollHandler()
   
   var scrollOffset: CGFloat = .zero {
     didSet {
@@ -28,21 +30,15 @@ public class MarkdownTextView: NSTextView {
   var isShowingFrames: Bool
   var textInsets: CGFloat
   
-  
-  let scrollHandler = ScrollHandler()
-  
-
-  var markdownBlocks: [MarkdownBlock] = []
-  
   public typealias OnEvent = (_ event: NSEvent, _ action: () -> Void) -> Void
   
   private var activeScrollValue: (NSRange, CGSize)?
   
   var lastTextValue = String()
   
-  public var onKeyDown: OnEvent = { $1() }
-  public var onFlagsChanged: OnEvent = { $1() }
-  public var onMouseDown: OnEvent = { $1() }
+//  public var onKeyDown: OnEvent = { $1() }
+//  public var onFlagsChanged: OnEvent = { $1() }
+//  public var onMouseDown: OnEvent = { $1() }
   
   public var onTextChange: MarkdownEditor.TextInfo = { _ in }
   public var onSelectionChange: MarkdownEditor.SelectionInfo = { _ in }
@@ -140,21 +136,19 @@ extension MarkdownTextView {
     
     super.viewDidMoveToWindow()
     
-    if let info = self.calculateTextInfo() {
-      self.onTextChange(info)
-    }
+    self.onTextChange(self.calculateTextInfo())
+    
     self.onEditorHeightChange(self.editorHeight)
     
     setupViewportLayoutController()
     
-    self.testStyles()
+//    self.testStyles()
     
     self.markdownBlocks = self.processMarkdownBlocks(highlight: true)
     
-    self.didChangeScroll() // Just to nudge it
+//    self.didChangeScroll() // Just to nudge it
     
   }
-  
   
   func setupViewportLayoutController() {
     guard let textLayoutManager = self.textLayoutManager else { return }
@@ -164,9 +158,6 @@ extension MarkdownTextView {
     
     self.viewportLayoutController = NSTextViewportLayoutController(textLayoutManager: textLayoutManager)
     self.viewportLayoutController?.delegate = viewportDelegate
-    
-    
-    //        viewportLayoutController?.viewportRange
   }
 
   func testStyles() {
@@ -176,15 +167,9 @@ extension MarkdownTextView {
           let tcs = self.textContentStorage
     else { return }
     
-    //    let testAttrs: [NSAttributedString.Key: Any] = [
-    //      .foregroundColor: NSColor.yellow
-    //    ]
-    //
     let documentRange = tlm.documentRange
     
     var codeBlockCount = 0
-    
-    //    let nsRange = NSRange(documentRange, in: tcm)
     
     // Enumerate through text paragraphs
     tcm.enumerateTextElements(from: documentRange.location, options: []) { textElement in
@@ -201,56 +186,37 @@ extension MarkdownTextView {
       
       return true
     }
-    
-    //    self.string.range
-    
-    //    guard let fullString = tcs.attributedString(in: documentRange)?.string else { return }
-    
     tcm.performEditingTransaction {
       
-      
-      
-      
-      //      var ranges: [NSTextRange] = []
-      
-      
-      
-      //      for range in ranges {
-      
-      //        tcs.textStorage?.setAttributes(testAttrs, range: nsRange)
-      
-      
-      //      }
-      
     }
   }
   
   
   
-  public override func layout() {
-    super.layout()
-    //    updateViewport()
-  }
+//  public override func layout() {
+//    super.layout()
+//    //    updateViewport()
+//  }
+//  
   
   
-  
-  public override func keyDown(with event: NSEvent) {
-    onKeyDown(event) {
-      super.keyDown(with: event)
-    }
-  }
-  
-  public override func flagsChanged(with event: NSEvent) {
-    onFlagsChanged(event) {
-      super.flagsChanged(with: event)
-    }
-  }
-  
-  public override func mouseDown(with event: NSEvent) {
-    onMouseDown(event) {
-      super.mouseDown(with: event)
-    }
-  }
+//  public override func keyDown(with event: NSEvent) {
+//    onKeyDown(event) {
+//      super.keyDown(with: event)
+//    }
+//  }
+//  
+//  public override func flagsChanged(with event: NSEvent) {
+//    onFlagsChanged(event) {
+//      super.flagsChanged(with: event)
+//    }
+//  }
+//  
+//  public override func mouseDown(with event: NSEvent) {
+//    onMouseDown(event) {
+//      super.mouseDown(with: event)
+//    }
+//  }
   
   public override func draw(_ rect: NSRect) {
     super.draw(rect)

@@ -10,37 +10,35 @@ import STTextKitPlus
 
 extension MarkdownTextView {
   
-
+  
   public override func setSelectedRanges(_ ranges: [NSValue], affinity: NSSelectionAffinity, stillSelecting: Bool) {
     
     super.setSelectedRanges(ranges, affinity: affinity, stillSelecting: stillSelecting)
     
-    if let info = calculateSelectionInfo() {
-      onSelectionChange(info)
-    }
-
+    onSelectionChange(calculateSelectionInfo())
+    
   }
-//  
-//  func selectedTextRange() -> NSTextRange? {
-//    let selectedTextRange = self.textLayoutManager?.textSelections
-//    return selectedTextRange?.first?.textRanges.first
-//  }
-//  
-//  
+  //
+  //  func selectedTextRange() -> NSTextRange? {
+  //    let selectedTextRange = self.textLayoutManager?.textSelections
+  //    return selectedTextRange?.first?.textRanges.first
+  //  }
+  //
+  //
   func getMarkdownBlock(for range: NSTextRange) -> MarkdownBlock? {
     guard let currentBlock = self.markdownBlocks.first(where: { $0.range.intersects(range) }) else { return nil }
     return currentBlock
   }
-//  
-//  
-//  func getSelectedMarkdownBlocks() -> [MarkdownBlock] {
-//    guard let range = self.selectedTextRange() else { return [] }
-//    
-//    return self.markdownBlocks.filter({ $0.range.intersects(range) })
-//
-//  }
-//  
-//  
+  //
+  //
+  //  func getSelectedMarkdownBlocks() -> [MarkdownBlock] {
+  //    guard let range = self.selectedTextRange() else { return [] }
+  //
+  //    return self.markdownBlocks.filter({ $0.range.intersects(range) })
+  //
+  //  }
+  //
+  //
   
   
   
@@ -80,46 +78,50 @@ extension MarkdownTextView {
       /// Zero-length selection
       
       return []
-//      guard let range = firstSelection.textRanges.first else { return [] }
+      //      guard let range = firstSelection.textRanges.first else { return [] }
       
-//      return self.markdownBlocks.filter { $0.range.contains(<#T##location: any NSTextLocation##any NSTextLocation#>) }
+      //      return self.markdownBlocks.filter { $0.range.contains(<#T##location: any NSTextLocation##any NSTextLocation#>) }
     }
     
   }
   
   
-  func calculateSelectionInfo() -> EditorInfo.Selection? {
+  func calculateSelectionInfo() -> EditorInfo.Selection {
     
-//    let selectedRange = self.selectedRange()
-//    let selectedRange = self.selectedTextRange()
-
+    guard let tlm = self.textLayoutManager else { return .init() }
     
-    guard let selectedLocation = self.selectedTextLocation(),
-          let textSelections = self.textLayoutManager?.textSelections,
-          let selectedTextRange = textSelections.first?.textRanges.first,
-          let selectionDescription: String = textSelections.first?.textRanges.first?.location.description
-    else { return nil }
-    
-    let selectedSyntax = self.getSelectedMarkdownBlocks().map { block in
-      block.syntax
-    }
+    //    let selectedRange = self.selectedRange()
+    let selectedRange = self.selectedTextRange()
     
     
-    let currentBlock = self.getMarkdownBlock(for: selectedTextRange) ?? .none
+//    guard let selectedLocation = self.selectedTextLocation(),
+//          let textSelections = self.textLayoutManager?.textSelections,
+//          let selectedTextRange = textSelections.first?.textRanges.first,
+//          let selectionDescription: String = textSelections.first?.textRanges.first?.location.description
+//    else { return .init() }
+//    
+//    let selectedSyntax = self.getSelectedMarkdownBlocks().map { block in
+//      block.syntax
+//    }
+//    
+//    
+//    let currentBlock = self.getMarkdownBlock(for: selectedTextRange) ?? .none
+    
+    let selectedString = tlm.textContentManager?.attributedString(in: selectedRange)
     
     
+    //    let fullString = self.string as NSString
     
-//    let fullString = self.string as NSString
-    
-//    let tcs = self.textContentStorage
+    //    let tcs = self.textContentStorage
     
     return EditorInfo.Selection(
-      selection: currentBlock?.description ?? "nil",
-      selectedSyntax: selectedSyntax,
+      selection: (selectedString?.string.count ?? 0).description,
+      //      selection: currentBlock?.description ?? "nil",
+//      selectedSyntax: selectedSyntax,
       lineNumber: 0,
-//      lineNumber: self.getLineAndColumn(for: selectedLocation)?.0,
+      //      lineNumber: self.getLineAndColumn(for: selectedLocation)?.0,
       columnNumber: 0
-//      columnNumber: self.getLineAndColumn(for: selectedLocation)?.1
+      //      columnNumber: self.getLineAndColumn(for: selectedLocation)?.1
     )
   }
   
