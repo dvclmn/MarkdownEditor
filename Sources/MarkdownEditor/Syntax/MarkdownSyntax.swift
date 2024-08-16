@@ -128,7 +128,7 @@ extension Markdown {
       }
     }
     
-    public static let regexPatterns: [Markdown.Syntax: Regex<Substring>] = {
+    @MainActor public static let regexPatterns: [Markdown.Syntax: Regex<Substring>] = {
       
       var patterns = [Markdown.Syntax: Regex<Substring>]()
       
@@ -168,7 +168,7 @@ extension Markdown {
       return patterns
     }()
     
-    public var regex: Regex<Substring> {
+    @MainActor public var regex: Regex<Substring> {
       return Markdown.Syntax.regexPatterns[self]!
     }
     
@@ -514,7 +514,7 @@ public struct MarkdownEditorConfiguration: Sendable {
 
 public struct MarkdownDefaults: Sendable {
   
-  public static let defaultFont =               NSFont.systemFont(ofSize: MarkdownDefaults.fontSize, weight: MarkdownDefaults.fontWeight)
+  @MainActor public static let defaultFont =               NSFont.systemFont(ofSize: MarkdownDefaults.fontSize, weight: MarkdownDefaults.fontWeight)
   public static let fontSize:                 Double = 15
   public static let fontWeight:               NSFont.Weight = .regular
   public static let fontOpacity:              Double = 0.85

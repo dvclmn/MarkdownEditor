@@ -8,18 +8,11 @@
 import SwiftUI
 import STTextKitPlus
 
-//extension NSTextSelection {
-//  func displayString() -> String {
-//    self.
-//  }
-//}
-
 extension MarkdownTextView {
   
-  
-  
-  
+
   public override func setSelectedRanges(_ ranges: [NSValue], affinity: NSSelectionAffinity, stillSelecting: Bool) {
+    
     super.setSelectedRanges(ranges, affinity: affinity, stillSelecting: stillSelecting)
     
     if let info = calculateSelectionInfo() {
@@ -34,10 +27,10 @@ extension MarkdownTextView {
 //  }
 //  
 //  
-//  func getMarkdownBlock(for range: NSTextRange, in blocks: [MarkdownBlock]) -> MarkdownBlock? {
-//    guard let currentBlock = blocks.first(where: { $0.range.intersects(range) }) else { return nil }
-//    return currentBlock
-//  }
+  func getMarkdownBlock(for range: NSTextRange) -> MarkdownBlock? {
+    guard let currentBlock = self.markdownBlocks.first(where: { $0.range.intersects(range) }) else { return nil }
+    return currentBlock
+  }
 //  
 //  
 //  func getSelectedMarkdownBlocks() -> [MarkdownBlock] {
@@ -100,13 +93,19 @@ extension MarkdownTextView {
 //    let selectedRange = self.selectedRange()
 //    let selectedRange = self.selectedTextRange()
 
-    guard let selectedLocation = self.selectedTextLocation() else { return nil }
+    
+    guard let selectedLocation = self.selectedTextLocation(),
+          let textSelections = self.textLayoutManager?.textSelections,
+          let selectedTextRange = textSelections.first?.textRanges.first,
+          let selectionDescription: String = textSelections.first?.textRanges.first?.location.description
+    else { return nil }
     
     let selectedSyntax = self.getSelectedMarkdownBlocks().map { block in
       block.syntax
     }
     
-    let selectionDescription: String = ""
+    
+    let currentBlock = self.getMarkdownBlock(for: selectedTextRange) ?? .none
     
     
     
@@ -115,10 +114,12 @@ extension MarkdownTextView {
 //    let tcs = self.textContentStorage
     
     return EditorInfo.Selection(
-      selection: selectionDescription,
+      selection: currentBlock?.description ?? "nil",
       selectedSyntax: selectedSyntax,
-      lineNumber: self.getLineAndColumn(for: selectedLocation)?.0,
-      columnNumber: self.getLineAndColumn(for: selectedLocation)?.1
+      lineNumber: 0,
+//      lineNumber: self.getLineAndColumn(for: selectedLocation)?.0,
+      columnNumber: 0
+//      columnNumber: self.getLineAndColumn(for: selectedLocation)?.1
     )
   }
   

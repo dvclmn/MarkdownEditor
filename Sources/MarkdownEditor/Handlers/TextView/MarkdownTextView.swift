@@ -49,10 +49,7 @@ public class MarkdownTextView: NSTextView {
   public var onEditorHeightChange: MarkdownEditor.EditorHeight = { _ in }
   public var onScrollChange: MarkdownEditor.ScrollInfo = { _ in }
   
-//  public var onScrollChange: @MainActor (EditorInfo.Scroll) -> Void = { _ in }
-  
 
-  
   public init(
     frame frameRect: NSRect,
     textContainer container: NSTextContainer?,
@@ -171,12 +168,7 @@ extension MarkdownTextView {
     
     //        viewportLayoutController?.viewportRange
   }
-  
-  public override func scrollWheel(with event: NSEvent) {
-    super.scrollWheel(with: event)
-    //    updateViewport()
-  }
-  
+
   func testStyles() {
     
     guard let tlm = self.textLayoutManager,

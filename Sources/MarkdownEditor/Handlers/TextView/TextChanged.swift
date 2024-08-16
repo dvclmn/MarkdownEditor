@@ -22,7 +22,7 @@ extension MarkdownTextView {
     }
     
     self.onEditorHeightChange(self.editorHeight)
-    self.markdownBlocks = self.processMarkdownBlocks(highlight: true)
+//    self.markdownBlocks = self.processMarkdownBlocks(highlight: true)
     
   }
   

@@ -17,6 +17,9 @@ public extension MarkdownEditor {
   final class Coordinator: NSObject, NSTextViewDelegate, NSTextContentStorageDelegate {
     var parent: MarkdownEditor
     var selectedRanges: [NSValue] = []
+    
+    var selections: [NSTextSelection] = []
+    
     var updatingNSView = false
     
 //    private var debouncedScrollTask: Task<Void, Never>?
