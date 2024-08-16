@@ -16,17 +16,19 @@ extension MarkdownTextView {
     allowsUndo = true
     isRichText = false
     
+    isVerticallyResizable = true
+    isHorizontallyResizable = true
+    wrapsTextToHorizontalBounds = true
+    
     smartInsertDeleteEnabled = false
     
     autoresizingMask = [.width, .height]
     textContainer?.widthTracksTextView = true
     textContainer?.heightTracksTextView = false
     
-    isHorizontallyResizable = false
-    isVerticallyResizable = true
-    
     textContainer?.lineFragmentPadding = self.configuration.insets
     textContainerInset = NSSize(width: 0, height: self.configuration.insets)
+    
     font = NSFont.systemFont(ofSize: 15, weight: .regular)
     textColor = NSColor.textColor
   }

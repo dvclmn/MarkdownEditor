@@ -11,7 +11,11 @@ import SwiftUI
 
 public class MarkdownTextView: NSTextView {
   
-  let parser = MarkdownParser()
+//  let parser = MarkdownParser()
+  
+  var blocks: [MarkdownBlock] = []
+  var rangeIndex: [NSTextRange: MarkdownBlock] = [:]
+  var processingTask: Task<Void, Never>?
   
   let heightHandler = Debouncer(interval: 0.7)
   let scrollHandler = Debouncer()
@@ -24,13 +28,9 @@ public class MarkdownTextView: NSTextView {
   
   
   private var viewportLayoutController: NSTextViewportLayoutController?
-  private var viewportDelegate: CustomViewportDelegate?
+  var viewportDelegate: CustomViewportDelegate?
   
-  var processingTime: Double = .zero {
-    didSet {
-      
-    }
-  }
+  var processingTime: Double = .zero
   
 //  var scrollOffset: CGFloat = .zero {
 //    didSet {

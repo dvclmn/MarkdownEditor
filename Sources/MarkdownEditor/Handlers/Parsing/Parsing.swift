@@ -7,10 +7,8 @@
 
 import SwiftUI
 
-actor MarkdownParser {
-  private var blocks: [MarkdownBlock] = []
-  private var rangeIndex: [NSTextRange: MarkdownBlock] = [:]
-  private var processingTask: Task<Void, Never>?
+extension MarkdownTextView {
+  
   
   // MARK: - Document Structure
   
@@ -50,6 +48,7 @@ actor MarkdownParser {
       blocks.removeAll()
       rangeIndex.removeAll()
       
+      processMarkdownBlocks()
       // Parse the entire document
       //      let parser = MarkdownParser() // You'd need to implement this
       //      let newBlocks = try? await parser.parse(text)
@@ -100,16 +99,14 @@ actor MarkdownParser {
 
 extension MarkdownTextView {
   
-  func processMarkdownBlocks(highlight: Bool = false) -> [MarkdownBlock] {
+  func processMarkdownBlocks(highlight: Bool = false) {
     guard let tlm = self.textLayoutManager,
           let tcm = tlm.textContentManager,
-          let tcs = self.textContentStorage else {
-      return []
-    }
+          let tcs = self.textContentStorage else { return }
     
     let documentRange = tlm.documentRange
-    var markdownBlocks: [MarkdownBlock] = []
-    var currentCodeBlock: MarkdownBlock?
+//    var markdownBlocks: [MarkdownBlock] = []
+//    var currentCodeBlock: MarkdownBlock?
     
     /// Basics: Enumerating over the text elements provides the opportunity to work with
     /// each and every `NSTextElement` that matches any filtering performed in
@@ -139,35 +136,34 @@ extension MarkdownTextView {
       }
       
       if content.hasPrefix("```") {
-        if let currentBlock = currentCodeBlock {
-          currentBlock.isComplete = true
-          if let fullRange = NSTextRange(location: currentBlock.range.location, end: paragraphRange.endLocation) {
-            currentBlock.range = fullRange
-          }
-          markdownBlocks.append(currentBlock)
-          currentCodeBlock = nil
-        } else {
-          currentCodeBlock = MarkdownBlock(tcm, range: paragraphRange, syntax: .codeBlock, isComplete: false)
-        }
+        
+        self.addBlock(MarkdownBlock(tcm, range: paragraphRange, syntax: .codeBlock))
+        
+//        if let currentBlock = currentCodeBlock {
+//
+//          if let fullRange = NSTextRange(location: currentBlock.range.location, end: paragraphRange.endLocation) {
+//            currentBlock.range = fullRange
+//          }
+//          markdownBlocks.append(currentBlock)
+//          currentCodeBlock = nil
+//        } else {
+//          currentCodeBlock = MarkdownBlock(tcm, range: paragraphRange, syntax: .codeBlock, isComplete: false)
+//        }
       }
       
       return true
     }
     
-    // Handle case where document ends without closing code block
-    if let currentBlock = currentCodeBlock {
-      markdownBlocks.append(currentBlock)
-    }
     
     if highlight {
-      for block in markdownBlocks where block.syntax == .codeBlock {
+      for block in self.blocks where block.syntax == .codeBlock {
         
         self.addStyle(for: block)
         
       }
     }
     
-    return markdownBlocks
+//    return markdownBlocks
   }
 }
 

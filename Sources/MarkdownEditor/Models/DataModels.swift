@@ -23,7 +23,7 @@ public struct EditorConfiguration: Sendable, Equatable {
 class MarkdownBlock: NSTextElement {
   var range: NSTextRange
   let syntax: Markdown.Syntax
-  var isComplete: Bool
+//  var isComplete: Bool
   
   init(
     _ textContentManager: NSTextContentManager,
@@ -33,7 +33,7 @@ class MarkdownBlock: NSTextElement {
   ) {
     self.range = range
     self.syntax = syntax
-    self.isComplete = isComplete
+//    self.isComplete = isComplete
     super.init(textContentManager: textContentManager)
   }
 }

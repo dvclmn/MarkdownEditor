@@ -25,25 +25,25 @@ struct ExampleView: View {
         configuration: EditorConfiguration(isShowingFrames: false)) { info in
           self.editorInfo = info
         }
-        .frame(height: 300)
+//        .frame(height: 300)
         .frame(maxWidth: .infinity, alignment: .top)
-        .border(Color.green.opacity(0.3))
+//        .border(Color.green.opacity(0.3))
       
       
-//      HStack(alignment: .bottom) {
-//        Text(self.editorInfo?.selection.summary ?? "nil")
-//        Spacer()
-//        Text(self.editorInfo?.scroll.summary ?? "nil")
-//        Spacer()
-//        Text(self.editorInfo?.text.summary ?? "nil")
-//      }
-//      .foregroundStyle(.secondary)
-//      .font(.callout)
-//      .frame(maxWidth: .infinity, alignment: .leading)
-//      .padding(.horizontal, 30)
-//      .padding(.top, 10)
-//      .padding(.bottom, 14)
-//      .background(.black.opacity(0.5))
+      HStack(alignment: .bottom) {
+        Text(self.editorInfo?.selection.summary ?? "nil")
+        Spacer()
+        Text(self.editorInfo?.scroll.summary ?? "nil")
+        Spacer()
+        Text(self.editorInfo?.text.summary ?? "nil")
+      }
+      .foregroundStyle(.secondary)
+      .font(.callout)
+      .frame(maxWidth: .infinity, alignment: .leading)
+      .padding(.horizontal, 30)
+      .padding(.top, 10)
+      .padding(.bottom, 14)
+      .background(.black.opacity(0.5))
     }
 //    .overlay(alignment: .topTrailing) {
 //      VStack {
@@ -54,7 +54,7 @@ struct ExampleView: View {
 //    }
     .background(.black.opacity(0.5))
     .background(.purple.opacity(0.1))
-    .frame(width: 500, height: 700)
+    .frame(width: 400, height: 700)
   }
 }
 
@@ -84,6 +84,40 @@ extension ExampleView {
     
     ### Markdown syntax summary
     A `viewport` is a _rectangular_ area within a ==flipped coordinate system== expanding along the y-axis, with __bold alternate__, as well as ***bold italic*** emphasis.
+    
+    1. You’d mentioned this is rendered within an OpenGL window
+    2. Despite the implementation details under the hood
+    3. They can only speculate, but perhaps OpenGL here is useful
+    
+    > This *brief* block quote, with ==text contents==, lines `advance expanding` the view in the current writing direction.ExampleView
+    
+    ```swift
+    import SwiftUI
+    import Combine
+    
+    class ChatsViewModel: ObservableObject {
+      @Dependency(.carerDatabase) var carerDatabase
+      @Published var chats = [Chat]()
+      @Published var messagesByChatId = [Int64: [Message]]()
+    
+      func loadChatsAndMessages(forCarer carerId: Int64) async {
+          do {
+              let chats = try await carerDatabase.fetchChatsForCarer(carerId)
+              self.chats = chats
+              for chat in chats {
+                  let messages = try await carerDatabase.fetchMessagesForChat(chat.id)
+                  messagesByChatId[chat.id] = messages
+              }
+          } catch {
+              print("Error fetching chats or messages: ")
+          }
+      }
+    }
+    ```
+    
+    ### Step 2: Create the SwiftUI View
+    
+    Now, let's create a SwiftUI view that uses this ViewModel to display the chats and their corresponding messages.
     
     1. You’d mentioned this is rendered within an OpenGL window
     2. Despite the implementation details under the hood

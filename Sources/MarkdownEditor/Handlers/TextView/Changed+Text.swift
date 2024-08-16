@@ -11,6 +11,7 @@ extension MarkdownTextView {
   
   
   public override func didChangeText() {
+    
     super.didChangeText()
     
     /// Debounced editor height updates, to avoid glitching
@@ -30,9 +31,10 @@ extension MarkdownTextView {
 //    } // END Task
 
     
-    let info = self.generateTextInfo()
     
     Task { @MainActor in
+      
+      let info = self.generateTextInfo()
       await infoHandler.update(info)
     }
   }
@@ -41,6 +43,7 @@ extension MarkdownTextView {
 extension EditorInfo.Text {
   public var summary: String {
       """
+      Processing time: \(processingTime)
       Characters: \(characterCount)
       Paragraphs: \(textElementCount)
       Code blocks: \(codeBlocks)
@@ -71,9 +74,8 @@ extension MarkdownTextView {
 //    )
 //  }
   
+  
   func generateTextInfo() -> EditorInfo.Text {
-    
-    //    self.editorInfo.text = EditorInfo.Text(/* new values */)
     
     guard let tlm = self.textLayoutManager,
           let viewportRange = tlm.textViewportLayoutController.viewportRange
@@ -83,12 +85,13 @@ extension MarkdownTextView {
     
     var textElementCount: Int = 0
     
-    textLayoutManager?.textContentManager?.enumerateTextElements(from: documentRange.location, using: { _ in
+    tlm.textContentManager?.enumerateTextElements(from: documentRange.location, using: { _ in
       textElementCount += 1
       return true
     })
     
     return EditorInfo.Text(
+      processingTime: self.processingTime,
       characterCount: self.string.count,
       textElementCount: textElementCount,
       //      codeBlocks: self.countCodeBlocks(),

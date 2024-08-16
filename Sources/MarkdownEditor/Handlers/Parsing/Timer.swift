@@ -8,7 +8,7 @@
 import SwiftUI
 
 
-extension MarkdownParser {
+extension MarkdownTextView {
 
   func measureBackgroundTaskTime(_ task: @escaping () async -> Void) async -> Double {
     let startTime = DispatchTime.now()
