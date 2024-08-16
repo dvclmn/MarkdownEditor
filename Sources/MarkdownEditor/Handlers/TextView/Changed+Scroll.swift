@@ -11,7 +11,7 @@ extension MarkdownTextView {
   
   func didChangeScroll() {
     Task {
-      await scrollHandler.processScroll { [weak self] in
+      await scrollHandler.processTask { [weak self] in
         
         guard let self = self else { return }
         
@@ -19,7 +19,6 @@ extension MarkdownTextView {
         Task { @MainActor in
           await self.infoHandler.update(info)
         }
-        
         
       } // END process scroll
     } // END Task
@@ -64,9 +63,9 @@ extension MarkdownTextView {
 
 actor Debouncer {
   private var task: Task<Void, Never>?
-  private let interval: Double = 0.2
+  private let interval: Double
   
-  init(interval: Double) {
+  init(interval: Double = 0.2) {
     self.interval = interval
   }
   

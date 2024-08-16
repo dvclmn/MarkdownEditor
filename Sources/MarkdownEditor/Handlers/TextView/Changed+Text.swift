@@ -13,12 +13,27 @@ extension MarkdownTextView {
   public override func didChangeText() {
     super.didChangeText()
     
+    /// Debounced editor height updates, to avoid glitching
+    ///
+    Task {
+      await heightHandler.processTask { [weak self] in
+        
+        guard let self = self else { return }
+        
+        let height = await self.generateEditorHeight()
+        
+        Task { @MainActor in
+          await self.infoHandler.update(height)
+        }
+        
+      } // END process scroll
+    } // END Task
+
+    
     let info = self.generateTextInfo()
-    let height = self.generateEditorHeight()
     
     Task { @MainActor in
       await infoHandler.update(info)
-      await infoHandler.update(height)
     }
   }
 }

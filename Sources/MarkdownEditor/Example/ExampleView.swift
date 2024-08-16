@@ -31,18 +31,20 @@ struct ExampleView: View {
           MarkdownEditor(
             text: $text,
             scrollOffsetIn: scrollOffset,
+            configuration: EditorConfiguration(isShowingFrames: true),
             info: { self.editorInfo = $0 }
           )
 //          .readSize { size in
 //            self.calculatedEditorHeight = size.height
 //          }
-          .frame(height: self.editorInfo?.frame.height)
+          .frame(height: self.editorInfo?.frame.height, alignment: .top)
+          .border(Color.green.opacity(0.3))
         }
       
       .scrollWithOffset { offset in
         self.scrollOffset = offset.y
       }
-      .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
+      .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
       
       HStack(alignment: .bottom) {
         Text(self.editorInfo?.selection.summary ?? "nil")

@@ -38,9 +38,8 @@ public class MarkdownTextView: NSTextView {
   
   let parser = MarkdownParser()
   
-  let heightHandler = Debouncer(interval: 0.1)
+  let heightHandler = Debouncer(interval: 0.7)
   let scrollHandler = Debouncer()
-  
   
   let infoHandler = EditorInfoHandler()
 
