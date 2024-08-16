@@ -25,10 +25,7 @@ extension MarkdownTextView {
   //  }
   //
   //
-  func getMarkdownBlock(for range: NSTextRange) -> MarkdownBlock? {
-    guard let currentBlock = self.markdownBlocks.first(where: { $0.range.intersects(range) }) else { return nil }
-    return currentBlock
-  }
+
   //
   //
   //  func getSelectedMarkdownBlocks() -> [MarkdownBlock] {
@@ -62,69 +59,28 @@ extension MarkdownTextView {
     
   }
   
-  func getSelectedMarkdownBlocks() -> [MarkdownBlock] {
-    guard let tlm = self.textLayoutManager else { return [] }
-    
-    let selection = tlm.textSelections
-    
-    if let firstSelection = selection.first {
-      /// Non-zero selection
-      
-      guard let range = firstSelection.textRanges.first else { return [] }
-      
-      return self.markdownBlocks.filter { $0.range.intersects(range) }
-      
-    } else {
-      /// Zero-length selection
-      
-      return []
-      //      guard let range = firstSelection.textRanges.first else { return [] }
-      
-      //      return self.markdownBlocks.filter { $0.range.contains(<#T##location: any NSTextLocation##any NSTextLocation#>) }
-    }
-    
-  }
-  
-  
-  func calculateSelectionInfo() -> EditorInfo.Selection {
-    
-    guard let tlm = self.textLayoutManager else { return .init() }
-    
-    //    let selectedRange = self.selectedRange()
-    let selectedRange = self.selectedTextRange()
-    
-    
-//    guard let selectedLocation = self.selectedTextLocation(),
-//          let textSelections = self.textLayoutManager?.textSelections,
-//          let selectedTextRange = textSelections.first?.textRanges.first,
-//          let selectionDescription: String = textSelections.first?.textRanges.first?.location.description
-//    else { return .init() }
+//  func getSelectedMarkdownBlocks() -> [MarkdownBlock] {
+//    guard let tlm = self.textLayoutManager else { return [] }
 //    
-//    let selectedSyntax = self.getSelectedMarkdownBlocks().map { block in
-//      block.syntax
+//    let selection = tlm.textSelections
+//    
+//    if let firstSelection = selection.first {
+//      /// Non-zero selection
+//      
+//      guard let range = firstSelection.textRanges.first else { return [] }
+//      
+//      return self.markdownBlocks.filter { $0.range.intersects(range) }
+//      
+//    } else {
+//      /// Zero-length selection
+//      
+//      return []
+//      //      guard let range = firstSelection.textRanges.first else { return [] }
+//      
+//      //      return self.markdownBlocks.filter { $0.range.contains(<#T##location: any NSTextLocation##any NSTextLocation#>) }
 //    }
 //    
-//    
-//    let currentBlock = self.getMarkdownBlock(for: selectedTextRange) ?? .none
-    
-    let selectedString = tlm.textContentManager?.attributedString(in: selectedRange)
-    
-    
-    //    let fullString = self.string as NSString
-    
-    //    let tcs = self.textContentStorage
-    
-    return EditorInfo.Selection(
-      selection: (selectedString?.string.count ?? 0).description,
-      //      selection: currentBlock?.description ?? "nil",
-//      selectedSyntax: selectedSyntax,
-      lineNumber: 0,
-      //      lineNumber: self.getLineAndColumn(for: selectedLocation)?.0,
-      columnNumber: 0
-      //      columnNumber: self.getLineAndColumn(for: selectedLocation)?.1
-    )
-  }
-  
+//  }
   
   
   

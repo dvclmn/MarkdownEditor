@@ -11,103 +11,20 @@ extension MarkdownTextView {
   
   public override func didChangeText() {
     super.didChangeText()
-    
-    
-      
 
-      
-      
     self.onTextChange(calculateTextInfo())
-      
-    
-    
     self.onEditorHeightChange(self.editorHeight)
-//    self.markdownBlocks = self.processMarkdownBlocks(highlight: true)
-    
-  }
-  
-  func calculateTextInfo() -> EditorInfo.Text {
-    
-    guard let tlm = self.textLayoutManager,
-          let viewportRange = tlm.textViewportLayoutController.viewportRange
-    else { return .init() }
-    
-    let documentRange = self.textLayoutManager!.documentRange
-    
-    var textElementCount: Int = 0
-    
-    textLayoutManager?.textContentManager?.enumerateTextElements(from: documentRange.location, using: { _ in
-      textElementCount += 1
-      return true
-    })
-    
-    return EditorInfo.Text(
-      editorHeight: self.editorHeight,
-      characterCount: self.string.count,
-      textElementCount: textElementCount,
-      codeBlocks: self.countCodeBlocks(),
-      documentRange: documentRange.description,
-      viewportRange: viewportRange.description
-    )
-  }
-  
-  func countCodeBlocks() -> Int {
-    
-    let codeblocks = self.markdownBlocks.filter { $0.syntax == .codeBlock }
-    
-    return codeblocks.count
-    
-  }
-  
-  func processMarkdownBlocks(highlight: Bool = false) -> [MarkdownBlock] {
-    guard let tlm = self.textLayoutManager,
-          let tcm = tlm.textContentManager,
-          let tcs = self.textContentStorage else {
-      return []
-    }
-    
-    let documentRange = tlm.documentRange
-    var markdownBlocks: [MarkdownBlock] = []
-    var currentCodeBlock: MarkdownBlock?
-    
-    tcm.enumerateTextElements(from: documentRange.location, options: []) { textElement in
-      guard let paragraph = textElement as? NSTextParagraph,
-            let paragraphRange = paragraph.elementRange,
-            let content = tcm.attributedString(in: paragraphRange)?.string else {
-        return true
-      }
-      
-      if content.hasPrefix("```") {
-        if let currentBlock = currentCodeBlock {
-          currentBlock.isComplete = true
-          if let fullRange = NSTextRange(location: currentBlock.range.location, end: paragraphRange.endLocation) {
-            currentBlock.range = fullRange
-          }
-          markdownBlocks.append(currentBlock)
-          currentCodeBlock = nil
-        } else {
-          currentCodeBlock = MarkdownBlock(tcm, range: paragraphRange, syntax: .codeBlock, isComplete: false)
-        }
-      }
-      
-      return true
-    }
-    
-    // Handle case where document ends without closing code block
-    if let currentBlock = currentCodeBlock {
-      markdownBlocks.append(currentBlock)
-    }
-    
-    if highlight {
-      for block in markdownBlocks where block.syntax == .codeBlock {
-        
-        self.addStyle(for: block)
 
-      }
-    }
     
-    return markdownBlocks
+    
+    
   }
+  
+  
+  
+  
+  
+  
   
   //  func calculateCodeBlocks() -> Int? {
   //    guard let tlm = self.textLayoutManager,

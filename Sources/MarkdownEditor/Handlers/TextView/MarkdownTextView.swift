@@ -11,11 +11,17 @@ import SwiftUI
 
 public class MarkdownTextView: NSTextView {
   
-  private let markdownProcessor = MarkdownProcessor()
+  let parser = MarkdownParser()
   let scrollHandler = ScrollHandler()
 
   private var viewportLayoutController: NSTextViewportLayoutController?
   private var viewportDelegate: CustomViewportDelegate?
+  
+  var processingTime: Double = .zero {
+    didSet {
+      
+    }
+  }
   
   var scrollOffset: CGFloat = .zero {
     didSet {
@@ -50,7 +56,7 @@ public class MarkdownTextView: NSTextView {
     self.isShowingFrames = isShowingFrames
     self.textInsets = textInsets
     
-    let textLayoutManager = MarkdownLayoutManager()
+    let textLayoutManager = NSTextLayoutManager()
     let textContentStorage = NSTextContentStorage()
     let container = NSTextContainer()
     
@@ -68,36 +74,6 @@ public class MarkdownTextView: NSTextView {
   public required init?(coder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
-  
-  
-  
-  //
-  //  func parseInlineCode() {
-  //    guard let textContentManager = self.textLayoutManager?.textContentManager else { return }
-  //
-  //    inlineCodeElements.removeAll()
-  //
-  ////    let fullRange = NSRange(location: 0, length: string.utf16.count)
-  //    let regex = Markdown.Syntax.inlineCode.regex
-  //
-  //    regex.
-  //
-  //    regex.enumerateMatches(in: string, options: [], range: fullRange) { match, _, _ in
-  //      if let matchRange = match?.range {
-  //        let element = InlineCodeElement(range: matchRange)
-  //        inlineCodeElements.append(element)
-  //
-  //        textContentManager.performEditingTransaction {
-  //          textContentManager.addTextElement(element, for: NSTextRange(matchRange, in: textContentManager))
-  //        }
-  //      }
-  //    }
-  //
-  //    print("Found \(inlineCodeElements.count) inline code elements")
-  //  }
-  //
-  //
-  
   
   public override var layoutManager: NSLayoutManager? {
     assertionFailure("TextKit 1 is not supported by this type")
@@ -123,26 +99,7 @@ extension MarkdownTextView {
     
     return height
   }
-  
-  
-  public override func viewDidMoveToWindow() {
-    
-    super.viewDidMoveToWindow()
-    
-    self.onTextChange(self.calculateTextInfo())
-    
-    self.onEditorHeightChange(self.editorHeight)
-    
-    setupViewportLayoutController()
-    
-//    self.testStyles()
-    
-    self.markdownBlocks = self.processMarkdownBlocks(highlight: true)
-    
-    self.didChangeScroll() // Just to nudge it
-    
-  }
-  
+
   func setupViewportLayoutController() {
     guard let textLayoutManager = self.textLayoutManager else { return }
     
