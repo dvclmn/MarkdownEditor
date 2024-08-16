@@ -18,40 +18,40 @@ struct ExampleView: View {
     
     VStack(spacing: 0) {
       
-      Spacer()
+//      Spacer()
       
       MarkdownEditor(
         text: $text,
-        configuration: EditorConfiguration(isShowingFrames: true)) { info in
+        configuration: EditorConfiguration(isShowingFrames: false)) { info in
           self.editorInfo = info
         }
         .frame(height: 300)
-//        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+        .frame(maxWidth: .infinity, alignment: .top)
         .border(Color.green.opacity(0.3))
       
       
-      HStack(alignment: .bottom) {
-        Text(self.editorInfo?.selection.summary ?? "nil")
-        Spacer()
-        Text(self.editorInfo?.scroll.summary ?? "nil")
-        Spacer()
-        Text(self.editorInfo?.text.summary ?? "nil")
-      }
-      .foregroundStyle(.secondary)
-      .font(.callout)
-      .frame(maxWidth: .infinity, alignment: .leading)
-      .padding(.horizontal, 30)
-      .padding(.top, 10)
-      .padding(.bottom, 14)
-      .background(.black.opacity(0.5))
+//      HStack(alignment: .bottom) {
+//        Text(self.editorInfo?.selection.summary ?? "nil")
+//        Spacer()
+//        Text(self.editorInfo?.scroll.summary ?? "nil")
+//        Spacer()
+//        Text(self.editorInfo?.text.summary ?? "nil")
+//      }
+//      .foregroundStyle(.secondary)
+//      .font(.callout)
+//      .frame(maxWidth: .infinity, alignment: .leading)
+//      .padding(.horizontal, 30)
+//      .padding(.top, 10)
+//      .padding(.bottom, 14)
+//      .background(.black.opacity(0.5))
     }
-    .overlay(alignment: .topTrailing) {
-      VStack {
-        //              Text("Local editor height \(self.editorInfo?.frame.height.description ?? "nil")")
-      }
-      .allowsHitTesting(false)
-      .foregroundStyle(.secondary)
-    }
+//    .overlay(alignment: .topTrailing) {
+//      VStack {
+//        //              Text("Local editor height \(self.editorInfo?.frame.height.description ?? "nil")")
+//      }
+//      .allowsHitTesting(false)
+//      .foregroundStyle(.secondary)
+//    }
     .background(.black.opacity(0.5))
     .background(.purple.opacity(0.1))
     .frame(width: 500, height: 700)

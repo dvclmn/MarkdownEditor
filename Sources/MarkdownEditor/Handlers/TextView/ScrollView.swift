@@ -7,6 +7,62 @@
 
 import SwiftUI
 
+/// Credit: https://github.com/ChimeHQ/TextViewPlus
+extension NSTextView {
+  private var maximumUsableWidth: CGFloat {
+    guard let scrollView = enclosingScrollView else {
+      return bounds.width
+    }
+    
+    let usableWidth = scrollView.contentSize.width - textContainerInset.width
+    
+    guard scrollView.rulersVisible, let rulerView = scrollView.verticalRulerView else {
+      return usableWidth
+    }
+    
+    return usableWidth - rulerView.requiredThickness
+  }
+  
+  /// Controls the relative sizing behavior of the NSTextView and its NSTextContainer
+  ///
+  /// NSTextView size changes/scrolling behavior is tricky. This adjusts:
+  /// - `textContainer.widthTracksTextView`
+  /// - `textContainer?.size`: to allow unlimited height/width growth
+  /// - `maxSize`: to allow unlimited height/width growth
+  /// - `frame`: to account for `NSScrollView` rulers
+  ///
+  /// Check out: https://developer.apple.com/library/archive/documentation/Cocoa/Conceptual/TextUILayer/Tasks/TextInScrollView.html
+  public var wrapsTextToHorizontalBounds: Bool {
+    get {
+      guard let container = textContainer else {
+        return false
+      }
+      
+      return container.widthTracksTextView
+    }
+    set {
+      textContainer?.widthTracksTextView = newValue
+      
+      let max = CGFloat.greatestFiniteMagnitude
+      let size = NSSize(width: max, height: max)
+      
+      textContainer?.size = size
+      maxSize = size
+      
+      // if we are turning on wrapping, our view could be the wrong size,
+      // so need to adjust it. Also, the textContainer's width could have
+      // been set to large, but adjusting the frame will fix that
+      // automatically
+      if newValue {
+        let newSize = NSSize(width: maximumUsableWidth, height: frame.height)
+        
+        self.frame = NSRect(origin: frame.origin, size: newSize)
+      }
+    }
+  }
+}
+
+
 
 public class MarkdownScrollView: NSScrollView {
   
@@ -53,7 +109,8 @@ public class MarkdownScrollView: NSScrollView {
     autohidesScrollers = true
     drawsBackground = false
     isFindBarVisible = true
-
+    
+    
   }
   
   // MARK: - Scroll Control Methods
@@ -101,19 +158,19 @@ public class MarkdownScrollView: NSScrollView {
   // MARK: - Custom Methods
   
   /// Add constraints to make the document view match the clip view's bounds
-//  func setupDocumentViewConstraints() {
-//    
-//    guard let documentView = documentView else { return }
-//    
-//    documentView.translatesAutoresizingMaskIntoConstraints = false
-//    
-//    NSLayoutConstraint.activate([
-//      documentView.topAnchor.constraint(equalTo: contentView.topAnchor),
-//      documentView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
-//      documentView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
-//      documentView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor)
-//    ])
-//  }
+  //  func setupDocumentViewConstraints() {
+  //
+  //    guard let documentView = documentView else { return }
+  //
+  //    documentView.translatesAutoresizingMaskIntoConstraints = false
+  //
+  //    NSLayoutConstraint.activate([
+  //      documentView.topAnchor.constraint(equalTo: contentView.topAnchor),
+  //      documentView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
+  //      documentView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
+  //      documentView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor)
+  //    ])
+  //  }
   // MARK: - Additional Custom Methods
   
   /// Set the scroll offset programmatically
@@ -174,5 +231,5 @@ public class MarkdownScrollView: NSScrollView {
   }
 }
 
-  
+
 

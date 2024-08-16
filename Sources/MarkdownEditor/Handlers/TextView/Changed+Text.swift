@@ -15,19 +15,19 @@ extension MarkdownTextView {
     
     /// Debounced editor height updates, to avoid glitching
     ///
-    Task {
-      await heightHandler.processTask { [weak self] in
-        
-        guard let self = self else { return }
-        
-        let height = await self.generateEditorHeight()
-        
-        Task { @MainActor in
-          await self.infoHandler.update(height)
-        }
-        
-      } // END process scroll
-    } // END Task
+//    Task {
+//      await heightHandler.processTask { [weak self] in
+//        
+//        guard let self = self else { return }
+//        
+//        let height = await self.generateEditorHeight()
+//        
+//        Task { @MainActor in
+//          await self.infoHandler.update(height)
+//        }
+//        
+//      } // END process scroll
+//    } // END Task
 
     
     let info = self.generateTextInfo()
@@ -53,23 +53,23 @@ extension EditorInfo.Text {
 
 extension MarkdownTextView {
   
-  
-  func generateEditorHeight() -> EditorInfo.Frame {
-    
-    guard let tlm = self.textLayoutManager
-    else { return .init() }
-    let documentRange = tlm.documentRange
-    
-    tlm.ensureLayout(for: documentRange)
-    
-    let typographicBounds: CGFloat = tlm.typographicBounds(in: documentRange)?.height ?? .zero
-    let height = (configuration.insets * 2) + typographicBounds
-
-    return EditorInfo.Frame(
-      height: height,
-      width: .greatestFiniteMagnitude // Not used currently
-    )
-  }
+//  
+//  func generateEditorHeight() -> EditorInfo.Frame {
+//    
+//    guard let tlm = self.textLayoutManager
+//    else { return .init() }
+//    let documentRange = tlm.documentRange
+//    
+//    tlm.ensureLayout(for: documentRange)
+//    
+//    let typographicBounds: CGFloat = tlm.typographicBounds(in: documentRange)?.height ?? .zero
+//    let height = (configuration.insets * 2) + typographicBounds
+//
+//    return EditorInfo.Frame(
+//      height: height,
+//      width: .greatestFiniteMagnitude // Not used currently
+//    )
+//  }
   
   func generateTextInfo() -> EditorInfo.Text {
     
@@ -79,7 +79,7 @@ extension MarkdownTextView {
           let viewportRange = tlm.textViewportLayoutController.viewportRange
     else { return .init() }
     
-    let documentRange = self.textLayoutManager!.documentRange
+    let documentRange = tlm.documentRange
     
     var textElementCount: Int = 0
     

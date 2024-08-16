@@ -29,18 +29,21 @@ public struct MarkdownEditor: NSViewRepresentable {
   
   public func makeNSView(context: Context) -> MarkdownScrollView {
     
-    
     let scrollView = MarkdownScrollView()
 
-    let textFrame = NSRect(x: 0, y: 0, width: scrollView.contentSize.width, height: scrollView.contentSize.height)
+//    let textFrame = NSRect(x: 0, y: 0, width: scrollView.contentSize.width, height: scrollView.contentSize.height)
     
     let textView = MarkdownTextView(
-      frame: textFrame,
+      frame: .zero,
       textContainer: nil,
       configuration: configuration
     )
     textView.delegate = context.coordinator
     scrollView.documentView = textView
+    
+    textView.isVerticallyResizable = true
+    textView.isHorizontallyResizable = true
+    textView.wrapsTextToHorizontalBounds = true
     
     textView.onInfoUpdate = { info in
       DispatchQueue.main.async { self.info(info) }
@@ -66,8 +69,8 @@ public struct MarkdownEditor: NSViewRepresentable {
       textView.configuration = self.configuration
     }
     
-//    textView.needsLayout = true
-//    textView.needsDisplay = true
+    textView.needsLayout = true
+    textView.needsDisplay = true
     
     context.coordinator.updatingNSView = false
   }

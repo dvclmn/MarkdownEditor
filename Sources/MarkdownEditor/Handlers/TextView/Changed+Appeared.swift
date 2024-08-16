@@ -13,16 +13,16 @@ extension MarkdownTextView {
     
     super.viewDidMoveToWindow()
     
-    setupViewportLayoutController()
+//    setupViewportLayoutController()
     
-    let height = self.generateEditorHeight()
+//    let height = self.generateEditorHeight()
     let textInfo = self.generateTextInfo()
     let selectionInfo = self.generateSelectionInfo()
     
     Task { @MainActor in
       await infoHandler.update(textInfo)
       await infoHandler.update(selectionInfo)
-      await infoHandler.update(height)
+//      await infoHandler.update(height)
     }
     
     
@@ -32,9 +32,9 @@ extension MarkdownTextView {
     
 //    self.didChangeScroll() // Just to nudge it
     
-    Task {
-      let executionTime = await self.parser.processFullDocumentWithTiming(self.string)
-    }
+//    Task {
+//      let executionTime = await self.parser.processFullDocumentWithTiming(self.string)
+//    }
     
   }
   
