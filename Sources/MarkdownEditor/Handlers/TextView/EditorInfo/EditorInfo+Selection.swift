@@ -7,8 +7,6 @@
 
 import SwiftUI
 
-
-
 extension EditorInfo.Selection {
   public var summary: String {
     
@@ -19,7 +17,7 @@ extension EditorInfo.Selection {
     return """
       Selection: \(selection)
       Selected Syntax: [\(formattedSyntaxNames)]
-      Line: \(lineNumber?.description ?? "nil"), Column: \(columnNumber?.description ?? "nil")
+      Line: \(location?.line.description ?? "nil"), Column: \(location?.column.description ?? "nil")
       """
   }
   
@@ -31,9 +29,9 @@ extension EditorInfo.Selection {
 
 extension MarkdownTextView {
   
-  func calculateSelectionInfo() -> EditorInfo.Selection {
+  func updateSelectionInfo() {
     
-    guard let tlm = self.textLayoutManager else { return .init() }
+    guard let tlm = self.textLayoutManager else { return }
     
     //    let selectedRange = self.selectedRange()
     let selectedRange = self.selectedTextRange()
@@ -59,15 +57,16 @@ extension MarkdownTextView {
     
     //    let tcs = self.textContentStorage
     
-    return EditorInfo.Selection(
+    let result = EditorInfo.Selection(
       selection: (selectedString?.string.count ?? 0).description,
       //      selection: currentBlock?.description ?? "nil",
-      //      selectedSyntax: selectedSyntax,
-      lineNumber: 0,
+            selectedSyntax: [],
+      location: EditorInfo.Selection.Location(line: 0, column: 0)
       //      lineNumber: self.getLineAndColumn(for: selectedLocation)?.0,
-      columnNumber: 0
       //      columnNumber: self.getLineAndColumn(for: selectedLocation)?.1
     )
+    
+    self.editorInfo.selection = result
   }
   
   

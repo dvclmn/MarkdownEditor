@@ -12,11 +12,11 @@ extension MarkdownTextView {
   public override func didChangeText() {
     super.didChangeText()
 
-    self.onTextChange(calculateTextInfo())
-    self.onEditorHeightChange(self.editorHeight)
-
     
     
+    self.updateTextInfo()
+    
+    self.onInfoUpdate(self.editorInfo)
     
   }
   

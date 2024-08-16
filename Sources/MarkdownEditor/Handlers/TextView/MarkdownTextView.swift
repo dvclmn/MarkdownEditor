@@ -14,6 +14,10 @@ public class MarkdownTextView: NSTextView {
   let parser = MarkdownParser()
   let scrollHandler = ScrollHandler()
 
+  var configuration: EditorConfiguration
+  
+  var editorInfo = EditorInfo()
+  
   private var viewportLayoutController: NSTextViewportLayoutController?
   private var viewportDelegate: CustomViewportDelegate?
   
@@ -31,35 +35,37 @@ public class MarkdownTextView: NSTextView {
     }
   }
   
-  var isShowingFrames: Bool
-  var textInsets: CGFloat
-  
   //  public typealias OnEvent = (_ event: NSEvent, _ action: () -> Void) -> Void
 //  public var onKeyDown: OnEvent = { $1() }
 //  public var onFlagsChanged: OnEvent = { $1() }
 //  public var onMouseDown: OnEvent = { $1() }
   
-  public var onTextChange: MarkdownEditor.TextInfo = { _ in }
-  public var onSelectionChange: MarkdownEditor.SelectionInfo = { _ in }
-  public var onEditorHeightChange: MarkdownEditor.EditorHeight = { _ in }
-  public var onScrollChange: MarkdownEditor.ScrollInfo = { _ in }
+  public var onInfoUpdate: MarkdownEditor.InfoUpdate = { _ in }
   
-
   public init(
     frame frameRect: NSRect,
     textContainer container: NSTextContainer?,
     scrollOffset: CGFloat,
-    isShowingFrames: Bool,
-    textInsets: CGFloat
+    configuration: EditorConfiguration
   ) {
     self.scrollOffset = scrollOffset
-    self.isShowingFrames = isShowingFrames
-    self.textInsets = textInsets
-    
-    let textLayoutManager = NSTextLayoutManager()
-    let textContentStorage = NSTextContentStorage()
+    self.configuration = configuration
+
+    /// First, we provide TextKit with a frame
+    ///
     let container = NSTextContainer()
     
+    /// Then we need some content to display, which is handled by `NSTextContentManager`,
+    /// which uses `NSTextContentStorage` by default
+    ///
+    let textContentStorage = NSTextContentStorage()
+    
+    /// This content is then laid out by `NSTextLayoutManager`
+    ///
+    let textLayoutManager = NSTextLayoutManager()
+    
+    /// Finally we connect these parts together.
+    ///
     textLayoutManager.textContainer = container
     textContentStorage.addTextLayoutManager(textLayoutManager)
     textContentStorage.primaryTextLayoutManager = textLayoutManager
@@ -76,7 +82,7 @@ public class MarkdownTextView: NSTextView {
   }
   
   public override var layoutManager: NSLayoutManager? {
-    assertionFailure("TextKit 1 is not supported by this type")
+    assertionFailure("TextKit 1 is not supported")
     return nil
   }
   
@@ -89,15 +95,15 @@ extension Notification.Name {
 
 extension MarkdownTextView {
   
-  var editorHeight: CGFloat {
+  func updateEditorHeight() {
     
     guard let tlm = self.textLayoutManager
-    else { return .zero }
+    else { return }
     let documentRange = tlm.documentRange
     let typographicBounds: CGFloat = tlm.typographicBounds(in: documentRange)?.height ?? .zero
-    let height = (textInsets * 2) + typographicBounds
+    let height = (configuration.insets * 2) + typographicBounds
     
-    return height
+    self.editorInfo.height = height
   }
 
   func setupViewportLayoutController() {
@@ -171,7 +177,7 @@ extension MarkdownTextView {
   public override func draw(_ rect: NSRect) {
     super.draw(rect)
     
-    if isShowingFrames {
+    if configuration.isShowingFrames {
       let border:NSBezierPath = NSBezierPath(rect: bounds)
       let borderColor = NSColor.red.withAlphaComponent(0.08)
       borderColor.set()

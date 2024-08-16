@@ -15,7 +15,8 @@ extension MarkdownTextView {
     
     super.setSelectedRanges(ranges, affinity: affinity, stillSelecting: stillSelecting)
     
-    onSelectionChange(calculateSelectionInfo())
+    self.updateSelectionInfo()
+    self.onInfoUpdate(self.editorInfo)
     
   }
   //

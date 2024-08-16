@@ -13,7 +13,8 @@ extension MarkdownTextView {
     
     super.viewDidMoveToWindow()
     
-    self.onTextChange(self.calculateTextInfo())
+    self.updateTextInfo()
+    self.onTextChange()
     
     self.onEditorHeightChange(self.editorHeight)
     

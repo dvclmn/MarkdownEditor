@@ -11,10 +11,10 @@ import Scrolling
 struct ExampleView: View {
   
   @State private var text: String = Self.exampleMarkdown
-  @State private var textInfo: EditorInfo.Text? = nil
-  @State private var selectionInfo: EditorInfo.Selection? = nil
-  @State private var scrollInfo: EditorInfo.Scroll? = nil
-  @State private var editorHeight: CGFloat = .zero
+  @State private var editorInfo: EditorInfo? = nil
+//  @State private var selectionInfo: EditorInfo.Selection? = nil
+//  @State private var scrollInfo: EditorInfo.Scroll? = nil
+//  @State private var editorHeight: CGFloat = .zero
   
   @State private var scrollOffset: CGFloat = .zero
   
@@ -28,13 +28,9 @@ struct ExampleView: View {
         MarkdownEditor(
           text: $text,
           scrollOffsetIn: scrollOffset,
-          isShowingFrames: false,
-          textInfo: { self.textInfo = $0 },
-          selectionInfo: { self.selectionInfo = $0 },
-          scrollInfo: { self.scrollInfo = $0 },
-          editorHeight: { self.editorHeight = $0 }
+          info: { self.editorInfo = $0 }
         )
-        .frame(height: self.editorHeight)
+        .frame(height: self.editorInfo?.height)
       }
       .scrollWithOffset { offset in
         self.scrollOffset = offset.y
@@ -42,11 +38,11 @@ struct ExampleView: View {
       .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
       
       HStack(alignment: .bottom) {
-        Text(self.selectionInfo?.summary ?? "nil")
+        Text(self.editorInfo?.selection.summary ?? "nil")
         Spacer()
-        Text(self.scrollInfo?.summary ?? "nil")
+        Text(self.editorInfo?.scroll.summary ?? "nil")
         Spacer()
-        Text(self.textInfo?.summary ?? "nil")
+        Text(self.editorInfo?.text.summary ?? "nil")
       }
       .foregroundStyle(.secondary)
       .font(.callout)
@@ -58,7 +54,7 @@ struct ExampleView: View {
     }
     .overlay(alignment: .topTrailing) {
       VStack {
-        Text("Local editor height \(self.editorHeight.description)")
+        Text("Local editor height \(self.editorInfo?.height.description ?? "nil")")
         Text("Local scroll offset \(self.scrollOffset)")
       }
       .allowsHitTesting(false)

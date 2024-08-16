@@ -7,6 +7,19 @@
 
 import SwiftUI
 
+public struct EditorConfiguration: Sendable, Equatable {
+  var isShowingFrames: Bool
+  var insets: CGFloat
+  
+  public init(
+    isShowingFrames: Bool = false,
+    insets: CGFloat = 30
+  ) {
+    self.isShowingFrames = isShowingFrames
+    self.insets = insets
+  }
+}
+
 class MarkdownBlock: NSTextElement {
   var range: NSTextRange
   let syntax: Markdown.Syntax

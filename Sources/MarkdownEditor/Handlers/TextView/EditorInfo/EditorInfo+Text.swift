@@ -10,7 +10,6 @@ import SwiftUI
 extension EditorInfo.Text {
   public var summary: String {
       """
-      Editor height: \(editorHeight)
       Characters: \(characterCount)
       Paragraphs: \(textElementCount)
       Code blocks: \(codeBlocks)
@@ -22,11 +21,13 @@ extension EditorInfo.Text {
 
 extension MarkdownTextView {
   
-  func calculateTextInfo() -> EditorInfo.Text {
+  func updateTextInfo() {
+    
+//    self.editorInfo.text = EditorInfo.Text(/* new values */)
     
     guard let tlm = self.textLayoutManager,
           let viewportRange = tlm.textViewportLayoutController.viewportRange
-    else { return .init() }
+    else { return }
     
     let documentRange = self.textLayoutManager!.documentRange
     
@@ -37,13 +38,14 @@ extension MarkdownTextView {
       return true
     })
     
-    return EditorInfo.Text(
-      editorHeight: self.editorHeight,
+    let result = EditorInfo.Text(
       characterCount: self.string.count,
       textElementCount: textElementCount,
 //      codeBlocks: self.countCodeBlocks(),
       documentRange: documentRange.description,
       viewportRange: viewportRange.description
     )
+    
+    self.editorInfo.text = result
   }
 }

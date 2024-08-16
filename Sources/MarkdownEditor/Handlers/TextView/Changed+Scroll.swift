@@ -14,13 +14,9 @@ extension MarkdownTextView {
       await scrollHandler.processScroll { [weak self] in
         
         guard let self = self else { return }
-        
-        let textInfo = await self.calculateTextInfo()
-        let scrollInfo = await self.calculateScrollInfo()
-        
+
         await MainActor.run {
-          self.onTextChange(textInfo)
-          self.onScrollChange(scrollInfo)
+          self.onInfoUpdate(self.editorInfo)
         }
 
       } // END process scroll

@@ -9,22 +9,22 @@ import SwiftUI
 
 extension MarkdownTextView {
   
-  func calculateScrollInfo() async -> EditorInfo.Scroll {
+  func updateScrollInfo() async {
     
     guard let tlm = self.textLayoutManager,
           let tcm = tlm.textContentManager,
           let viewportRange = tlm.textViewportLayoutController.viewportRange
-    else { return .init() }
+    else { return }
     
     let visibleRange = tlm.documentRange.intersection(viewportRange)
     
-    guard let visibleString = tcm.attributedString(in: visibleRange)?.string else { return .init() }
+    guard let visibleString = tcm.attributedString(in: visibleRange)?.string else { return }
     
     let stringPreviewLength = 20
     let stringStart = visibleString.prefix(stringPreviewLength)
     let stringEnd = visibleString.suffix(stringPreviewLength)
     
-    return EditorInfo.Scroll(
+    let result = EditorInfo.Scroll(
       summary: """
       Scroll offset: \(scrollOffset)
       Characters
@@ -34,6 +34,8 @@ extension MarkdownTextView {
       ...\(stringEnd)
       """
     )
+    
+    self.editorInfo.scroll = result
   } // END scroll info
   
 }
