@@ -26,12 +26,11 @@ class LineNumberView: NSRulerView {
   override func drawHashMarksAndLabels(in rect: NSRect) {
     guard let textView = textView,
           let tlm = textView.textLayoutManager,
-//          let tcm = tlm.textContentManager,
           let viewportRange = tlm.textViewportLayoutController.viewportRange
     else { return }
     
     let visibleRect = textView.visibleRect
-
+    
     let font = NSFont.systemFont(ofSize: 10)
     let attributes: [NSAttributedString.Key: Any] = [
       .font: font,
@@ -39,29 +38,29 @@ class LineNumberView: NSRulerView {
     ]
     
     var lineNumber = 1
+    var lastYPosition: CGFloat = -1
     
-    tlm.enumerateTextLayoutFragments(in: viewportRange, options: .ensuresExtraLineFragment) { layoutFragment in
-      
-      let lineFragments: [NSTextLineFragment] = layoutFragment.textLineFragments
-      let element = layoutFragment.textElement as? NSTextParagraph
-      let rangeInElement: NSTextRange = element?.paragraphContentRange ?? layoutFragment.rangeInElement
-      
-      for lineFragment in lineFragments {
-        
+    tlm.enumerateTextLayoutFragments(in: viewportRange, options: .ensuresLayout) { layoutFragment in
+      for lineFragment in layoutFragment.textLineFragments {
         let lineRect = lineFragment.typographicBounds
-        let yPosition = lineRect.minY - visibleRect.minY
+        let yPosition = lineRect.minY + layoutFragment.layoutFragmentFrame.minY - visibleRect.minY
         
-        let lineNumberString = "\(lineNumber)"
-        let size = lineNumberString.size(withAttributes: attributes)
-        let xPosition = self.bounds.width - size.width - 4
-        
-        lineNumberString.draw(at: NSPoint(x: xPosition, y: yPosition), withAttributes: attributes)
-        
-        lineNumber += 1
+        // Only draw if this is a new Y position
+        if yPosition > lastYPosition {
+          let lineNumberString = "\(lineNumber)"
+          let size = lineNumberString.size(withAttributes: attributes)
+          let xPosition = self.bounds.width - size.width - 4
+          
+          lineNumberString.draw(at: NSPoint(x: xPosition, y: yPosition), withAttributes: attributes)
+          
+          lineNumber += 1
+          lastYPosition = yPosition
+        }
       }
       return true
     }
   }
+
   
   
   override func mouseDown(with event: NSEvent) {

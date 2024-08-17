@@ -11,7 +11,7 @@ import Geometry
 
 struct ExampleView: View {
   
-  @State private var text: String = Self.exampleMarkdown
+  @State private var text: String = Self.shortSample
   @State private var editorInfo: EditorInfo? = nil
   
   var body: some View {
