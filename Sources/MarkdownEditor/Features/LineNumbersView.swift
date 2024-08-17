@@ -51,48 +51,40 @@ class LineNumberView: NSRulerView {
         let yPosition = lineRect.minY + layoutFragment.layoutFragmentFrame.minY - visibleRect.minY
         
         // Only draw if this is a new Y position
-        if yPosition > lastYPosition {
-          
-          let isNewParagraph: Bool
-          
-          guard index > 0 else {
-            
-            
-          }
-          
-          if index == 0 {
-            // This is the first line in the layout fragment
-            if let textElement = layoutFragment.textElement as? NSTextParagraph {
-              // Check if this layout fragment starts a new paragraph
-              isNewParagraph = textElement.elementRange?.location == layoutFragment.rangeInElement.location
-              
-            } else {
-              // If it's not a paragraph element, assume it's a new paragraph
-              isNewParagraph = true
-            }
-          } else {
-            // This is not the first line, so it's a continuation
-            isNewParagraph = false
-          }
-          
-          let lineNumberString: String
-          if isNewParagraph {
-            lineNumberString = "\(lineNumber)"
-            lineNumber += 1
-          } else {
-            lineNumberString = "○" // or any other symbol for continuation
-          }
-          
-          let size = lineNumberString.size(withAttributes: attributes)
-          let xPosition = self.bounds.width - size.width - 4
-          
-          lineNumberString.draw(at: NSPoint(x: xPosition, y: yPosition), withAttributes: attributes)
-          
-          lastYPosition = yPosition
+        guard yPosition > lastYPosition else { continue }
+        
+        let isNewParagraph: Bool
+        
+        if index == 0 {
+          // This is the first line, so it's likely a new paragraph
+          isNewParagraph = false
+        } else if let textElement = layoutFragment.textElement as? NSTextParagraph,
+                  let elementRange = textElement.elementRange?.location {
+          // Check if this layout fragment starts a new paragraph
+          isNewParagraph = elementRange == layoutFragment.rangeInElement.location
+        } else {
+          // If we can't determine, assume it's not a new paragraph
+          isNewParagraph = false
         }
+        
+        let lineNumberString: String
+        if isNewParagraph {
+          lineNumberString = "\(lineNumber)"
+          lineNumber += 1
+        } else {
+          lineNumberString = "•" // or any other symbol for continuation
+        }
+        
+        let size = lineNumberString.size(withAttributes: attributes)
+        let xPosition = self.bounds.width - size.width - 4
+        
+        lineNumberString.draw(at: NSPoint(x: xPosition, y: yPosition), withAttributes: attributes)
+        
+        lastYPosition = yPosition
       }
       return true
     }
+
     
     
 //
