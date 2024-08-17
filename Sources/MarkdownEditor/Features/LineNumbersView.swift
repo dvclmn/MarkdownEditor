@@ -6,6 +6,7 @@
 //
 
 import AppKit
+import STTextKitPlus
 
 class LineNumberView: NSRulerView {
   
@@ -25,42 +26,120 @@ class LineNumberView: NSRulerView {
   
   override func drawHashMarksAndLabels(in rect: NSRect) {
     guard let textView = textView,
-          let tlm = textView.textLayoutManager,
-          let viewportRange = tlm.textViewportLayoutController.viewportRange
+          let tlm = textView.textLayoutManager
+            //          let viewportRange = tlm.textViewportLayoutController.viewportRange
     else { return }
     
     let visibleRect = textView.visibleRect
     
-    let font = NSFont.systemFont(ofSize: 10)
-    let attributes: [NSAttributedString.Key: Any] = [
-      .font: font,
+    //    let descriptor = NSFontDescriptor.preferredFontDescriptor(forTextStyle: .body).withSymbolicTraits([.expanded])
+    
+    let font = NSFont.monospacedDigitSystemFont(ofSize: 12, weight: .medium)
+    //    let font = NSFont.systemFont(ofSize: 13, weight: .regular, width: .condensed)
+    let attributes: Attributes = [
+      .font: font as Any,
       .foregroundColor: NSColor.secondaryLabelColor
     ]
     
     var lineNumber = 1
     var lastYPosition: CGFloat = -1
     
-    tlm.enumerateTextLayoutFragments(in: viewportRange, options: .ensuresLayout) { layoutFragment in
-      for lineFragment in layoutFragment.textLineFragments {
+    
+    tlm.enumerateTextLayoutFragments(in: tlm.documentRange, options: .ensuresLayout) { layoutFragment in
+      for (index, lineFragment) in layoutFragment.textLineFragments.enumerated() {
         let lineRect = lineFragment.typographicBounds
         let yPosition = lineRect.minY + layoutFragment.layoutFragmentFrame.minY - visibleRect.minY
         
         // Only draw if this is a new Y position
         if yPosition > lastYPosition {
-          let lineNumberString = "\(lineNumber)"
+          
+          let isNewParagraph: Bool
+          
+          guard index > 0 else {
+            
+            
+          }
+          
+          if index == 0 {
+            // This is the first line in the layout fragment
+            if let textElement = layoutFragment.textElement as? NSTextParagraph {
+              // Check if this layout fragment starts a new paragraph
+              isNewParagraph = textElement.elementRange?.location == layoutFragment.rangeInElement.location
+              
+            } else {
+              // If it's not a paragraph element, assume it's a new paragraph
+              isNewParagraph = true
+            }
+          } else {
+            // This is not the first line, so it's a continuation
+            isNewParagraph = false
+          }
+          
+          let lineNumberString: String
+          if isNewParagraph {
+            lineNumberString = "\(lineNumber)"
+            lineNumber += 1
+          } else {
+            lineNumberString = "○" // or any other symbol for continuation
+          }
+          
           let size = lineNumberString.size(withAttributes: attributes)
           let xPosition = self.bounds.width - size.width - 4
           
           lineNumberString.draw(at: NSPoint(x: xPosition, y: yPosition), withAttributes: attributes)
           
-          lineNumber += 1
           lastYPosition = yPosition
         }
       }
       return true
     }
+    
+    
+//
+//    
+//    tlm.enumerateTextLayoutFragments(in: tlm.documentRange, options: .ensuresLayout) { layoutFragment in
+//      for lineFragment in layoutFragment.textLineFragments {
+//        let lineRect = lineFragment.typographicBounds
+//        let yPosition = lineRect.minY + layoutFragment.layoutFragmentFrame.minY - visibleRect.minY
+//        
+//        // Only draw if this is a new Y position
+//        if yPosition > lastYPosition {
+//          let lineNumberString = "\(lineNumber)"
+//          let size = lineNumberString.size(withAttributes: attributes)
+//          let xPosition = self.bounds.width - size.width - 4
+//          
+//          lineNumberString.draw(at: NSPoint(x: xPosition, y: yPosition), withAttributes: attributes)
+//          
+//          lineNumber += 1
+//          lastYPosition = yPosition
+//        }
+//      }
+//      return true
+//    }
+    
+    
+    
+    //    tlm.enumerateTextLayoutFragments(in: viewportRange, options: .ensuresLayout) { layoutFragment in
+    //      for lineFragment in layoutFragment.textLineFragments {
+    //        let lineRect = lineFragment.typographicBounds
+    //        let yPosition = lineRect.minY + layoutFragment.layoutFragmentFrame.minY - visibleRect.minY
+    //
+    //        // Only draw if this is a new Y position
+    //        if yPosition > lastYPosition {
+    //          let lineNumberString = "\(lineNumber)"
+    //          let size = lineNumberString.size(withAttributes: attributes)
+    //          let xPosition = self.bounds.width - size.width - 4
+    //
+    //          lineNumberString.draw(at: NSPoint(x: xPosition, y: yPosition), withAttributes: attributes)
+    //
+    //          lineNumber += 1
+    //          lastYPosition = yPosition
+    //        }
+    //      }
+    //      return true
+    //    }
   }
-
+  
   
   
   override func mouseDown(with event: NSEvent) {

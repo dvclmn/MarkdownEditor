@@ -60,7 +60,11 @@ struct ExampleView: View {
 
 extension ExampleView {
   
-  static let shortSample: String = "This *brief* block quote, with ==text contents==, lines `advance expanding` the view in the current writing direction.ExampleView"
+  static let shortSample: String = """
+  This *brief* block quote, with ==text contents==, lines `advance expanding` the view in the current writing direction.ExampleView".
+  
+  Includes one line break.
+  """
   
   static let exampleMarkdown: String = """
     # Markdown samples
