@@ -7,6 +7,8 @@
 
 import SwiftUI
 
+
+
 extension MarkdownTextView {
   
   
@@ -99,50 +101,118 @@ extension MarkdownTextView {
 
 extension MarkdownTextView {
   
+  private func extractLanguageIdentifier(from string: String) -> Language? {
+    let components = string.components(separatedBy: "```")
+    guard components.count > 1 else { return nil }
+    let identifier = components[1].trimmingCharacters(in: .whitespacesAndNewlines)
+    
+    let languageMatch = Language.allCases.first(where: { identifier.contains($0.rawValue) })
+    
+    return languageMatch
+  }
+  
   func processMarkdownBlocks(highlight: Bool = false) {
     guard let tlm = self.textLayoutManager,
           let tcm = tlm.textContentManager,
           let tcs = self.textContentStorage else { return }
     
     let documentRange = tlm.documentRange
-
+    
+    
+    
+    var codeBlocks: [MarkdownBlock] = []
+    var currentBlock: MarkdownBlock?
+    var lineNumber = 0
+    
+    
+    
+    
     tcm.enumerateTextElements(from: documentRange.location, options: []) { textElement in
       guard let paragraph = textElement as? NSTextParagraph,
             let paragraphRange = paragraph.elementRange,
-            let content = tcm.attributedString(in: paragraphRange)?.string else {
-        return false
-      }
+            let content = tcm.attributedString(in: paragraphRange)?.string
+      else { return false }
       
       
-      if content.hasPrefix("```") {
+      
+      //    self.enumerateTextElements(from: NSTextLocation(offset: 0), options: []) { textElement in
+      
+      //      guard let paragraph = textElement as? NSTextParagraph else { return true }
+      lineNumber += 1
+      
+      let trimmedString = paragraph.attributedString.string.trimmingCharacters(in: .whitespacesAndNewlines)
+      
+      if currentBlock == nil {
+        // Look for opening of a code block
+        if trimmedString.hasPrefix("```") {
+          let languageIdentifier = extractLanguageIdentifier(from: trimmedString)
+          currentBlock = MarkdownBlock(
+            tcm, range: paragraphRange, syntax: .codeBlock, languageIdentifier: languageIdentifier
+          )
+        }
+      } else {
         
-        self.addBlock(MarkdownBlock(tcm, range: paragraphRange, syntax: .codeBlock))
+
+        self.showDropdownForCodeBlock(at: paragraphRange)
+                  
+                
         
-//        if let currentBlock = currentCodeBlock {
-//
-//          if let fullRange = NSTextRange(location: currentBlock.range.location, end: paragraphRange.endLocation) {
-//            currentBlock.range = fullRange
+        
+        
+        // We're inside a code block, look for closing
+//        if trimmedString == "```" {
+//          currentBlock?.range.location. = lineNumber
+//          if let block = currentBlock {
+//            codeBlocks.append(block)
 //          }
-//          markdownBlocks.append(currentBlock)
-//          currentCodeBlock = nil
+//          currentBlock = nil
 //        } else {
-//          currentCodeBlock = MarkdownBlock(tcm, range: paragraphRange, syntax: .codeBlock, isComplete: false)
+//          currentBlock?.content.append(paragraph.attributedString)
 //        }
       }
       
       return true
     }
     
+//    // Handle unclosed code block
+//    if let unclosedBlock = currentBlock {
+//      unclosedBlock.endLine = lineNumber
+//      codeBlocks.append(unclosedBlock)
+//    }
+//    
     
-    if highlight {
-      for block in self.blocks where block.syntax == .codeBlock {
-        
-        self.addStyle(for: block)
-        
-      }
-    }
     
-//    return markdownBlocks
+    //
+    //
+    //      if content.hasPrefix("```") {
+    //
+    //        self.addBlock(MarkdownBlock(tcm, range: paragraphRange, syntax: .codeBlock))
+    //
+    ////        if let currentBlock = currentCodeBlock {
+    ////
+    ////          if let fullRange = NSTextRange(location: currentBlock.range.location, end: paragraphRange.endLocation) {
+    ////            currentBlock.range = fullRange
+    ////          }
+    ////          markdownBlocks.append(currentBlock)
+    ////          currentCodeBlock = nil
+    ////        } else {
+    ////          currentCodeBlock = MarkdownBlock(tcm, range: paragraphRange, syntax: .codeBlock, isComplete: false)
+    ////        }
+    //      }
+    //
+    //      return true
+    //    }
+    //
+    //
+    //    if highlight {
+    //      for block in self.blocks where block.syntax == .codeBlock {
+    //
+    //        self.addStyle(for: block)
+    //
+    //      }
+    //    }
+    
+    //    return markdownBlocks
   }
 }
 

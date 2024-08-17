@@ -22,7 +22,7 @@ extension MarkdownTextView {
       
         let nsRange = NSRange(block.range, in: tcm)
       
-      tcs.textStorage?.setAttributesButts(.highlighter, range: nsRange, with: self.typingAttributes)
+      tcs.textStorage?.setAttributesCustom(.highlighter, range: nsRange, with: self.typingAttributes)
       
     }
   } // END addStyle

@@ -19,6 +19,10 @@ extension MarkdownTextView {
     
     super.didChangeText()
     
+
+    
+    
+    
     /// Debounced editor height updates, to avoid glitching
     ///
 //    Task {

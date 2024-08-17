@@ -7,6 +7,13 @@
 
 import SwiftUI
 
+public enum Language: String, CaseIterable {
+  case swift
+  case python
+  case rust
+  case go
+}
+
 public struct EditorConfiguration: Sendable, Equatable {
   var isShowingFrames: Bool
   var insets: CGFloat
@@ -23,17 +30,17 @@ public struct EditorConfiguration: Sendable, Equatable {
 class MarkdownBlock: NSTextElement {
   var range: NSTextRange
   let syntax: Markdown.Syntax
-//  var isComplete: Bool
+  var languageIdentifier: Language?
   
   init(
     _ textContentManager: NSTextContentManager,
     range: NSTextRange,
     syntax: Markdown.Syntax,
-    isComplete: Bool = true
+    languageIdentifier: Language? = nil
   ) {
     self.range = range
     self.syntax = syntax
-//    self.isComplete = isComplete
+    self.languageIdentifier = languageIdentifier
     super.init(textContentManager: textContentManager)
   }
 }
