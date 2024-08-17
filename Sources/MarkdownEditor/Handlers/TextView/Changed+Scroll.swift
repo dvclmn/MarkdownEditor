@@ -60,6 +60,23 @@ extension MarkdownTextView {
 
 
 
+/// Example usage (seems like this could be improved)
+/// ```
+///    Task {
+///      await heightHandler.processTask { [weak self] in
+///
+///        guard let self = self else { return }
+///
+///        let height = await self.generateEditorHeight()
+///
+///        Task { @MainActor in
+///          await self.infoHandler.update(height)
+///        }
+///
+///      } // END process scroll
+///    } // END Task
+/// ```
+///
 actor Debouncer {
   private var task: Task<Void, Never>?
   private let interval: Double

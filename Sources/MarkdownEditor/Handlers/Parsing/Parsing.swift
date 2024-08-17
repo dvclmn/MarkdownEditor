@@ -36,6 +36,20 @@ extension MarkdownTextView {
   
   // MARK: - Processing
   
+  /// Example usage:
+  /// ```
+  ///    Task {
+  ///
+  ///      do {
+  ///        try await Task.sleep(for: .seconds(0.4))
+  ///
+  ///        self.processingTime = await self.processFullDocumentWithTiming(self.string)
+  ///      } catch {
+  ///
+  ///      }
+  ///    }
+  /// ```
+  ///
   func processFullDocumentWithTiming(_ text: String) async -> Double {
     return await measureBackgroundTaskTime {
       await self.processFullDocument(text)
