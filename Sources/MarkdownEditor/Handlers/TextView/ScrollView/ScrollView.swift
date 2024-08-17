@@ -11,8 +11,8 @@ import SwiftUI
 
 public class MarkdownScrollView: NSScrollView {
   
-  var gutterView: GutterView!
-  var textView: MarkdownTextView!
+  var gutterView: GutterView?
+  var textView: MarkdownTextView?
   
   // MARK: - Properties
   
@@ -53,6 +53,10 @@ public class MarkdownScrollView: NSScrollView {
   
   private func setupScrollView() {
     
+//    guard let gutterView = self.gutterView
+//          let textView = textView
+//    else { return }
+    
     hasVerticalScroller = true
     hasHorizontalScroller = false
     autohidesScrollers = true
@@ -65,13 +69,19 @@ public class MarkdownScrollView: NSScrollView {
     
     // Create the gutter view
     gutterView = GutterView(frame: NSRect(x: 0, y: 0, width: 30, height: bounds.height))
-    gutterView.autoresizingMask = [.height]
+    gutterView?.autoresizingMask = [.height]
+    gutterView?.textView = textView
 
-    contentView.addSubview(gutterView)
+    if let gutterView = gutterView {
+      contentView.addSubview(gutterView)
+    }
     
     // Set up notifications for bounds changes
     contentView.postsBoundsChangedNotifications = true
+    
     NotificationCenter.default.addObserver(self, selector: #selector(boundsDidChange), name: NSView.boundsDidChangeNotification, object: contentView)
+    
+    NotificationCenter.default.addObserver(self, selector: #selector(textDidChange), name: NSText.didChangeNotification, object: textView)
     
   }
   
@@ -79,9 +89,13 @@ public class MarkdownScrollView: NSScrollView {
     updateGutterFrame()
   }
   
+  @objc private func textDidChange(_ notification: Notification) {
+    gutterView?.needsDisplay = true
+  }
+  
   private func updateGutterFrame() {
     let contentBounds = contentView.bounds
-    gutterView.frame = NSRect(x: contentBounds.minX, y: contentBounds.minY, width: 30, height: contentBounds.height)
+    gutterView?.frame = NSRect(x: contentBounds.minX, y: contentBounds.minY, width: 30, height: contentBounds.height)
   }
   
   public override func tile() {
