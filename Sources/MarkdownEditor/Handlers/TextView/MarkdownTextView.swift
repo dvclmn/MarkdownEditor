@@ -9,6 +9,31 @@ import SwiftUI
 //import STTextKitPlus
 
 
+class AlternatingBackgroundLayoutManager: NSTextLayoutManager {
+  var evenLineColor: NSColor = .lightGray.withAlphaComponent(0.3)
+  var oddLineColor: NSColor = .clear
+  
+  override func drawBackground(forGlyphRange glyphsToShow: NSRange, at origin: CGPoint) {
+    super.drawBackground(forGlyphRange: glyphsToShow, at: origin)
+    
+    guard let textContainer = textContainer else { return }
+    
+    enumerateTextLayoutFragments(in: glyphsToShow) { fragment in
+      let fragmentFrame = fragment.layoutFragmentFrame.offsetBy(dx: origin.x, dy: origin.y)
+      let lineNumber = Int(fragmentFrame.minY / fragment.layoutFragmentFrame.height)
+      
+      let backgroundColor = lineNumber % 2 == 0 ? evenLineColor : oddLineColor
+      backgroundColor.setFill()
+      
+      let rect = NSRect(x: 0, y: fragmentFrame.minY, width: textContainer.size.width, height: fragmentFrame.height)
+      NSBezierPath(rect: rect).fill()
+      
+      return true
+    }
+  }
+}
+
+
 public class MarkdownTextView: NSTextView {
   
 //  let parser = MarkdownParser()

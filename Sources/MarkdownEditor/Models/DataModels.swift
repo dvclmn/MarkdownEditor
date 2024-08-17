@@ -20,7 +20,7 @@ public struct EditorConfiguration: Sendable, Equatable {
   
   public init(
     isShowingFrames: Bool = false,
-    insets: CGFloat = 50
+    insets: CGFloat = 20
   ) {
     self.isShowingFrames = isShowingFrames
     self.insets = insets

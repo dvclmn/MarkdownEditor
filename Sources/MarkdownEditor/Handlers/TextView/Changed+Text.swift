@@ -7,11 +7,6 @@
 
 import SwiftUI
 
-extension MarkdownEditor.Coordinator {
-  
-  
-  
-}
 
 extension MarkdownTextView {
   
@@ -43,13 +38,12 @@ extension EditorInfo.Text {
       Code blocks: \(codeBlocks)
       Document Range: \(documentRange)
       Viewport Range: \(viewportRange)
+      Scratchpad: \(scratchPad)
       """
   }
 }
 
-
 extension MarkdownTextView {
-
   
   func generateTextInfo() -> EditorInfo.Text {
     
@@ -66,13 +60,18 @@ extension MarkdownTextView {
       return true
     })
     
+    let scratchPad: String = """
+    Insets: \(self.textContainer?.lineFragmentPadding.description ?? "")
+    """
+    
     return EditorInfo.Text(
       processingTime: self.processingTime,
       characterCount: self.string.count,
       textElementCount: textElementCount,
       codeBlocks: self.blocks.filter { $0.syntax == .codeBlock }.count,
       documentRange: documentRange.description,
-      viewportRange: viewportRange.description
+      viewportRange: viewportRange.description,
+      scratchPad: scratchPad
     )
   }
   

@@ -23,6 +23,7 @@ public struct EditorInfo: Sendable {
     var codeBlocks: Int = 0
     var documentRange: String = ""
     var viewportRange: String = ""
+    var scratchPad: String = ""
   }
   
   public struct Selection: Sendable {
