@@ -11,8 +11,27 @@ import SwiftUI
 
 public class MarkdownScrollView: NSScrollView {
   
-  var gutterView: LineNumberView?
-  var textView: MarkdownTextView?
+  var textView: MarkdownTextView!
+  var gutterView: LineNumberView!
+  
+  // MARK: - Initialization
+  
+  override init(frame frameRect: NSRect) {
+    
+    let textView = MarkdownTextView(frame: .zero, textContainer: nil)
+    let gutterView = LineNumberView(scrollView: nil, orientation: .verticalRuler)
+    
+    self.textView = textView
+    self.gutterView = gutterView
+    
+    super.init(frame: frameRect)
+    setupScrollView()
+  }
+  
+  required init?(coder: NSCoder) {
+    assertionFailure("This init not supported")
+    super.init(coder: coder)
+  }
   
   // MARK: - Properties
   
@@ -39,52 +58,35 @@ public class MarkdownScrollView: NSScrollView {
   /// Closure to be called when scroll offset changes
   var scrollOffsetDidChange: ((CGPoint) -> Void)?
   
-  // MARK: - Initialization
   
-  override init(frame frameRect: NSRect) {
-    super.init(frame: frameRect)
-    setupScrollView()
-  }
-  
-  required init?(coder: NSCoder) {
-    super.init(coder: coder)
-    setupScrollView()
-  }
   
   private func setupScrollView() {
-    
-    
+ 
     hasVerticalScroller = true
     hasHorizontalScroller = false
     autohidesScrollers = true
     drawsBackground = false
     isFindBarVisible = true
     
-    textView = MarkdownTextView(frame: .zero, textContainer: nil)
     documentView = textView
     
-    // Create the gutter view as a ruler
-    gutterView = LineNumberView(scrollView: self, orientation: .verticalRuler)
-    gutterView?.clientView = textView
+    gutterView.scrollView = self
+    gutterView.clientView = textView
     
     // Set the ruler view
     verticalRulerView = gutterView
     rulersVisible = true
     
-    // Set up notifications for bounds changes
     NotificationCenter.default.addObserver(self, selector: #selector(textDidChange), name: NSText.didChangeNotification, object: textView)
-
-    
-    
   }
   
   var gutterWidth: CGFloat {
-    return (textView?.configuration.insets ?? 30) - 10
+    return (textView.configuration.insets) - 10
   }
-
+  
   
   @objc private func textDidChange(_ notification: Notification) {
-    gutterView?.needsDisplay = true
+    gutterView.needsDisplay = true
   }
   
   public override func tile() {
@@ -94,8 +96,8 @@ public class MarkdownScrollView: NSScrollView {
   deinit {
     NotificationCenter.default.removeObserver(self)
   }
-
-
+  
+  
   
   // MARK: - Scroll Control Methods
   
@@ -125,12 +127,12 @@ public class MarkdownScrollView: NSScrollView {
   
   // MARK: - NSScrollView Overrides
   
-//  public override func scrollWheel(with event: NSEvent) {
-//    super.scrollWheel(with: event)
-//    
-//    // Notify about scroll offset change
-//    scrollOffsetDidChange?(contentView.bounds.origin)
-//  }
+  //  public override func scrollWheel(with event: NSEvent) {
+  //    super.scrollWheel(with: event)
+  //
+  //    // Notify about scroll offset change
+  //    scrollOffsetDidChange?(contentView.bounds.origin)
+  //  }
   
   public override func viewDidEndLiveResize() {
     super.viewDidEndLiveResize()
@@ -141,20 +143,20 @@ public class MarkdownScrollView: NSScrollView {
   
   // MARK: - Custom Methods
   
-  /// Add constraints to make the document view match the clip view's bounds
-    func setupDocumentViewConstraints() {
-  
-      guard let documentView = documentView else { return }
-  
-      documentView.translatesAutoresizingMaskIntoConstraints = false
-  
-      NSLayoutConstraint.activate([
-        documentView.topAnchor.constraint(equalTo: contentView.topAnchor),
-        documentView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
-        documentView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
-        documentView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor)
-      ])
-    }
+//  /// Add constraints to make the document view match the clip view's bounds
+//  func setupDocumentViewConstraints() {
+//    
+//    guard let documentView = documentView else { return }
+//    
+//    documentView.translatesAutoresizingMaskIntoConstraints = false
+//    
+//    NSLayoutConstraint.activate([
+//      documentView.topAnchor.constraint(equalTo: contentView.topAnchor),
+//      documentView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
+//      documentView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
+//      documentView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor)
+//    ])
+//  }
   // MARK: - Additional Custom Methods
   
   /// Set the scroll offset programmatically
@@ -173,36 +175,36 @@ public class MarkdownScrollView: NSScrollView {
   /// Check if a specific rect is visible in the scroll view
   /// - Parameter rect: The rect to check
   /// - Returns: True if the rect is fully visible, false otherwise
-//  func isRectVisible(_ rect: CGRect) -> Bool {
-//    return visibleRect.contains(rect)
-//  }
+  //  func isRectVisible(_ rect: CGRect) -> Bool {
+  //    return visibleRect.contains(rect)
+  //  }
   
   /// Scroll to make a specific rect visible
   /// - Parameters:
   ///   - rect: The rect to make visible
   ///   - animated: Whether to animate the scrolling
-//  func scrollRectToVisible(_ rect: CGRect, animated: Bool) {
-//    NSAnimationContext.runAnimationGroup({ context in
-//      context.duration = animated ? 0.3 : 0
-//      self.contentView.animator().scrollToVisible(rect)
-//    }, completionHandler: nil)
-//  }
+  //  func scrollRectToVisible(_ rect: CGRect, animated: Bool) {
+  //    NSAnimationContext.runAnimationGroup({ context in
+  //      context.duration = animated ? 0.3 : 0
+  //      self.contentView.animator().scrollToVisible(rect)
+  //    }, completionHandler: nil)
+  //  }
   
   /// Get the current zoom scale
-//  var zoomScale: CGFloat {
-//    return magnification
-//  }
+  //  var zoomScale: CGFloat {
+  //    return magnification
+  //  }
   
   /// Set the zoom scale
   /// - Parameters:
   ///   - scale: The new zoom scale
   ///   - animated: Whether to animate the zoom change
-//  func setZoomScale(_ scale: CGFloat, animated: Bool) {
-//    NSAnimationContext.runAnimationGroup({ context in
-//      context.duration = animated ? 0.3 : 0
-//      self.animator().magnification = scale
-//    }, completionHandler: nil)
-//  }
+  //  func setZoomScale(_ scale: CGFloat, animated: Bool) {
+  //    NSAnimationContext.runAnimationGroup({ context in
+  //      context.duration = animated ? 0.3 : 0
+  //      self.animator().magnification = scale
+  //    }, completionHandler: nil)
+  //  }
 }
 
 

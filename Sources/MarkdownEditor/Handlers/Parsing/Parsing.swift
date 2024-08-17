@@ -5,32 +5,30 @@
 //  Created by Dave Coleman on 16/8/2024.
 //
 
-import SwiftUI
-
-
+import AppKit
 
 extension MarkdownTextView {
   
   
   // MARK: - Document Structure
   
-  func addBlock(_ block: MarkdownBlock) {
+  func addBlock(_ block: MarkdownElement) {
     blocks.append(block)
     rangeIndex[block.range] = block
   }
   
-  func removeBlock(_ block: MarkdownBlock) {
+  func removeBlock(_ block: MarkdownElement) {
     blocks.removeAll { $0 === block }
     rangeIndex.removeValue(forKey: block.range)
   }
   
-  func updateBlockRange(_ block: MarkdownBlock, newRange: NSTextRange) {
+  func updateBlockRange(_ block: MarkdownElement, newRange: NSTextRange) {
     rangeIndex.removeValue(forKey: block.range)
     block.range = newRange
     rangeIndex[newRange] = block
   }
   
-  func blocksInRange(_ range: NSTextRange) -> [MarkdownBlock] {
+  func blocksInRange(_ range: NSTextRange) -> [MarkdownElement] {
     return blocks.filter { $0.range.intersects(range) }
   }
   
@@ -64,7 +62,7 @@ extension MarkdownTextView {
       blocks.removeAll()
       rangeIndex.removeAll()
       
-      processAllMarkdownBlocks()
+      processAllMarkdownElements()
       // Parse the entire document
       //      let parser = MarkdownParser() // You'd need to implement this
       //      let newBlocks = try? await parser.parse(text)
@@ -95,7 +93,7 @@ extension MarkdownTextView {
   
   // MARK: - Viewport Handling
   
-  func getBlocksForViewport(_ range: NSTextRange) async -> [MarkdownBlock] {
+  func getBlocksForViewport(_ range: NSTextRange) async -> [MarkdownElement] {
     return blocksInRange(range)
   }
 }
@@ -108,21 +106,21 @@ extension MarkdownTextView {
 //
 //}
 
-//func getMarkdownBlock(for range: NSTextRange) -> MarkdownBlock? {
+//func getMarkdownElement(for range: NSTextRange) -> MarkdownElement? {
 //  guard let currentBlock = self.markdownBlocks.first(where: { $0.range.intersects(range) }) else { return nil }
 //  return currentBlock
 //}
 
 extension MarkdownTextView {
   
-  func processAllMarkdownBlocks(highlight: Bool = false) {
+  func processAllMarkdownElements(highlight: Bool = false) {
     guard let tlm = self.textLayoutManager,
           let tcm = tlm.textContentManager,
           let tcs = self.textContentStorage else { return }
     
     let documentRange = tlm.documentRange
     
-    var currentBlock: MarkdownBlock?
+    var currentBlock: MarkdownElement?
     var lineNumber = 0
     
     tcm.enumerateTextElements(from: documentRange.location) { textElement in

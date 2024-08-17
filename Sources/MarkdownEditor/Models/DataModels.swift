@@ -27,7 +27,7 @@ public struct EditorConfiguration: Sendable, Equatable {
   }
 }
 
-class MarkdownBlock: NSTextElement {
+class MarkdownElement: NSTextElement {
   var range: NSTextRange
   let syntax: Markdown.Syntax
   var languageIdentifier: Language?

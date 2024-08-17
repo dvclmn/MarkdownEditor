@@ -22,7 +22,7 @@ extension MarkdownTextView {
     }
 #if DEBUG
     // TODO: This is an expensive operation, and is only here temporarily for debugging.
-    self.processAllMarkdownBlocks(highlight: true)
+    self.processAllMarkdownElements(highlight: true)
 #endif
 
 

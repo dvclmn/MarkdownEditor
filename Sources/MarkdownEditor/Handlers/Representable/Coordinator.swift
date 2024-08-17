@@ -29,7 +29,7 @@ public extension MarkdownEditor {
       self.parent = parent
     }
     
-
+    
     
     public func textDidChange(_ notification: Notification) {
       
@@ -44,9 +44,9 @@ public extension MarkdownEditor {
       /// a delegate, for my ``MarkdownTextView``. Which means I can take
       /// full advantage of methods here, just like I can with overrides in `MarkdownTextView`. They often have different functionalities to
       /// experiment with.
-//      Task {
-//        textView.processingTime = await textView.processFullDocumentWithTiming(textView.string)
-//      }
+      //      Task {
+      //        textView.processingTime = await textView.processFullDocumentWithTiming(textView.string)
+      //      }
       
     }
     
@@ -59,12 +59,22 @@ public extension MarkdownEditor {
       
     }
     
-    
-    public func textLayoutManager(_ textLayoutManager: NSTextLayoutManager, textLayoutFragmentFor location: NSTextLocation, in textElement: NSTextElement) -> NSTextLayoutFragment {
+    /// From LLM, not sure if true:
+    /// This method (`textLayoutManager`, defined on protocol `NSTextLayoutManagerDelegate`) is called by the system when it needs to create a layout fragment for a specific portion of text. It gives you an opportunity to provide a custom NSTextLayoutFragment subclass for different parts of your text.
+    ///
+    /// The method the framework calls to give the delegate an opportunity to return a custom text layout fragment.
+    ///
+    public func textLayoutManager(
+      _ textLayoutManager: NSTextLayoutManager,
+      textLayoutFragmentFor location: NSTextLocation,
+      in textElement: NSTextElement
+    ) -> NSTextLayoutFragment {
       
-      let fragment = GridBackgroundLayoutFragment(textElement: textElement, range: textElement.elementRange)
-      fragment.gridColor = self.gridColor
-      fragment.gridSpacing = self.gridSpacing
+      let fragment = CodeBlockBackground(
+        textElement: textElement,
+        range: textElement.elementRange,
+        paragraphStyle: .default
+      )
       return fragment
     }
     

@@ -33,7 +33,7 @@ extension MarkdownTextView {
   
   //
   //
-  //  func getSelectedMarkdownBlocks() -> [MarkdownBlock] {
+  //  func getSelectedMarkdownElements() -> [MarkdownElement] {
   //    guard let range = self.selectedTextRange() else { return [] }
   //
   //    return self.markdownBlocks.filter({ $0.range.intersects(range) })
@@ -80,12 +80,12 @@ extension MarkdownTextView {
     //          let selectionDescription: String = textSelections.first?.textRanges.first?.location.description
     //    else { return .init() }
     //
-    //    let selectedSyntax = self.getSelectedMarkdownBlocks().map { block in
+    //    let selectedSyntax = self.getSelectedMarkdownElements().map { block in
     //      block.syntax
     //    }
     //
     //
-    //    let currentBlock = self.getMarkdownBlock(for: selectedTextRange) ?? .none
+    //    let currentBlock = self.getMarkdownElement(for: selectedTextRange) ?? .none
     
     let selectedString = tlm.textContentManager?.attributedString(in: selectedRange)
     
@@ -126,7 +126,7 @@ extension MarkdownTextView {
     
   }
   
-//  func getSelectedMarkdownBlocks() -> [MarkdownBlock] {
+//  func getSelectedMarkdownElements() -> [MarkdownElement] {
 //    guard let tlm = self.textLayoutManager else { return [] }
 //    
 //    let selection = tlm.textSelections
@@ -151,7 +151,7 @@ extension MarkdownTextView {
   
   
   
-  //  func getMarkdownBlock(for range: NSTextRange, in blocks: [MarkdownBlock]) -> MarkdownBlock? {
+  //  func getMarkdownElement(for range: NSTextRange, in blocks: [MarkdownElement]) -> MarkdownElement? {
   //    // First, check if the range intersects with any block
   //    if let intersectingBlock = blocks.first(where: { $0.range.intersects(range) }) {
   //      return intersectingBlock
@@ -161,12 +161,12 @@ extension MarkdownTextView {
   //    return blocks.first(where: { $0.range.contains(range.location) })
   //  }
   //
-  //  func getSelectedMarkdownBlocks() -> [MarkdownBlock] {
+  //  func getSelectedMarkdownElements() -> [MarkdownElement] {
   //    guard let range = self.selectedTextRange() else { return [] }
   //
   //    if range.isEmpty {
   //      // For a single insertion point, return the block containing that point
-  //      if let block = getMarkdownBlock(for: range, in: self.markdownBlocks) {
+  //      if let block = getMarkdownElement(for: range, in: self.markdownBlocks) {
   //        return [block]
   //      }
   //    } else {
@@ -179,14 +179,14 @@ extension MarkdownTextView {
   
   
   //
-  //  func getCurrentMarkdownBlock(for range: NSTextRange, in blocks: [MarkdownBlock]) -> MarkdownBlock? {
+  //  func getCurrentMarkdownElement(for range: NSTextRange, in blocks: [MarkdownElement]) -> MarkdownElement? {
   //    // First, check if the range is directly within any block
   //    if let directBlock = blocks.first(where: { $0.range.intersects(range) }) {
   //      return directBlock
   //    }
   //
   //    // If not within any block, find the nearest block
-  //    var nearestBlock: MarkdownBlock?
+  //    var nearestBlock: MarkdownElement?
   //    var smallestDistance = Int.max
   //
   //    for block in blocks {

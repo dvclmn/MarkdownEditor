@@ -11,8 +11,8 @@ import SwiftUI
 
 public class MarkdownTextView: NSTextView {
   
-  var blocks: [MarkdownBlock] = []
-  var rangeIndex: [NSTextRange: MarkdownBlock] = [:]
+  var blocks: [MarkdownElement] = []
+  var rangeIndex: [NSTextRange: MarkdownElement] = [:]
   var processingTask: Task<Void, Never>?
   
   let infoHandler = EditorInfoHandler()
@@ -49,6 +49,10 @@ public class MarkdownTextView: NSTextView {
     let textLayoutManager = NSTextLayoutManager()
     
     /// Finally we connect these parts together.
+    ///
+    /// > Important: Access to the text container is through the `textLayoutManager`. There is
+    /// > still a `textContainer` property directly on `NSTextView`, but as I understand it,
+    /// > that isn't the one we use.
     ///
     textLayoutManager.textContainer = container
     textContentStorage.addTextLayoutManager(textLayoutManager)
