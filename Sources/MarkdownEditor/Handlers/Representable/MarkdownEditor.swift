@@ -31,12 +31,14 @@ public struct MarkdownEditor: NSViewRepresentable {
     
     let scrollView = MarkdownScrollView(frame: .zero)
     
-    scrollView.textView.delegate = context.coordinator
-    scrollView.textView.configuration = configuration
+    scrollView.textView?.delegate = context.coordinator
+    scrollView.textView?.configuration = configuration
     
-    scrollView.textView.onInfoUpdate = { info in
+    scrollView.textView?.onInfoUpdate = { info in
       DispatchQueue.main.async { self.info(info) }
     }
+    
+    scrollView.rulersVisible = true
     
     return scrollView
   }

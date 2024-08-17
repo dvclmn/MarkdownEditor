@@ -11,7 +11,7 @@ import SwiftUI
 
 public class MarkdownScrollView: NSScrollView {
   
-  var gutterView: GutterView?
+  var gutterView: LineNumberView?
   var textView: MarkdownTextView?
   
   // MARK: - Properties
@@ -53,9 +53,6 @@ public class MarkdownScrollView: NSScrollView {
   
   private func setupScrollView() {
     
-//    guard let gutterView = self.gutterView
-//          let textView = textView
-//    else { return }
     
     hasVerticalScroller = true
     hasHorizontalScroller = false
@@ -63,44 +60,35 @@ public class MarkdownScrollView: NSScrollView {
     drawsBackground = false
     isFindBarVisible = true
     
-    // Create the text view
     textView = MarkdownTextView(frame: .zero, textContainer: nil)
     documentView = textView
     
-    // Create the gutter view
-    gutterView = GutterView(frame: NSRect(x: 0, y: 0, width: 30, height: bounds.height))
-    gutterView?.autoresizingMask = [.height]
-    gutterView?.textView = textView
-
-    if let gutterView = gutterView {
-      contentView.addSubview(gutterView)
-    }
+    // Create the gutter view as a ruler
+    gutterView = LineNumberView(scrollView: self, orientation: .verticalRuler)
+    gutterView?.clientView = textView
+    
+    // Set the ruler view
+    verticalRulerView = gutterView
+    rulersVisible = true
     
     // Set up notifications for bounds changes
-    contentView.postsBoundsChangedNotifications = true
-    
-    NotificationCenter.default.addObserver(self, selector: #selector(boundsDidChange), name: NSView.boundsDidChangeNotification, object: contentView)
-    
     NotificationCenter.default.addObserver(self, selector: #selector(textDidChange), name: NSText.didChangeNotification, object: textView)
+
+    
     
   }
   
-  @objc private func boundsDidChange(_ notification: Notification) {
-    updateGutterFrame()
+  var gutterWidth: CGFloat {
+    return (textView?.configuration.insets ?? 30) - 10
   }
+
   
   @objc private func textDidChange(_ notification: Notification) {
     gutterView?.needsDisplay = true
   }
   
-  private func updateGutterFrame() {
-    let contentBounds = contentView.bounds
-    gutterView?.frame = NSRect(x: contentBounds.minX, y: contentBounds.minY, width: 30, height: contentBounds.height)
-  }
-  
   public override func tile() {
     super.tile()
-    updateGutterFrame()
   }
   
   deinit {
@@ -137,12 +125,12 @@ public class MarkdownScrollView: NSScrollView {
   
   // MARK: - NSScrollView Overrides
   
-  public override func scrollWheel(with event: NSEvent) {
-    super.scrollWheel(with: event)
-    
-    // Notify about scroll offset change
-    scrollOffsetDidChange?(contentView.bounds.origin)
-  }
+//  public override func scrollWheel(with event: NSEvent) {
+//    super.scrollWheel(with: event)
+//    
+//    // Notify about scroll offset change
+//    scrollOffsetDidChange?(contentView.bounds.origin)
+//  }
   
   public override func viewDidEndLiveResize() {
     super.viewDidEndLiveResize()
@@ -154,19 +142,19 @@ public class MarkdownScrollView: NSScrollView {
   // MARK: - Custom Methods
   
   /// Add constraints to make the document view match the clip view's bounds
-  //  func setupDocumentViewConstraints() {
-  //
-  //    guard let documentView = documentView else { return }
-  //
-  //    documentView.translatesAutoresizingMaskIntoConstraints = false
-  //
-  //    NSLayoutConstraint.activate([
-  //      documentView.topAnchor.constraint(equalTo: contentView.topAnchor),
-  //      documentView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
-  //      documentView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
-  //      documentView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor)
-  //    ])
-  //  }
+    func setupDocumentViewConstraints() {
+  
+      guard let documentView = documentView else { return }
+  
+      documentView.translatesAutoresizingMaskIntoConstraints = false
+  
+      NSLayoutConstraint.activate([
+        documentView.topAnchor.constraint(equalTo: contentView.topAnchor),
+        documentView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
+        documentView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
+        documentView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor)
+      ])
+    }
   // MARK: - Additional Custom Methods
   
   /// Set the scroll offset programmatically
@@ -185,46 +173,36 @@ public class MarkdownScrollView: NSScrollView {
   /// Check if a specific rect is visible in the scroll view
   /// - Parameter rect: The rect to check
   /// - Returns: True if the rect is fully visible, false otherwise
-  func isRectVisible(_ rect: CGRect) -> Bool {
-    return visibleRect.contains(rect)
-  }
+//  func isRectVisible(_ rect: CGRect) -> Bool {
+//    return visibleRect.contains(rect)
+//  }
   
   /// Scroll to make a specific rect visible
   /// - Parameters:
   ///   - rect: The rect to make visible
   ///   - animated: Whether to animate the scrolling
-  func scrollRectToVisible(_ rect: CGRect, animated: Bool) {
-    NSAnimationContext.runAnimationGroup({ context in
-      context.duration = animated ? 0.3 : 0
-      self.contentView.animator().scrollToVisible(rect)
-    }, completionHandler: nil)
-  }
+//  func scrollRectToVisible(_ rect: CGRect, animated: Bool) {
+//    NSAnimationContext.runAnimationGroup({ context in
+//      context.duration = animated ? 0.3 : 0
+//      self.contentView.animator().scrollToVisible(rect)
+//    }, completionHandler: nil)
+//  }
   
   /// Get the current zoom scale
-  var zoomScale: CGFloat {
-    return magnification
-  }
+//  var zoomScale: CGFloat {
+//    return magnification
+//  }
   
   /// Set the zoom scale
   /// - Parameters:
   ///   - scale: The new zoom scale
   ///   - animated: Whether to animate the zoom change
-  func setZoomScale(_ scale: CGFloat, animated: Bool) {
-    NSAnimationContext.runAnimationGroup({ context in
-      context.duration = animated ? 0.3 : 0
-      self.animator().magnification = scale
-    }, completionHandler: nil)
-  }
-  
-  /// Add a shadow to the scroll view
-  func addShadow(color: NSColor = .black, opacity: Float = 0.5, radius: CGFloat = 5) {
-    wantsLayer = true
-    layer?.shadowColor = color.cgColor
-    layer?.shadowOpacity = opacity
-    layer?.shadowRadius = radius
-    layer?.shadowOffset = .zero
-    layer?.masksToBounds = false
-  }
+//  func setZoomScale(_ scale: CGFloat, animated: Bool) {
+//    NSAnimationContext.runAnimationGroup({ context in
+//      context.duration = animated ? 0.3 : 0
+//      self.animator().magnification = scale
+//    }, completionHandler: nil)
+//  }
 }
 
 
