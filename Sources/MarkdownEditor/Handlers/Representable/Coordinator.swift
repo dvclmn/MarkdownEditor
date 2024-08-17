@@ -14,7 +14,7 @@ public extension MarkdownEditor {
     Coordinator(self)
   }
   
-  final class Coordinator: NSObject, NSTextViewDelegate, NSTextContentStorageDelegate {
+  final class Coordinator: NSObject, NSTextViewDelegate, NSTextContentStorageDelegate, NSTextLayoutManagerDelegate {
     var parent: MarkdownEditor
     var selectedRanges: [NSValue] = []
     
@@ -54,6 +54,24 @@ public extension MarkdownEditor {
       
       self.selectedRanges = textView.selectedRanges
       
+    }
+    
+    
+    // MARK: - NSTextLayoutManagerDelegate
+    
+    public func textLayoutManager(_ textLayoutManager: NSTextLayoutManager,
+                           textLayoutFragmentFor location: NSTextLocation,
+                           in textElement: NSTextElement) -> NSTextLayoutFragment {
+      let index = textLayoutManager.offset(from: textLayoutManager.documentRange.location, to: location)
+      
+      let layoutFragment = BubbleLayoutFragment(textElement: textElement, range: textElement.elementRange)
+      layoutFragment.commentDepth = commentDepthValue!.uintValue
+      
+      if commentDepthValue != nil {
+        return layoutFragment
+      } else {
+        return NSTextLayoutFragment(textElement: textElement, range: textElement.elementRange)
+      }
     }
   }
 }

@@ -8,27 +8,21 @@
 import SwiftUI
 //import STTextKitPlus
 
-
-class AlternatingBackgroundLayoutManager: NSTextLayoutManager {
-  var evenLineColor: NSColor = .lightGray.withAlphaComponent(0.3)
-  var oddLineColor: NSColor = .clear
+class LayoutManagerDelegate:  NSTextLayoutManagerDelegate {
   
-  override func drawBackground(forGlyphRange glyphsToShow: NSRange, at origin: CGPoint) {
-    super.drawBackground(forGlyphRange: glyphsToShow, at: origin)
-    
-    guard let textContainer = textContainer else { return }
-    
-    enumerateTextLayoutFragments(in: glyphsToShow) { fragment in
-      let fragmentFrame = fragment.layoutFragmentFrame.offsetBy(dx: origin.x, dy: origin.y)
-      let lineNumber = Int(fragmentFrame.minY / fragment.layoutFragmentFrame.height)
-      
-      let backgroundColor = lineNumber % 2 == 0 ? evenLineColor : oddLineColor
-      backgroundColor.setFill()
-      
-      let rect = NSRect(x: 0, y: fragmentFrame.minY, width: textContainer.size.width, height: fragmentFrame.height)
-      NSBezierPath(rect: rect).fill()
-      
-      return true
+  // MARK: - NSTextLayoutManagerDelegate
+  
+  func textLayoutManager(_ textLayoutManager: NSTextLayoutManager,
+                         textLayoutFragmentFor location: NSTextLocation,
+                         in textElement: NSTextElement) -> NSTextLayoutFragment {
+    let index = textLayoutManager.offset(from: textLayoutManager.documentRange.location, to: location)
+    let commentDepthValue = textContentStorage!.textStorage!.attribute(.commentDepth, at: index, effectiveRange: nil) as! NSNumber?
+    if commentDepthValue != nil {
+      let layoutFragment = BubbleLayoutFragment(textElement: textElement, range: textElement.elementRange)
+      layoutFragment.commentDepth = commentDepthValue!.uintValue
+      return layoutFragment
+    } else {
+      return NSTextLayoutFragment(textElement: textElement, range: textElement.elementRange)
     }
   }
 }
