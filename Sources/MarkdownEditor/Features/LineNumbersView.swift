@@ -8,7 +8,7 @@
 import AppKit
 
 class LineNumberView: NSRulerView {
- 
+  
   weak var textView: MarkdownTextView? {
     return clientView as? MarkdownTextView
   }
@@ -26,57 +26,39 @@ class LineNumberView: NSRulerView {
   override func drawHashMarksAndLabels(in rect: NSRect) {
     guard let textView = textView,
           let tlm = textView.textLayoutManager,
-          let tcm = tlm.textContentManager
+//          let tcm = tlm.textContentManager,
+          let viewportRange = tlm.textViewportLayoutController.viewportRange
     else { return }
     
-    let content = textView.string
-    var lineNumber: Int = 0
-    
     let visibleRect = textView.visibleRect
-    guard let visibleRange = tlm.textViewportLayoutController.viewportRange else {
-      return
-    }
-    
+
     let font = NSFont.systemFont(ofSize: 10)
     let attributes: [NSAttributedString.Key: Any] = [
       .font: font,
       .foregroundColor: NSColor.secondaryLabelColor
     ]
     
-    tlm.enumerateTextLayoutFragments(in: visibleRange) { fragment in
-      let lineFragments = fragment.textLineFragments
+    var lineNumber = 1
+    
+    tlm.enumerateTextLayoutFragments(in: viewportRange, options: .ensuresExtraLineFragment) { layoutFragment in
+      
+      let lineFragments: [NSTextLineFragment] = layoutFragment.textLineFragments
+      let element = layoutFragment.textElement as? NSTextParagraph
+      let rangeInElement: NSTextRange = element?.paragraphContentRange ?? layoutFragment.rangeInElement
       
       for lineFragment in lineFragments {
         
-        lineNumber += 1
         let lineRect = lineFragment.typographicBounds
         let yPosition = lineRect.minY - visibleRect.minY
         
-        let textRange = lineFragment.textRange
-        let startLocation = tcm.documentRange.location
-        //          let lineNumber = content.lineNumber(for: startLocation)
+        let lineNumberString = "\(lineNumber)"
+        let size = lineNumberString.size(withAttributes: attributes)
+        let xPosition = self.bounds.width - size.width - 4
         
+        lineNumberString.draw(at: NSPoint(x: xPosition, y: yPosition), withAttributes: attributes)
         
-        //  func lineNumber(for characterIndex: Int) -> Int {
-        //    let substring = self.substring(to: characterIndex)
-        //    return substring.components(separatedBy: .newlines).count
-        //  }
-        //
-        
-        
-        
-        
-        
-        
+        lineNumber += 1
       }
-      let lineNumberString = lineNumber.description
-      
-      let size = lineNumberString.size(withAttributes: attributes)
-      
-      let xPosition = self.bounds.width - size.width - 4
-      
-      lineNumberString.draw(at: NSPoint(x: xPosition, y: yPosition), withAttributes: attributes)
-      
       return true
     }
   }
