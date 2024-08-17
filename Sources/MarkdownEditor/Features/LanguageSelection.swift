@@ -41,6 +41,16 @@ class LanguageComboBox: NSComboBox, Sendable {
 
 extension MarkdownTextView {
   
+  private func extractLanguageIdentifier(from string: String) -> Language? {
+    let components = string.components(separatedBy: "```")
+    guard components.count > 1 else { return nil }
+    let identifier = components[1].trimmingCharacters(in: .whitespacesAndNewlines)
+    
+    let languageMatch = Language.allCases.first(where: { identifier.contains($0.rawValue) })
+    
+    return languageMatch
+  }
+  
   func showDropdownForCodeBlock(at range: NSTextRange) {
     guard let startLocation = textLayoutManager?.location(range.location, offsetBy: 0) else { return }
     

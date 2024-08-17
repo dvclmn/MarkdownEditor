@@ -50,7 +50,7 @@ extension MarkdownTextView {
       blocks.removeAll()
       rangeIndex.removeAll()
       
-      processMarkdownBlocks()
+      processAllMarkdownBlocks()
       // Parse the entire document
       //      let parser = MarkdownParser() // You'd need to implement this
       //      let newBlocks = try? await parser.parse(text)
@@ -101,260 +101,33 @@ extension MarkdownTextView {
 
 extension MarkdownTextView {
   
-  private func extractLanguageIdentifier(from string: String) -> Language? {
-    let components = string.components(separatedBy: "```")
-    guard components.count > 1 else { return nil }
-    let identifier = components[1].trimmingCharacters(in: .whitespacesAndNewlines)
-    
-    let languageMatch = Language.allCases.first(where: { identifier.contains($0.rawValue) })
-    
-    return languageMatch
-  }
-  
-  func processMarkdownBlocks(highlight: Bool = false) {
+  func processAllMarkdownBlocks(highlight: Bool = false) {
     guard let tlm = self.textLayoutManager,
           let tcm = tlm.textContentManager,
           let tcs = self.textContentStorage else { return }
     
     let documentRange = tlm.documentRange
     
-    
-    
-    var codeBlocks: [MarkdownBlock] = []
     var currentBlock: MarkdownBlock?
     var lineNumber = 0
     
-    
-    
-    
-    tcm.enumerateTextElements(from: documentRange.location, options: []) { textElement in
+    tcm.enumerateTextElements(from: documentRange.location) { textElement in
       guard let paragraph = textElement as? NSTextParagraph,
             let paragraphRange = paragraph.elementRange,
             let content = tcm.attributedString(in: paragraphRange)?.string
       else { return false }
       
-      
-      
-      //    self.enumerateTextElements(from: NSTextLocation(offset: 0), options: []) { textElement in
-      
-      //      guard let paragraph = textElement as? NSTextParagraph else { return true }
       lineNumber += 1
       
-      let trimmedString = paragraph.attributedString.string.trimmingCharacters(in: .whitespacesAndNewlines)
+      /// Identify code block opening
+      /// Three backticks, ignore leading whitespace
+      ///
       
-      if currentBlock == nil {
-        // Look for opening of a code block
-        if trimmedString.hasPrefix("```") {
-          let languageIdentifier = extractLanguageIdentifier(from: trimmedString)
-          currentBlock = MarkdownBlock(
-            tcm, range: paragraphRange, syntax: .codeBlock, languageIdentifier: languageIdentifier
-          )
-        }
-      } else {
-        
-
-        self.showDropdownForCodeBlock(at: paragraphRange)
-                  
-                
-        
-        
-        
-        // We're inside a code block, look for closing
-//        if trimmedString == "```" {
-//          currentBlock?.range.location. = lineNumber
-//          if let block = currentBlock {
-//            codeBlocks.append(block)
-//          }
-//          currentBlock = nil
-//        } else {
-//          currentBlock?.content.append(paragraph.attributedString)
-//        }
-      }
       
       return true
+      
     }
-    
-//    // Handle unclosed code block
-//    if let unclosedBlock = currentBlock {
-//      unclosedBlock.endLine = lineNumber
-//      codeBlocks.append(unclosedBlock)
-//    }
-//    
-    
-    
-    //
-    //
-    //      if content.hasPrefix("```") {
-    //
-    //        self.addBlock(MarkdownBlock(tcm, range: paragraphRange, syntax: .codeBlock))
-    //
-    ////        if let currentBlock = currentCodeBlock {
-    ////
-    ////          if let fullRange = NSTextRange(location: currentBlock.range.location, end: paragraphRange.endLocation) {
-    ////            currentBlock.range = fullRange
-    ////          }
-    ////          markdownBlocks.append(currentBlock)
-    ////          currentCodeBlock = nil
-    ////        } else {
-    ////          currentCodeBlock = MarkdownBlock(tcm, range: paragraphRange, syntax: .codeBlock, isComplete: false)
-    ////        }
-    //      }
-    //
-    //      return true
-    //    }
-    //
-    //
-    //    if highlight {
-    //      for block in self.blocks where block.syntax == .codeBlock {
-    //
-    //        self.addStyle(for: block)
-    //
-    //      }
-    //    }
-    
-    //    return markdownBlocks
+   
   }
 }
-
-//public class MarkdownParser {
-//  var elements: [MarkdownFragment] = []
-//  var visibleElements: [MarkdownFragment] = []
-//
-//  public var text: String {
-//    didSet {
-//      updateElements()
-//    }
-//  }
-
-//  public var visibleRange: NSRange {
-//    didSet {
-//      updateVisibleElements()
-//    }
-//  }
-//
-//  init(text: String = "") {
-//    self.text = text
-//    self.visibleRange = NSRange(location: 0, length: 0)
-//    updateElements()
-//  }
-
-//  private func updateElements() {
-// Parse the entire text and update the elements array
-// This would involve your Markdown parsing logic
-//  }
-
-//  private func updateVisibleElements() {
-//    visibleElements = elements.filter { NSIntersectionRange($0.range, visibleRange).length > 0 }
-//  }
-//
-//  public func elementsInRange(_ range: NSRange) -> [MarkdownFragment] {
-//    return elements.filter { NSIntersectionRange($0.range, range).length > 0 }
-//  }
-//
-//  public func elementAt(_ location: Int) -> MarkdownFragment? {
-//    return elements.first { NSLocationInRange(location, $0.range) }
-//  }
-
-//  public func applyStyle(for element: MarkdownFragment) -> [NSAttributedString.Key: Any] {
-//    // Return appropriate style attributes based on the element
-//
-//    return [:]
-//  }
-//
-//  public func toggleSyntax(_ syntax: Markdown.Syntax, in range: NSRange) {
-//    // Logic to add or remove syntax in the given range
-//  }
-//}
-
-
-
-//class MarkdownParser {
-//  // MARK: - Parsing Methods
-//
-//  func parse(_ text: String) async throws -> [MarkdownBlock] {
-//    // Parse the entire document
-//  }
-//
-//  func parse(_ text: String, in range: NSTextRange) async throws -> [MarkdownBlock] {
-//    // Parse a specific range within the document
-//  }
-//}
-
-// MARK: - Block-Level Parsing
-//
-//  private func parseHeadings(_ line: String) -> MarkdownBlock?
-//  private func parseLists(_ lines: [String]) -> MarkdownBlock?
-//  private func parseCodeBlocks(_ lines: [String]) -> MarkdownBlock?
-//  private func parseBlockquotes(_ lines: [String]) -> MarkdownBlock?
-//  private func parseParagraphs(_ lines: [String]) -> MarkdownBlock?
-//
-//  // MARK: - Inline Parsing
-//
-//  private func parseInlineElements(_ text: String) -> [InlineElement]
-//  private func parseEmphasis(_ text: String) -> [InlineElement]
-//  private func parseLinks(_ text: String) -> [InlineElement]
-//  private func parseInlineCode(_ text: String) -> [InlineElement]
-//
-//  // MARK: - Utility Methods
-//
-//  private func splitIntoLines(_ text: String) -> [String]
-//  private func identifyBlockType(_ line: String) -> BlockType
-//  private func mergeAdjacentBlocks(_ blocks: [MarkdownBlock]) -> [MarkdownBlock]
-//}
-//
-//enum BlockType {
-//  case heading(level: Int)
-//  case paragraph
-//  case list(type: ListType)
-//  case codeBlock
-//  case blockquote
-//  // ... other block types ...
-//}
-//
-//enum ListType {
-//  case unordered
-//  case ordered
-//}
-//
-//struct InlineElement {
-//  let range: NSRange
-//  let type: InlineElementType
-//}
-//
-//enum InlineElementType {
-//  case bold
-//  case italic
-//  case link(url: String)
-//  case code
-//  // ... other inline types ...
-//}
-
-
-
-//
-//  func parseInlineCode() {
-//    guard let textContentManager = self.textLayoutManager?.textContentManager else { return }
-//
-//    inlineCodeElements.removeAll()
-//
-////    let fullRange = NSRange(location: 0, length: string.utf16.count)
-//    let regex = Markdown.Syntax.inlineCode.regex
-//
-//    regex.
-//
-//    regex.enumerateMatches(in: string, options: [], range: fullRange) { match, _, _ in
-//      if let matchRange = match?.range {
-//        let element = InlineCodeElement(range: matchRange)
-//        inlineCodeElements.append(element)
-//
-//        textContentManager.performEditingTransaction {
-//          textContentManager.addTextElement(element, for: NSTextRange(matchRange, in: textContentManager))
-//        }
-//      }
-//    }
-//
-//    print("Found \(inlineCodeElements.count) inline code elements")
-//  }
-//
-//
 

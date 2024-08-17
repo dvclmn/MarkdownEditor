@@ -47,7 +47,7 @@ extension MarkdownTextView {
     }
 #if DEBUG
     // TODO: This is an expensive operation, and is only here temporarily for debugging.
-    self.processMarkdownBlocks(highlight: true)
+    self.processAllMarkdownBlocks(highlight: true)
 #endif
 
 //    Task {

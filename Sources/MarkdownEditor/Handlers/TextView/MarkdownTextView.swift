@@ -50,7 +50,7 @@ public class MarkdownTextView: NSTextView {
   public init(
     frame frameRect: NSRect,
     textContainer container: NSTextContainer?,
-    configuration: EditorConfiguration
+    configuration: EditorConfiguration = .init()
   ) {
     self.configuration = configuration
 

@@ -29,17 +29,12 @@ public struct MarkdownEditor: NSViewRepresentable {
   
   public func makeNSView(context: Context) -> MarkdownScrollView {
     
-    let scrollView = MarkdownScrollView()
-
-    let textView = MarkdownTextView(
-      frame: .zero,
-      textContainer: nil,
-      configuration: configuration
-    )
-    textView.delegate = context.coordinator
-    scrollView.documentView = textView
+    let scrollView = MarkdownScrollView(frame: .zero)
     
-    textView.onInfoUpdate = { info in
+    scrollView.textView.delegate = context.coordinator
+    scrollView.textView.configuration = configuration
+    
+    scrollView.textView.onInfoUpdate = { info in
       DispatchQueue.main.async { self.info(info) }
     }
     
@@ -48,8 +43,7 @@ public struct MarkdownEditor: NSViewRepresentable {
   
   public func updateNSView(_ scrollView: MarkdownScrollView, context: Context) {
     
-    guard let textView = scrollView.documentView as? MarkdownTextView else { return }
-
+    guard let textView = scrollView.textView else { return }
     
     context.coordinator.parent = self
     

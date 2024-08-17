@@ -11,6 +11,9 @@ import SwiftUI
 
 public class MarkdownScrollView: NSScrollView {
   
+  var gutterView: GutterView!
+  var textView: MarkdownTextView!
+  
   // MARK: - Properties
   
   /// The current vertical scroll offset
@@ -49,14 +52,48 @@ public class MarkdownScrollView: NSScrollView {
   }
   
   private func setupScrollView() {
+    
     hasVerticalScroller = true
     hasHorizontalScroller = false
     autohidesScrollers = true
     drawsBackground = false
     isFindBarVisible = true
     
+    // Create the text view
+    textView = MarkdownTextView(frame: .zero, textContainer: nil)
+    documentView = textView
+    
+    // Create the gutter view
+    gutterView = GutterView(frame: NSRect(x: 0, y: 0, width: 30, height: bounds.height))
+    gutterView.autoresizingMask = [.height]
+
+    contentView.addSubview(gutterView)
+    
+    // Set up notifications for bounds changes
+    contentView.postsBoundsChangedNotifications = true
+    NotificationCenter.default.addObserver(self, selector: #selector(boundsDidChange), name: NSView.boundsDidChangeNotification, object: contentView)
     
   }
+  
+  @objc private func boundsDidChange(_ notification: Notification) {
+    updateGutterFrame()
+  }
+  
+  private func updateGutterFrame() {
+    let contentBounds = contentView.bounds
+    gutterView.frame = NSRect(x: contentBounds.minX, y: contentBounds.minY, width: 30, height: contentBounds.height)
+  }
+  
+  public override func tile() {
+    super.tile()
+    updateGutterFrame()
+  }
+  
+  deinit {
+    NotificationCenter.default.removeObserver(self)
+  }
+
+
   
   // MARK: - Scroll Control Methods
   
