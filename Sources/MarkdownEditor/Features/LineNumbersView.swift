@@ -32,10 +32,8 @@ class LineNumberView: NSRulerView {
     
     let visibleRect = textView.visibleRect
     
-    //    let descriptor = NSFontDescriptor.preferredFontDescriptor(forTextStyle: .body).withSymbolicTraits([.expanded])
-    
     let font = NSFont.monospacedDigitSystemFont(ofSize: 12, weight: .medium)
-    //    let font = NSFont.systemFont(ofSize: 13, weight: .regular, width: .condensed)
+
     let attributes: Attributes = [
       .font: font as Any,
       .foregroundColor: NSColor.secondaryLabelColor

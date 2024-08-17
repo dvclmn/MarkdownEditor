@@ -47,11 +47,17 @@ extension MarkdownTextView {
     
 //    standard.titleTextAttributes = try? Dictionary(container, including: \.uiKit)
     
+    
+    
+    
+    
     font = NSFont.systemFont(ofSize: 15, weight: .regular)
     textColor = NSColor.textColor
     
     let paragraphStyle = NSMutableParagraphStyle()
-    paragraphStyle.lineHeightMultiple = 1.4 // Multiplies the default line height by 1.5
+    
+    // TODO: Obvs exaggerated value for testing
+    paragraphStyle.lineHeightMultiple = 2.2
     
     var attributes = AttributeContainer()
     attributes.foregroundColor = NSColor.textColor

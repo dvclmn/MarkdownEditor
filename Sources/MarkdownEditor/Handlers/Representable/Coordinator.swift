@@ -22,6 +22,9 @@ public extension MarkdownEditor {
     
     var updatingNSView = false
     
+    var gridColor: NSColor = .lightGray.withAlphaComponent(0.3)
+    var gridSpacing: CGFloat = 20.0
+    
     init(_ parent: MarkdownEditor) {
       self.parent = parent
     }
@@ -57,22 +60,14 @@ public extension MarkdownEditor {
     }
     
     
-    // MARK: - NSTextLayoutManagerDelegate
-    
-    public func textLayoutManager(_ textLayoutManager: NSTextLayoutManager,
-                           textLayoutFragmentFor location: NSTextLocation,
-                           in textElement: NSTextElement) -> NSTextLayoutFragment {
-      let index = textLayoutManager.offset(from: textLayoutManager.documentRange.location, to: location)
+    public func textLayoutManager(_ textLayoutManager: NSTextLayoutManager, textLayoutFragmentFor location: NSTextLocation, in textElement: NSTextElement) -> NSTextLayoutFragment {
       
-      let layoutFragment = BubbleLayoutFragment(textElement: textElement, range: textElement.elementRange)
-      layoutFragment.commentDepth = commentDepthValue!.uintValue
-      
-      if commentDepthValue != nil {
-        return layoutFragment
-      } else {
-        return NSTextLayoutFragment(textElement: textElement, range: textElement.elementRange)
-      }
+      let fragment = GridBackgroundLayoutFragment(textElement: textElement, range: textElement.elementRange)
+      fragment.gridColor = self.gridColor
+      fragment.gridSpacing = self.gridSpacing
+      return fragment
     }
+    
   }
 }
 

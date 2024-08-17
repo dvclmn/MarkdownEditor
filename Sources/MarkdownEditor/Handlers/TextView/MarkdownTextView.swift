@@ -8,36 +8,12 @@
 import SwiftUI
 //import STTextKitPlus
 
-class LayoutManagerDelegate:  NSTextLayoutManagerDelegate {
-  
-  // MARK: - NSTextLayoutManagerDelegate
-  
-  func textLayoutManager(_ textLayoutManager: NSTextLayoutManager,
-                         textLayoutFragmentFor location: NSTextLocation,
-                         in textElement: NSTextElement) -> NSTextLayoutFragment {
-    let index = textLayoutManager.offset(from: textLayoutManager.documentRange.location, to: location)
-    let commentDepthValue = textContentStorage!.textStorage!.attribute(.commentDepth, at: index, effectiveRange: nil) as! NSNumber?
-    if commentDepthValue != nil {
-      let layoutFragment = BubbleLayoutFragment(textElement: textElement, range: textElement.elementRange)
-      layoutFragment.commentDepth = commentDepthValue!.uintValue
-      return layoutFragment
-    } else {
-      return NSTextLayoutFragment(textElement: textElement, range: textElement.elementRange)
-    }
-  }
-}
-
 
 public class MarkdownTextView: NSTextView {
-  
-//  let parser = MarkdownParser()
   
   var blocks: [MarkdownBlock] = []
   var rangeIndex: [NSTextRange: MarkdownBlock] = [:]
   var processingTask: Task<Void, Never>?
-  
-  let heightHandler = Debouncer(interval: 0.7)
-  let scrollHandler = Debouncer()
   
   let infoHandler = EditorInfoHandler()
 
@@ -45,25 +21,11 @@ public class MarkdownTextView: NSTextView {
   
   var editorInfo = EditorInfo()
   
-  
   private var viewportLayoutController: NSTextViewportLayoutController?
   var viewportDelegate: CustomViewportDelegate?
   
   var processingTime: Double = .zero
-  
-//  var scrollOffset: CGFloat = .zero {
-//    didSet {
-//      if scrollOffset != oldValue {
-//        didChangeScroll()
-//      }
-//    }
-//  }
-  
-  //  public typealias OnEvent = (_ event: NSEvent, _ action: () -> Void) -> Void
-//  public var onKeyDown: OnEvent = { $1() }
-//  public var onFlagsChanged: OnEvent = { $1() }
-//  public var onMouseDown: OnEvent = { $1() }
-  
+
   public var onInfoUpdate: MarkdownEditor.InfoUpdate = { _ in }
   
   public init(

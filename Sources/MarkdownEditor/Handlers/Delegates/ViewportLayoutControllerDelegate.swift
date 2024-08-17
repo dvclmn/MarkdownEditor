@@ -13,17 +13,6 @@ class CustomViewportDelegate: NSObject, @preconcurrency  NSTextViewportLayoutCon
   
   var statusString: String = ""
   
-  public func textViewportLayoutController(_ textViewportLayoutController: NSTextViewportLayoutController, configureRenderingSurfaceFor textLayoutFragment: NSTextLayoutFragment) {
-
-    if let textLayoutFragment = textLayoutFragment as? STTextLayoutFragment {
-      textLayoutFragment.showsInvisibleCharacters = showsInvisibleCharacters
-    }
-    
-    contentView.addSubview(fragmentView)
-    fragmentViewMap.setObject(fragmentView, forKey: textLayoutFragment)
-  }
-  
-  
   @MainActor func viewportBounds(for textViewportLayoutController: NSTextViewportLayoutController) -> CGRect {
     guard let textView = textView else { return .zero }
     return textView.visibleRect

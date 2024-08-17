@@ -64,6 +64,12 @@ extension ExampleView {
   This *brief* block quote, with ==text contents==, lines `advance expanding` the view in the current writing direction.ExampleView".
   
   Includes one line break.
+  
+  Followed by another. In addition, here is a list:
+  
+  - [AttributeContainer](http://apple.com) is a container for attributes.
+  - By configuring the container, we can set, replace, and merge
+  - A large number of attributes for a string (or fragment) at once.
   """
   
   static let exampleMarkdown: String = """
