@@ -11,9 +11,10 @@ import SwiftUI
 
 public class MarkdownTextView: NSTextView {
   
+  /// `private(set)` means *gettable* from outside, but only *settable* from within `MarkdownParser`
   var elements: [Markdown.Element] = []
   var rangeIndex: [NSTextRange: Markdown.Element] = [:]
-  var processingTask: Task<Void, Never>?
+  var parsingTask: Task<Void, Never>?
   
   let infoHandler = EditorInfoHandler()
 
@@ -57,7 +58,7 @@ public class MarkdownTextView: NSTextView {
     textLayoutManager.textContainer = container
     textContentStorage.addTextLayoutManager(textLayoutManager)
     textContentStorage.primaryTextLayoutManager = textLayoutManager
-    container.containerSize = NSSize(width: frameRect.width, height: CGFloat.greatestFiniteMagnitude) 
+    container.containerSize = NSSize(width: frameRect.width, height: CGFloat.greatestFiniteMagnitude)
     
     super.init(frame: frameRect, textContainer: container)
     

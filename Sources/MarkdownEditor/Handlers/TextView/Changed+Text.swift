@@ -13,6 +13,12 @@ extension MarkdownTextView {
   public override func didChangeText() {
     
     super.didChangeText()
+    
+    Task {
+      if let (_, time) = await self.processFullDocument(self.string) {
+        self.processingTime = time
+      }
+    }
 
     Task { @MainActor in
 
@@ -20,12 +26,6 @@ extension MarkdownTextView {
       await infoHandler.update(info)
 
     }
-#if DEBUG
-    // TODO: This is an expensive operation, and is only here temporarily for debugging.
-    self.processAllMarkdownElements(highlight: true)
-#endif
-
-
   }
 }
 

@@ -17,11 +17,9 @@ extension MarkdownTextView {
     super.viewDidMoveToWindow()
     
     setupViewportLayoutController()
+
     
-#if DEBUG
-    // TODO: This is an expensive operation, and is only here temporarily for debugging.
-    self.processAllMarkdownElements(highlight: true)
-#endif
+    
     
     Task { @MainActor in
       
@@ -33,11 +31,7 @@ extension MarkdownTextView {
         /// The aim of this code here is to prompt the EditorInfo to populate with actual data
         /// when the view is initialised, without waiting for text/selection to change.
         try await Task.sleep(for: .seconds(0.1))
-        
-//        self.processingTime = await self.processFullDocumentWithTiming(self.string)
-        
-        
-        
+
         let textInfo = self.generateTextInfo()
         let selectionInfo = self.generateSelectionInfo()
         await infoHandler.update(textInfo)
@@ -45,6 +39,12 @@ extension MarkdownTextView {
         
       } catch {
         
+      }
+    } // END Task
+    
+    Task {
+      if let (_, time) = await self.processFullDocument(self.string) {
+        self.processingTime = time
       }
     }
     

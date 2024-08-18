@@ -9,21 +9,18 @@ import SwiftUI
 
 
 extension MarkdownTextView {
-
+  
   func measureBackgroundTaskTime(_ task: @escaping () async -> Void) async -> Double {
-    let startTime = DispatchTime.now()
+    let startTime = ProcessInfo.processInfo.systemUptime
     
     await Task.detached(priority: .background) {
       await task()
     }.value
     
-    let endTime = DispatchTime.now()
+    let endTime = ProcessInfo.processInfo.systemUptime
     
-    let nanoTime = endTime.uptimeNanoseconds - startTime.uptimeNanoseconds
-    let timeInterval = Double(nanoTime) / 1_000_000 // Convert to milliseconds
+    let timeInterval = endTime - startTime
     
-    return timeInterval
+    return timeInterval * 1000 // Convert to milliseconds
   }
-
-
 }

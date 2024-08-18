@@ -8,31 +8,24 @@
 import AppKit
 
 
-protocol Markdownable {
+protocol Markdownable: Equatable {
   var type: Markdown.Syntax { get set }
   var range: NSTextRange { get set }
 }
 
 public struct Markdown {
   
-  public struct Element: Equatable {
+  public struct Element: Markdownable {
     var type: Markdown.Syntax
     var range: NSTextRange
   }
-  
   
   public enum Structure {
     case block
     case line
     case inline
   }
-//  
-//  public enum Boundary {
-//    case opening
-//    case closing
-//    case single
-//  }
-  
+
 }
 
 

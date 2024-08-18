@@ -9,7 +9,7 @@ import AppKit
 
 public class MarkdownContainerView: NSView {
   let scrollView: MarkdownScrollView
-  let gridView: InfiniteGridView
+//  let gridView: InfiniteGridView
   
   override init(frame: NSRect) {
     
@@ -18,7 +18,7 @@ public class MarkdownContainerView: NSView {
     let gridView = InfiniteGridView(scrollView: scrollView)
     
     self.scrollView = scrollView
-    self.gridView = gridView
+//    self.gridView = gridView
     
     super.init(frame: frame)
     
@@ -31,11 +31,11 @@ public class MarkdownContainerView: NSView {
   
   private func setupViews() {
     // Set up GridView
-    gridView.translatesAutoresizingMaskIntoConstraints = false
-    addSubview(gridView)
+//    gridView.translatesAutoresizingMaskIntoConstraints = false
+//    addSubview(gridView)
     
-    scrollView.documentView?.addSubview(gridView)
-    gridView.updateFrame(with: scrollView.documentView?.bounds ?? .zero)
+//    scrollView.documentView?.addSubview(gridView)
+//    gridView.updateFrame(with: scrollView.documentView?.bounds ?? .zero)
     
     // Set up ScrollView and TextView
     scrollView.translatesAutoresizingMaskIntoConstraints = false
@@ -53,12 +53,12 @@ public class MarkdownContainerView: NSView {
     //      gridView.grid.configuration.spacing = 20
     //    }
     
-    gridView.grid.isSubdivided = true
-    gridView.grid.shouldScroll = true
-    
-    // TODO: Create function to properly calculate according to text line height
-    gridView.grid.spacing = 39.5
-    gridView.grid.offset = 10
+//    gridView.grid.isSubdivided = true
+//    gridView.grid.shouldScroll = true
+//    
+//    // TODO: Create function to properly calculate according to text line height
+//    gridView.grid.spacing = 39.5
+//    gridView.grid.offset = 10
     
     
     
@@ -70,10 +70,10 @@ public class MarkdownContainerView: NSView {
     
     // Make GridView and ScrollView the same size as this view
     NSLayoutConstraint.activate([
-      gridView.topAnchor.constraint(equalTo: topAnchor),
-      gridView.leadingAnchor.constraint(equalTo: leadingAnchor),
-      gridView.trailingAnchor.constraint(equalTo: trailingAnchor),
-      gridView.bottomAnchor.constraint(equalTo: bottomAnchor),
+//      gridView.topAnchor.constraint(equalTo: topAnchor),
+//      gridView.leadingAnchor.constraint(equalTo: leadingAnchor),
+//      gridView.trailingAnchor.constraint(equalTo: trailingAnchor),
+//      gridView.bottomAnchor.constraint(equalTo: bottomAnchor),
       
       scrollView.topAnchor.constraint(equalTo: topAnchor),
       scrollView.leadingAnchor.constraint(equalTo: leadingAnchor),
