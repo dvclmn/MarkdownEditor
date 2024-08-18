@@ -46,22 +46,23 @@ extension EditorInfo.Text {
 
 extension MarkdownTextView {
   
-  func profile(_ name: String, block: () async  -> Void) async -> ProfileInfo {
-    let start = Date()
-    await block()
-    let duration = Date().timeIntervalSince(start)
-    let profile = ProfileInfo(name: name, duration: duration)
-    profiler.addProfile(profile)
-    return profile
-  }
-
-  
   func generateTextInfo() -> EditorInfo.Text {
+    
+    
     
     guard let tlm = self.textLayoutManager,
           let tcm = tlm.textContentManager,
           let viewportRange = tlm.textViewportLayoutController.viewportRange
     else { return .init() }
+    
+    
+    
+    let significantProfiles = profiler.getSignificantProfiles(threshold: 5.0)
+    
+    var profilesSummary: String = ""
+    for profile in significantProfiles {
+      profilesSummary += "\(profile.name): \(profile.duration)s (\(String(format: "%.2f", profile.percentage))%)"
+    }
     
     let documentRange = tlm.documentRange
     
@@ -76,6 +77,7 @@ extension MarkdownTextView {
     Insets: \(self.textContainer?.lineFragmentPadding.description ?? "")
     Total elements: \(self.elements.count)
     TCM's attString char. count: \(tcm.attributedString(in: documentRange)?.string.count ?? 0)
+    Profiler: \(profilesSummary)
     """
     
     return EditorInfo.Text(

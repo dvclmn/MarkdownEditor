@@ -7,14 +7,8 @@
 
 import AppKit
 
-public struct ProfileInfo {
-  let name: String
-  let duration: TimeInterval
-  var percentage: Double = 0
-}
-
-public class Profiler {
-  public static let shared = Profiler()
+actor Profiler {
+  static let shared = Profiler()
   private init() {}
   
   private var profiles: [ProfileInfo] = []
@@ -41,4 +35,12 @@ public class Profiler {
     return profiles.filter { $0.percentage >= threshold }
       .sorted { $0.percentage > $1.percentage }
   }
+  
+  
+}
+
+struct ProfileInfo: Sendable {
+  let name: String
+  let duration: TimeInterval
+  var percentage: Double = 0
 }

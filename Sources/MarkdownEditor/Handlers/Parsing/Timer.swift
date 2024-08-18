@@ -10,6 +10,7 @@ import SwiftUI
 
 extension MarkdownTextView {
   
+
   func measureBackgroundTaskTime(_ task: @escaping () async -> Void) async -> Double {
     let startTime = ProcessInfo.processInfo.systemUptime
     
@@ -24,7 +25,18 @@ extension MarkdownTextView {
     let timeInterval = endTime - startTime
     
     return timeInterval * 1000 // Convert to milliseconds
-    
   }
   
+  
+  func profile(_ name: String, operation: @escaping () async -> Void) async {
+    let start = Date()
+    await operation()
+    let duration = Date().timeIntervalSince(start)
+    await profiler.addProfile(ProfileInfo(name: name, duration: duration))
+  }
+  
+  
+  
 }
+
+

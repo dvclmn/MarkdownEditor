@@ -65,14 +65,14 @@ extension MarkdownTextView {
     
     let range = range ?? tlm.documentRange
     
-    let time = await measureBackgroundTaskTime { [self] in
+    let time = await measureBackgroundTaskTime {
       
-      parsingTask?.cancel()
-      parsingTask = Task {
+      self.parsingTask?.cancel()
+      self.parsingTask = Task {
         
         // Clear existing elements
-        elements.removeAll()
-        rangeIndex.removeAll()
+        self.elements.removeAll()
+        self.rangeIndex.removeAll()
         
         let documentRange = tlm.documentRange
         
