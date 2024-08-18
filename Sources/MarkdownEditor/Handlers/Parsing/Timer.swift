@@ -14,7 +14,9 @@ extension MarkdownTextView {
     let startTime = ProcessInfo.processInfo.systemUptime
     
     await Task.detached(priority: .background) {
-      await task()
+      await self.profile("Process markdown background") {
+        await task()
+      }
     }.value
     
     let endTime = ProcessInfo.processInfo.systemUptime
@@ -22,5 +24,7 @@ extension MarkdownTextView {
     let timeInterval = endTime - startTime
     
     return timeInterval * 1000 // Convert to milliseconds
+    
   }
+  
 }

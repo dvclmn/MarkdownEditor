@@ -16,6 +16,8 @@ public class MarkdownTextView: NSTextView {
   var rangeIndex: [NSTextRange: Markdown.Element] = [:]
   var parsingTask: Task<Void, Never>?
   
+  let profiler = Profiler.shared
+  
   let infoHandler = EditorInfoHandler()
 
   var configuration: EditorConfiguration

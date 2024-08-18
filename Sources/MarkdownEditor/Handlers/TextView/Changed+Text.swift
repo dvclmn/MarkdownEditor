@@ -46,6 +46,16 @@ extension EditorInfo.Text {
 
 extension MarkdownTextView {
   
+  func profile(_ name: String, block: () async  -> Void) async -> ProfileInfo {
+    let start = Date()
+    await block()
+    let duration = Date().timeIntervalSince(start)
+    let profile = ProfileInfo(name: name, duration: duration)
+    profiler.addProfile(profile)
+    return profile
+  }
+
+  
   func generateTextInfo() -> EditorInfo.Text {
     
     guard let tlm = self.textLayoutManager,
