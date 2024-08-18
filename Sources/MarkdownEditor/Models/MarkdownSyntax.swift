@@ -92,6 +92,8 @@ extension Markdown {
       
       var patterns = [Markdown.Syntax: Regex<Substring>]()
       
+      patterns[.h1] = /^#\\s.*$/
+      
       patterns[.inlineCode] = /`[^`\n]+?`/
       patterns[.codeBlock] = /^```\w*[\s\S]*?```$/
       
@@ -176,7 +178,7 @@ extension Markdown {
       }
     }
     
-    public var layoutType: LayoutType {
+    public var structure: Markdown.Structure {
       switch self {
         case .h1, .h2, .h3:
             .line

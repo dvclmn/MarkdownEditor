@@ -12,7 +12,7 @@ import Foundation
 extension MarkdownTextView {
   
   // TODO: This of course needs to be expanded to support *actual* styles, just placeholder yellow colour for now
-  func addStyle(for block: MarkdownElement) {
+  func addStyle(for element: Markdown.Element) {
     guard let tlm = self.textLayoutManager,
           let tcm = tlm.textContentManager,
           let tcs = self.textContentStorage
@@ -20,7 +20,7 @@ extension MarkdownTextView {
     
     tcm.performEditingTransaction {
       
-        let nsRange = NSRange(block.range, in: tcm)
+        let nsRange = NSRange(element.range, in: tcm)
       
       tcs.textStorage?.setAttributesCustom(.highlighter, range: nsRange, with: self.typingAttributes)
       

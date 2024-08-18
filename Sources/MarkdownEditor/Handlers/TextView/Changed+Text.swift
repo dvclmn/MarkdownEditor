@@ -38,7 +38,8 @@ extension EditorInfo.Text {
       Code blocks: \(codeBlocks)
       Document Range: \(documentRange)
       Viewport Range: \(viewportRange)
-      Scratchpad: \(scratchPad)
+      
+      \(scratchPad)
       """
   }
 }
@@ -48,6 +49,7 @@ extension MarkdownTextView {
   func generateTextInfo() -> EditorInfo.Text {
     
     guard let tlm = self.textLayoutManager,
+          let tcm = tlm.textContentManager,
           let viewportRange = tlm.textViewportLayoutController.viewportRange
     else { return .init() }
     
@@ -62,13 +64,15 @@ extension MarkdownTextView {
     
     let scratchPad: String = """
     Insets: \(self.textContainer?.lineFragmentPadding.description ?? "")
+    Total elements: \(self.elements.count)
+    TCM's attString char. count: \(tcm.attributedString(in: documentRange)?.string.count ?? 0)
     """
     
     return EditorInfo.Text(
       processingTime: self.processingTime,
       characterCount: self.string.count,
       textElementCount: textElementCount,
-      codeBlocks: self.blocks.filter { $0.syntax == .codeBlock }.count,
+      codeBlocks: self.elements.filter { $0.type == .codeBlock }.count,
       documentRange: documentRange.description,
       viewportRange: viewportRange.description,
       scratchPad: scratchPad
