@@ -51,13 +51,13 @@ extension MarkdownTextView {
     
     
     
-    font = NSFont.systemFont(ofSize: 15, weight: .regular)
+    font = NSFont.systemFont(ofSize: 14, weight: .regular)
     textColor = NSColor.textColor
     
     let paragraphStyle = NSMutableParagraphStyle()
     
     // TODO: Obvs exaggerated value for testing
-    paragraphStyle.lineHeightMultiple = 2.2
+    paragraphStyle.lineHeightMultiple = 2.0
     
     var attributes = AttributeContainer()
     attributes.foregroundColor = NSColor.textColor

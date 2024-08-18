@@ -33,11 +33,8 @@ extension MarkdownTextView {
 extension EditorInfo.Text {
   public var summary: String {
       """
-      Processing time: \(processingTime)
       Characters: \(characterCount)
       Paragraphs: \(textElementCount)
-      Code blocks: \(codeBlocks)
-      Document Range: \(documentRange)
       Viewport Range: \(viewportRange)
       
       \(scratchPad)
@@ -51,6 +48,7 @@ extension MarkdownTextView {
   
   func generateTextInfo() -> EditorInfo.Text {
     
+//    TCM's attString char. count: \(tcm.attributedString(in: documentRange)?.string.count ?? 0)
     
     
     guard let tlm = self.textLayoutManager,
@@ -72,7 +70,6 @@ extension MarkdownTextView {
     let scratchPad: String = """
     Insets: \(self.textContainer?.lineFragmentPadding.description ?? "")
     Total elements: \(self.elements.count)
-    TCM's attString char. count: \(tcm.attributedString(in: documentRange)?.string.count ?? 0)
     Profiler: \(profilerReport ?? "nil")
     """
     

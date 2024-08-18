@@ -6,6 +6,7 @@
 //
 
 import AppKit
+import Rearrange
 
 extension MarkdownTextView {
   
@@ -60,86 +61,42 @@ extension MarkdownTextView {
   ) async -> (result: Void, processingTime: Double)? {
     
     guard let tlm = self.textLayoutManager,
-      let tcm = tlm.textContentManager
+          let tcm = tlm.textContentManager
     else { return nil }
     
-    let range = range ?? tlm.documentRange
+    let searchRange = range ?? tlm.documentRange
+    let syntaxList: [Markdown.Syntax] = [.inlineCode, .codeBlock]
     
     let time = await measureBackgroundTaskTime {
       
       self.parsingTask?.cancel()
+      
       self.parsingTask = Task {
         
-        // Clear existing elements
-        self.elements.removeAll()
-        self.rangeIndex.removeAll()
         
-        let documentRange = tlm.documentRange
         
-        //    var currentElement: Markdown.Element?
-        var lineNumber = 0
-        
-        tcm.enumerateTextElements(from: documentRange.location) { textElement in
-          guard let paragraph = textElement as? NSTextParagraph
-                  //            let paragraphRange = paragraph.elementRange
-                  //            let content = tcm.attributedString(in: paragraphRange)?.string
-          else { return false }
+        self.parsingTask = Task {
+          self.elements.removeAll()
+          self.rangeIndex.removeAll()
           
-          lineNumber += 1
-          
-          let syntaxList: [Markdown.Syntax] = [.codeBlock, .inlineCode]
+          let nsRange = NSRange(searchRange, provider: tcm)
           
           for syntax in syntaxList {
-            
-            let regex = syntax.regex
-            
-            guard let attributedString = tcm.attributedString(in: documentRange)
-                    
-            else { return false }
-            
-            let string = attributedString.string
-            let fullRange = string.startIndex..<string.endIndex
-            
-            ///
-            /// `using block: (String?, NSTextRange, NSTextRange?, UnsafeMutablePointer<ObjCBool>) -> Void`
-            /// This is the enclosing range. Its meaning depends on the enumeration options:
-            /// - For `.byWords`, it's the range of the enclosing word.
-            /// - For `.byLines`, it's the range of the enclosing line.
-            /// - For `.byParagraphs`, it's the range of the enclosing paragraph.
-            /// - It can be nil if not applicable or if using `.byCharacters`.
-            tlm.enumerateSubstrings(from: documentRange.location, options: .byWords) { subString, substringRange, enclosingRange, stop in
-              
-              guard let string = subString else {
-                
-                tlm.addRenderingAttribute(.foregroundColor, value: NSColor.red, for: enclosingRange ?? substringRange)
-                return
-              }
-              
-              
-              
-              if !string.isEmpty {
-                
-                tlm.addRenderingAttribute(.foregroundColor, value: NSColor.green, for: enclosingRange ?? substringRange)
-                
-                //            let element = Markdown.Element(type: .h1, range: enclosingRange ?? substringRange)
-                //            self.addElement(element)
-                
-              } else {
-                tlm.addRenderingAttribute(.foregroundColor, value: NSColor.orange, for: enclosingRange ?? substringRange)
-              }
-              
-            }
-            
-          } // END syntax loop
+            let newElements = text.markdownMatches(of: syntax, in: nsRange, textContentManager: tcm)
+            newElements.forEach { self.addElement($0) }
+          }
           
-          
-          return true
-          
+          self.elements.sort { $0.range.location.compare($1.range.location) == .orderedAscending }
         }
         
-      } // END Task
+        
+      }
+      
+      
+      
       await self.parsingTask?.value
     }
+    
     return ((), time)
     
   }
@@ -178,3 +135,22 @@ extension MarkdownTextView {
 //  guard let currentBlock = self.markdownBlocks.first(where: { $0.range.intersects(range) }) else { return nil }
 //  return currentBlock
 //}
+
+
+extension String {
+  @MainActor
+  func markdownMatches(
+    of syntax: Markdown.Syntax,
+    in range: NSRange,
+    textContentManager: NSTextContentManager
+  ) -> [Markdown.Element] {
+    guard let stringRange = range.range(in: self) else { return [] }
+    return self[stringRange].matches(of: syntax.regex).compactMap { match in
+      let matchRange = NSRange(match.range, in: self)
+      let offsetRange = NSRange(location: matchRange.location + range.location, length: matchRange.length)
+      guard let textRange = NSTextRange(offsetRange, provider: textContentManager) else { return nil }
+      return Markdown.Element(type: syntax, range: textRange)
+    }
+  }
+}
+

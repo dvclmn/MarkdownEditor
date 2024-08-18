@@ -17,7 +17,7 @@ let package = Package(
     ],
     dependencies: [
 //            .package(url: "https://github.com/raspu/Highlightr.git", from: "2.1.2"),
-//            .package(url: "https://github.com/ChimeHQ/Rearrange.git", from: "1.8.1"),
+            .package(url: "https://github.com/ChimeHQ/Rearrange.git", from: "1.8.1"),
             .package(url: "https://github.com/krzyzanowskim/STTextKitPlus.git", from: "0.1.4"),
             .package(name: "Utilities", path: "../Utilities"),
 //            .package(name: "Styles", path: "../Styles"),
@@ -28,7 +28,7 @@ let package = Package(
     targets: [
         .target(
             name: "MarkdownEditor",
-            dependencies: ["STTextKitPlus", "Utilities", "Helpers"]
+            dependencies: ["STTextKitPlus", "Utilities", "Helpers", "Rearrange"]
         ),
 //        .target(
 //          name: "Syntax",
