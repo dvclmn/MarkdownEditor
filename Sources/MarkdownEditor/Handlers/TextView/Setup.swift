@@ -64,7 +64,7 @@ extension MarkdownTextView {
     attributes.paragraphStyle = paragraphStyle
     attributes.font = NSFont.systemFont(ofSize: 15, weight: NSFont.Weight.init(0.0))
     
-    typingAttributes = attributes.getAttributes() ?? [:]
+//    typingAttributes = attributes.getAttributes() ?? [:]
     defaultParagraphStyle = paragraphStyle
 
   }

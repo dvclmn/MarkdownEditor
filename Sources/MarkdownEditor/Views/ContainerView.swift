@@ -14,7 +14,7 @@ public class MarkdownContainerView: NSView {
   override init(frame: NSRect) {
     
     let scrollView = MarkdownScrollView(frame: .zero)
-
+    
     let gridView = GridView(frame: frame)
     
     self.scrollView = scrollView
@@ -38,8 +38,23 @@ public class MarkdownContainerView: NSView {
     scrollView.translatesAutoresizingMaskIntoConstraints = false
     addSubview(scrollView)
     
-    gridView.gridColor = .lightGray.withAlphaComponent(0.0)
-    gridView.gridSpacing = 20.0
+    //    if let paragraphStyle = scrollView.textView.defaultParagraphStyle {
+    //
+    //      let spacingMultiple = max(paragraphStyle.lineHeightMultiple, 1)
+    //      let spacing = max(paragraphStyle.lineSpacing, 1) * (spacingMultiple * 10)
+    //
+    //      gridView.grid.configuration.spacing = spacing
+    //
+    //    } else {
+    //      gridView.grid.configuration.spacing = 20
+    //    }
+    
+    gridView.grid.isSubdivided = true
+    
+    // TODO: Create function to properly calculate according to text line height
+    gridView.grid.spacing = 39
+    
+    
     
     // Make GridView and ScrollView the same size as this view
     NSLayoutConstraint.activate([
@@ -56,6 +71,6 @@ public class MarkdownContainerView: NSView {
     
     // Make ScrollView transparent
     scrollView.drawsBackground = false
-
+    
   }
 }
