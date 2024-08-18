@@ -70,7 +70,7 @@ class GridBackgroundLayoutFragment: NSTextLayoutFragment {
 class CodeBlockBackground: NSTextLayoutFragment {
   
   private let paragraphStyle: NSParagraphStyle
-  var showsInvisibleCharacters: Bool = true
+  var showsInvisibleCharacters: Bool = false
   
   let backgroundColor: NSColor = .lightGray.withAlphaComponent(0.2)
   let cornerRadius: CGFloat = 5
@@ -100,9 +100,12 @@ class CodeBlockBackground: NSTextLayoutFragment {
     backgroundColor.setFill()
     path.fill()
     
-    if self.state {
-      context.strokePath()
+    context.strokePath()
+    
+    if showsInvisibleCharacters {
+      drawInvisibles(at: point, in: context)
     }
+    
     context.restoreGState()
     
     // Draw the actual text content

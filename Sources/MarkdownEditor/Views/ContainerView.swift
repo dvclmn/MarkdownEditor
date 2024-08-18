@@ -38,7 +38,7 @@ public class MarkdownContainerView: NSView {
     scrollView.translatesAutoresizingMaskIntoConstraints = false
     addSubview(scrollView)
     
-    gridView.gridColor = .lightGray.withAlphaComponent(0.3)
+    gridView.gridColor = .lightGray.withAlphaComponent(0.0)
     gridView.gridSpacing = 20.0
     
     // Make GridView and ScrollView the same size as this view

@@ -21,16 +21,11 @@ public extension MarkdownEditor {
     var selections: [NSTextSelection] = []
     
     var updatingNSView = false
-    
-    var gridColor: NSColor = .lightGray.withAlphaComponent(0.3)
-    var gridSpacing: CGFloat = 20.0
-    
+
     init(_ parent: MarkdownEditor) {
       self.parent = parent
     }
-    
-    
-    
+        
     public func textDidChange(_ notification: Notification) {
       
       guard let textView = notification.object as? MarkdownTextView,
@@ -64,19 +59,56 @@ public extension MarkdownEditor {
     ///
     /// The method the framework calls to give the delegate an opportunity to return a custom text layout fragment.
     ///
-    public func textLayoutManager(
-      _ textLayoutManager: NSTextLayoutManager,
-      textLayoutFragmentFor location: NSTextLocation,
-      in textElement: NSTextElement
-    ) -> NSTextLayoutFragment {
+//    public func textLayoutManager(
+//      _ textLayoutManager: NSTextLayoutManager,
+//      textLayoutFragmentFor location: NSTextLocation,
+//      in textElement: NSTextElement
+//    ) -> NSTextLayoutFragment {
+//      
+//      let fragment = CodeBlockBackground(
+//        textElement: textElement,
+//        range: textElement.elementRange,
+//        paragraphStyle: .default
+//      )
+//      return fragment
+//    }
+    
+    
+//    public func textLayoutManager(_ textLayoutManager: NSTextLayoutManager, textLayoutFragmentFor location: NSTextLocation, in textElement: NSTextElement) -> NSTextLayoutFragment {
       
-      let fragment = CodeBlockBackground(
-        textElement: textElement,
-        range: textElement.elementRange,
-        paragraphStyle: .default
-      )
-      return fragment
-    }
+//      let fragment = CodeBlockBackground(
+//        textElement: textElement,
+//        range: textElement.elementRange,
+//        paragraphStyle: .default
+//      )
+//      return fragment
+      
+      
+//      if let markdownElement = textElement as? MarkdownElement {
+        
+//        switch markdownElement.syntax {
+//          case .codeBlock:
+//            return CodeBlockBackground(textElement: markdownElement, range: markdownElement.elementRange, paragraphStyle: .default)
+//          default:
+//            return NSTextLayoutFragment(textElement: textElement, range: textElement.elementRange)
+//        }
+        
+//        switch markdownElement.type {
+//          case .codeBlock:
+//            return CodeBlockLayoutFragment(textElement: textElement, range: textElement.elementRange)
+//          case .blockQuote:
+//            return BlockQuoteLayoutFragment(textElement: textElement, range: textElement.elementRange)
+//          case .heading(let level):
+//            return HeadingLayoutFragment(textElement: textElement, range: textElement.elementRange, level: level)
+//          case .paragraph:
+//            return NSTextLayoutFragment(textElement: textElement, range: textElement.elementRange)
+//        }
+//      }
+//      return NSTextLayoutFragment(textElement: textElement, range: textElement.elementRange)
+//    }
+    
+    
+    
     
   }
 }
