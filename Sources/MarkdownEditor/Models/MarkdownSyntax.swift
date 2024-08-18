@@ -11,35 +11,19 @@ import SwiftUI
 import RegexBuilder
 
 extension Markdown {
-
+  
   public enum Syntax: Identifiable, Equatable, Hashable, Sendable, CaseIterable {
     
-    case h1
-    case h2
-    case h3
-    
-    case bold
-    
-    case boldAlt
-    
-    case italic
-    case italicAlt
-    
-    case boldItalic
-    case boldItalicAlt
-    
+    case h1, h2, h3
+    case bold, boldAlt
+    case italic, italicAlt
+    case boldItalic, boldItalicAlt
     case strikethrough
-    
     case highlight
-    
     case inlineCode
-    
     case codeBlock
-    
     case quoteBlock
-    
     case link
-    
     case image
     
     nonisolated public var id: String {
@@ -88,24 +72,48 @@ extension Markdown {
       }
     }
     
+    public enum RegexOutput {
+      case single(Regex<(Substring, Substring)>)
+      case double(Regex<(Substring, Substring, Substring)>)
+      // Add more cases if needed, e.g.:
+      // case triple(Regex<(Substring, Substring, Substring, Substring)>)
+    }
     
-    private static let regexCache: [Markdown.Syntax: Regex<(Substring, Substring)>] = {
-      var cache = [Markdown.Syntax: Regex<(Substring, Substring)>]()
-      cache[.h1] = /# (.*)/
-      cache[.h2] = /## (.*)/
-      cache[.h3] = /### (.*)/
-      cache[.bold] = /\*\*(.*?)\*\*/
-      cache[.italic] = /\*(.*?)\*/
-      cache[.boldItalic] = /\*\*\*(.*?)\*\*\*/
-      cache[.strikethrough] = /\~\~(.*?)\~\~/
-      cache[.inlineCode] = /`([^\n`]+)(?!``)`(?!`)/
-      cache[.codeBlock] = /(?m)^```([\s\S]*?)^```/
+    private static let regexCache: [Markdown.Syntax: RegexOutput] = {
+      var cache = [Markdown.Syntax: RegexOutput]()
+      for syntax in Self.allCases {
+        cache[syntax] = syntax.createRegex()
+      }
       return cache
     }()
     
-    public var regex: Regex<(Substring, Substring)> {
-      return Markdown.Syntax.regexCache[self]!
+    public var regex: RegexOutput {
+      return Self.regexCache[self]!
     }
+    
+    private func createRegex() -> any RegexComponent {
+      switch self {
+        case .h1: return .single(/# (.*)/)
+        case .h2: return .single(/## (.*)/)
+        case .h3: return .single(/### (.*)/)
+        case .bold: return .single(/\*\*(.*?)\*\*/)
+        case .boldAlt: return .single(/__(.*?)__/)
+        case .italic: return .single(/\*(.*?)\*/)
+        case .italicAlt: return .single(/_(.*?)_/)
+        case .boldItalic: return .single(/\*\*\*(.*?)\*\*\*/)
+        case .boldItalicAlt: return .single(/___(.*?)___/)
+        case .strikethrough: return .single(/\~\~(.*?)\~\~/)
+        case .highlight: return .single(/==(.*?)==/)
+        case .inlineCode: return .single(/`([^\n`]+)(?!``)`(?!`)/)
+        case .codeBlock: return .single(/(?m)^```([\s\S]*?)^```/)
+        case .quoteBlock: return .single(/^> (.*)/)
+        case .link: return .double(/\[([^\]]+)\]\(([^\)]+)\)/)
+        case .image: return .double(/!\[([^\]]+)\]\(([^\)]+)\)/)
+      }
+    }
+    
+    
+    
     
     public var isWrappable: Bool {
       switch self {

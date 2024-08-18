@@ -61,7 +61,7 @@ extension MarkdownTextView {
           let tcm = tlm.textContentManager,
           let viewportRange = tlm.textViewportLayoutController.viewportRange
     else { return nil }
-
+    
     let time = await measureBackgroundTaskTime {
       
       self.parsingTask?.cancel()
@@ -83,11 +83,11 @@ extension MarkdownTextView {
     
     return ((), time)
   }
-        
-        
-        
-        
-        
+  
+  
+  
+  
+  
   func parseMarkdown(
     in range: NSTextRange? = nil
   ) async -> (result: Void, processingTime: Double)? {
@@ -97,10 +97,10 @@ extension MarkdownTextView {
     else { return nil }
     
     let searchRange = range ?? tlm.documentRange
-//    let syntaxList: [Markdown.Syntax] = [
-//      .inlineCode,
-//      .codeBlock
-//    ]
+    //    let syntaxList: [Markdown.Syntax] = [
+    //      .inlineCode,
+    //      .codeBlock
+    //    ]
     
     let time = await measureBackgroundTaskTime {
       
@@ -179,13 +179,18 @@ extension String {
     in range: NSRange,
     textContentManager: NSTextContentManager
   ) -> [Markdown.Element] {
-    guard let stringRange = range.range(in: self) else { return [] }
+    
+    guard let stringRange = range.range(in: self)
+    else { return [] }
+    
     return self[stringRange].matches(of: syntax.regex).compactMap { match in
+      
       let matchRange = NSRange(match.range, in: self)
       let offsetRange = NSRange(location: matchRange.location + range.location, length: matchRange.length)
       guard let textRange = NSTextRange(offsetRange, provider: textContentManager) else { return nil }
       return Markdown.Element(type: syntax, range: textRange)
-    }
+      
+    } // END loop over matches
   }
 }
 
