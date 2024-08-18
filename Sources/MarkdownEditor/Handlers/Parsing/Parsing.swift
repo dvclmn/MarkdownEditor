@@ -68,20 +68,16 @@ extension MarkdownTextView {
       
       self.parsingTask = Task {
         
-        for element in self.elements {
-          switch element.type {
+        tcm.performEditingTransaction {
+          
+          for element in self.elements {
             
-            case .inlineCode:
-              
-              tlm.setRenderingAttributes(element.type.contentAttributes, for: element.range)
-              
-            default:
-              break
-              
+            tlm.setRenderingAttributes(element.type.contentAttributes, for: element.range)
+            
           }
-        }
-        
-      }
+          
+        } // END perform editing
+      } // END task
       
     }
     
@@ -101,10 +97,10 @@ extension MarkdownTextView {
     else { return nil }
     
     let searchRange = range ?? tlm.documentRange
-    let syntaxList: [Markdown.Syntax] = [
-      .inlineCode,
-      .codeBlock
-    ]
+//    let syntaxList: [Markdown.Syntax] = [
+//      .inlineCode,
+//      .codeBlock
+//    ]
     
     let time = await measureBackgroundTaskTime {
       
@@ -120,7 +116,7 @@ extension MarkdownTextView {
           
           let nsRange = NSRange(searchRange, provider: tcm)
           
-          for syntax in syntaxList {
+          for syntax in Markdown.Syntax.allCases {
             let newElements = self.string.markdownMatches(of: syntax, in: nsRange, textContentManager: tcm)
             newElements.forEach { self.addElement($0) }
           }
