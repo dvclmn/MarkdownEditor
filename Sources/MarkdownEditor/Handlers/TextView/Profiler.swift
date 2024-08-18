@@ -7,6 +7,21 @@
 
 import AppKit
 
+
+struct ProfileInfo: Sendable, Identifiable {
+  let id: UUID
+  let name: String
+  var duration: TimeInterval
+  var percentage: Double = 0
+  
+  init(name: String, duration: TimeInterval) {
+    self.id = UUID()
+    self.name = name
+    self.duration = duration
+  }
+
+}
+
 actor Profiler {
   static let shared = Profiler()
   private init() {}
@@ -19,14 +34,25 @@ actor Profiler {
     totalDuration = 0
   }
   
-  func addProfile(_ profile: ProfileInfo) {
-    profiles.append(profile)
-    totalDuration += profile.duration
+  func addOrUpdateProfile(_ profile: ProfileInfo) {
+    if let index = profiles.firstIndex(where: { $0.name == profile.name }) {
+      updateProfile(at: index, with: profile)
+    } else {
+      profiles.append(profile)
+      totalDuration += profile.duration
+    }
+  }
+  
+  /// `inout` is being used here implicitly. When we modify `profiles[index]`, we're actually modifying the struct in place, which is equivalent to using `inout`.
+  private func updateProfile(at index: Int, with newProfile: ProfileInfo) {
+    totalDuration -= profiles[index].duration
+    totalDuration += newProfile.duration
+    profiles[index].duration = newProfile.duration
   }
   
   func calculatePercentages() {
-    for i in 0..<profiles.count {
-      profiles[i].percentage = (profiles[i].duration / totalDuration) * 100
+    for index in profiles.indices {
+      profiles[index].percentage = (profiles[index].duration / totalDuration) * 100
     }
   }
   
@@ -39,8 +65,19 @@ actor Profiler {
   
 }
 
-struct ProfileInfo: Sendable {
-  let name: String
-  let duration: TimeInterval
-  var percentage: Double = 0
+
+extension MarkdownTextView {
+  func generateProfilerReport() -> String? {
+    
+    let significantProfiles = profiler.getSignificantProfiles(threshold: 5.0)
+    
+    var profilesSummary: String = ""
+    
+    for profile in significantProfiles {
+      
+      profilesSummary += "\(profile.name): \(String(format: "%.3f", profile.duration)) seconds, \(String(format: "%.2f", profile.percentage))%)"
+    }
+
+    return profilesSummary
+  }
 }

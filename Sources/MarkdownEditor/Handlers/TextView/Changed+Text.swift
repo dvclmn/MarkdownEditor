@@ -14,17 +14,18 @@ extension MarkdownTextView {
     
     super.didChangeText()
     
-    Task {
-      if let (_, time) = await self.processFullDocument(self.string) {
-        self.processingTime = time
-      }
-    }
 
     Task { @MainActor in
 
       let info = self.generateTextInfo()
       await infoHandler.update(info)
 
+    }
+    
+    Task {
+      if let (_, time) = await self.processFullDocument(self.string) {
+        self.processingTime = time
+      }
     }
   }
 }
@@ -46,6 +47,8 @@ extension EditorInfo.Text {
 
 extension MarkdownTextView {
   
+  
+  
   func generateTextInfo() -> EditorInfo.Text {
     
     
@@ -54,15 +57,6 @@ extension MarkdownTextView {
           let tcm = tlm.textContentManager,
           let viewportRange = tlm.textViewportLayoutController.viewportRange
     else { return .init() }
-    
-    
-    
-    let significantProfiles = profiler.getSignificantProfiles(threshold: 5.0)
-    
-    var profilesSummary: String = ""
-    for profile in significantProfiles {
-      profilesSummary += "\(profile.name): \(profile.duration)s (\(String(format: "%.2f", profile.percentage))%)"
-    }
     
     let documentRange = tlm.documentRange
     
@@ -73,11 +67,13 @@ extension MarkdownTextView {
       return true
     })
     
+    let profilerReport = generateProfilerReport()
+    
     let scratchPad: String = """
     Insets: \(self.textContainer?.lineFragmentPadding.description ?? "")
     Total elements: \(self.elements.count)
     TCM's attString char. count: \(tcm.attributedString(in: documentRange)?.string.count ?? 0)
-    Profiler: \(profilesSummary)
+    Profiler: \(profilerReport ?? "nil")
     """
     
     return EditorInfo.Text(
