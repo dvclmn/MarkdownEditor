@@ -28,6 +28,7 @@ public class MarkdownTextView: NSTextView {
   var viewportDelegate: CustomViewportDelegate?
   
   var processingTime: Double = .zero
+  var lightProcessingTime: Double = .zero
 
   public var onInfoUpdate: MarkdownEditor.InfoUpdate = { _ in }
   

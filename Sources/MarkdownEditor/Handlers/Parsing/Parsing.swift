@@ -55,8 +55,44 @@ extension MarkdownTextView {
   
   // MARK: - Processing
   
-  func processFullDocument(
-    _ text: String,
+  func applyMarkdownStyles() async -> (result: Void, processingTime: Double)? {
+    
+    guard let tlm = self.textLayoutManager,
+          let tcm = tlm.textContentManager,
+          let viewportRange = tlm.textViewportLayoutController.viewportRange
+    else { return nil }
+
+    let time = await measureBackgroundTaskTime {
+      
+      self.parsingTask?.cancel()
+      
+      self.parsingTask = Task {
+        
+        for element in self.elements {
+          switch element.type {
+            
+            case .inlineCode:
+              
+              tlm.setRenderingAttributes(element.type.contentAttributes, for: element.range)
+              
+            default:
+              break
+              
+          }
+        }
+        
+      }
+      
+    }
+    
+    return ((), time)
+  }
+        
+        
+        
+        
+        
+  func parseMarkdown(
     in range: NSTextRange? = nil
   ) async -> (result: Void, processingTime: Double)? {
     
@@ -65,7 +101,10 @@ extension MarkdownTextView {
     else { return nil }
     
     let searchRange = range ?? tlm.documentRange
-    let syntaxList: [Markdown.Syntax] = [.inlineCode, .codeBlock]
+    let syntaxList: [Markdown.Syntax] = [
+      .inlineCode,
+      .codeBlock
+    ]
     
     let time = await measureBackgroundTaskTime {
       
@@ -82,7 +121,7 @@ extension MarkdownTextView {
           let nsRange = NSRange(searchRange, provider: tcm)
           
           for syntax in syntaxList {
-            let newElements = text.markdownMatches(of: syntax, in: nsRange, textContentManager: tcm)
+            let newElements = self.string.markdownMatches(of: syntax, in: nsRange, textContentManager: tcm)
             newElements.forEach { self.addElement($0) }
           }
           

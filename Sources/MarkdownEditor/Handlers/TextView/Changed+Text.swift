@@ -17,13 +17,22 @@ extension MarkdownTextView {
 
     Task { @MainActor in
 
+      try await Task.sleep(for: .seconds(0.1))
+      
+      if let (_, time) = await self.applyMarkdownStyles() {
+        self.lightProcessingTime = time
+      }
+
+
       let info = self.generateTextInfo()
       await infoHandler.update(info)
+      
 
     }
     
     Task {
-      if let (_, time) = await self.processFullDocument(self.string) {
+      // TODO: Consider adding a debounce to this as well as all the rest
+      if let (_, time) = await self.parseMarkdown() {
         self.processingTime = time
       }
     }

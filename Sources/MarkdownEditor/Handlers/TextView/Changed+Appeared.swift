@@ -23,6 +23,10 @@ extension MarkdownTextView {
     
     Task { @MainActor in
       
+      
+      
+      
+      
       do {
         
         /// Adding this line seems to have been the difference between this function straight
@@ -32,6 +36,10 @@ extension MarkdownTextView {
         /// when the view is initialised, without waiting for text/selection to change.
         try await Task.sleep(for: .seconds(0.1))
 
+        if let (_, time) = await self.applyMarkdownStyles() {
+          self.lightProcessingTime = time
+        }
+        
         let textInfo = self.generateTextInfo()
         let selectionInfo = self.generateSelectionInfo()
         await infoHandler.update(textInfo)
@@ -43,7 +51,7 @@ extension MarkdownTextView {
     } // END Task
     
     Task {
-      if let (_, time) = await self.processFullDocument(self.string) {
+      if let (_, time) = await self.parseMarkdown() {
         self.processingTime = time
       }
     }
