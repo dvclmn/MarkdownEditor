@@ -9,13 +9,13 @@ import AppKit
 
 public class MarkdownContainerView: NSView {
   let scrollView: MarkdownScrollView
-  let gridView: GridView
+  let gridView: InfiniteGridView
   
   override init(frame: NSRect) {
     
     let scrollView = MarkdownScrollView(frame: .zero)
     
-    let gridView = GridView(frame: frame)
+    let gridView = InfiniteGridView(scrollView: scrollView)
     
     self.scrollView = scrollView
     self.gridView = gridView
@@ -34,9 +34,13 @@ public class MarkdownContainerView: NSView {
     gridView.translatesAutoresizingMaskIntoConstraints = false
     addSubview(gridView)
     
+    scrollView.documentView?.addSubview(gridView)
+    gridView.updateFrame(with: scrollView.documentView?.bounds ?? .zero)
+    
     // Set up ScrollView and TextView
     scrollView.translatesAutoresizingMaskIntoConstraints = false
     addSubview(scrollView)
+    
     
     //    if let paragraphStyle = scrollView.textView.defaultParagraphStyle {
     //
@@ -50,9 +54,17 @@ public class MarkdownContainerView: NSView {
     //    }
     
     gridView.grid.isSubdivided = true
+    gridView.grid.shouldScroll = true
     
     // TODO: Create function to properly calculate according to text line height
-    gridView.grid.spacing = 39
+    gridView.grid.spacing = 39.5
+    gridView.grid.offset = 10
+    
+    
+    
+    
+    
+//    gridView.grid.colour = .clear
     
     
     
@@ -73,4 +85,6 @@ public class MarkdownContainerView: NSView {
     scrollView.drawsBackground = false
     
   }
+  
+  
 }

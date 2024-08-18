@@ -7,44 +7,101 @@
 
 import AppKit
 
+class InfiniteGridView: NSView {
+  var grid: Grid
+  weak var scrollView: NSScrollView?
+  private var boundsObservation: NSKeyValueObservation?
+  
+  init(grid: Grid = Grid(), scrollView: NSScrollView) {
+    self.grid = grid
+    self.scrollView = scrollView
+    super.init(frame: .zero)
+    self.wantsLayer = true
+    self.layer?.contents = nil
+    
+    setupBoundsObserver()
 
+  }
+  
+  required init?(coder: NSCoder) {
+    fatalError("init(coder:) has not been implemented")
+  }
+  
+  override func draw(_ dirtyRect: NSRect) {
+    guard let context = NSGraphicsContext.current?.cgContext,
+          let scrollView = scrollView else { return }
+    
+    let visibleRect = scrollView.contentView.bounds
+    let contentBounds = scrollView.documentView?.bounds ?? .zero
+    
+    // Adjust the drawing origin based on the scroll position
+    context.translateBy(x: -visibleRect.origin.x, y: -visibleRect.origin.y)
+    
+    // Calculate the area to draw (visible area plus some overflow)
+    let drawingRect = NSRect(
+      x: visibleRect.origin.x - grid.spacing,
+      y: visibleRect.origin.y - grid.spacing,
+      width: visibleRect.width + 2 * grid.spacing,
+      height: visibleRect.height + 2 * grid.spacing
+    )
+    
+    // Clip to the content bounds
+    context.clip(to: contentBounds)
+    
+    // Draw the grid
+    grid.drawGrid(for: drawingRect, in: context)
+  }
+  
+  private func setupBoundsObserver() {
+    boundsObservation = scrollView?.documentView?.observe(\.bounds, options: [.new]) { [weak self] _, change in
+      guard let newBounds = change.newValue else { return }
+      self?.updateFrame(with: newBounds)
+    }
+  }
+  
+  func updateFrame(with newBounds: NSRect) {
+    self.frame = newBounds
+    self.needsDisplay = true
+  }
+  
+  deinit {
+    boundsObservation?.invalidate()
+  }
+
+}
 
 struct Grid {
   var colour: NSColor = .lightGray.withAlphaComponent(0.3)
   var spacing: CGFloat = 20
   var lineWidth: CGFloat = 0.5
   var isSubdivided: Bool = false
-  var anchor: CGPoint = .init(x: 30, y: 30)
+  var shouldScroll: Bool = false
+  var offset: CGFloat = .zero
 }
 
 extension Grid {
   func drawGrid(for rect: NSRect, in context: CGContext) {
     context.saveGState()
     
-    // Calculate initial offsets based on anchor point
-    let xOffset = (anchor.x.truncatingRemainder(dividingBy: spacing) + spacing).truncatingRemainder(dividingBy: spacing)
-    let yOffset = (anchor.y.truncatingRemainder(dividingBy: spacing) + spacing).truncatingRemainder(dividingBy: spacing)
-    
     // Draw main grid lines
     context.setStrokeColor(self.colour.cgColor)
     context.setLineWidth(self.lineWidth)
     
-    drawGridLines(in: context, for: rect, interval: self.spacing, xOffset: xOffset, yOffset: yOffset)
+    drawGridLines(in: context, for: rect, interval: self.spacing, offset: self.offset)
+
     context.strokePath()
     
     if self.isSubdivided {
-      
       // Draw fainter lines
       let fainerColor = self.colour.withAlphaComponent(0.2) // Adjust alpha as needed
       context.setStrokeColor(fainerColor.cgColor)
       context.setLineWidth(self.lineWidth / 2) // Thinner lines
       
-      let subXOffset = xOffset + (self.spacing / 2)
-      let subYOffset = yOffset + (self.spacing / 2)
-      drawGridLines(in: context, for: rect, interval: self.spacing, xOffset: subXOffset, yOffset: subYOffset)
-      context.strokePath()
+      let halfSpacing = self.spacing / 2
+      drawGridLines(in: context, for: rect, interval: self.spacing, offset: halfSpacing + self.offset)
     }
     
+    context.strokePath()
     context.restoreGState()
   }
   
@@ -52,24 +109,22 @@ extension Grid {
     in context: CGContext,
     for rect: NSRect,
     interval: CGFloat,
-    xOffset: CGFloat,
-    yOffset: CGFloat
+    offset: CGFloat = 0
   ) {
     // Draw vertical lines
-    for x in stride(from: xOffset, through: rect.width + xOffset, by: interval) {
-      let adjustedX = x - xOffset
-      context.move(to: CGPoint(x: adjustedX, y: 0))
-      context.addLine(to: CGPoint(x: adjustedX, y: rect.height))
+    for x in stride(from: offset, through: rect.width, by: interval) {
+      context.move(to: CGPoint(x: x, y: 0))
+      context.addLine(to: CGPoint(x: x, y: rect.height))
     }
     
     // Draw horizontal lines
-    for y in stride(from: yOffset, through: rect.height + yOffset, by: interval) {
-      let adjustedY = y - yOffset
-      context.move(to: CGPoint(x: 0, y: adjustedY))
-      context.addLine(to: CGPoint(x: rect.width, y: adjustedY))
+    for y in stride(from: offset, through: rect.height, by: interval) {
+      context.move(to: CGPoint(x: 0, y: y))
+      context.addLine(to: CGPoint(x: rect.width, y: y))
     }
   }
 }
+
 
 class GridView: NSView {
   var grid = Grid()
