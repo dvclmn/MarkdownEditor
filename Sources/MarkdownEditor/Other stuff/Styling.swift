@@ -13,8 +13,8 @@ extension MarkdownEditor {
   
   /// Style syntax characters
   ///
-  private static func applySyntaxAttributes<S: MarkdownSyntax>(
-    for syntax: S,
+  private static func applySyntaxAttributes(
+    for syntax: Markdown.Syntax,
     to attributedString: NSMutableAttributedString,
     in range: NSRange
   ) {

@@ -13,10 +13,10 @@ import RegexBuilder
 // TODO: Shortcut to move lines up aND DOWN
 
 //public protocol MarkdownSyntax: Equatable, Sendable {
-//  
+//
 //  associatedtype RegexOutput
 //  associatedtype Structure
-//  
+//
 //  var name: String { get }
 //  var regex: Regex<RegexOutput> { get }
 //  var structure: Structure { get }
@@ -47,7 +47,25 @@ public extension Markdown {
     public var syntax: Markdown.Syntax
     public var type: InlinePresentationIntent
   }
-
+  
+  enum EmphasisStyle: Sendable {
+    case asterisk
+    case underscore
+  }
+  
+  enum ListStyle: Sendable {
+    case ordered
+    case unordered
+    
+    public var name: String {
+      switch self {
+        case .ordered:
+          "Ordered"
+        case .unordered:
+          "Unordered"
+      }
+    }
+  }
   
   
   /// Usage:
@@ -65,7 +83,7 @@ public extension Markdown {
   /// )
   /// ```
   /// My approach atm is to write up a struct will all the propreties I may need, then i'll work out how to seperate it out logically
-
+  
   
   
 }
@@ -74,42 +92,11 @@ public extension Markdown {
 
 extension Markdown {
   
-  //  struct RegexBuilder: Sendable {
-  //
-  //    static func buildRegex(
-  //      openingSyntax: Substring,
-  //      closingSyntax: Substring?
-  //    ) -> Regex<(Substring, Substring, Substring, Substring)> {
-  //
-  //      Regex {
-  //        Capture(openingSyntax)
-  //        Capture(OneOrMore(.reluctant) { .any })
-  //        Capture(closingSyntax ?? openingSyntax)
-  //      }
-  //    }
-  //  }
   
-  
-  public enum EmphasisStyle: Sendable {
-    case asterisk
-    case underscore
-  }
-  
-  public enum ListStyle: Sendable {
-    case ordered
-    case unordered
-    
-    public var name: String {
-      switch self {
-        case .ordered:
-          "Ordered"
-        case .unordered:
-          "Unordered"
-      }
-    }
-  }
   
   public enum Syntax: Identifiable, Equatable, Hashable, Sendable {
+    
+    
     
     case heading(level: Int)
     
@@ -140,6 +127,22 @@ extension Markdown {
     nonisolated public var id: String {
       self.name
     }
+    
+    static public var testCases: [Markdown.Syntax] {
+      return [
+        .bold(style: .asterisk),
+        .bold(style: .underscore),
+        .italic(style: .asterisk),
+        .italic(style: .underscore),
+        .inlineCode
+      ]
+    }
+    
+//    public func allCases(): [Markdown.Syntax] {
+//      return [
+//        .heading(level: <#T##Int#>)
+//      ]
+//    }
     
     /// Swift gets the whole match first, that's one `Substring`, and then gets the
     /// capture group, that's the second `Substring`. To get just the syntax characters,
@@ -419,8 +422,7 @@ extension Markdown {
       
       switch self {
           
-        case .heading(let level):
-          
+        case .heading:
           return [
             .font: NSFont.systemFont(ofSize: self.fontSize, weight: .medium),
             .foregroundColor: NSColor.systemCyan
@@ -496,7 +498,7 @@ extension Markdown {
           return [:]
         case .image:
           return [:]
-        case .list(style: let style):
+        case .list:
           return [:]
         case .horiztonalRule:
           return [:]
@@ -506,7 +508,7 @@ extension Markdown {
     public var syntaxAttributes: [NSAttributedString.Key : Any]  {
       
       switch self {
-        case .heading(let level):
+        case .heading:
           return [
             .foregroundColor: NSColor.systemMint
           ]

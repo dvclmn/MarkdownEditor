@@ -41,12 +41,12 @@ class LanguageComboBox: NSComboBox, Sendable {
 
 extension MarkdownTextView {
   
-  private func extractLanguageIdentifier(from string: String) -> Language? {
+  private func extractLanguageIdentifier(from string: String) -> LanguageHint? {
     let components = string.components(separatedBy: "```")
     guard components.count > 1 else { return nil }
     let identifier = components[1].trimmingCharacters(in: .whitespacesAndNewlines)
     
-    let languageMatch = Language.allCases.first(where: { identifier.contains($0.rawValue) })
+    let languageMatch = LanguageHint.allCases.first(where: { identifier.contains($0.rawValue) })
     
     return languageMatch
   }
@@ -60,7 +60,7 @@ extension MarkdownTextView {
     
     // Create and position the combo box
     let comboBox = LanguageComboBox(frame: NSRect(x: 5, y: 5, width: 150, height: 25))
-    comboBox.addItems(withObjectValues: Language.allCases)
+    comboBox.addItems(withObjectValues: LanguageHint.allCases)
     
     // Add the combo box to the text view
     self.addSubview(comboBox)

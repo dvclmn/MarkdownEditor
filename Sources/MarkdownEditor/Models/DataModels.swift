@@ -14,16 +14,19 @@ import SwiftUI
 /// Hence why `PresentationIntent` ships with this property `components`:
 /// `public var components: [PresentationIntent.IntentType]`
 
-public protocol MarkdownElement: Equatable {
-  associatedtype Syntax: MarkdownSyntax
-  var type: Syntax { get set }
-  var range: NSTextRange { get set }
-}
-
-public typealias AnyMarkdownElement = (any MarkdownElement)
+//public protocol MarkdownElement: Equatable {
+//  var type: Markdown.Syntax { get set }
+//  var range: NSTextRange { get set }
+//}
+//
+//public typealias AnyMarkdownElement = (any MarkdownElement)
 
 public struct Markdown {
 
+  struct Element: Sendable {
+    var type: Markdown.Syntax
+    nonisolated(unsafe) var range: NSTextRange
+  }
   
 }
 

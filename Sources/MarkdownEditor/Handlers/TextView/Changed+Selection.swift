@@ -47,8 +47,8 @@ extension MarkdownTextView {
 extension EditorInfo.Selection {
   public var summary: String {
     
-    let formattedSyntaxNames: String = selectedSyntax.map { syntax in
-      syntax.name
+    let formattedSyntaxNames: String = selectedElement.map { syntax in
+      syntax.type.name
     }.joined(separator: ", ")
     
     return """
@@ -80,7 +80,7 @@ extension MarkdownTextView {
     //          let selectionDescription: String = textSelections.first?.textRanges.first?.location.description
     //    else { return .init() }
     //
-    //    let selectedSyntax = self.getSelectedMarkdownElements().map { block in
+    //    let selectedElement = self.getSelectedMarkdownElements().map { block in
     //      block.syntax
     //    }
     //
@@ -97,7 +97,7 @@ extension MarkdownTextView {
     return EditorInfo.Selection(
       selection: (selectedString?.string.count ?? 0).description,
       //      selection: currentBlock?.description ?? "nil",
-      selectedSyntax: [],
+      selectedElement: [],
       location: EditorInfo.Selection.Location(line: 0, column: 0)
       //      lineNumber: self.getLineAndColumn(for: selectedLocation)?.0,
       //      columnNumber: self.getLineAndColumn(for: selectedLocation)?.1
