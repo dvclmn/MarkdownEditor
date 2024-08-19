@@ -8,24 +8,22 @@
 import SwiftUI
 
 extension MarkdownTextView {
-  
-  
-  
-  
+
   public override func viewDidMoveToWindow() {
     
     super.viewDidMoveToWindow()
     
+    
     setupViewportLayoutController()
-
+    Task {
+      await runMainMarkdownParse()
+    }
     
     
-    
+  }
+  
+  func runMainMarkdownParse() async {
     Task { @MainActor in
-      
-      
-      
-      
       
       do {
         
@@ -34,8 +32,8 @@ extension MarkdownTextView {
         ///
         /// The aim of this code here is to prompt the EditorInfo to populate with actual data
         /// when the view is initialised, without waiting for text/selection to change.
-        try await Task.sleep(for: .seconds(0.1))
-
+        try await Task.sleep(for: .seconds(0.8))
+        
         if let (_, time) = await self.applyMarkdownStyles() {
           self.lightProcessingTime = time
         }
@@ -50,11 +48,10 @@ extension MarkdownTextView {
       }
     } // END Task
     
-    Task {
+    
       if let (_, time) = await self.parseMarkdown() {
         self.processingTime = time
       }
-    }
     
   }
   

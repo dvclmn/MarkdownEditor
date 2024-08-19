@@ -6,12 +6,9 @@
 //
 
 import SwiftUI
-//import STTextKitPlus
-
 
 public class MarkdownTextView: NSTextView {
   
-  /// `private(set)` means *gettable* from outside, but only *settable* from within `MarkdownParser`
   var elements: [Markdown.Element] = []
   var rangeIndex: [NSTextRange: Markdown.Element] = [:]
   var parsingTask: Task<Void, Never>?
@@ -26,6 +23,7 @@ public class MarkdownTextView: NSTextView {
   
   private var viewportLayoutController: NSTextViewportLayoutController?
   var viewportDelegate: CustomViewportDelegate?
+  
   
   var processingTime: Double = .zero
   var lightProcessingTime: Double = .zero

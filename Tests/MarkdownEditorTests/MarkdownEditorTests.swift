@@ -1,56 +1,74 @@
-////
-////  File.swift
-////  
-////
-////  Created by Dave Coleman on 11/8/2024.
-////
 //
-//import Foundation
+//  File.swift
 //
-//import XCTest
-//@testable import MarkdownEditor
 //
-//final class MarkdownEditorTests: XCTestCase {
-//  func testMarkdownStyling() {
-//    // Your test code here
-//  }
-//  
-//  func testTextWrapping() {
-//    // Your test code here
-//  }
-//  
-//  // Add more test methods as needed
-//}
+//  Created by Dave Coleman on 11/8/2024.
 //
-//class MarkdownStylerTests: XCTestCase {
-//  var styler: MarkdownStyler!
-//  
-//  override func setUpWithError() throws {
-//    styler = MarkdownStyler()
-//  }
-//  
-//  func testBoldStyling() {
-//    let input = "This is **bold** text"
-//    let attributes = styler.style(input)
-//    
-//    XCTAssertEqual(attributes.count, 3)
-//    XCTAssertTrue(attributes[1].attributes.contains { $0.key == .font && ($0.value as? NSFont)?.fontDescriptor.symbolicTraits.contains(.bold) == true })
-//  }
-//  
-//  func testItalicStyling() {
-//    let input = "This is *italic* text"
-//    let attributes = styler.style(input)
-//    
-//    XCTAssertEqual(attributes.count, 3)
-//    XCTAssertTrue(attributes[1].attributes.contains { $0.key == .font && ($0.value as? NSFont)?.fontDescriptor.symbolicTraits.contains(.italic) == true })
-//  }
-//  
-//  func testWrappingConfig() {
-//    let config = WrappingConfig(syntax: .inlineCode, triggerKey: "`", shortcut: AppKitKeyboardShortcut("e", modifiers: .command))
-//    
-//    XCTAssertEqual(config.syntax, .inlineCode)
-//    XCTAssertEqual(config.triggerKey, "`")
-//    XCTAssertEqual(config.shortcut?.key, "e")
-//    XCTAssertEqual(config.shortcut?.modifiers, .command)
-//  }
-//}
+
+import Foundation
+import SwiftUI
+import Testing
+
+@testable import MarkdownEditor
+
+@MainActor @Suite("MarkdownTextView tests")
+struct MarkdownTextViewTests {
+  
+  let editor: MarkdownEditor
+  let coordinator: MarkdownEditor.Coordinator
+  
+  let nsView: MarkdownContainerView
+  
+  init() {
+    
+    let editor = MarkdownEditor(
+      text: .constant("# Header\n\nThis is **bold** text."),
+      configuration: .init()
+    )
+    let coordinator = MarkdownEditor.Coordinator(editor)
+    let nsView = MarkdownContainerView(frame: .zero)
+    
+    nsView.scrollView.textView.delegate = coordinator
+    nsView.scrollView.textView.textLayoutManager?.delegate = coordinator
+    nsView.scrollView.textView.configuration = editor.configuration
+    
+    nsView.scrollView.textView.onInfoUpdate = { info in
+      DispatchQueue.main.async { editor.info(info) }
+    }
+    
+    self.editor = editor
+    self.coordinator = coordinator
+    self.nsView = nsView
+    
+  }
+  
+  
+  @Test("Adding markdown content parses elements")
+  func addingContentParsesElements() async throws {
+    guard let textView = nsView.scrollView.textView else { return }
+    
+    textView.string = """
+    # Header
+    
+    This is **bold** text.
+    """
+    
+    textView.setupViewportLayoutController()
+    
+    try await Task.sleep(for: .seconds(0.1))
+    
+    await textView.runMainMarkdownParse()
+    
+    print("Text: \(textView.string)")
+    print("Elements: \(textView.elements)")
+    
+    #expect(!textView.elements.isEmpty)
+    #expect(textView.elements.count == 2)
+    #expect(textView.elements[0].type == .heading(level: 1))
+    #expect(textView.elements[1].type == .bold(style: .asterisk))
+
+  }
+  
+  
+  
+}

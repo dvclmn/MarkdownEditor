@@ -30,7 +30,7 @@ public protocol MarkdownIntent: Equatable, Sendable {
   var type: StructureType { get }
 }
 
-public typealias AnyMarkdownIntent = (any MarkdownIntent)
+//public typealias AnyMarkdownIntent = (any MarkdownIntent)
 
 public extension Markdown {
   
@@ -130,11 +130,13 @@ extension Markdown {
     
     static public var testCases: [Markdown.Syntax] {
       return [
+        .heading(level: 2),
         .bold(style: .asterisk),
         .bold(style: .underscore),
         .italic(style: .asterisk),
         .italic(style: .underscore),
-        .inlineCode
+        .inlineCode,
+        .strikethrough
       ]
     }
     
@@ -283,7 +285,7 @@ extension Markdown {
       }
     }
     
-    public var intent: AnyMarkdownIntent {
+    public var intent: any MarkdownIntent {
       switch self {
         case .heading(let level):
           BlockIntent(syntax: .heading(level: level), type: PresentationIntent(.header(level: level), identity: level))
@@ -384,25 +386,25 @@ extension Markdown {
       }
     }
     
-    //    public var shortcut: KeyboardShortcut? {
-    //      switch self {
-    //
-    //        case .bold, .boldAlt:
-    //            .init("b", modifiers: [.command])
-    //        case .italic, .italicAlt:
-    //            .init("i", modifiers: [.command])
-    //        case .boldItalic, .boldItalicAlt:
-    //            .init("b", modifiers: [.command, .shift])
-    //        case .strikethrough:
-    //            .init("u", modifiers: [.command])
-    //        case .inlineCode:
-    //            .init("c", modifiers: [.command, .option])
-    //        case .codeBlock:
-    //            .init("k", modifiers: [.command, .shift])
-    //        default:
-    //          nil
-    //      }
-    //    }
+        public var shortcut: KeyboardShortcut? {
+          switch self {
+    
+            case .bold:
+                .init("b", modifiers: [.command])
+            case .italic:
+                .init("i", modifiers: [.command])
+            case .boldItalic:
+                .init("b", modifiers: [.command, .shift])
+            case .strikethrough:
+                .init("u", modifiers: [.command])
+            case .inlineCode:
+                .init("c", modifiers: [.command, .option])
+            case .codeBlock:
+                .init("k", modifiers: [.command, .shift])
+            default:
+              nil
+          }
+        }
     
     public var fontSize: Double {
       switch self {
@@ -451,27 +453,25 @@ extension Markdown {
           ]
           
         case .boldItalic:
-          let bodyDescriptor = NSFontDescriptor.preferredFontDescriptor(forTextStyle: .body)
-          let font = NSFont(descriptor: bodyDescriptor.withSymbolicTraits([.italic, .bold]), size: self.fontSize)
+          
           return [
-            .font: font as Any,
             .foregroundColor: self.foreGroundColor,
             .backgroundColor: NSColor.clear
           ]
           
         case .strikethrough:
           return [
-            .font: NSFont.systemFont(ofSize: self.fontSize, weight: .medium),
-            .foregroundColor: self.foreGroundColor,
-            .backgroundColor: NSColor.yellow
+            .strikethroughStyle: NSUnderlineStyle.thick.rawValue,
+            .strikethroughColor: NSColor.red,
+            .foregroundColor: NSColor.green,
+            .baselineOffset: 0
+//            .foregroundColor: self.foreGroundColor,
           ]
           
         case .highlight:
           return [
-            .font: NSFont.systemFont(ofSize: self.fontSize, weight: .medium),
             .foregroundColor: self.foreGroundColor,
-            .strikethroughStyle: NSUnderlineStyle.single.rawValue,
-            .backgroundColor: NSColor.clear
+            .backgroundColor: NSColor.yellow.withAlphaComponent(0.3)
           ]
           
         case .inlineCode:

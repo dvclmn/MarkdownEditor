@@ -10,18 +10,18 @@ import Rearrange
 
 extension MarkdownTextView {
   
-//  static func createElement<S: MarkdownSyntax>(type: S, range: NSTextRange) -> AnyMarkdownElement {
-//    switch type {
-//      case let singleCapture as Markdown.SingleCaptureSyntax:
-//        return Markdown.SingleCaptureElement(type: singleCapture, range: range)
-//      case let doubleCapture as Markdown.DoubleCaptureSyntax:
-//        return Markdown.DoubleCaptureElement(type: doubleCapture, range: range)
-//      default:
-//        fatalError("Unsupported syntax type")
-//    }
-//  }
-//  
-//  
+  //  static func createElement<S: MarkdownSyntax>(type: S, range: NSTextRange) -> AnyMarkdownElement {
+  //    switch type {
+  //      case let singleCapture as Markdown.SingleCaptureSyntax:
+  //        return Markdown.SingleCaptureElement(type: singleCapture, range: range)
+  //      case let doubleCapture as Markdown.DoubleCaptureSyntax:
+  //        return Markdown.DoubleCaptureElement(type: doubleCapture, range: range)
+  //      default:
+  //        fatalError("Unsupported syntax type")
+  //    }
+  //  }
+  //
+  //
   func addElement(_ element: Markdown.Element) {
     elements.append(element)
     rangeIndex[element.range] = element
@@ -120,8 +120,6 @@ extension MarkdownTextView {
       
       self.parsingTask = Task {
         
-        
-        
         self.parsingTask = Task {
           self.elements.removeAll()
           self.rangeIndex.removeAll()
@@ -129,61 +127,20 @@ extension MarkdownTextView {
           let nsRange = NSRange(searchRange, provider: tcm)
           
           for syntax in Markdown.Syntax.testCases {
-            
             let newElements = self.string.markdownMatches(of: syntax, in: nsRange, textContentManager: tcm)
             newElements.forEach { self.addElement($0) }
-            
           }
-          
           self.elements.sort { $0.range.location.compare($1.range.location) == .orderedAscending }
-        }
-        
-        
+        } // END task
       }
-      
-      
       
       await self.parsingTask?.value
     }
     
     return ((), time)
-    
   }
-  
-  //  func processRange(_ range: NSTextRange, in text: String) async {
-  //    let parser = MarkdownParser() // You'd need to implement this
-  //    let newBlocks = try? await parser.parse(text, in: range)
-  
-  //    if let newBlocks = newBlocks, !Task.isCancelled {
-  //      for element in newBlocks {
-  //        if let existingBlock = rangeIndex[element.range] {
-  //          updateBlockRange(existingBlock, newRange: element.range)
-  //        } else {
-  //          addBlock(element)
-  //        }
-  //      }
-  //    }
-  //  }
-  
-  // MARK: - Viewport Handling
-  
-  //  func getBlocksForViewport(_ range: NSTextRange) async -> [MarkdownElement] {
-  //    return elementsInRange(range)
-  //  }
 }
 
-//func countCodeBlocks() -> Int {
-//
-//  let codeblocks = self.markdownBlocks.filter { $0.syntax == .codeBlock }
-//
-//  return codeblocks.count
-//
-//}
-
-//func getMarkdownElement(for range: NSTextRange) -> MarkdownElement? {
-//  guard let currentBlock = self.markdownBlocks.first(where: { $0.range.intersects(range) }) else { return nil }
-//  return currentBlock
-//}
 
 extension String {
   
@@ -197,9 +154,6 @@ extension String {
     guard let stringRange = range.range(in: self) else { return [] }
     
     var elements: [Markdown.Element] = []
-    
-//    let matches: (Substring, Substring) = self[stringRange].matches(of: syntax.regex)
-    
     
     for match in self[stringRange].matches(of: syntax.regex) {
       let matchRange = match.range
@@ -218,19 +172,6 @@ extension String {
     }
     
     return elements
-
-  
-  
-    
-//    let matches = self[stringRange].matches(of: syntax.regex) { match in
-//      let matchRange = NSRange(match.range, in: self)
-//      let offsetRange = NSRange(location: matchRange.location + range.location, length: matchRange.length)
-//      guard let textRange = NSTextRange(offsetRange, provider: textContentManager) else { return nil }
-//      
-//      return MarkdownTextView.createElement(type: syntax, range: textRange)
-//    }
-//    
-//    return result
   }
 }
 

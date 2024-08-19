@@ -51,8 +51,8 @@ extension MarkdownTextView {
     
     
     
-    font = NSFont.systemFont(ofSize: 14, weight: .regular)
-    textColor = NSColor.textColor
+//    font = NSFont.systemFont(ofSize: 14, weight: .regular)
+//    textColor = NSColor.textColor
     
     let paragraphStyle = NSMutableParagraphStyle()
     

@@ -81,7 +81,7 @@ actor Debouncer {
   private var task: Task<Void, Never>?
   private let interval: Double
   
-  init(interval: Double = 0.2) {
+  init(interval: Double = 0.1) {
     self.interval = interval
   }
   
