@@ -14,38 +14,10 @@ import Testing
 @MainActor @Suite("MarkdownTextView tests")
 struct MarkdownTextViewTests {
   
-  let editor: MarkdownEditor
-  let coordinator: MarkdownEditor.Coordinator
-  
-  let nsView: MarkdownContainerView
-  
-  init() {
-    
-    let editor = MarkdownEditor(
-      text: .constant("# Header\n\nThis is **bold** text."),
-      configuration: .init()
-    )
-    let coordinator = MarkdownEditor.Coordinator(editor)
-    let nsView = MarkdownContainerView(frame: .zero)
-    
-    nsView.scrollView.textView.delegate = coordinator
-    nsView.scrollView.textView.textLayoutManager?.delegate = coordinator
-    nsView.scrollView.textView.configuration = editor.configuration
-    
-    nsView.scrollView.textView.onInfoUpdate = { info in
-      DispatchQueue.main.async { editor.info(info) }
-    }
-    
-    self.editor = editor
-    self.coordinator = coordinator
-    self.nsView = nsView
-    
-  }
-  
-  
   @Test("Adding markdown content parses elements")
   func addingContentParsesElements() async throws {
-    guard let textView = nsView.scrollView.textView else { return }
+    
+    let textView = MarkdownTextView(frame: .zero, textContainer: nil)
     
     textView.string = """
     # Header
