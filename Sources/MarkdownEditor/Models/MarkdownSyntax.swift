@@ -10,16 +10,33 @@ import Foundation
 import SwiftUI
 import RegexBuilder
 
+// TODO: Shortcut to move lines up aND DOWN
 
+public protocol MarkdownSyntax: Equatable, Sendable {
+  associatedtype RegexOutput
+  var name: String { get }
+  var regex: Regex<RegexOutput> { get }
+  var structure: Markdown.Structure { get }
+  var contentAttributes: AttributeSet { get }
+  var syntaxAttributes: AttributeSet { get }
+}
+
+public typealias AnyMarkdownSyntax = (any MarkdownSyntax)
 
 public extension Markdown {
+  
+  enum Structure: Sendable {
+    case block
+    case line
+    case inline
+  }
   
   struct SingleCaptureSyntax: MarkdownSyntax {
     public typealias RegexOutput = (Substring, Substring)
     
     public let name: String
     nonisolated(unsafe) public let regex: Regex<RegexOutput>
-    
+    public var structure: Markdown.Structure = .inline
     
     public var contentAttributes: AttributeSet = .highlighter
     public var syntaxAttributes: AttributeSet = .codeBlock
@@ -27,15 +44,16 @@ public extension Markdown {
     public static func == (lhs: SingleCaptureSyntax, rhs: SingleCaptureSyntax) -> Bool {
       return lhs.name == rhs.name
     }
-
+    
   }
   
   struct DoubleCaptureSyntax: MarkdownSyntax {
     
     public typealias RegexOutput = (Substring, Substring, Substring)
-
+    
     public let name: String
     nonisolated(unsafe) public let regex: Regex<RegexOutput>
+    public var structure: Markdown.Structure = .inline
     
     public var contentAttributes: AttributeSet = .highlighter
     public var syntaxAttributes: AttributeSet = .codeBlock
@@ -65,20 +83,23 @@ public extension Markdown {
       quoteBlock,
       link,
       image
-
+      
     ]
     
     static let h1 = SingleCaptureSyntax(
       name: "H1",
-      regex: /# (.*)/
+      regex: /# (.*)/,
+      structure: .line
     )
     static let h2 = SingleCaptureSyntax(
       name: "H2",
-      regex: /## (.*)/
+      regex: /## (.*)/,
+      structure: .line
     )
     static let h3 = SingleCaptureSyntax(
       name: "H3",
-      regex: /### (.*)/
+      regex: /### (.*)/,
+      structure: .line
     )
     static let bold = SingleCaptureSyntax(
       name: "Bold",
@@ -118,11 +139,13 @@ public extension Markdown {
     )
     static let codeBlock = SingleCaptureSyntax(
       name: "Code Block",
-      regex: /(?m)^```([\\s\\S]*?)^```/
+      regex: /(?m)^```([\\s\\S]*?)^```/,
+      structure: .block
     )
     static let quoteBlock = SingleCaptureSyntax(
       name: "Quote Block",
-      regex: /^> (.*)/
+      regex: /^> (.*)/,
+      structure: .block
     )
     static let link = DoubleCaptureSyntax(
       name: "Link",
@@ -131,7 +154,7 @@ public extension Markdown {
     static let image = DoubleCaptureSyntax(
       name: "Image",
       regex: /!\[([^\]]+)\]\(([^\)]+)\)/)
-
+    
   }
 }
 

@@ -10,17 +10,35 @@ import SwiftUI
 public typealias Attributes = [NSAttributedString.Key: Any]
 
 
-public struct AttributeSet: ExpressibleByDictionaryLiteral, Sendable, Equatable {
+public struct AttributeSet: ExpressibleByDictionaryLiteral, Sendable {
+  nonisolated(unsafe) public var attributes: Attributes
   
-  nonisolated(unsafe) let attributes: Attributes
-  
-  public init(
-    dictionaryLiteral elements: (Attributes.Key, Attributes.Value)...
-  ) {
+  public init(dictionaryLiteral elements: (Attributes.Key, Attributes.Value)...) {
     self.attributes = Dictionary(uniqueKeysWithValues: elements)
   }
+}
+
+extension AttributeSet: Sequence {
+  public func makeIterator() -> Dictionary<NSAttributedString.Key, Any>.Iterator {
+    return attributes.makeIterator()
+  }
+}
+
+extension AttributeSet {
+  
+  
+  init(_ attributes: [NSAttributedString.Key: Any]) {
+    self.attributes = attributes
+  }
+  
+  subscript(_ key: NSAttributedString.Key) -> Any? {
+    get { attributes[key] }
+    set { attributes[key] = newValue }
+  }
+  
   
 }
+
 
 public extension AttributeSet {
   

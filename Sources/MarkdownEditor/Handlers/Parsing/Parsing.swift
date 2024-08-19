@@ -10,16 +10,30 @@ import Rearrange
 
 extension MarkdownTextView {
   
-  func addElement<S: MarkdownSyntax>(_ element: Markdown.Element<S>) {
+  static func createElement<S: MarkdownSyntax>(type: S, range: NSTextRange) -> AnyMarkdownElement {
+    switch type {
+      case let singleCapture as Markdown.SingleCaptureSyntax:
+        return Markdown.SingleCaptureElement(type: singleCapture, range: range)
+      case let doubleCapture as Markdown.DoubleCaptureSyntax:
+        return Markdown.DoubleCaptureElement(type: doubleCapture, range: range)
+      default:
+        fatalError("Unsupported syntax type")
+    }
+  }
+  
+  
+  func addElement(_ element: AnyMarkdownElement) {
     elements.append(element)
     rangeIndex[element.range] = element
   }
   
-  func removeElement<S: MarkdownSyntax>(_ element: Markdown.Element<S>) {
-    elements.removeAll { $0 as? Markdown.Element<S> == element }
+  func removeElement(_ element: AnyMarkdownElement) {
+    elements.removeAll { $0.range == element.range }
     rangeIndex.removeValue(forKey: element.range)
   }
-
+  
+  
+  
   func updateElementRange(for elementRange: NSTextRange, newRange: NSTextRange) {
     if let index = elements.firstIndex(where: { $0.range == elementRange }) {
       var updatedElement = elements[index]
@@ -31,27 +45,29 @@ extension MarkdownTextView {
     }
   }
   
-//  func elementsInRange(_ range: NSTextRange) -> [any Markdown.Element] {
-//    return elements.filter { $0.range.intersects(range) }
-//  }
-//  
-//  func element(for range: NSTextRange) -> Markdown.Element? {
-//    return rangeIndex[range]
-//  }
-//  
-//  func addElements(_ newElements: [Markdown.Element]) {
-//    elements.append(contentsOf: newElements)
-//    for element in newElements {
-//      rangeIndex[element.range] = element
-//    }
-//  }
-//  
-//  func removeElements(_ elementsToRemove: [Markdown.Element]) {
-//    elements.removeAll { elementsToRemove.contains($0) }
-//    for element in elementsToRemove {
-//      rangeIndex.removeValue(forKey: element.range)
-//    }
-//  }
+  func elementsInRange(_ range: NSTextRange) -> [AnyMarkdownElement] {
+    return elements.filter { $0.range.intersects(range) }
+  }
+  
+  func element(for range: NSTextRange) -> (AnyMarkdownElement)? {
+    return rangeIndex[range]
+  }
+  
+  func addElements(_ newElements: [AnyMarkdownElement]) {
+    elements.append(contentsOf: newElements)
+    for element in newElements {
+      rangeIndex[element.range] = element
+    }
+  }
+  
+  func removeElements(_ elementsToRemove: [AnyMarkdownElement]) {
+    elements.removeAll { element in
+      elementsToRemove.contains { $0.range == element.range }
+    }
+    for element in elementsToRemove {
+      rangeIndex.removeValue(forKey: element.range)
+    }
+  }
   
   // MARK: - Processing
   
@@ -72,7 +88,7 @@ extension MarkdownTextView {
           
           for element in self.elements {
             
-            tlm.setRenderingAttributes(element.type.contentAttributes, for: element.range)
+            tlm.setRenderingAttributes(element.type.contentAttributes.attributes, for: element.range)
             
           }
           
@@ -171,26 +187,22 @@ extension MarkdownTextView {
 //  return currentBlock
 //}
 
-
 extension String {
   @MainActor
-  func markdownMatches(
-    of syntax: Markdown.Syntax,
+  func markdownMatches<S: MarkdownSyntax>(
+    of syntax: S,
     in range: NSRange,
     textContentManager: NSTextContentManager
-  ) -> [Markdown.Element] {
-    
-    guard let stringRange = range.range(in: self)
-    else { return [] }
+  ) -> [AnyMarkdownElement] {
+    guard let stringRange = range.range(in: self) else { return [] }
     
     return self[stringRange].matches(of: syntax.regex).compactMap { match in
-      
       let matchRange = NSRange(match.range, in: self)
       let offsetRange = NSRange(location: matchRange.location + range.location, length: matchRange.length)
       guard let textRange = NSTextRange(offsetRange, provider: textContentManager) else { return nil }
-      return Markdown.Element(type: syntax, range: textRange)
       
-    } // END loop over matches
+      return MarkdownTextView.createElement(type: syntax, range: textRange)
+    }
   }
 }
 

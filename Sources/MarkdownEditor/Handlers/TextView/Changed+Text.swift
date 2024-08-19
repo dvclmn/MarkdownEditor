@@ -86,7 +86,7 @@ extension MarkdownTextView {
       processingTime: self.processingTime,
       characterCount: self.string.count,
       textElementCount: textElementCount,
-      codeBlocks: self.elements.filter { $0.type == .codeBlock }.count,
+      codeBlocks: self.elements.filter { $0.type == . }.count,
       documentRange: documentRange.description,
       viewportRange: viewportRange.description,
       scratchPad: scratchPad

@@ -12,8 +12,8 @@ import SwiftUI
 public class MarkdownTextView: NSTextView {
   
   /// `private(set)` means *gettable* from outside, but only *settable* from within `MarkdownParser`
-  var elements: [Markdown.Element] = []
-  var rangeIndex: [NSTextRange: Markdown.Element] = [:]
+  var elements: [AnyMarkdownElement] = []
+  var rangeIndex: [NSTextRange: AnyMarkdownElement] = [:]
   var parsingTask: Task<Void, Never>?
   
   let profiler = Profiler.shared
