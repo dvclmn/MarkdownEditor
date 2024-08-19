@@ -8,17 +8,54 @@
 import AppKit
 
 
-protocol Markdownable: Equatable {
-  var type: Markdown.Syntax { get set }
+public protocol MarkdownElement: Equatable {
+  
+  associatedtype Syntax
+  var type: Syntax { get set }
   var range: NSTextRange { get set }
+}
+
+public protocol MarkdownSyntax: Equatable {
+  associatedtype RegexOutput
+  var regex: Regex<RegexOutput> { get }
+  var name: String { get }
+  var contentAttributes: AttributeSet { get }
+  var syntaxAttributes: AttributeSet { get }
 }
 
 public struct Markdown {
   
-  public struct Element: Markdownable {
-    var type: Markdown.Syntax
-    var range: NSTextRange
+  /// `Markdown.Element` is generic over `MarkdownSyntax`, because Markdown's syntax types do not all share the same structure. Some, like **bold**, can be represented with two capture groups: `Regex<(Substring, Substring)>`. One group for the text that has been marked up ("bold"), and one group for the syntax characters themselves ("**" and "**").
+  ///
+  /// Others, such as [links](http://link.com), require three capture groups: `Regex<(Substring, Substring, Substring)>`. One for the label, one for the link, and one for the syntax characters.
+  ///
+//  public struct Element<S: MarkdownSyntax>: Equatable {
+//    public var type: S
+//    public var range: NSTextRange
+//    
+//    public static func == (lhs: Markdown.Element<S>, rhs: Markdown.Element<S>) -> Bool {
+//      return lhs.type == rhs.type && lhs.range == rhs.range
+//    }
+//  }
+  
+  public struct SingleCaptureElement: MarkdownElement {
+    
+    public typealias Syntax = SingleCaptureSyntax
+    public var type: Syntax
+    public var range: NSTextRange
+    
   }
+  
+  public struct DoubleCaptureElement: MarkdownElement {
+    
+    public typealias Syntax = DoubleCaptureSyntax
+    public var type: Syntax
+    public var range: NSTextRange
+    
+  }
+  
+  
+  
   
   public enum Structure {
     case block
@@ -27,8 +64,6 @@ public struct Markdown {
   }
 
 }
-
-
 
 
 
@@ -51,24 +86,3 @@ public struct EditorConfiguration: Sendable, Equatable {
     self.insets = insets
   }
 }
-
-
-
-//class MarkdownElement: NSTextElement {
-//  var range: NSTextRange
-//  let syntax: Markdown.Syntax
-//  var languageIdentifier: Language?
-//  
-//  init(
-//    _ textContentManager: NSTextContentManager,
-//    range: NSTextRange,
-//    syntax: Markdown.Syntax,
-//    languageIdentifier: Language? = nil
-//  ) {
-//    self.range = range
-//    self.syntax = syntax
-//    self.languageIdentifier = languageIdentifier
-//    super.init(textContentManager: textContentManager)
-//  }
-//}
-

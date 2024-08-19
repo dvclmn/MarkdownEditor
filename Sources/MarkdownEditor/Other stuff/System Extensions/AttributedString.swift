@@ -9,10 +9,10 @@ import SwiftUI
 
 public typealias Attributes = [NSAttributedString.Key: Any]
 
-@MainActor
-public struct AttributeSet: @preconcurrency ExpressibleByDictionaryLiteral {
+
+public struct AttributeSet: ExpressibleByDictionaryLiteral, Sendable, Equatable {
   
-  let attributes: Attributes
+  nonisolated(unsafe) let attributes: Attributes
   
   public init(
     dictionaryLiteral elements: (Attributes.Key, Attributes.Value)...

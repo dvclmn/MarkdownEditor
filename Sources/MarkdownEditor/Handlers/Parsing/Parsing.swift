@@ -10,16 +10,16 @@ import Rearrange
 
 extension MarkdownTextView {
   
-  func addElement(_ element: Markdown.Element) {
+  func addElement<S: MarkdownSyntax>(_ element: Markdown.Element<S>) {
     elements.append(element)
     rangeIndex[element.range] = element
   }
   
-  func removeElement(_ element: Markdown.Element) {
-    elements.removeAll { $0 == element }
+  func removeElement<S: MarkdownSyntax>(_ element: Markdown.Element<S>) {
+    elements.removeAll { $0 as? Markdown.Element<S> == element }
     rangeIndex.removeValue(forKey: element.range)
   }
-  
+
   func updateElementRange(for elementRange: NSTextRange, newRange: NSTextRange) {
     if let index = elements.firstIndex(where: { $0.range == elementRange }) {
       var updatedElement = elements[index]
@@ -31,27 +31,27 @@ extension MarkdownTextView {
     }
   }
   
-  func elementsInRange(_ range: NSTextRange) -> [Markdown.Element] {
-    return elements.filter { $0.range.intersects(range) }
-  }
-  
-  func element(for range: NSTextRange) -> Markdown.Element? {
-    return rangeIndex[range]
-  }
-  
-  func addElements(_ newElements: [Markdown.Element]) {
-    elements.append(contentsOf: newElements)
-    for element in newElements {
-      rangeIndex[element.range] = element
-    }
-  }
-  
-  func removeElements(_ elementsToRemove: [Markdown.Element]) {
-    elements.removeAll { elementsToRemove.contains($0) }
-    for element in elementsToRemove {
-      rangeIndex.removeValue(forKey: element.range)
-    }
-  }
+//  func elementsInRange(_ range: NSTextRange) -> [any Markdown.Element] {
+//    return elements.filter { $0.range.intersects(range) }
+//  }
+//  
+//  func element(for range: NSTextRange) -> Markdown.Element? {
+//    return rangeIndex[range]
+//  }
+//  
+//  func addElements(_ newElements: [Markdown.Element]) {
+//    elements.append(contentsOf: newElements)
+//    for element in newElements {
+//      rangeIndex[element.range] = element
+//    }
+//  }
+//  
+//  func removeElements(_ elementsToRemove: [Markdown.Element]) {
+//    elements.removeAll { elementsToRemove.contains($0) }
+//    for element in elementsToRemove {
+//      rangeIndex.removeValue(forKey: element.range)
+//    }
+//  }
   
   // MARK: - Processing
   
@@ -116,7 +116,7 @@ extension MarkdownTextView {
           
           let nsRange = NSRange(searchRange, provider: tcm)
           
-          for syntax in Markdown.Syntax.allCases {
+          for syntax in Markdown.Syntax.all {
             let newElements = self.string.markdownMatches(of: syntax, in: nsRange, textContentManager: tcm)
             newElements.forEach { self.addElement($0) }
           }
