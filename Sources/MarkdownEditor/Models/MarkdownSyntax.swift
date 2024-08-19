@@ -16,27 +16,44 @@ public protocol MarkdownSyntax: Equatable, Sendable {
   associatedtype RegexOutput
   var name: String { get }
   var regex: Regex<RegexOutput> { get }
-  var structure: Markdown.Structure { get }
+  var structure: AnyMarkdownStructure { get }
   var contentAttributes: AttributeSet { get }
   var syntaxAttributes: AttributeSet { get }
 }
 
+public protocol MarkdownStructure: Sendable {
+  associatedtype StructureType
+  var name: String { get }
+  var type: StructureType { get }
+}
+
 public typealias AnyMarkdownSyntax = (any MarkdownSyntax)
+public typealias AnyMarkdownStructure = (any MarkdownStructure)
 
 public extension Markdown {
   
-  enum Structure: Sendable {
-    case block
-    case line
-    case inline
+  /// E.g. code blocks, quote blocks, headings
+  ///
+  struct BlockStructure: MarkdownStructure {
+    public var name: String
+    public var type: PresentationIntent
   }
+  
+  /// E.g. bold, italic, strikethrough
+  ///
+  struct InlineStructure: MarkdownStructure {
+    public var name: String
+    public var type: InlinePresentationIntent
+  }
+  
+  
   
   struct SingleCaptureSyntax: MarkdownSyntax {
     public typealias RegexOutput = (Substring, Substring)
     
     public let name: String
     nonisolated(unsafe) public let regex: Regex<RegexOutput>
-    public var structure: Markdown.Structure = .inline
+    public var structure: 
     
     public var contentAttributes: AttributeSet = .highlighter
     public var syntaxAttributes: AttributeSet = .codeBlock
