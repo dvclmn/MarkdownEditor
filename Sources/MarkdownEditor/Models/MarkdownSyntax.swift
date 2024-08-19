@@ -12,29 +12,23 @@ import RegexBuilder
 
 // TODO: Shortcut to move lines up aND DOWN
 
-public protocol MarkdownSyntax: Equatable, Sendable {
-  
-  associatedtype RegexOutput
-  associatedtype Structure
-  
-  var name: String { get }
-  var regex: Regex<RegexOutput> { get }
-  var structure: Structure { get }
-  var contentAttributes: AttributeSet { get }
-  var syntaxAttributes: AttributeSet { get }
-}
+//public protocol MarkdownSyntax: Equatable, Sendable {
+//  
+//  associatedtype RegexOutput
+//  associatedtype Structure
+//  
+//  var name: String { get }
+//  var regex: Regex<RegexOutput> { get }
+//  var structure: Structure { get }
+//  var contentAttributes: AttributeSet { get }
+//  var syntaxAttributes: AttributeSet { get }
+//}
 
 public protocol MarkdownIntent: Equatable, Sendable {
   associatedtype StructureType
   var syntax: Markdown.Syntax { get }
   var type: StructureType { get }
 }
-
-
-
-
-
-public typealias AnyMarkdownSyntax = (any MarkdownSyntax)
 
 public typealias AnyMarkdownIntent = (any MarkdownIntent)
 
@@ -53,42 +47,7 @@ public extension Markdown {
     public var syntax: Markdown.Syntax
     public var type: InlinePresentationIntent
   }
-  
-  
-  
-  //  struct SingleCaptureSyntax: MarkdownSyntax {
-  //    public typealias RegexOutput = (Substring, Substring)
-  //
-  //    public let name: String
-  //    nonisolated(unsafe) public let regex: Regex<RegexOutput>
-  //
-  //
-  //    public var contentAttributes: AttributeSet = .highlighter
-  //    public var syntaxAttributes: AttributeSet = .codeBlock
-  //
-  //    public static func == (lhs: SingleCaptureSyntax, rhs: SingleCaptureSyntax) -> Bool {
-  //      return lhs.name == rhs.name
-  //    }
-  //
-  //  }
-  //
-  //  struct DoubleCaptureSyntax: MarkdownSyntax {
-  //
-  //    public typealias RegexOutput = (Substring, Substring, Substring)
-  //
-  //    public let name: String
-  //    nonisolated(unsafe) public let regex: Regex<RegexOutput>
-  //
-  //    public var contentAttributes: AttributeSet = .highlighter
-  //    public var syntaxAttributes: AttributeSet = .codeBlock
-  //
-  //    public static func == (lhs: DoubleCaptureSyntax, rhs: DoubleCaptureSyntax) -> Bool {
-  //      return lhs.name == rhs.name
-  //    }
-  //  }
-  
-  
-  
+
   
   
   /// Usage:
@@ -106,22 +65,7 @@ public extension Markdown {
   /// )
   /// ```
   /// My approach atm is to write up a struct will all the propreties I may need, then i'll work out how to seperate it out logically
-  //  struct MarkdownElement {
-  //    let type: InlinePresentationIntent
-  //    let range: NSRange
-  //    let additionalInfo: [String: Any]?
-  //
-  //    struct ElementType {
-  //      let name: String
-  //      let structure: (Inline)PresentationIntent
-  //      let regex: Regex<AnyRegexOutput>
-  //    }
-  //
-  //  }
-  
-  
-  
-  
+
   
   
 }
@@ -129,6 +73,21 @@ public extension Markdown {
 
 
 extension Markdown {
+  
+  //  struct RegexBuilder: Sendable {
+  //
+  //    static func buildRegex(
+  //      openingSyntax: Substring,
+  //      closingSyntax: Substring?
+  //    ) -> Regex<(Substring, Substring, Substring, Substring)> {
+  //
+  //      Regex {
+  //        Capture(openingSyntax)
+  //        Capture(OneOrMore(.reluctant) { .any })
+  //        Capture(closingSyntax ?? openingSyntax)
+  //      }
+  //    }
+  //  }
   
   
   public enum EmphasisStyle: Sendable {
@@ -182,7 +141,11 @@ extension Markdown {
       self.name
     }
     
-    public var regex: Regex<(content: Substring, syntax: Substring)> {
+    /// Swift gets the whole match first, that's one `Substring`, and then gets the
+    /// capture group, that's the second `Substring`. To get just the syntax characters,
+    /// I can subtract the content from the whole match, and what's left should be syntax
+    ///
+    public var regex: Regex<(Substring, Substring)> {
       switch self {
           // TODO: Proper implementation needed
         case .heading:
@@ -194,6 +157,7 @@ extension Markdown {
             case .underscore:
               return /\_\_(.*?)\_\_/
           }
+          
         case .italic(let style):
           switch style {
             case .asterisk:
@@ -214,7 +178,7 @@ extension Markdown {
           return /==(.*?)==/
         case .inlineCode:
           return /`([^\\n`]+)(?!``)`(?!`)/
-        case .list(let style):
+        case .list(_):
           // TODO: Needs proper implementation
           return /- (.*?)/
         case .horiztonalRule:
@@ -224,9 +188,9 @@ extension Markdown {
         case .quoteBlock:
           return /^> (.*)/
         case .link:
-          return /\[(?<label>[^\]]+)\](?<syntax>\([^\)]+\))/
+          return  /\[([^\]]+)\]\([^\)]+\)/
         case .image:
-          return /!\[(?<label>[^\]]+)\](?<syntax>\([^\)]+\))/
+          return  /!\[([^\]]+)\]\([^\)]+\)/
       }
     }
     
@@ -285,16 +249,21 @@ extension Markdown {
     public var name: String {
       
       switch self {
-        case .heading(let level): return "Heading \(self.syntaxCharacters)"
-        case .bold(let style): return "Bold"
-        case .italic(let style): return "Italic"
-        case .boldItalic(let style): return "Bold Italic"
+        case .heading: return "Heading \(self.syntaxCharacters)"
+        case .bold: return "Bold"
+        case .italic: return "Italic"
+        case .boldItalic: return "Bold Italic"
         case .strikethrough: return "Strikethrough"
         case .highlight: return "Highlight"
         case .inlineCode: return "Inline code"
         case .list(let style): return "List \(style.name)"
-        case .horiztonalRule: return "Horizontal Rule"
-        case .codeBlock(let language): return "Code block (\(language?.string)"
+        case .horiztonalRule: return "Horizontal rule"
+        case .codeBlock(let language):
+          if let language = language {
+            return "Code block (\(language)"
+          } else {
+            return "Code block"
+          }
         case .quoteBlock: return "Quote"
         case .link: return "Link"
         case .image: return "Image"
@@ -310,7 +279,7 @@ extension Markdown {
         default: false
       }
     }
-
+    
     public var intent: AnyMarkdownIntent {
       switch self {
         case .heading(let level):
@@ -561,56 +530,6 @@ extension Markdown {
       }
     }
   }
-}
-
-
-public struct MarkdownEditorConfiguration: Sendable {
-  public var fontSize: Double
-  public var fontWeight: NSFont.Weight
-  public var insertionPointColour: Color
-  public var codeColour: Color
-  public var paddingX: Double
-  public var paddingY: Double
-  
-  public init(
-    fontSize: Double = MarkdownDefaults.fontSize,
-    fontWeight: NSFont.Weight = MarkdownDefaults.fontWeight,
-    insertionPointColour: Color = .blue,
-    codeColour: Color = .primary.opacity(0.7),
-    paddingX: Double = MarkdownDefaults.paddingX,
-    paddingY: Double = MarkdownDefaults.paddingY
-  ) {
-    self.fontSize = fontSize
-    self.fontWeight = fontWeight
-    self.insertionPointColour = insertionPointColour
-    self.codeColour = codeColour
-    self.paddingX = paddingX
-    self.paddingY = paddingY
-  }
-}
-
-
-
-public struct MarkdownDefaults: Sendable {
-  
-  @MainActor public static let defaultFont =               NSFont.systemFont(ofSize: MarkdownDefaults.fontSize, weight: MarkdownDefaults.fontWeight)
-  public static let fontSize:                 Double = 15
-  public static let fontWeight:               NSFont.Weight = .regular
-  public static let fontOpacity:              Double = 0.85
-  
-  public static let headerSyntaxSize:         Double = 20
-  
-  public static let fontSizeMono:             Double = 14.5
-  
-  public static let syntaxAlpha:              Double = 0.3
-  public static let backgroundInlineCode:     Double = 0.2
-  public static let backgroundCodeBlock:      Double = 0.4
-  
-  public static let lineSpacing:              Double = 6
-  public static let paragraphSpacing:         Double = 0
-  
-  public static let paddingX: Double = 30
-  public static let paddingY: Double = 30
 }
 
 

@@ -5,7 +5,7 @@
 //  Created by Dave Coleman on 16/8/2024.
 //
 
-import AppKit
+import SwiftUI
 
 /// In keeping with Apple's convention, my idea of `Syntax` ==  their idea of `PresentationIntent.Kind`
 /// My idea of `Structure` ==  their idea of `PresentationIntent` vs `InlinePresentationIntent`
@@ -23,16 +23,7 @@ public protocol MarkdownElement: Equatable {
 public typealias AnyMarkdownElement = (any MarkdownElement)
 
 public struct Markdown {
-  
-  public struct SingleCaptureElement: MarkdownElement {
-    public var type: SingleCaptureSyntax
-    public var range: NSTextRange
-  }
-  
-  public struct DoubleCaptureElement: MarkdownElement {
-    public var type: DoubleCaptureSyntax
-    public var range: NSTextRange
-  }
+
   
 }
 
@@ -175,3 +166,55 @@ public struct EditorConfiguration: Sendable, Equatable {
     self.insets = insets
   }
 }
+
+
+public struct MarkdownEditorConfiguration: Sendable {
+  public var fontSize: Double
+  public var fontWeight: NSFont.Weight
+  public var insertionPointColour: Color
+  public var codeColour: Color
+  public var paddingX: Double
+  public var paddingY: Double
+  
+  public init(
+    fontSize: Double = MarkdownDefaults.fontSize,
+    fontWeight: NSFont.Weight = MarkdownDefaults.fontWeight,
+    insertionPointColour: Color = .blue,
+    codeColour: Color = .primary.opacity(0.7),
+    paddingX: Double = MarkdownDefaults.paddingX,
+    paddingY: Double = MarkdownDefaults.paddingY
+  ) {
+    self.fontSize = fontSize
+    self.fontWeight = fontWeight
+    self.insertionPointColour = insertionPointColour
+    self.codeColour = codeColour
+    self.paddingX = paddingX
+    self.paddingY = paddingY
+  }
+}
+
+
+
+public struct MarkdownDefaults: Sendable {
+  
+  @MainActor public static let defaultFont =               NSFont.systemFont(ofSize: MarkdownDefaults.fontSize, weight: MarkdownDefaults.fontWeight)
+  public static let fontSize:                 Double = 15
+  public static let fontWeight:               NSFont.Weight = .regular
+  public static let fontOpacity:              Double = 0.85
+  
+  public static let headerSyntaxSize:         Double = 20
+  
+  public static let fontSizeMono:             Double = 14.5
+  
+  public static let syntaxAlpha:              Double = 0.3
+  public static let backgroundInlineCode:     Double = 0.2
+  public static let backgroundCodeBlock:      Double = 0.4
+  
+  public static let lineSpacing:              Double = 6
+  public static let paragraphSpacing:         Double = 0
+  
+  public static let paddingX: Double = 30
+  public static let paddingY: Double = 30
+}
+
+
