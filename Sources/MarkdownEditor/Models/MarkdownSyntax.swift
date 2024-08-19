@@ -106,118 +106,24 @@ public extension Markdown {
   /// )
   /// ```
   /// My approach atm is to write up a struct will all the propreties I may need, then i'll work out how to seperate it out logically
-//  struct MarkdownElement {
-//    let type: InlinePresentationIntent
-//    let range: NSRange
-//    let additionalInfo: [String: Any]?
-//    
-//    struct ElementType {
-//      let name: String
-//      let structure: (Inline)PresentationIntent
-//      let regex: Regex<AnyRegexOutput>
-//    }
-//    
-//  }
+  //  struct MarkdownElement {
+  //    let type: InlinePresentationIntent
+  //    let range: NSRange
+  //    let additionalInfo: [String: Any]?
+  //
+  //    struct ElementType {
+  //      let name: String
+  //      let structure: (Inline)PresentationIntent
+  //      let regex: Regex<AnyRegexOutput>
+  //    }
+  //
+  //  }
   
   
   
   
   
-  @MainActor
-  struct SyntaxStruct: Equatable {
-    
-    static let all: [AnyMarkdownSyntax] = [
-      h1,
-      h2,
-      h3,
-      bold,
-      boldAlt,
-      italic,
-      italicAlt,
-      boldItalic,
-      boldItalicAlt,
-      strikethrough,
-      highlight,
-      inlineCode,
-      codeBlock,
-      quoteBlock,
-      link,
-      image
-      
-    ]
-    
-    static let h1 = SingleCaptureSyntax(
-      name: "H1",
-      regex: /# (.*)/,
-      structure: .line
-    )
-    static let h2 = SingleCaptureSyntax(
-      name: "H2",
-      regex: /## (.*)/,
-      structure: .line
-    )
-    static let h3 = SingleCaptureSyntax(
-      name: "H3",
-      regex: /### (.*)/,
-      structure: .line
-    )
-    static let bold = SingleCaptureSyntax(
-      name: "Bold",
-      regex: /\\*\\*(.*?)\\*\\*/
-    )
-    static let boldAlt = SingleCaptureSyntax(
-      name: "Bold Alt",
-      regex: /__(.*?)__/
-    )
-    static let italic = SingleCaptureSyntax(
-      name: "Italic",
-      regex: /\\*(.*?)\\*/
-    )
-    static let italicAlt = SingleCaptureSyntax(
-      name: "Italic Alt",
-      regex: /_(.*?)_/
-    )
-    static let boldItalic = SingleCaptureSyntax(
-      name: "Bold Italic",
-      regex: /\\*\\*\\*(.*?)\\*\\*\\*/
-    )
-    static let boldItalicAlt = SingleCaptureSyntax(
-      name: "Bold Italic Alt",
-      regex: /___(.*?)___/
-    )
-    static let strikethrough = SingleCaptureSyntax(
-      name: "Strikethrough",
-      regex: /~~(.*?)~~/
-    )
-    static let highlight = SingleCaptureSyntax(
-      name: "Highlight",
-      regex: /==(.*?)==/
-    )
-    static let inlineCode = SingleCaptureSyntax(
-      name: "Inline Code",
-      regex: /`([^\\n`]+)(?!``)`(?!`)/
-    )
-    static let codeBlock = SingleCaptureSyntax(
-      name: "Code Block",
-      regex: /(?m)^```([\\s\\S]*?)^```/,
-      structure: .block
-    )
-    
-    static let quoteBlock = SingleCaptureSyntax(
-      name: "Quote Block",
-      regex: /^> (.*)/,
-      structure:
-    )
-    
-    static let link = DoubleCaptureSyntax(
-      name: "Link",
-      regex: /\[([^\]]+)\]\(([^\)]+)\)/
-    )
-    static let image = DoubleCaptureSyntax(
-      name: "Image",
-      regex: /!\[([^\]]+)\]\(([^\)]+)\)/)
-    
-  }
+  
 }
 
 
@@ -233,6 +139,15 @@ extension Markdown {
   public enum ListStyle: Sendable {
     case ordered
     case unordered
+    
+    public var name: String {
+      switch self {
+        case .ordered:
+          "Ordered"
+        case .unordered:
+          "Unordered"
+      }
+    }
   }
   
   public enum Syntax: Identifiable, Equatable, Hashable, Sendable {
@@ -252,7 +167,7 @@ extension Markdown {
     
     case horiztonalRule
     
-//    case table(columns: [PresentationIntent.TableColumn])
+    //    case table(columns: [PresentationIntent.TableColumn])
     // case tableCell(columnIndex: Int)
     // case tableHeaderRow
     // case tableRow(rowIndex: Int
@@ -265,6 +180,54 @@ extension Markdown {
     
     nonisolated public var id: String {
       self.name
+    }
+    
+    public var regex: Regex<(content: Substring, syntax: Substring)> {
+      switch self {
+          // TODO: Proper implementation needed
+        case .heading:
+          return /# (.*)/
+        case .bold(let style):
+          switch style {
+            case .asterisk:
+              return /\\*\\*(.*?)\\*\\*/
+            case .underscore:
+              return /\_\_(.*?)\_\_/
+          }
+        case .italic(let style):
+          switch style {
+            case .asterisk:
+              return /\\*(.*?)\\*/
+            case .underscore:
+              return /_(.*?)_/
+          }
+        case .boldItalic(let style):
+          switch style {
+            case .asterisk:
+              return /\\*\\*\\*(.*?)\\*\\*\\*/
+            case .underscore:
+              return /___(.*?)___/
+          }
+        case .strikethrough:
+          return /~~(.*?)~~/
+        case .highlight:
+          return /==(.*?)==/
+        case .inlineCode:
+          return /`([^\\n`]+)(?!``)`(?!`)/
+        case .list(let style):
+          // TODO: Needs proper implementation
+          return /- (.*?)/
+        case .horiztonalRule:
+          return /(---)/
+        case .codeBlock(let language):
+          return /(?m)^```([\\s\\S]*?)^```/
+        case .quoteBlock:
+          return /^> (.*)/
+        case .link:
+          return /\[(?<label>[^\]]+)\](?<syntax>\([^\)]+\))/
+        case .image:
+          return /!\[(?<label>[^\]]+)\](?<syntax>\([^\)]+\))/
+      }
     }
     
     public var intentIdentity: Int {
@@ -320,46 +283,23 @@ extension Markdown {
     }
     
     public var name: String {
+      
       switch self {
-        default: "Default"
-          //         case .heading(let level):
-          //            "H\(level)"
-//        case .h1:
-//          "Heading 1"
-//        case .h2:
-//          "Heading 2"
-//        case .h3:
-//          "Heading 3"
-//        case .bold, .boldAlt:
-//          "Bold"
-//          
-//        case .italic, .italicAlt:
-//          "Italic"
-//          
-//        case .boldItalic, .boldItalicAlt:
-//          "Bold Italic"
-//          
-//        case .strikethrough:
-//          "Strikethrough"
-//          
-//        case .highlight:
-//          "Highlight"
-//          
-//        case .inlineCode:
-//          "Inline code"
-//          
-//        case .codeBlock:
-//          "Code block"
-//          
-//        case .quoteBlock:
-//          "Quote block"
-//          
-//        case .link:
-//          "Link"
-//          
-//        case .image:
-//          "Image"
+        case .heading(let level): return "Heading \(self.syntaxCharacters)"
+        case .bold(let style): return "Bold"
+        case .italic(let style): return "Italic"
+        case .boldItalic(let style): return "Bold Italic"
+        case .strikethrough: return "Strikethrough"
+        case .highlight: return "Highlight"
+        case .inlineCode: return "Inline code"
+        case .list(let style): return "List \(style.name)"
+        case .horiztonalRule: return "Horizontal Rule"
+        case .codeBlock(let language): return "Code block (\(language?.string)"
+        case .quoteBlock: return "Quote"
+        case .link: return "Link"
+        case .image: return "Image"
       }
+      
     }
     
     
@@ -370,38 +310,6 @@ extension Markdown {
         default: false
       }
     }
-    
-//    public func structure<S: MarkdownStructure>(for syntax: Self) -> S {
-//      switch self {
-//        case .heading(let level):
-//          BlockStructure(name: <#T##String#>, type: <#T##PresentationIntent#>)
-//        case .bold(let style):
-//          <#code#>
-//        case .italic(let style):
-//          <#code#>
-//        case .boldItalic(let style):
-//          <#code#>
-//        case .strikethrough:
-//          <#code#>
-//        case .highlight:
-//          <#code#>
-//        case .inlineCode:
-//          <#code#>
-//        case .list(let style):
-//          <#code#>
-//        case .horiztonalRule:
-//          <#code#>
-//        case .codeBlock(let language):
-//          <#code#>
-//        case .quoteBlock:
-//          <#code#>
-//        case .link:
-//          <#code#>
-//        case .image:
-//          <#code#>
-//      }
-//    }
-    
 
     public var intent: AnyMarkdownIntent {
       switch self {
@@ -432,7 +340,7 @@ extension Markdown {
         case .image:
           InlineIntent(syntax: self, type: .image)
       }
-        
+      
       
     }
     
@@ -504,25 +412,25 @@ extension Markdown {
       }
     }
     
-//    public var shortcut: KeyboardShortcut? {
-//      switch self {
-//          
-//        case .bold, .boldAlt:
-//            .init("b", modifiers: [.command])
-//        case .italic, .italicAlt:
-//            .init("i", modifiers: [.command])
-//        case .boldItalic, .boldItalicAlt:
-//            .init("b", modifiers: [.command, .shift])
-//        case .strikethrough:
-//            .init("u", modifiers: [.command])
-//        case .inlineCode:
-//            .init("c", modifiers: [.command, .option])
-//        case .codeBlock:
-//            .init("k", modifiers: [.command, .shift])
-//        default:
-//          nil
-//      }
-//    }
+    //    public var shortcut: KeyboardShortcut? {
+    //      switch self {
+    //
+    //        case .bold, .boldAlt:
+    //            .init("b", modifiers: [.command])
+    //        case .italic, .italicAlt:
+    //            .init("i", modifiers: [.command])
+    //        case .boldItalic, .boldItalicAlt:
+    //            .init("b", modifiers: [.command, .shift])
+    //        case .strikethrough:
+    //            .init("u", modifiers: [.command])
+    //        case .inlineCode:
+    //            .init("c", modifiers: [.command, .option])
+    //        case .codeBlock:
+    //            .init("k", modifiers: [.command, .shift])
+    //        default:
+    //          nil
+    //      }
+    //    }
     
     public var fontSize: Double {
       switch self {
