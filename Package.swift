@@ -30,13 +30,9 @@ let package = Package(
             name: "MarkdownEditor",
             dependencies: ["STTextKitPlus", "Utilities", "Helpers", "Rearrange"]
         ),
-//        .target(
-//          name: "Syntax",
-//          dependencies: []
-//        ),
         .testTarget(
           name: "MarkdownEditorTests",
-          dependencies: ["MarkdownEditor"]),
+          dependencies: ["MarkdownEditor", "Utilities", "Helpers"]),
 
     ]
 )
