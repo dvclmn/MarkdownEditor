@@ -22,7 +22,7 @@ extension MarkdownTextViewTests {
   func findMarkdownMatches() async {
     guard let tcm = textView.textLayoutManager?.textContentManager else { return }
     
-    textView.string = exampleString02
+    textView.string = "Here is one sentence."
     
     var elements: [Markdown.Element] = []
     var boldSyntax: Markdown.Syntax = .bold(style: .asterisk)
@@ -30,6 +30,7 @@ extension MarkdownTextViewTests {
     elements = exampleString02.markdownMatches(of: boldSyntax, textContentManager: tcm)
     
     printValue(elements, keyPaths: [\.range, \.type])
+    
     
     
   }

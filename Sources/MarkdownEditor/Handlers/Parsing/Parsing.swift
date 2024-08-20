@@ -6,59 +6,9 @@
 //
 
 import AppKit
-import Rearrange
+import BaseHelpers
 
 extension MarkdownTextView {
-  
-
-  func addElement(_ element: Markdown.Element) {
-    elements.append(element)
-    rangeIndex[element.range] = element
-  }
-  
-  func removeElement(_ element: Markdown.Element) {
-    elements.removeAll { $0.range == element.range }
-    rangeIndex.removeValue(forKey: element.range)
-  }
-  
-  
-  
-  func updateElementRange(for elementRange: NSTextRange, newRange: NSTextRange) {
-    if let index = elements.firstIndex(where: { $0.range == elementRange }) {
-      var updatedElement = elements[index]
-      updatedElement.range = newRange
-      elements[index] = updatedElement
-      
-      rangeIndex.removeValue(forKey: elementRange)
-      rangeIndex[newRange] = updatedElement
-    }
-  }
-  
-  func elementsInRange(_ range: NSTextRange) -> [Markdown.Element] {
-    return elements.filter { $0.range.intersects(range) }
-  }
-  
-  func element(for range: NSTextRange) -> (Markdown.Element)? {
-    return rangeIndex[range]
-  }
-  
-  func addElements(_ newElements: [Markdown.Element]) {
-    elements.append(contentsOf: newElements)
-    for element in newElements {
-      rangeIndex[element.range] = element
-    }
-  }
-  
-  func removeElements(_ elementsToRemove: [Markdown.Element]) {
-    elements.removeAll { element in
-      elementsToRemove.contains { $0.range == element.range }
-    }
-    for element in elementsToRemove {
-      rangeIndex.removeValue(forKey: element.range)
-    }
-  }
-  
-  // MARK: - Processing
   
   func applyMarkdownStyles() async {
     
@@ -77,7 +27,7 @@ extension MarkdownTextView {
       } // END perform editing
     } // END task
   }
-
+  
   
   func parseMarkdown(
     in range: NSTextRange? = nil
@@ -111,12 +61,31 @@ extension MarkdownTextView {
     }
     
     await self.parsingTask?.value
-
+    
   }
+
+  
+
 }
 
 
 
+
+
+extension Regex<Regex<(Substring, Substring)>.RegexOutput>.Match {
+  var prettyDescription: String {
+    var result = "Match:\n"
+    result += "  Range: \(self.range)\n"
+    result += "  Matched text: \"\(self.0)\"\n"
+    if !self.1.isEmpty {
+      result += "  Captured group: \"\(self.1)\"\n"
+    }
+    result += "  Output:\n"
+    result += "    Full match: \"\(self.output.0)\"\n"
+    result += "    Capture: \"\(self.output.1)\"\n"
+    return result
+  }
+}
 
 
 
@@ -128,27 +97,51 @@ extension String {
     textContentManager tcm: NSTextContentManager
   ) -> [Markdown.Element] {
     
-    let nsRange = NSRange(range ?? tcm.documentRange, provider: tcm)
+    /// If no range is supplied, we default to the `documentRange`
+    ///
+    let textRange = range ?? tcm.documentRange
     
-    guard let stringRange = nsRange.range(in: self) else { return [] }
+    let nsRange = NSRange(textRange, in: tcm)
+    
+    guard let stringRange = nsRange.range(in: self) else {
+      print("Couldn't get `Range<String.Index>` from NSRange")
+      return []
+    }
     
     var elements: [Markdown.Element] = []
     
     for match in self[stringRange].matches(of: syntax.regex) {
       
-      let matchRange = match.range
-      let matchStart = matchRange.lowerBound.utf16Offset(in: self)
-      let matchLength = self.distance(from: matchRange.lowerBound, to: matchRange.upperBound)
+      print("Original string: \(self)")
+      print("Document range: \(textRange)")
+      print(match.prettyDescription)
+      
+      let matchRange: Range<String.Index> = match.range
+      let matchStart: Int = matchRange.lowerBound.utf16Offset(in: self)
+      
+      /// Both parameters in `String.distance(from:to:)`
+      /// ask for a value of type `String.Index`
+      ///
+      /// ```
+      /// func distance(
+      ///   from start: String.Index,
+      ///   to end: String.Index
+      /// ) -> Int
+      ///```
+      ///
+      let matchLength: Int = self.distance(
+        from: matchRange.lowerBound,
+        to: matchRange.upperBound)
       
       let offsetRange = NSRange(
         location: nsRange.location + matchStart,
         length: matchLength
       )
-      guard let textRange = NSTextRange(offsetRange, in: tcm) else { continue }
       
-      // Only add the element if it's a valid markdown element
+      guard let matchTextRange = NSTextRange(offsetRange, in: tcm) else { continue }
+      
       if isValidMarkdownElement(syntax: syntax, match: match) {
-        let element = Markdown.Element(type: syntax, range: textRange)
+        let element = Markdown.Element(type: syntax, range: matchTextRange)
         elements.append(element)
       }
     }

@@ -25,7 +25,11 @@ public struct Markdown {
 
   struct Element: Sendable {
     var type: Markdown.Syntax
-    nonisolated(unsafe) var range: NSTextRange
+    nonisolated(unsafe) var contentRange: NSTextRange
+    
+    var syntaxRange: NSTextRange {
+      
+    }
   }
   
 }
