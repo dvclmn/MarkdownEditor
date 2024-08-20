@@ -80,18 +80,4 @@ struct MarkdownTextViewTests {
   
 }
 
-extension Markdown.Syntax {
-  
-  static public var testCases: [Markdown.Syntax] {
-    return [
-      .heading(level: 2),
-      .bold(style: .asterisk),
-      .bold(style: .underscore),
-      .italic(style: .asterisk),
-      .italic(style: .underscore),
-      .inlineCode,
-      .strikethrough
-    ]
-  }
-  
-}
+

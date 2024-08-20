@@ -10,106 +10,7 @@ import Foundation
 import SwiftUI
 import RegexBuilder
 
-// TODO: Shortcut to move lines up aND DOWN
-
-//public protocol MarkdownSyntax: Equatable, Sendable {
-//
-//  associatedtype RegexOutput
-//  associatedtype Structure
-//
-//  var name: String { get }
-//  var regex: Regex<RegexOutput> { get }
-//  var structure: Structure { get }
-//  var contentAttributes: AttributeSet { get }
-//  var syntaxAttributes: AttributeSet { get }
-//}
-
-public typealias MarkdownRegexOutput = Regex<(Substring, Substring)>
-
-public protocol MarkdownIntent: Equatable, Sendable {
-  associatedtype StructureType
-  var syntax: Markdown.Syntax { get }
-  var type: StructureType { get }
-}
-
-//public typealias AnyMarkdownIntent = (any MarkdownIntent)
-
-public extension Markdown {
-  
-  /// E.g. code blocks, quote blocks, headings
-  ///
-  struct BlockIntent: MarkdownIntent {
-    public var syntax: Markdown.Syntax
-    public var type: PresentationIntent
-  }
-  
-  /// E.g. bold, italic, strikethrough
-  ///
-  struct InlineIntent: MarkdownIntent {
-    public var syntax: Markdown.Syntax
-    public var type: InlinePresentationIntent
-  }
-  
-  enum EmphasisStyle: Sendable {
-    case asterisk
-    case underscore
-  }
-  
-  enum ListStyle: Sendable {
-    case ordered
-    case unordered
-    
-    public var name: String {
-      switch self {
-        case .ordered:
-          "Ordered"
-        case .unordered:
-          "Unordered"
-      }
-    }
-  }
-  
-  
-  /// Usage:
-  /// ```
-  /// let link = MarkdownInlineElement(
-  ///   intent: .link(url: URL(string: "https://example.com")!, title: "Example"),
-  ///   range: NSRange(location: 0, length: 10),
-  ///   additionalInfo: ["url": URL(string: "https://example.com")!, "title": "Example"]
-  /// )
-  ///
-  /// let image = MarkdownInlineElement(
-  ///   intent: .image(url: URL(string: "https://example.com/image.jpg")!, altText: "An example /// image", title: "Example"),
-  ///   range: NSRange(location: 0, length: 20),
-  ///   additionalInfo: ["url": URL(string: "https://example.com/image.jpg")!, "altText": "An /// example image", "title": "Example"]
-  /// )
-  /// ```
-  /// My approach atm is to write up a struct will all the propreties I may need, then i'll work out how to seperate it out logically
-  
-  
-  
-}
-
-
-
 extension Markdown {
-  
-  
-  /// To obtain the precise Range(s), for syntax characters, first I must determine
-  /// the syntax structure for each and every Markdown syntax type.
-  ///
-  /// For instance, elements like bold and italic are symmetrical, so this is one category.
-  /// ## Symmetical
-  /// E.g. `**bold**`
-  ///
-  /// This means a pattern of `{openingSyntax}{content}{closingSyntax}`
-  ///
-  /// So the calculation / process for this would be
-  /// 1. Obtain full range (This is the first substring in `Regex<(Substring, Substring)>`)
-  /// 2. The full range's start location *plus two* is the opening syntax Range
-  /// 3. Closing syntax range: Get start point by subtracting two from the full range's end location. Plus two gives us the end point.
-  /// 4. The result gives us the content range
-  /// 5
   
   public enum Syntax: Identifiable, Equatable, Hashable, Sendable {
     
@@ -125,7 +26,7 @@ extension Markdown {
     
     case list(style: ListStyle)
     
-    case horiztonalRule
+    case horizontalRule
     
     /// To be supported in future versions:
     // case table(columns: [PresentationIntent.TableColumn])
@@ -144,56 +45,88 @@ extension Markdown {
     }
     
     
+//    public var regex: AnyRegexOutput {
+//      switch self {
+//        case .heading(let level):
+//
+//        case .bold(let style):
+//          <#code#>
+//        case .italic(let style):
+//          <#code#>
+//        case .boldItalic(let style):
+//          <#code#>
+//        case .strikethrough:
+//          <#code#>
+//        case .highlight:
+//          <#code#>
+//        case .inlineCode:
+//          <#code#>
+//        case .list(let style):
+//          <#code#>
+//        case .horizontalRule:
+//          <#code#>
+//        case .codeBlock(let language):
+//          <#code#>
+//        case .quoteBlock:
+//          <#code#>
+//        case .link:
+//          <#code#>
+//        case .image:
+//          <#code#>
+//      }
+//    }
+//    
+    
     /// Swift gets the whole match first, that's one `Substring`, and then gets the
     /// capture group, that's the second `Substring`. To get just the syntax characters,
     /// I can subtract the content from the whole match, and what's left should be syntax
     ///
-    public var regex: Regex<(Substring, Substring)> {
+    public var regex: Regex<Substring> {
       switch self {
           // TODO: Proper implementation needed
         case .heading:
-          return /# (.*)/
+          return /# .*/
         case .bold(let style):
           switch style {
             case .asterisk:
-              return /\\*\\*(.*?)\\*\\*/
+              return /\\*\\*.*?\\*\\*/
             case .underscore:
-              return /\_\_(.*?)\_\_/
+              return /\_\_.*?\_\_/
           }
           
         case .italic(let style):
           switch style {
             case .asterisk:
-              return /\\*(.*?)\\*/
+              return /\\*.*?\\*/
             case .underscore:
-              return /_(.*?)_/
+              return /_.*?_/
           }
         case .boldItalic(let style):
           switch style {
             case .asterisk:
-              return /\\*\\*\\*(.*?)\\*\\*\\*/
+              return /\\*\\*\\*.*?\\*\\*\\*/
             case .underscore:
-              return /___(.*?)___/
+              return /___.*?___/
           }
         case .strikethrough:
-          return /~~(.*?)~~/
+          return /~~.*?~~/
         case .highlight:
-          return /==(.*?)==/
+          return /==.*?==/
         case .inlineCode:
-          return /`([^\\n`]+)(?!``)`(?!`)/
+          return /`[^\\n`]+(?!``)`(?!`)/
         case .list(_):
           // TODO: Needs proper implementation
-          return /- (.*?)/
-        case .horiztonalRule:
-          return /(---)/
-        case .codeBlock(let language):
-          return /(?m)^```([\\s\\S]*?)^```/
+          return /- .*?/
+        case .horizontalRule:
+          return /---/
+        case .codeBlock:
+          return /(?m)^```[\\s\\S]*?^```/
         case .quoteBlock:
-          return /^> (.*)/
+          return /^> .*/
         case .link:
-          return  /\[([^\]]+)\]\([^\)]+\)/
+          return  /\[[^\]]+\]\([^\)]+\)/
         case .image:
-          return  /!\[([^\]]+)\]\([^\)]+\)/
+          return  /!\[[^\]]+\]\([^\)]+\)/
       }
     }
     
@@ -235,7 +168,7 @@ extension Markdown {
             case .unordered:
               return 12
           }
-        case .horiztonalRule:
+        case .horizontalRule:
           return 13
         case .codeBlock(let language):
           guard let language = language else { return 14 }
@@ -260,7 +193,7 @@ extension Markdown {
         case .highlight: return "Highlight"
         case .inlineCode: return "Inline code"
         case .list(let style): return "List \(style.name)"
-        case .horiztonalRule: return "Horizontal rule"
+        case .horizontalRule: return "Horizontal rule"
         case .codeBlock(let language):
           if let language = language {
             return "Code block (\(language)"
@@ -274,7 +207,54 @@ extension Markdown {
       
     }
     
+    public var layout: Markdown.Syntax.Layout {
+      switch self {
+        case .bold,
+            .italic,
+            .boldItalic,
+            .strikethrough,
+            .highlight,
+            .inlineCode,
+            .link,
+            .image:
+          return .inline
+          
+        case .heading,
+            .quoteBlock,
+            .horizontalRule,
+            .list:
+          return .block(.singleLine)
+
+        case .codeBlock:
+          return .block(.multiLine)
+      }
+    }
     
+    
+    public var syntaxBoundary: Markdown.Syntax.BoundaryStyle {
+      switch self {
+        case .heading, .list:
+            return .leading
+          
+        case .bold,
+            .italic,
+            .boldItalic,
+            .strikethrough,
+            .highlight,
+            .inlineCode,
+            .quoteBlock:
+            return .enclosed(.symmetrical)
+          
+        case .horizontalRule:
+            return .none
+          
+        case .codeBlock(let language):
+            return .enclosed(.symmetrical)
+
+        case .link, .image:
+          return .enclosed(.asymmetrical)
+      }
+    }
     
     public var isWrappable: Bool {
       switch self {
@@ -301,8 +281,8 @@ extension Markdown {
           InlineIntent(syntax: .inlineCode, type: .code)
         case .list(let style):
           BlockIntent(syntax: .list(style: style), type: .list(style: style))
-        case .horiztonalRule:
-          BlockIntent(syntax: .horiztonalRule, type: PresentationIntent(.thematicBreak, identity: self.intentIdentity))
+        case .horizontalRule:
+          BlockIntent(syntax: .horizontalRule, type: PresentationIntent(.thematicBreak, identity: self.intentIdentity))
         case .codeBlock(let language):
           BlockIntent(syntax: self, type: PresentationIntent(.codeBlock(languageHint: language?.string), identity: self.intentIdentity))
         case .quoteBlock:
@@ -312,8 +292,6 @@ extension Markdown {
         case .image:
           InlineIntent(syntax: self, type: .image)
       }
-      
-      
     }
     
     public var hideSyntax: Bool {
@@ -363,7 +341,7 @@ extension Markdown {
           
           // TODO: Can improve implementation here
         case .list: return "- "
-        case .horiztonalRule: return "---"
+        case .horizontalRule: return "---"
         case .codeBlock(let language): return "```\(language?.string ?? "")"
         case .quoteBlock: return "> "
         case .link: return "?"
@@ -371,165 +349,100 @@ extension Markdown {
       }
     }
     
-    public var syntaxCharacterCount: Int? {
+    public var syntaxCharacterCount: Int {
       self.syntaxCharacters.count
     }
     
-    public var isSyntaxSymmetrical: Bool {
+    public var shortcut: KeyboardShortcut? {
       switch self {
-        case .heading, .quoteBlock:
-          false
-        default:
-          true
-      }
-    }
-    
-        public var shortcut: KeyboardShortcut? {
-          switch self {
-    
-            case .bold:
-                .init("b", modifiers: [.command])
-            case .italic:
-                .init("i", modifiers: [.command])
-            case .boldItalic:
-                .init("b", modifiers: [.command, .shift])
-            case .strikethrough:
-                .init("u", modifiers: [.command])
-            case .inlineCode:
-                .init("c", modifiers: [.command, .option])
-            case .codeBlock:
-                .init("k", modifiers: [.command, .shift])
-            default:
-              nil
-          }
-        }
-    
-    public var fontSize: Double {
-      switch self {
-        case .inlineCode, .codeBlock:
-          14
-        default: MarkdownDefaults.fontSize
-      }
-    }
-    public var foreGroundColor: NSColor {
-      switch self {
-        default:
-            .textColor.withAlphaComponent(0.85)
-      }
-    }
-    
-    public var contentAttributes: Attributes {
-      
-      switch self {
-          
-        case .heading:
-          return [
-            .font: NSFont.systemFont(ofSize: self.fontSize, weight: .medium),
-            .foregroundColor: NSColor.systemCyan
-          ]
           
         case .bold:
-          return [
-            .font: NSFont.systemFont(ofSize: self.fontSize, weight: .bold),
-            .foregroundColor: self.foreGroundColor,
-            .backgroundColor: NSColor.clear
-          ]
-          
+            .init("b", modifiers: [.command])
         case .italic:
-          let bodyDescriptor = NSFontDescriptor.preferredFontDescriptor(forTextStyle: .body)
-          let italicDescriptor = bodyDescriptor.withSymbolicTraits(.italic)
-          let mediumWeightDescriptor = italicDescriptor.addingAttributes([
-            .traits: [
-              NSFontDescriptor.TraitKey.weight: NSFont.Weight.medium
-            ]
-          ])
-          let font = NSFont(descriptor: mediumWeightDescriptor, size: self.fontSize)
-          return [
-            .font: font as Any,
-            .foregroundColor: self.foreGroundColor,
-            .backgroundColor: NSColor.clear
-          ]
-          
+            .init("i", modifiers: [.command])
         case .boldItalic:
-          
-          return [
-            .foregroundColor: self.foreGroundColor,
-            .backgroundColor: NSColor.clear
-          ]
-          
+            .init("b", modifiers: [.command, .shift])
         case .strikethrough:
-          return [
-            .strikethroughStyle: NSUnderlineStyle.thick.rawValue,
-            .strikethroughColor: NSColor.red,
-            .foregroundColor: NSColor.green,
-            .baselineOffset: 0
-//            .foregroundColor: self.foreGroundColor,
-          ]
-          
-        case .highlight:
-          return [
-            .foregroundColor: self.foreGroundColor,
-            .backgroundColor: NSColor.yellow.withAlphaComponent(0.3)
-          ]
-          
+            .init("u", modifiers: [.command])
         case .inlineCode:
-          return [
-            .font: NSFont.monospacedSystemFont(ofSize: self.fontSize, weight: .medium),
-            .foregroundColor: self.foreGroundColor,
-            .backgroundColor: NSColor.black.withAlphaComponent(MarkdownDefaults.backgroundInlineCode)
-          ]
+            .init("c", modifiers: [.command, .option])
         case .codeBlock:
-          return [
-            .font: NSFont.monospacedSystemFont(ofSize: self.fontSize, weight: .medium),
-            .foregroundColor: self.foreGroundColor,
-            //          .backgroundColor: NSColor.black.withAlphaComponent(MarkdownDefaults.backgroundCodeBlock)
-          ]
-          
-        case .quoteBlock:
-          return [
-            //               .font: NSFont.monospacedSystemFont(ofSize: self.fontSize, weight: .medium),
-            //               .foregroundColor: self.foreGroundColor,
-            .backgroundColor: NSColor.black.withAlphaComponent(MarkdownDefaults.backgroundCodeBlock)
-          ]
-          
-        case .link:
-          return [:]
-        case .image:
-          return [:]
-        case .list:
-          return [:]
-        case .horiztonalRule:
-          return [:]
-      }
-    } // END content attributes
-    
-    public var syntaxAttributes: [NSAttributedString.Key : Any]  {
-      
-      switch self {
-        case .heading:
-          return [
-            .foregroundColor: NSColor.systemMint
-          ]
-        case .inlineCode:
-          return [
-            .font: NSFont.monospacedSystemFont(ofSize: self.fontSize, weight: .regular),
-            .foregroundColor: NSColor.textColor.withAlphaComponent(MarkdownDefaults.syntaxAlpha),
-            .backgroundColor: NSColor.black.withAlphaComponent(MarkdownDefaults.backgroundInlineCode)
-          ]
-        case .codeBlock:
-          return [
-            .font: NSFont.monospacedSystemFont(ofSize: self.fontSize, weight: .regular),
-            .foregroundColor: NSColor.textColor.withAlphaComponent(MarkdownDefaults.syntaxAlpha),
-            .backgroundColor: NSColor.black.withAlphaComponent(MarkdownDefaults.backgroundCodeBlock)
-          ]
+            .init("k", modifiers: [.command, .shift])
         default:
-          return [
-            .font: NSFont.monospacedSystemFont(ofSize: self.fontSize, weight: .regular),
-            .foregroundColor: NSColor.textColor.withAlphaComponent(MarkdownDefaults.syntaxAlpha)
-          ]
+          nil
       }
+    }
+
+  }
+}
+
+
+public extension Markdown.Syntax {
+  enum EmphasisStyle: Sendable {
+    case asterisk
+    case underscore
+  }
+  
+  enum ListStyle: Sendable {
+    case ordered
+    case unordered
+    
+    public var name: String {
+      switch self {
+        case .ordered:
+          "Ordered"
+        case .unordered:
+          "Unordered"
+      }
+    }
+  }
+  
+  enum Layout {
+    case inline
+    case block(BlockType)
+    
+    public enum BlockType {
+      case singleLine
+      case multiLine
+    }
+  }
+  
+  enum BoundaryStyle {
+    
+    /// E.g. `# Headings`
+    ///
+    case leading
+    
+    /// E.g. Symmetrical: `**bold**`
+    /// E.g. Asymmetrical: `[label](http://link.url)`
+    ///
+    case enclosed(EnclosedType)
+    
+    /// E.g. Horizontal rule
+    ///
+    case none
+    
+    public enum EnclosedType {
+      case symmetrical
+      case asymmetrical
     }
   }
 }
 
 
+
+extension Markdown.Syntax {
+  
+  static public var testCases: [Markdown.Syntax] {
+    return [
+      .heading(level: 2),
+      .bold(style: .asterisk),
+      .bold(style: .underscore),
+      .italic(style: .asterisk),
+      .italic(style: .underscore),
+      .inlineCode,
+      .strikethrough
+    ]
+  }
+  
+}

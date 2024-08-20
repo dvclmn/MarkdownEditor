@@ -87,6 +87,18 @@ extension Regex<Regex<(Substring, Substring)>.RegexOutput>.Match {
   }
 }
 
+extension Regex<Regex<Substring>.RegexOutput>.Match {
+  var prettyDescription: String {
+    var result = "Match:\n"
+    result += "  Range: \(self.range)\n"
+    result += "  Matched text: \"\(self)\"\n"
+    
+    result += "  Output:\n"
+    result += "    Full match: \"\(self.output)\"\n"
+    return result
+  }
+}
+
 
 
 extension String {
@@ -183,7 +195,7 @@ extension String {
             return ["- ", "* ", "+ "].contains { fullMatch.hasPrefix($0) }
         }
         
-      case .horiztonalRule:
+      case .horizontalRule:
         // Check for at least 3 hyphens, asterisks, or underscores
         return ["---", "***", "___"].contains { fullMatch.hasPrefix($0) }
         
@@ -201,7 +213,7 @@ extension String {
     }
   }
   
-  private func delimiterPair(for syntax: Markdown.Syntax, style: Markdown.EmphasisStyle) -> (String, String) {
+  private func delimiterPair(for syntax: Markdown.Syntax, style: Markdown.Syntax.EmphasisStyle) -> (String, String) {
     let delimiter: String
     switch (syntax, style) {
       case (.bold, .asterisk), (.boldItalic, .asterisk):
