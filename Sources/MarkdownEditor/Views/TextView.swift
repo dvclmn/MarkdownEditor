@@ -13,8 +13,6 @@ public class MarkdownTextView: NSTextView {
   var rangeIndex: [NSTextRange: Markdown.Element] = [:]
   var parsingTask: Task<Void, Never>?
   
-  let profiler = Profiler.shared
-  
   let infoHandler = EditorInfoHandler()
 
   var configuration: EditorConfiguration
@@ -24,10 +22,6 @@ public class MarkdownTextView: NSTextView {
   private var viewportLayoutController: NSTextViewportLayoutController?
   var viewportDelegate: CustomViewportDelegate?
   
-  
-  var processingTime: Double = .zero
-  var lightProcessingTime: Double = .zero
-
   public var onInfoUpdate: MarkdownEditor.InfoUpdate = { _ in }
   
   public init(

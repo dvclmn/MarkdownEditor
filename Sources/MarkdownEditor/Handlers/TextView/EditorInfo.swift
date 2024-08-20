@@ -17,7 +17,6 @@ public struct EditorInfo: Sendable {
   
   
   public struct Text: Sendable {
-    var processingTime: Double = .zero
     var characterCount: Int = 0
     var textElementCount: Int = 0
     var codeBlocks: Int = 0

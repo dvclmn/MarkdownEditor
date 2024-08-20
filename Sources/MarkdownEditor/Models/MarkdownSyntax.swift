@@ -24,6 +24,8 @@ import RegexBuilder
 //  var syntaxAttributes: AttributeSet { get }
 //}
 
+public typealias MarkdownRegexOutput = Regex<(Substring, Substring)>
+
 public protocol MarkdownIntent: Equatable, Sendable {
   associatedtype StructureType
   var syntax: Markdown.Syntax { get }
@@ -96,8 +98,6 @@ extension Markdown {
   
   public enum Syntax: Identifiable, Equatable, Hashable, Sendable {
     
-    
-    
     case heading(level: Int)
     
     case bold(style: EmphasisStyle)
@@ -110,10 +110,10 @@ extension Markdown {
     
     case list(style: ListStyle)
     
-    
     case horiztonalRule
     
-    //    case table(columns: [PresentationIntent.TableColumn])
+    /// To be supported in future versions:
+    // case table(columns: [PresentationIntent.TableColumn])
     // case tableCell(columnIndex: Int)
     // case tableHeaderRow
     // case tableRow(rowIndex: Int

@@ -34,9 +34,7 @@ extension MarkdownTextView {
         /// when the view is initialised, without waiting for text/selection to change.
         try await Task.sleep(for: .seconds(0.8))
         
-        if let (_, time) = await self.applyMarkdownStyles() {
-          self.lightProcessingTime = time
-        }
+        await self.applyMarkdownStyles()
         
         let textInfo = self.generateTextInfo()
         let selectionInfo = self.generateSelectionInfo()
@@ -48,11 +46,8 @@ extension MarkdownTextView {
       }
     } // END Task
     
-    
-      if let (_, time) = await self.parseMarkdown() {
-        self.processingTime = time
-      }
-    
+      await self.parseMarkdown()
+
   }
   
 }

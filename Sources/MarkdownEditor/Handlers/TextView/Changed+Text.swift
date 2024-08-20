@@ -19,11 +19,8 @@ extension MarkdownTextView {
 
       try await Task.sleep(for: .seconds(0.1))
       
-      if let (_, time) = await self.applyMarkdownStyles() {
-        self.lightProcessingTime = time
-      }
-
-
+      await self.applyMarkdownStyles()
+      
       let info = self.generateTextInfo()
       await infoHandler.update(info)
       
@@ -32,9 +29,7 @@ extension MarkdownTextView {
     
     Task {
       // TODO: Consider adding a debounce to this as well as all the rest
-      if let (_, time) = await self.parseMarkdown() {
-        self.processingTime = time
-      }
+      await self.parseMarkdown()
     }
   }
 }
@@ -74,16 +69,12 @@ extension MarkdownTextView {
       return true
     })
     
-    let profilerReport = generateProfilerReport()
-    
     let scratchPad: String = """
     Insets: \(self.textContainer?.lineFragmentPadding.description ?? "")
     Total elements: \(self.elements.count)
-    Profiler: \(profilerReport ?? "nil")
     """
     
     return EditorInfo.Text(
-      processingTime: self.processingTime,
       characterCount: self.string.count,
       textElementCount: textElementCount,
       codeBlocks: self.elements.filter { $0.type == .codeBlock(language: nil) }.count,
