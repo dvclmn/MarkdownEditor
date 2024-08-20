@@ -95,6 +95,21 @@ public extension Markdown {
 extension Markdown {
   
   
+  /// To obtain the precise Range(s), for syntax characters, first I must determine
+  /// the syntax structure for each and every Markdown syntax type.
+  ///
+  /// For instance, elements like bold and italic are symmetrical, so this is one category.
+  /// ## Symmetical
+  /// E.g. `**bold**`
+  ///
+  /// This means a pattern of `{openingSyntax}{content}{closingSyntax}`
+  ///
+  /// So the calculation / process for this would be
+  /// 1. Obtain full range (This is the first substring in `Regex<(Substring, Substring)>`)
+  /// 2. The full range's start location *plus two* is the opening syntax Range
+  /// 3. Closing syntax range: Get start point by subtracting two from the full range's end location. Plus two gives us the end point.
+  /// 4. The result gives us the content range
+  /// 5
   
   public enum Syntax: Identifiable, Equatable, Hashable, Sendable {
     
@@ -128,23 +143,6 @@ extension Markdown {
       self.name
     }
     
-    static public var testCases: [Markdown.Syntax] {
-      return [
-        .heading(level: 2),
-        .bold(style: .asterisk),
-        .bold(style: .underscore),
-        .italic(style: .asterisk),
-        .italic(style: .underscore),
-        .inlineCode,
-        .strikethrough
-      ]
-    }
-    
-//    public func allCases(): [Markdown.Syntax] {
-//      return [
-//        .heading(level: <#T##Int#>)
-//      ]
-//    }
     
     /// Swift gets the whole match first, that's one `Substring`, and then gets the
     /// capture group, that's the second `Substring`. To get just the syntax characters,
