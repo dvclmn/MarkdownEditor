@@ -43,45 +43,7 @@ extension Markdown {
     nonisolated public var id: String {
       self.name
     }
-    
-    
-    //    public var regex: AnyRegexOutput {
-    //      switch self {
-    //        case .heading(let level):
-    //
-    //        case .bold(let style):
-    //          <#code#>
-    //        case .italic(let style):
-    //          <#code#>
-    //        case .boldItalic(let style):
-    //          <#code#>
-    //        case .strikethrough:
-    //          <#code#>
-    //        case .highlight:
-    //          <#code#>
-    //        case .inlineCode:
-    //          <#code#>
-    //        case .list(let style):
-    //          <#code#>
-    //        case .horizontalRule:
-    //          <#code#>
-    //        case .codeBlock(let language):
-    //          <#code#>
-    //        case .quoteBlock:
-    //          <#code#>
-    //        case .link:
-    //          <#code#>
-    //        case .image:
-    //          <#code#>
-    //      }
-    //    }
-    //
-    
-    /// Swift gets the whole match first, that's one `Substring`, and then gets the
-    /// capture group, that's the second `Substring`. To get just the syntax characters,
-    /// I can subtract the content from the whole match, and what's left should be syntax
-    ///
-    
+
     public var intentIdentity: Int {
       switch self {
         case .heading(let level):
@@ -354,6 +316,15 @@ public extension Markdown.Syntax {
     case block(BlockType)
     
     public enum BlockType {
+      
+      /// I think i'll keep this distinction between single- and multi-line
+      /// For instance, adding an explicit line break within a code block is valid,
+      /// and does not 'interrupt' or 'break out of' the block.
+      ///
+      /// Whereas doing the same in a heading, *does* break out of the heading.
+      ///
+      /// I think encapsulating that distinction is important.
+      ///
       case singleLine
       case multiLine
     }
