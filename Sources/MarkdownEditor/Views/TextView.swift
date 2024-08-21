@@ -9,8 +9,8 @@ import SwiftUI
 
 public class MarkdownTextView: NSTextView {
   
-  var elements: [AnyMarkdownElement] = []
-  var rangeIndex: [NSTextRange: AnyMarkdownElement] = [:]
+  var elements: [Markdown.Element] = []
+  var rangeIndex: [NSTextRange: Markdown.Element] = [:]
   var parsingTask: Task<Void, Never>?
   
   let infoHandler = EditorInfoHandler()

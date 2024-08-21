@@ -134,80 +134,57 @@ extension Markdown.Syntax {
 //          case .underscore:
 //            return /__[^_]*?__/
         
-      case .italic(let style):
-        switch style {
-            
-            /// Matches italic text with asterisks: One asterisk, followed by any characters (non-greedy), ending with one asterisk
-            ///
-          case .asterisk:
-            return /\*[^\*]*?\*/
-            
-            
-            /// Matches italic text with underscores: One underscore, followed by any characters (non-greedy), ending with one underscore
-            ///
-          case .underscore:
-            return /_.*?_/
-        }
+      case .italic:
+        return /(?<leading>_|\*)(?<content>[^_|\*]*?)(?<trailing>_|\*)/
         
-      case .boldItalic(let style):
-        switch style {
-            
-            /// Matches bold and italic text with asterisks: Three asterisks, followed by any characters (non-greedy), ending with three asterisks
-            ///
-          case .asterisk:
-            return /\*\*\*.*?\*\*\*/
-            
-            /// Matches bold and italic text with underscores: Three underscores, followed by any characters (non-greedy), ending with three underscores
-            ///
-          case .underscore:
-            return /___.*?___/
-        }
+      case .boldItalic:
+        return /(?<leading>___|\*\*\*)(?<content>[^_|\*]*?)(?<trailing>___|\*\*\*)/
         
         
         /// Matches strikethrough text: Two tildes, followed by any characters (non-greedy), ending with two tildes
       case .strikethrough:
-        return /~~.*?~~/
+        return /(?<leading>~~)(?<content>[^~]*?)(?<trailing>~~)/
         
         /// Matches highlighted text: Two equal signs, followed by any characters (non-greedy), ending with two equal signs
       case .highlight:
-        return /==.*?==/
+        return /(?<leading>==)(?<content>[^=]*?)(?<trailing>==)/
         
         /// Matches inline code: A backtick, followed by one or more characters that are not newlines or backticks,
         /// not followed by two backticks, ending with a backtick not followed by another backtick
         /// Note: This complex pattern ensures that it doesn't match multi-line code blocks or nested backticks
       case .inlineCode:
-        return /`[^\n`]+(?!``)`(?!`)/
+        return /(?<leading>`)(?<content>(?:[^`\n])+?)(?<trailing>`)/
         
         /// Matches a simple list item: A hyphen followed by a space and any characters until the end of the line
         /// Note: This is a placeholder and needs proper implementation for nested lists
       case .list(_):
-        return /- .*?/
+        return /(?<leading>`)(?<content>(?:[^`\n])+?)(?<trailing>`)/
         
         /// Matches a horizontal rule: Three hyphens
       case .horizontalRule:
-        return /---/
+        return /(?<leading>`)(?<content>(?:[^`\n])+?)(?<trailing>`)/
         
         /// Matches a code block: Starts with three backticks, includes any characters (including newlines),
         /// and ends with three backticks at the start of a line
         /// Note: (?m) enables multiline mode, [\s\S] matches any character including newlines
       case .codeBlock:
-        return /(?m)^```[\s\S]*?^```/
+        return /(?<leading>(?m)^```)(?<content>[\s\S]*?)(?<trailing>^```)/
         
         /// Matches a quote block: A '>' followed by a space at the start of a line, then any characters until the end of the line
       case .quoteBlock:
-        return /^> .*/
+        return /(?<leading>^>)(?<content>[^>\n]+)(?<trailing>)/
         
         /// Matches a link: Text in square brackets followed by a URL in parentheses
         /// Note: `[^\]]+` matches one or more characters that are not closing square brackets
         /// `[^\)]+` matches one or more characters that are not closing parentheses
       case .link:
-        return  /\[[^\]]+\]\([^\)]+\)/
+        return  /(?<leading>\[)(?<content>[^\]]+)(?<trailing>\]\([^\)]+\))/
         
         /// Matches an image reference: Similar to a link, but prefixed with an exclamation mark
         /// Note: The pattern is identical to the link pattern, just with a leading '!'
         ///
       case .image:
-        return  /!\[[^\]]+\]\([^\)]+\)/
+        return  /(?<leading>!\[)(?<content>[^\]]+)(?<trailing>\]\([^\)]+\))/
     }
   }
   
