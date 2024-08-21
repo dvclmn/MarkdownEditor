@@ -79,7 +79,12 @@ extension Markdown.Syntax {
   /// pattern to match any character, including newlines.
   ///
   ///
-  public var regex: Regex<Substring> {
+  public var regex: Regex<(
+    Substring,
+    leading: Substring,
+    content: Substring,
+    trailing: Substring
+  )> {
     switch self {
         
         /// `^# ` The caret ensures this only matches if the string starts on a new line
@@ -88,26 +93,28 @@ extension Markdown.Syntax {
       case .heading(let level):
         
         if level == 1 {
-          return /^# .*$/
+          return /^(?<leading>#) (?<content>.*$)(?<trailing>)/
           
         } else if level == 2 {
-          return /^## .*$/
+          return /^(?<leading>##) (?<content>.*$)(?<trailing>)/
           
         } else if level == 3 {
-          return /^### .*$/
+          return /^(?<leading>###) (?<content>.*$)(?<trailing>)/
           
         } else if level == 4 {
-          return /^#### .*$/
+          return /^(?<leading>####) (?<content>.*$)(?<trailing>)/
           
         } else if level == 5 {
-          return /^##### .*$/
+          return /^(?<leading>#####) (?<content>.*$)(?<trailing>)/
           
         } else {
-          return /^###### .*$/
+          return /^(?<leading>######) (?<content>.*$)(?<trailing>)/
         }
         
-      case .bold(let style):
-        switch style {
+      case .bold:
+        
+        return /(?<leading>__|\*\*)(?<content>[^_|\*]*?)(?<trailing>__|\*\*)/
+//        switch style {
             
             /// `[^\*]` This is a 'negated set' or 'negated character class'. The caret here means 'match
             /// anything that *isn't* the following character(s). The character being negated is an asterisk,
@@ -119,14 +126,13 @@ extension Markdown.Syntax {
             /// preventing the match from spilling out and finding matches that — depending on your
             /// needs — you may not want to have matched.
             ///
-          case .asterisk:
-            return /\*\*[^\*]*?\*\*/
+//          case .asterisk:
+//            return /\*\*[^\*]*?\*\*/
             
             /// Matches bold text with underscores: Two underscores, followed by any characters (non-greedy), ending with two underscores
             ///
-          case .underscore:
-            return /__[^_]*?__/
-        }
+//          case .underscore:
+//            return /__[^_]*?__/
         
       case .italic(let style):
         switch style {

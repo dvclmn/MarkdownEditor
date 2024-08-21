@@ -12,56 +12,36 @@ public typealias AnyMarkdownElement = (any MarkdownElement)
 
 
 public protocol MarkdownElement: Sendable {
-  
   associatedtype MarkdownRegexOutput
-  
   var regex: Regex<MarkdownRegexOutput> { get }
-  var fullRange: NSTextRange? { get }
+}
+
+public protocol MarkdownHeading {
   
-  /// ```swift
-  /// var elements: [AnyMarkdownElement] = [...]
-  ///
-  ///
-  /// // Updating a specific element
-  /// if var heading = elements[0] as? Markdown.Heading {
-  ///   let updatedHeading = heading.withUpdatedRange(newRange)
-  ///   elements[0] = updatedHeading
-  /// }
-  ///
-  /// // Or, if you're iterating through elements
-  /// elements = elements.map { element in
-  ///   switch element {
-  ///     case let heading as Markdown.Heading:
-  ///       return heading.withUpdatedRange(newRange) as AnyMarkdownElement
-  ///     case let inline as Markdown.InlineSymmetrical:
-  ///       return inline.withUpdatedRange(newRange) as AnyMarkdownElement
-  ///     default:
-  ///       return element
-  ///   }
-  /// }
-  ///
-  /// ```
-  ///
-  func withUpdatedRange(_ newRange: NSTextRange) -> Self
+  var level: Int { get }
 }
 
 extension Markdown {
   
+  struct Element {
+    var syntax: Markdown.Syntax
+    var range: NSTextRange
+  }
+  
   /// What I've learned so far, defining a very specific per-syntax Regex output type seems
   /// like the best way to simply and accurately define: what is content, and what is syntax?
   ///
-  struct Heading: MarkdownElement {
-    
-    var level: Int
-    var regex: Regex<Substring>
-    var fullRange: NSTextRange?
-    
-    func withUpdatedRange(_ newRange: NSTextRange) -> Heading {
-      var updated = self
-      updated.fullRange = newRange
-      return updated
-    }
-  }
+//  struct Heading: MarkdownHeading {
+//    
+//    var level: Int
+//    var regex: Regex<Substring>
+//    
+//    func withUpdatedRange(_ newRange: NSTextRange) -> Heading {
+//      var updated = self
+//      updated.fullRange = newRange
+//      return updated
+//    }
+//  }
   
   struct InlineSymmetrical: MarkdownElement {
     

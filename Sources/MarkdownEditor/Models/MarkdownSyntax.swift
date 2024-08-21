@@ -16,9 +16,9 @@ extension Markdown {
     
     case heading(level: Int)
     
-    case bold(style: EmphasisStyle)
-    case italic(style: EmphasisStyle)
-    case boldItalic(style: EmphasisStyle)
+    case bold
+    case italic
+    case boldItalic
     
     case strikethrough
     case highlight
@@ -44,58 +44,6 @@ extension Markdown {
       self.name
     }
 
-    public var intentIdentity: Int {
-      switch self {
-        case .heading(let level):
-          return 1 + level
-        case .bold(let style):
-          switch style {
-            case .asterisk:
-              return 2
-            case .underscore:
-              return 3
-          }
-        case .italic(let style):
-          switch style {
-            case .asterisk:
-              return 4
-            case .underscore:
-              return 5
-          }
-        case .boldItalic(let style):
-          switch style {
-            case .asterisk:
-              return 6
-            case .underscore:
-              return 7
-          }
-        case .strikethrough:
-          return 8
-        case .highlight:
-          return 9
-        case .inlineCode:
-          return 10
-        case .list(let style):
-          switch style {
-            case .ordered:
-              return 11
-            case .unordered:
-              return 12
-          }
-        case .horizontalRule:
-          return 13
-        case .codeBlock(let language):
-          guard let language = language else { return 14 }
-          return 14 + (language.intentIdentifier * 100)
-        case .quoteBlock:
-          return 15
-        case .link:
-          return 16
-        case .image:
-          return 17
-      }
-    }
-    
     public var name: String {
       
       switch self {

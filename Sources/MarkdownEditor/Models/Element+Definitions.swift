@@ -5,50 +5,52 @@
 //  Created by Dave Coleman on 21/8/2024.
 //
 
-extension Markdown {
-  public static let allSyntax: [AnyMarkdownElement] = [
-    Markdown.Heading.heading1,
-    Markdown.Heading.heading2,
-    Markdown.Heading.heading3,
-    Markdown.Heading.heading4,
-    Markdown.Heading.heading5,
-    Markdown.Heading.heading6,
-    
-    Markdown.InlineSymmetrical.bold,
-    Markdown.InlineSymmetrical.italic,
-    Markdown.InlineSymmetrical.boldItalic,
-    Markdown.InlineSymmetrical.inlineCode,
-    Markdown.InlineSymmetrical.strikethrough
-  ]
-}
+//extension Markdown {
+//  public static let allSyntax: [AnyMarkdownElement] = [
+//    Markdown.Heading.heading1,
+//    Markdown.Heading.heading2,
+//    Markdown.Heading.heading3,
+//    Markdown.Heading.heading4,
+//    Markdown.Heading.heading5,
+//    Markdown.Heading.heading6,
+//    
+//    Markdown.InlineSymmetrical.bold,
+//    Markdown.InlineSymmetrical.italic,
+//    Markdown.InlineSymmetrical.boldItalic,
+//    Markdown.InlineSymmetrical.inlineCode,
+//    Markdown.InlineSymmetrical.strikethrough
+//  ]
+//}
+//
+//
 
-extension Markdown.Heading {
-  
-  public static let heading1 = Markdown.Heading(
-    level: 1,
-    regex: /^# .*$/
-  )
-  public static let heading2 = Markdown.Heading(
-    level: 2,
-    regex: /^## .*$/
-  )
-  public static let heading3 = Markdown.Heading(
-    level: 3,
-    regex: /^### .*$/
-  )
-  public static let heading4 = Markdown.Heading(
-    level: 4,
-    regex: /^#### .*$/
-  )
-  public static let heading5 = Markdown.Heading(
-    level: 5,
-    regex: /^##### .*$/
-  )
-  public static let heading6 = Markdown.Heading(
-    level: 6,
-    regex: /^###### .*$/
-  )
-}
+//extension Markdown.Heading {
+//  
+//  public static let heading1 = Markdown.Heading(
+//    level: 1,
+//    regex: /^# .*$/
+//  )
+//  public static let heading2 = Markdown.Heading(
+//    level: 2,
+//    regex: /^## .*$/
+//  )
+//  public static let heading3 = Markdown.Heading(
+//    level: 3,
+//    regex: /^### .*$/
+//  )
+//  public static let heading4 = Markdown.Heading(
+//    level: 4,
+//    regex: /^#### .*$/
+//  )
+//  public static let heading5 = Markdown.Heading(
+//    level: 5,
+//    regex: /^##### .*$/
+//  )
+//  public static let heading6 = Markdown.Heading(
+//    level: 6,
+//    regex: /^###### .*$/
+//  )
+//}
 
 extension Markdown.InlineSymmetrical {
   public static let bold = Markdown.InlineSymmetrical(
