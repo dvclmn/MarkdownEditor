@@ -47,7 +47,10 @@ extension Markdown {
     public var name: String {
       
       switch self {
-        case .heading: return "Heading \(self.syntaxCharacters)"
+        case .heading(let level):
+          var hashSymbols = String(repeating: "#", count: level)
+          return "Heading \(hashSymbols)"
+          
         case .bold: return "Bold"
         case .italic: return "Italic"
         case .boldItalic: return "Bold Italic"
@@ -125,36 +128,36 @@ extension Markdown {
       }
     }
     
-    public var intent: any MarkdownIntent {
-      switch self {
-        case .heading(let level):
-          BlockIntent(syntax: .heading(level: level), type: PresentationIntent(.header(level: level), identity: level))
-        case .bold(let style):
-          InlineIntent(syntax: .bold(style: style), type: .emphasized)
-        case .italic(let style):
-          InlineIntent(syntax: .italic(style: style), type: .emphasized)
-        case .boldItalic(let style):
-          InlineIntent(syntax: .boldItalic(style: style), type: .stronglyEmphasized)
-        case .strikethrough:
-          InlineIntent(syntax: .strikethrough, type: .strikethrough)
-        case .highlight:
-          InlineIntent(syntax: .highlight, type: .highlight)
-        case .inlineCode:
-          InlineIntent(syntax: .inlineCode, type: .code)
-        case .list(let style):
-          BlockIntent(syntax: .list(style: style), type: .list(style: style))
-        case .horizontalRule:
-          BlockIntent(syntax: .horizontalRule, type: PresentationIntent(.thematicBreak, identity: self.intentIdentity))
-        case .codeBlock(let language):
-          BlockIntent(syntax: self, type: PresentationIntent(.codeBlock(languageHint: language?.string), identity: self.intentIdentity))
-        case .quoteBlock:
-          BlockIntent(syntax: self, type: PresentationIntent(.blockQuote, identity: self.intentIdentity))
-        case .link:
-          InlineIntent(syntax: self, type: .link)
-        case .image:
-          InlineIntent(syntax: self, type: .image)
-      }
-    }
+//    public var intent: any MarkdownIntent {
+//      switch self {
+//        case .heading(let level):
+//          BlockIntent(syntax: .heading(level: level), type: PresentationIntent(.header(level: level), identity: level))
+//        case .bold(let style):
+//          InlineIntent(syntax: .bold(style: style), type: .emphasized)
+//        case .italic(let style):
+//          InlineIntent(syntax: .italic(style: style), type: .emphasized)
+//        case .boldItalic(let style):
+//          InlineIntent(syntax: .boldItalic(style: style), type: .stronglyEmphasized)
+//        case .strikethrough:
+//          InlineIntent(syntax: .strikethrough, type: .strikethrough)
+//        case .highlight:
+//          InlineIntent(syntax: .highlight, type: .highlight)
+//        case .inlineCode:
+//          InlineIntent(syntax: .inlineCode, type: .code)
+//        case .list(let style):
+//          BlockIntent(syntax: .list(style: style), type: .list(style: style))
+//        case .horizontalRule:
+//          BlockIntent(syntax: .horizontalRule, type: PresentationIntent(.thematicBreak, identity: self.intentIdentity))
+//        case .codeBlock(let language):
+//          BlockIntent(syntax: self, type: PresentationIntent(.codeBlock(languageHint: language?.string), identity: self.intentIdentity))
+//        case .quoteBlock:
+//          BlockIntent(syntax: self, type: PresentationIntent(.blockQuote, identity: self.intentIdentity))
+//        case .link:
+//          InlineIntent(syntax: self, type: .link)
+//        case .image:
+//          InlineIntent(syntax: self, type: .image)
+//      }
+//    }
     
     public var hideSyntax: Bool {
       switch self {
@@ -165,56 +168,56 @@ extension Markdown {
       }
     }
     
-    public var syntaxCharacters: String {
-      switch self {
-        case .heading(let level):
-          
-          let maxLevel = 6
-          
-          /// Could also be written like this:
-          /// ```
-          /// var result = ""
-          /// for _ in 1...min(level, 6) {
-          ///   result += "#"
-          /// }
-          /// return result
-          ///
-          /// ```
-          let levelWithLimit = min(level, maxLevel)
-          return String(repeating: "#", count: levelWithLimit)
-        case .bold(let style):
-          switch style {
-            case .asterisk: return "**"
-            case .underscore: return "__"
-          }
-        case .italic(let style):
-          switch style {
-            case .asterisk: return "*"
-            case .underscore: return "_"
-          }
-        case .boldItalic(let style):
-          switch style {
-            case .asterisk: return "***"
-            case .underscore: return "___"
-          }
-        case .strikethrough: return "~~"
-        case .highlight: return "=="
-        case .inlineCode: return "`"
-          
-          // TODO: Can improve implementation here
-        case .list: return "- "
-        case .horizontalRule: return "---"
-        case .codeBlock(let language): return "```\(language?.string ?? "")"
-        case .quoteBlock: return "> "
-        case .link: return "?"
-        case .image: return "?"
-      }
-    }
+//    public var syntaxCharacters: String {
+//      switch self {
+//        case .heading(let level):
+//          
+//          let maxLevel = 6
+//          
+//          /// Could also be written like this:
+//          /// ```
+//          /// var result = ""
+//          /// for _ in 1...min(level, 6) {
+//          ///   result += "#"
+//          /// }
+//          /// return result
+//          ///
+//          /// ```
+//          let levelWithLimit = min(level, maxLevel)
+//          return String(repeating: "#", count: levelWithLimit)
+//        case .bold(let style):
+//          switch style {
+//            case .asterisk: return "**"
+//            case .underscore: return "__"
+//          }
+//        case .italic(let style):
+//          switch style {
+//            case .asterisk: return "*"
+//            case .underscore: return "_"
+//          }
+//        case .boldItalic(let style):
+//          switch style {
+//            case .asterisk: return "***"
+//            case .underscore: return "___"
+//          }
+//        case .strikethrough: return "~~"
+//        case .highlight: return "=="
+//        case .inlineCode: return "`"
+//          
+//          // TODO: Can improve implementation here
+//        case .list: return "- "
+//        case .horizontalRule: return "---"
+//        case .codeBlock(let language): return "```\(language?.string ?? "")"
+//        case .quoteBlock: return "> "
+//        case .link: return "?"
+//        case .image: return "?"
+//      }
+//    }
     
-    public var syntaxCharacterCount: Int {
-      self.syntaxCharacters.count
-    }
-    
+//    public var syntaxCharacterCount: Int {
+//      self.syntaxCharacters.count
+//    }
+//    
     public var shortcut: KeyboardShortcut? {
       switch self {
           
@@ -307,10 +310,8 @@ extension Markdown.Syntax {
   static public var testCases: [Markdown.Syntax] {
     return [
       .heading(level: 2),
-      .bold(style: .asterisk),
-      .bold(style: .underscore),
-      .italic(style: .asterisk),
-      .italic(style: .underscore),
+      .bold,
+      .italic,
       .inlineCode,
       .strikethrough
     ]

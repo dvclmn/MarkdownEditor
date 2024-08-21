@@ -12,7 +12,7 @@ import BaseHelpers
 extension MarkdownTextView {
   
   // TODO: This of course needs to be expanded to support *actual* styles, just placeholder yellow colour for now
-  func addStyle(for element: AnyMarkdownElement) {
+  func addStyle(for element: Markdown.Element) {
     guard let tlm = self.textLayoutManager,
           let tcm = tlm.textContentManager,
           let tcs = self.textContentStorage

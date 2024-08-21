@@ -28,7 +28,7 @@ public struct EditorInfo: Sendable {
   public struct Selection: Sendable {
     var selection: String = ""
     //  var selectedRange: NSTextRange?
-    var selectedElement: [AnyMarkdownElement] = []
+    var selectedElement: [Markdown.Element] = []
     var location: Location? = nil
     
     public struct Location: Sendable {

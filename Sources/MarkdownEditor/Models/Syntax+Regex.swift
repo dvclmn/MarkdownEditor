@@ -7,7 +7,14 @@
 
 import RegexBuilder
 
+public typealias MarkdownRegex = Regex<(
+  Substring,
+  leading: Substring,
+  content: Substring,
+  trailing: Substring
+)>
 
+public typealias MarkdownRange = Range<String.Index>
 
 extension Markdown.Syntax {
   
@@ -79,12 +86,7 @@ extension Markdown.Syntax {
   /// pattern to match any character, including newlines.
   ///
   ///
-  public var regex: Regex<(
-    Substring,
-    leading: Substring,
-    content: Substring,
-    trailing: Substring
-  )> {
+  public var regex: MarkdownRegex {
     switch self {
         
         /// `^# ` The caret ensures this only matches if the string starts on a new line

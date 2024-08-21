@@ -8,7 +8,7 @@
 import Foundation
 import AppKit
 
-public typealias AnyMarkdownElement = (any MarkdownElement)
+//public typealias Markdown.Element = (any MarkdownElement)
 
 
 public protocol MarkdownElement: Sendable {
@@ -25,7 +25,7 @@ extension Markdown {
   
   struct Element {
     var syntax: Markdown.Syntax
-    var range: NSTextRange
+    var range: MarkdownRange
   }
   
   /// What I've learned so far, defining a very specific per-syntax Regex output type seems

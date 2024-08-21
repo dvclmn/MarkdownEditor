@@ -24,9 +24,9 @@ extension MarkdownTextViewTests {
     
     textView.string = "Here is one sentence."
     
-    var elements: [AnyMarkdownElement] = []
+    var elements: [Markdown.Element] = []
     
-    elements = exampleString02.markdownMatches(of: Markdown.InlineSymmetrical.bold, textContentManager: tcm)
+    elements = exampleString02.markdownMatches(of: Markdown.Syntax.bold, textContentManager: tcm)
 
   }
   

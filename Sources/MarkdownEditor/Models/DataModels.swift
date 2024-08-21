@@ -33,7 +33,7 @@ extension NSTextRange: @unchecked @retroactive Sendable {
 //  var range: NSTextRange { get set }
 //}
 //
-//public typealias AnyMarkdownElement = (any MarkdownElement)
+//public typealias Markdown.Element = (any MarkdownElement)
 
 
 
@@ -103,7 +103,7 @@ public extension Markdown {
 public struct Markdown {
 
 //  struct Element: Sendable {
-//    var type: AnyMarkdownElement
+//    var type: Markdown.Element
 //    nonisolated(unsafe) var fullRange: NSTextRange
 //    
 //    
@@ -111,45 +111,45 @@ public struct Markdown {
   
 }
 
-extension PresentationIntent {
-  static func list(style: Markdown.Syntax.ListStyle) -> PresentationIntent {
-    
-    var kind: PresentationIntent.Kind
-    
-    switch style {
-      case .ordered:
-        kind = .orderedList
-      case .unordered:
-        kind = .unorderedList
-    }
-    
-    return PresentationIntent(kind, identity: Markdown.Syntax.list(style: style).intentIdentity)
-    
-  }
-}
-
-
-extension InlinePresentationIntent {
-  
-  static var link: InlinePresentationIntent {
-    var intent = InlinePresentationIntent()
-    // Set some custom bit or combine with other intents as needed
-    return intent
-  }
-  
-  static var image: InlinePresentationIntent {
-    var intent = InlinePresentationIntent()
-    // Set some custom bit or combine with other intents as needed
-    return intent
-  }
-  
-  static var highlight: InlinePresentationIntent {
-    var intent = InlinePresentationIntent()
-    // Set some custom bit or combine with other intents as needed
-    return intent
-  }
-  
-}
+//extension PresentationIntent {
+//  static func list(style: Markdown.Syntax.ListStyle) -> PresentationIntent {
+//    
+//    var kind: PresentationIntent.Kind
+//    
+//    switch style {
+//      case .ordered:
+//        kind = .orderedList
+//      case .unordered:
+//        kind = .unorderedList
+//    }
+//    
+//    return PresentationIntent(kind, identity: Markdown.Syntax.list(style: style).intentIdentity)
+//    
+//  }
+//}
+//
+//
+//extension InlinePresentationIntent {
+//  
+//  static var link: InlinePresentationIntent {
+//    var intent = InlinePresentationIntent()
+//    // Set some custom bit or combine with other intents as needed
+//    return intent
+//  }
+//  
+//  static var image: InlinePresentationIntent {
+//    var intent = InlinePresentationIntent()
+//    // Set some custom bit or combine with other intents as needed
+//    return intent
+//  }
+//  
+//  static var highlight: InlinePresentationIntent {
+//    var intent = InlinePresentationIntent()
+//    // Set some custom bit or combine with other intents as needed
+//    return intent
+//  }
+//  
+//}
 
 
 

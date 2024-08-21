@@ -6,7 +6,7 @@
 //
 
 //extension Markdown {
-//  public static let allSyntax: [AnyMarkdownElement] = [
+//  public static let allSyntax: [Markdown.Element] = [
 //    Markdown.Heading.heading1,
 //    Markdown.Heading.heading2,
 //    Markdown.Heading.heading3,
