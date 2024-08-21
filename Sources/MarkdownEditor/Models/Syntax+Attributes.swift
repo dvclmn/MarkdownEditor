@@ -8,6 +8,30 @@
 import AppKit
 import Foundation
 
+public struct MarkdownDefaults: Sendable {
+  
+  @MainActor public static let defaultFont =               NSFont.systemFont(ofSize: MarkdownDefaults.fontSize, weight: MarkdownDefaults.fontWeight)
+  public static let fontSize:                 Double = 15
+  public static let fontWeight:               NSFont.Weight = .regular
+  public static let fontOpacity:              Double = 0.85
+  
+  public static let headerSyntaxSize:         Double = 20
+  
+  public static let fontSizeMono:             Double = 14.5
+  
+  public static let syntaxAlpha:              Double = 0.3
+  public static let backgroundInlineCode:     Double = 0.2
+  public static let backgroundCodeBlock:      Double = 0.4
+  
+  public static let lineSpacing:              Double = 6
+  public static let paragraphSpacing:         Double = 0
+  
+  public static let paddingX: Double = 30
+  public static let paddingY: Double = 30
+}
+
+
+
 public extension Markdown.Syntax {
   
   var fontSize: Double {

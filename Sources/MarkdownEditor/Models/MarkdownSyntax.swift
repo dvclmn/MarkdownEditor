@@ -45,90 +45,42 @@ extension Markdown {
     }
     
     
-//    public var regex: AnyRegexOutput {
-//      switch self {
-//        case .heading(let level):
-//
-//        case .bold(let style):
-//          <#code#>
-//        case .italic(let style):
-//          <#code#>
-//        case .boldItalic(let style):
-//          <#code#>
-//        case .strikethrough:
-//          <#code#>
-//        case .highlight:
-//          <#code#>
-//        case .inlineCode:
-//          <#code#>
-//        case .list(let style):
-//          <#code#>
-//        case .horizontalRule:
-//          <#code#>
-//        case .codeBlock(let language):
-//          <#code#>
-//        case .quoteBlock:
-//          <#code#>
-//        case .link:
-//          <#code#>
-//        case .image:
-//          <#code#>
-//      }
-//    }
-//    
+    //    public var regex: AnyRegexOutput {
+    //      switch self {
+    //        case .heading(let level):
+    //
+    //        case .bold(let style):
+    //          <#code#>
+    //        case .italic(let style):
+    //          <#code#>
+    //        case .boldItalic(let style):
+    //          <#code#>
+    //        case .strikethrough:
+    //          <#code#>
+    //        case .highlight:
+    //          <#code#>
+    //        case .inlineCode:
+    //          <#code#>
+    //        case .list(let style):
+    //          <#code#>
+    //        case .horizontalRule:
+    //          <#code#>
+    //        case .codeBlock(let language):
+    //          <#code#>
+    //        case .quoteBlock:
+    //          <#code#>
+    //        case .link:
+    //          <#code#>
+    //        case .image:
+    //          <#code#>
+    //      }
+    //    }
+    //
     
     /// Swift gets the whole match first, that's one `Substring`, and then gets the
     /// capture group, that's the second `Substring`. To get just the syntax characters,
     /// I can subtract the content from the whole match, and what's left should be syntax
     ///
-    public var regex: Regex<Substring> {
-      switch self {
-          // TODO: Proper implementation needed
-        case .heading:
-          return /# .*/
-        case .bold(let style):
-          switch style {
-            case .asterisk:
-              return /\\*\\*.*?\\*\\*/
-            case .underscore:
-              return /\_\_.*?\_\_/
-          }
-          
-        case .italic(let style):
-          switch style {
-            case .asterisk:
-              return /\\*.*?\\*/
-            case .underscore:
-              return /_.*?_/
-          }
-        case .boldItalic(let style):
-          switch style {
-            case .asterisk:
-              return /\\*\\*\\*.*?\\*\\*\\*/
-            case .underscore:
-              return /___.*?___/
-          }
-        case .strikethrough:
-          return /~~.*?~~/
-        case .highlight:
-          return /==.*?==/
-        case .inlineCode:
-          return /`[^\\n`]+(?!``)`(?!`)/
-        case .list(_):
-          // TODO: Needs proper implementation
-          return /- .*?/
-        case .horizontalRule:
-          return /---/
-        case .codeBlock:
-          return /(?m)^```[\\s\\S]*?^```/
-        case .quoteBlock:
-          return /^> .*/
-        case .link:
-          return  /\[[^\]]+\]\([^\)]+\)/
-        case .image:
-          return  /!\[[^\]]+\]\([^\)]+\)/
-      }
-    }
     
     public var intentIdentity: Int {
       switch self {
@@ -224,7 +176,7 @@ extension Markdown {
             .horizontalRule,
             .list:
           return .block(.singleLine)
-
+          
         case .codeBlock:
           return .block(.multiLine)
       }
@@ -234,7 +186,7 @@ extension Markdown {
     public var syntaxBoundary: Markdown.Syntax.BoundaryStyle {
       switch self {
         case .heading, .list:
-            return .leading
+          return .leading
           
         case .bold,
             .italic,
@@ -243,14 +195,14 @@ extension Markdown {
             .highlight,
             .inlineCode,
             .quoteBlock:
-            return .enclosed(.symmetrical)
+          return .enclosed(.symmetrical)
           
         case .horizontalRule:
-            return .none
+          return .none
           
         case .codeBlock(let language):
-            return .enclosed(.symmetrical)
-
+          return .enclosed(.symmetrical)
+          
         case .link, .image:
           return .enclosed(.asymmetrical)
       }
@@ -372,7 +324,7 @@ extension Markdown {
           nil
       }
     }
-
+    
   }
 }
 

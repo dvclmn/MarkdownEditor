@@ -6,6 +6,116 @@
 //
 
 import SwiftUI
+import RegexBuilder
+
+public typealias AnyMarkdownElement = (any MarkdownElement)
+
+public protocol MarkdownElement: Sendable {
+  
+  associatedtype MarkdownRegexOutput
+  
+  var regex: Regex<MarkdownRegexOutput> { get }
+  var fullRange: NSTextRange? { get }
+  
+  /// ```swift
+  /// var elements: [AnyMarkdownElement] = [...]
+  ///
+  ///
+  /// // Updating a specific element
+  /// if var heading = elements[0] as? Markdown.Heading {
+  ///   let updatedHeading = heading.withUpdatedRange(newRange)
+  ///   elements[0] = updatedHeading
+  /// }
+  ///
+  /// // Or, if you're iterating through elements
+  /// elements = elements.map { element in
+  ///   switch element {
+  ///     case let heading as Markdown.Heading:
+  ///       return heading.withUpdatedRange(newRange) as AnyMarkdownElement
+  ///     case let inline as Markdown.InlineSymmetrical:
+  ///       return inline.withUpdatedRange(newRange) as AnyMarkdownElement
+  ///     default:
+  ///       return element
+  ///   }
+  /// }
+  ///
+  /// ```
+  ///
+  func withUpdatedRange(_ newRange: NSTextRange) -> Self
+}
+
+extension Regex<Substring>: @unchecked @retroactive Sendable {
+  
+}
+
+extension NSTextRange: @unchecked @retroactive Sendable {
+  
+}
+
+extension Markdown {
+  
+  /// What I've learned so far, defining a very specific per-syntax Regex output type seems
+  /// like the best way to simply and accurately define: what is content, and what is syntax?
+  ///
+  struct Heading: MarkdownElement {
+    
+    
+    var level: Int
+    
+    /// The first `Substring` is always the full match. Then the second and third are for syntax and content
+    ///
+    var regex: Regex<Substring>
+    
+    
+    var fullRange: NSTextRange?
+    
+    func withUpdatedRange(_ newRange: NSTextRange) -> Heading {
+      var updated = self
+      updated.fullRange = newRange
+      return updated
+    }
+  }
+  
+  struct InlineSymmetrical: MarkdownElement {
+    
+    var type: SyntaxType
+    
+    /// Substring definitions:
+    ///
+    /// 1. Full match
+    /// 2. Leading syntax
+    /// 3. Content
+    /// 4. Trailing syntax
+    ///
+    var regex: Regex<(Substring, Substring, Substring, Substring)>
+    
+    var fullRange: NSTextRange?
+    
+    enum SyntaxType {
+      case bold, italic, boldItalic, strikethrough, highlight, inlineCode
+    }
+    
+    func withUpdatedRange(_ newRange: NSTextRange) -> InlineSymmetrical {
+      var updated = self
+      updated.fullRange = newRange
+      return updated
+    }
+    
+    
+    static let bold = InlineSymmetrical(
+      type: .bold,
+      regex: /\*\*[^\*]*?\*\*/,
+      fullRange: nil
+    )
+    
+    
+    
+    
+  }
+  
+}
+
+
 
 /// In keeping with Apple's convention, my idea of `Syntax` ==  their idea of `PresentationIntent.Kind`
 /// My idea of `Structure` ==  their idea of `PresentationIntent` vs `InlinePresentationIntent`
@@ -237,54 +347,5 @@ public struct EditorConfiguration: Sendable, Equatable {
   }
 }
 
-
-public struct MarkdownEditorConfiguration: Sendable {
-  public var fontSize: Double
-  public var fontWeight: NSFont.Weight
-  public var insertionPointColour: Color
-  public var codeColour: Color
-  public var paddingX: Double
-  public var paddingY: Double
-  
-  public init(
-    fontSize: Double = MarkdownDefaults.fontSize,
-    fontWeight: NSFont.Weight = MarkdownDefaults.fontWeight,
-    insertionPointColour: Color = .blue,
-    codeColour: Color = .primary.opacity(0.7),
-    paddingX: Double = MarkdownDefaults.paddingX,
-    paddingY: Double = MarkdownDefaults.paddingY
-  ) {
-    self.fontSize = fontSize
-    self.fontWeight = fontWeight
-    self.insertionPointColour = insertionPointColour
-    self.codeColour = codeColour
-    self.paddingX = paddingX
-    self.paddingY = paddingY
-  }
-}
-
-
-
-public struct MarkdownDefaults: Sendable {
-  
-  @MainActor public static let defaultFont =               NSFont.systemFont(ofSize: MarkdownDefaults.fontSize, weight: MarkdownDefaults.fontWeight)
-  public static let fontSize:                 Double = 15
-  public static let fontWeight:               NSFont.Weight = .regular
-  public static let fontOpacity:              Double = 0.85
-  
-  public static let headerSyntaxSize:         Double = 20
-  
-  public static let fontSizeMono:             Double = 14.5
-  
-  public static let syntaxAlpha:              Double = 0.3
-  public static let backgroundInlineCode:     Double = 0.2
-  public static let backgroundCodeBlock:      Double = 0.4
-  
-  public static let lineSpacing:              Double = 6
-  public static let paragraphSpacing:         Double = 0
-  
-  public static let paddingX: Double = 30
-  public static let paddingY: Double = 30
-}
 
 

@@ -21,9 +21,9 @@ extension MarkdownTextView {
     self.parsingTask = Task {
       
       tcm.performEditingTransaction {
-        for element in self.elements where element.range.intersects(viewportRange) {
-          tlm.setRenderingAttributes(element.type.contentAttributes, for: element.range)
-        }
+//        for element in self.elements where element.range.intersects(viewportRange) {
+//          tlm.setRenderingAttributes(element.type.contentAttributes, for: element.range)
+//        }
       } // END perform editing
     } // END task
   }
@@ -54,9 +54,9 @@ extension MarkdownTextView {
             textContentManager: tcm
           )
           
-          newElements.forEach { self.addElement($0) }
+//          newElements.forEach { self.addElement($0) }
         }
-        self.elements.sort { $0.range.location.compare($1.range.location) == .orderedAscending }
+//        self.elements.sort { $0.range.location.compare($1.range.location) == .orderedAscending }
       } // END task
     }
     
@@ -152,10 +152,10 @@ extension String {
       
       guard let matchTextRange = NSTextRange(offsetRange, in: tcm) else { continue }
       
-      if isValidMarkdownElement(syntax: syntax, match: match) {
-        let element = Markdown.Element(type: syntax, range: matchTextRange)
-        elements.append(element)
-      }
+//      if isValidMarkdownElement(syntax: syntax, match: match) {
+//        let element = Markdown.Element(type: syntax, range: matchTextRange)
+//        elements.append(element)
+//      }
     }
     
     return elements
