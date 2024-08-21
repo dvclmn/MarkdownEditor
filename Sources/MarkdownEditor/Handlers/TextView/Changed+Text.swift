@@ -19,7 +19,7 @@ extension MarkdownTextView {
 
       try await Task.sleep(for: .seconds(0.1))
       
-//      await self.applyMarkdownStyles()
+      await self.applyMarkdownStyles()
       
       let info = self.generateTextInfo()
       await infoHandler.update(info)
