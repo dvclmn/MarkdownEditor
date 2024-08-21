@@ -8,7 +8,6 @@
 import SwiftUI
 import RegexBuilder
 
-public typealias AnyMarkdownElement = (any MarkdownElement)
 
 
 

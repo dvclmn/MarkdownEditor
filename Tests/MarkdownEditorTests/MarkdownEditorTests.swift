@@ -67,7 +67,7 @@ struct MarkdownTextViewTests {
     
     print("Average parse duration: \(averageDuration) seconds")
     
-//    printValue(textView.elements, keyPaths: [\.type, \.range])
+//    printCollection(textView.elements, keyPaths: [\.type, \.range])
     
     #expect(!textView.elements.isEmpty)
 //    #expect(textView.elements.count == 2)

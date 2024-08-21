@@ -8,6 +8,9 @@
 import Foundation
 import AppKit
 
+public typealias AnyMarkdownElement = (any MarkdownElement)
+
+
 public protocol MarkdownElement: Sendable {
   
   associatedtype MarkdownRegexOutput

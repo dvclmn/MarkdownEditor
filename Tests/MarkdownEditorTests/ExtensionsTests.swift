@@ -18,7 +18,7 @@ import Logging
 
 extension MarkdownTextViewTests {
   
-  @Test("Finds markdown matches at all", .disabled())
+  @Test("Finds markdown matches at all")
   func findMarkdownMatches() async {
     guard let tcm = textView.textLayoutManager?.textContentManager else { return }
     
@@ -27,11 +27,7 @@ extension MarkdownTextViewTests {
     var elements: [AnyMarkdownElement] = []
     
     elements = exampleString02.markdownMatches(of: Markdown.InlineSymmetrical.bold, textContentManager: tcm)
-    
-//    printValue(elements, keyPaths: [\.range, \.type])
-    
-    
-    
+
   }
   
 }

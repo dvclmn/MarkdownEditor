@@ -47,13 +47,13 @@ extension MarkdownTextView {
 extension EditorInfo.Selection {
   public var summary: String {
     
-    let formattedSyntaxNames: String = selectedElement.map { syntax in
-      syntax.type.name
-    }.joined(separator: ", ")
+//    let formattedSyntaxNames: String = selectedElement.map { syntax in
+//      syntax.regex
+//    }.joined(separator: ", ")
     
     return """
       Selection: \(selection)
-      Selected Syntax: [\(formattedSyntaxNames)]
+      Selected Syntax: [\\(formattedSyntaxNames)]
       Line: \(location?.line.description ?? "nil"), Column: \(location?.column.description ?? "nil")
       """
   }
