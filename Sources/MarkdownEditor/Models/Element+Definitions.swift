@@ -5,6 +5,23 @@
 //  Created by Dave Coleman on 21/8/2024.
 //
 
+extension Markdown {
+  public static let allSyntax: [AnyMarkdownElement] = [
+    Markdown.Heading.heading1,
+    Markdown.Heading.heading2,
+    Markdown.Heading.heading3,
+    Markdown.Heading.heading4,
+    Markdown.Heading.heading5,
+    Markdown.Heading.heading6,
+    
+    Markdown.InlineSymmetrical.bold,
+    Markdown.InlineSymmetrical.italic,
+    Markdown.InlineSymmetrical.boldItalic,
+    Markdown.InlineSymmetrical.inlineCode,
+    Markdown.InlineSymmetrical.strikethrough
+  ]
+}
+
 extension Markdown.Heading {
   
   public static let heading1 = Markdown.Heading(

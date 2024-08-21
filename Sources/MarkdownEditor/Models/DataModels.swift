@@ -103,12 +103,12 @@ public extension Markdown {
 
 public struct Markdown {
 
-  struct Element: Sendable {
-    var type: Markdown.Syntax
-    nonisolated(unsafe) var fullRange: NSTextRange
-    
-    
-  }
+//  struct Element: Sendable {
+//    var type: AnyMarkdownElement
+//    nonisolated(unsafe) var fullRange: NSTextRange
+//    
+//    
+//  }
   
 }
 
