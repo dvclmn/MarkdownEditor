@@ -44,10 +44,11 @@ extension MarkdownTextView {
     textContainer?.lineFragmentPadding = self.configuration.insets
     textContainerInset = NSSize(width: 0, height: self.configuration.insets)
     
-    let attributes = self.configuration.attributes
+    let renderingAttributes = self.configuration.renderingAttributes
+    let fontAttributes = self.configuration.fontAttributes
 
-    typingAttributes = attributes.getAttributes() ?? [:]
-    defaultParagraphStyle = attributes.paragraphStyle
+    typingAttributes = renderingAttributes.getAttributes() ?? [:]
+    defaultParagraphStyle = fontAttributes.paragraphStyle
 
   }
 }

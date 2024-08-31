@@ -34,7 +34,7 @@ extension MarkdownTextView {
           let tcs = self.textContentStorage,
           let viewportRange = tlm.textViewportLayoutController.viewportRange,
           let viewportString = tcm.attributedString(in: viewportRange)?.string
-
+            
     else { return }
     
     /// Whilst this is 'only' the viewport range, we can/should squeeze out more
@@ -49,12 +49,12 @@ extension MarkdownTextView {
       
       tcm.performEditingTransaction {
         
-
+        
         let removableRenderingAttributes: [Attributes.Key] = [
           .foregroundColor,
           .backgroundColor
         ]
-
+        
         /// I need to verify whether I treat certain attributes differently, based
         /// on whether they are rendering vs
         for attribute in removableRenderingAttributes {
@@ -67,8 +67,17 @@ extension MarkdownTextView {
         /// specified range (`NSRange`).
         ///
         tcs.textStorage?.removeAttribute(.font, range: nsViewportRange)
-
-
+        
+        guard let defaultFontAttributes = self.configuration.fontAttributes.getAttributes(),
+              let defaultRenderingAttributes = self.configuration.renderingAttributes.getAttributes()
+        else { break }
+        
+        tcs.textStorage?.addAttributes(defaultFontAttributes, range: contentNSRange)
+        
+        let contentNSRange = NSRange(markdownNSTextRange.content, in: tcm)
+        
+        tlm.setRenderingAttributes(defaultRenderingAttributes, for: viewportRange)
+        
         /// What am I trying to do?
         /// 1. The app starts, text is there, should be styled via a first pass
         /// 2. I think the code should know what markdown syntax the user's
@@ -89,27 +98,30 @@ extension MarkdownTextView {
           ) else { break }
           
           guard markdownNSTextRange.content.intersects(viewportRange) else { break }
-                
-          let contentNSRange = NSRange(markdownNSTextRange.content, in: tcm)
-          
-//          print("Text range, for rendering attributes: \(markdownNSTextRange.content)")
-          
-//          tcs.textStorage?.invalidateAttributes(in: contentNSRange)
-          
-//          tcs.textStorage?.removeAttribute(.font, range: contentNSRange)
-          
-          guard let attributes = self.configuration.attributes.getAttributes() else { break }
-          
-          tcs.textStorage?.addAttributes(attributes, range: contentNSRange)
-          
-          tcs.textStorage?.addAttributes(element.syntax.contentAttributes, range: contentNSRange)
           
           
-//          tlm.setRenderingAttributes(element.syntax.contentAttributes, for: markdownNSTextRange.content)
-//          tlm.setRenderingAttributes(element.syntax.syntaxAttributes, for: markdownNSTextRange.leading)
-//          tlm.setRenderingAttributes(element.syntax.syntaxAttributes, for: markdownNSTextRange.trailing)
           
-//          tcm.attributedString(in: markdownNSTextRange.content).attr
+          //          print("Text range, for rendering attributes: \(markdownNSTextRange.content)")
+          
+          //          tcs.textStorage?.invalidateAttributes(in: contentNSRange)
+          
+          //          tcs.textStorage?.removeAttribute(.font, range: contentNSRange)
+          
+         
+          
+          if let fontAttributes = element.syntax.contentFontAttributes {
+            tcs.textStorage?.addAttributes(fontAttributes, range: contentNSRange)
+          }
+          
+          tlm.setRenderingAttributes(element.syntax.contentRenderingAttributes, for: markdownNSTextRange.content)
+          
+          
+          
+          //          tlm.setRenderingAttributes(element.syntax.contentAttributes, for: markdownNSTextRange.content)
+          //          tlm.setRenderingAttributes(element.syntax.syntaxAttributes, for: markdownNSTextRange.leading)
+          //          tlm.setRenderingAttributes(element.syntax.syntaxAttributes, for: markdownNSTextRange.trailing)
+          
+          //          tcm.attributedString(in: markdownNSTextRange.content).attr
           
           
           
@@ -125,9 +137,7 @@ extension MarkdownTextView {
   func parseMarkdown(
     in range: NSTextRange? = nil
   ) async {
-    
-//    printHeader("Let's parse markdown", diagnostics: .init())
-    
+
     guard let tlm = self.textLayoutManager,
           let tcm = tlm.textContentManager
     else { return }
@@ -155,11 +165,8 @@ extension MarkdownTextView {
       }
     } // END task
     
-//    printCollection(elements, keyPaths: [\.range.description, \.syntax.name])
-    
     await self.parsingTask?.value
     
-//    printFooter("Finished parsing markdown")
   }
 }
 
@@ -170,7 +177,7 @@ extension String {
     in range: NSTextRange? = nil,
     textContentManager tcm: NSTextContentManager
   ) -> [Markdown.Element] {
-
+    
     var elements: [Markdown.Element] = []
     
     /// If no range is supplied, we default to the `documentRange`
@@ -199,88 +206,47 @@ extension String {
     ///
     for match in self[stringRange].matches(of: syntax.regex) {
       
-      /// Get whole match, as `Range<String.Index>`
-      let overallRange = match.range
       
-      /// `output` is of type `MarkdownRegex.RegexOutput`
-      let output = match.output
+      let finalRange: MarkdownRange = getMarkdownRange(in: match)
       
-      // Calculate the ranges for leading, content, and trailing
-      let leadingEndIndex = self.index(overallRange.lowerBound, offsetBy: output.leading.count)
-      let leadingRange = overallRange.lowerBound..<leadingEndIndex
-      
-      let contentEndIndex = self.index(leadingEndIndex, offsetBy: output.content.count)
-      let contentRange = leadingEndIndex..<contentEndIndex
-      
-      let trailingRange = contentEndIndex..<overallRange.upperBound
-
-      let markdownRange: MarkdownRange = (
-        leading: leadingRange,
-        content: contentRange,
-        trailing: trailingRange
-      )
-      
-//      let contentMatch = match.output.content
-      
-//      let range = match.range
-      
-      // Now you can use this markdownRange to create your Markdown.Element
-       let element = Markdown.Element(syntax: syntax, range: markdownRange)
-       elements.append(element)
-
+      let element = Markdown.Element(syntax: syntax, range: finalRange)
+      elements.append(element)
       
       
-      print("Match: \(match)")
-//      let range: Range<String.Index> = match.range
       
-//      let newElement = Markdown.Element(syntax: syntax, range: range)
-      
-//      elements.append(newElement)
-      
-      let headerInfo: String = """
-      Content match: \\(String(contentMatch))
-      Syntax: \\(newElement.syntax.name)
-      """
-      
-//      print(match.boxedDescription(header: headerInfo))
-      
-    }
-    
-    //    var elements: [Markdown.Element] = []
-    
-    
-//    switch element {
-//      case let heading as Markdown.Heading:
-//        for match in self[stringRange].matches(of: heading.regex) {
-//          
-//          print(match.prettyDescription)
-//          
-//          
-//          
-//          
-//        }
-//        
-//      case let inlineSymmetrical as Markdown.InlineSymmetrical:
-//        for match in self[stringRange].matches(of: inlineSymmetrical.regex) {
-//          
-//          //          let (fullMatch, leadingSyntax, content, trailingSyntax) = match.output
-//          
-//          print(match.prettyDescription)
-//        }
-//        
-//      default:
-//        // Handle unknown types or provide a default behavior
-//        print("Unknown MarkdownElement type")
-//    }
-    
-    
-//    print("Finished this function")
-    
-        print("Here are the elements: \(elements)")
-    
-//    printFooter()
+    } // END loop over string matches
     
     return elements
+    
+  } // END markdownMatches
+  
+  func getMarkdownRange(in match: Regex<MarkdownRegex.RegexOutput>.Match) -> MarkdownRange {
+    
+    /// Get whole match, as `Range<String.Index>`
+    let fullRange = match.range
+    
+    /// `output` is of type `MarkdownRegex.RegexOutput`
+    let output = match.output
+    
+    /// Calculate the indices/ranges for leading, content, and trailing
+    ///
+    /// Indices in `String.Index` format, ranges as `Range<String.Index>`
+    ///
+    let leadingEndIndex = self.index(fullRange.lowerBound, offsetBy: output.leading.count)
+    let leadingRange = fullRange.lowerBound..<leadingEndIndex
+    
+    let contentEndIndex = self.index(leadingEndIndex, offsetBy: output.content.count)
+    let contentRange = leadingEndIndex..<contentEndIndex
+    
+    let trailingRange = contentEndIndex..<fullRange.upperBound
+    
+    let markdownRange: MarkdownRange = (
+      leading: leadingRange,
+      content: contentRange,
+      trailing: trailingRange
+    )
+    
+    return markdownRange
     
   }
   

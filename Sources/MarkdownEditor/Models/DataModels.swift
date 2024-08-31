@@ -23,45 +23,39 @@ extension NSParagraphStyle: @unchecked @retroactive Sendable {
   
 }
 
-
-
-/// In keeping with Apple's convention, my idea of `Syntax` ==  their idea of `PresentationIntent.Kind`
-/// My idea of `Structure` ==  their idea of `PresentationIntent` vs `InlinePresentationIntent`
-///
-/// I think `PresentationIntent.IntentType` exists because a *block* type of structure can contain other elements
-/// Hence why `PresentationIntent` ships with this property `components`:
-/// `public var components: [PresentationIntent.IntentType]`
-
-//public protocol MarkdownElement: Equatable {
-//  var type: Markdown.Syntax { get set }
-//  var range: NSTextRange { get set }
-//}
-//
-//public typealias Markdown.Element = (any MarkdownElement)
-
-
-
-// TODO: Shortcut to move lines up aND DOWN
-
-//public protocol MarkdownSyntax: Equatable, Sendable {
-//
-//  associatedtype RegexOutput
-//  associatedtype Structure
-//
-//  var name: String { get }
-//  var regex: Regex<RegexOutput> { get }
-//  var structure: Structure { get }
-//  var contentAttributes: AttributeSet { get }
-//  var syntaxAttributes: AttributeSet { get }
-//}
-
 public typealias MarkdownRegexOutput = Regex<Substring>
-
-
 
 public struct Markdown {
 
 }
+
+
+public enum LanguageHint: String, CaseIterable, Sendable {
+  case swift
+  case python
+  case rust
+  case go
+  
+  public var string: String {
+    self.rawValue
+  }
+  
+  public var intentIdentifier: Int {
+    switch self {
+      case .swift:
+        1
+      case .python:
+        2
+      case .rust:
+        3
+      case .go:
+        4
+    }
+  }
+}
+
+
+
 
 
 
@@ -124,32 +118,6 @@ public struct Markdown {
 ///
 /// Others, such as [links](http://link.com), require three capture groups: `Regex<(Substring, Substring, Substring)>`. One for the label, one for the link, and one for the syntax characters.
 ///
-
-
-public enum LanguageHint: String, CaseIterable, Sendable {
-  case swift
-  case python
-  case rust
-  case go
-  
-  public var string: String {
-    self.rawValue
-  }
-  
-  public var intentIdentifier: Int {
-    switch self {
-      case .swift:
-        1
-      case .python:
-        2
-      case .rust:
-        3
-      case .go:
-        4
-    }
-  }
-}
-
 
 
 

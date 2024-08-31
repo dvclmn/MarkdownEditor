@@ -64,22 +64,22 @@ extension EditorInfo.Selection {
   }
 }
 
-
-extension Markdown.Element {
-  func isSelected(
-    tlm: NSTextLayoutManager
-  ) -> Bool {
-    
-    /// To get `Range<String.Index>` and `any NSTextLocation`
-    /// to work together here, I will need to supply the original string they
-    /// were in, as a reference point — I think.
-    
-    let location = tlm.insertionPointLocations
-    
-    self.range.content
-    
-  }
-}
+//
+//extension Markdown.Element {
+//  func isSelected(
+//    tlm: NSTextLayoutManager
+//  ) -> Bool {
+//    
+//    /// To get `Range<String.Index>` and `any NSTextLocation`
+//    /// to work together here, I will need to supply the original string they
+//    /// were in, as a reference point — I think.
+//    
+//    let location = tlm.insertionPointLocations
+//    
+//    self.range.content
+//    
+//  }
+//}
 
 extension MarkdownTextView {
   

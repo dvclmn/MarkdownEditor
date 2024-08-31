@@ -11,7 +11,8 @@ import SwiftUI
 
 public struct MarkdownEditorConfiguration: Sendable, Equatable {
   
-  public var attributes: AttributeContainer
+  public var fontAttributes: AttributeContainer
+  public var renderingAttributes: AttributeContainer
   
   public var insertionPointColour: Color
   public var codeColour: Color
@@ -20,7 +21,8 @@ public struct MarkdownEditorConfiguration: Sendable, Equatable {
   public var insets: CGFloat
   
   public init(
-    attributes: AttributeContainer = .markdownEditorDefaults,
+    fontAttributes: AttributeContainer = .markdownFontDefaults,
+    renderingAttributes: AttributeContainer = .markdownRenderingDefaults,
     
     insertionPointColour: Color = .blue,
     codeColour: Color = .primary.opacity(0.7),
@@ -29,7 +31,8 @@ public struct MarkdownEditorConfiguration: Sendable, Equatable {
     isShowingFrames: Bool = false,
     insets: CGFloat = 20
   ) {
-    self.attributes = attributes
+    self.fontAttributes = fontAttributes
+    self.renderingAttributes = renderingAttributes
     
     self.insertionPointColour = insertionPointColour
     self.codeColour = codeColour
@@ -40,8 +43,16 @@ public struct MarkdownEditorConfiguration: Sendable, Equatable {
 }
 
 public extension AttributeContainer {
-  static var markdownEditorDefaults: AttributeContainer {
-    
+  
+  static var markdownRenderingDefaults: AttributeContainer {
+
+    var container = AttributeContainer()
+    container.foregroundColor = NSColor.textColor
+
+    return container
+  }
+  
+  static var markdownFontDefaults: AttributeContainer {
     
     let paragraphStyle = NSMutableParagraphStyle()
     
@@ -50,7 +61,6 @@ public extension AttributeContainer {
     
     var container = AttributeContainer()
     
-    container.foregroundColor = NSColor.textColor
     container.paragraphStyle = paragraphStyle
     container.font = MarkdownDefaults.defaultFont
     

@@ -66,34 +66,67 @@ public extension Markdown.Syntax {
     }
   }
 
-  var contentAttributes: Attributes {
+  var contentFontAttributes: Attributes? {
+    
+    switch self {
+        
+      case .heading:
+        return [
+          .font: NSFont.systemFont(ofSize: self.fontSize, weight: .medium),
+        ]
+        
+      case .bold:
+        return [
+          .font: NSFont.systemFont(ofSize: self.fontSize, weight: .bold),
+        ]
+        
+      case .italic:
+        let bodyDescriptor = NSFontDescriptor.preferredFontDescriptor(forTextStyle: .body)
+        let italicDescriptor = bodyDescriptor.withSymbolicTraits(.italic)
+        let mediumWeightDescriptor = italicDescriptor.addingAttributes([
+          .traits: [
+            NSFontDescriptor.TraitKey.weight: NSFont.Weight.medium
+          ]
+        ])
+        let font = NSFont(descriptor: mediumWeightDescriptor, size: self.fontSize)
+        return [
+          .font: font as Any,
+        ]
+        
+      case .boldItalic:
+        
+        return [
+          .font: NSFont.systemFont(ofSize: self.fontSize, weight: .bold),
+        ]
+        
+      case .inlineCode, .codeBlock:
+        return [
+          .font: NSFont.monospacedSystemFont(ofSize: self.fontSize, weight: .medium)
+        ]
+      
+      case .link, .image, .list, .strikethrough, .horizontalRule, .highlight, .quoteBlock:
+        return nil
+    }
+  }
+  var contentRenderingAttributes: Attributes {
         
         switch self {
             
           case .heading:
             return [
-              .font: NSFont.systemFont(ofSize: self.fontSize, weight: .medium),
               .foregroundColor: NSColor.systemCyan
             ]
             
           case .bold:
             return [
-              .font: NSFont.systemFont(ofSize: self.fontSize, weight: .bold),
+
               .foregroundColor: self.foreGroundColor,
               .backgroundColor: NSColor.clear
             ]
             
           case .italic:
-            let bodyDescriptor = NSFontDescriptor.preferredFontDescriptor(forTextStyle: .body)
-            let italicDescriptor = bodyDescriptor.withSymbolicTraits(.italic)
-            let mediumWeightDescriptor = italicDescriptor.addingAttributes([
-              .traits: [
-                NSFontDescriptor.TraitKey.weight: NSFont.Weight.medium
-              ]
-            ])
-            let font = NSFont(descriptor: mediumWeightDescriptor, size: self.fontSize)
+            
             return [
-              .font: font as Any,
               .foregroundColor: self.foreGroundColor,
               .backgroundColor: NSColor.clear
             ]
@@ -122,21 +155,16 @@ public extension Markdown.Syntax {
             
           case .inlineCode:
             return [
-              .font: NSFont.monospacedSystemFont(ofSize: self.fontSize, weight: .medium),
               .foregroundColor: self.foreGroundColor,
               .backgroundColor: NSColor.black.withAlphaComponent(MarkdownDefaults.backgroundInlineCode)
             ]
           case .codeBlock:
             return [
-              .font: NSFont.monospacedSystemFont(ofSize: self.fontSize, weight: .medium),
               .foregroundColor: self.foreGroundColor,
-              //          .backgroundColor: NSColor.black.withAlphaComponent(MarkdownDefaults.backgroundCodeBlock)
             ]
             
           case .quoteBlock:
             return [
-              //               .font: NSFont.monospacedSystemFont(ofSize: self.fontSize, weight: .medium),
-              //               .foregroundColor: self.foreGroundColor,
               .backgroundColor: NSColor.black.withAlphaComponent(MarkdownDefaults.backgroundCodeBlock)
             ]
             
