@@ -93,37 +93,6 @@ extension MarkdownTextView {
     self.viewportLayoutController = NSTextViewportLayoutController(textLayoutManager: textLayoutManager)
     self.viewportLayoutController?.delegate = viewportDelegate
   }
-
-  func testStyles() {
-    
-    guard let tlm = self.textLayoutManager,
-          let tcm = tlm.textContentManager,
-          let tcs = self.textContentStorage
-    else { return }
-    
-    let documentRange = tlm.documentRange
-    
-    var codeBlockCount = 0
-    
-    // Enumerate through text paragraphs
-    tcm.enumerateTextElements(from: documentRange.location, options: []) { textElement in
-      guard let paragraph = textElement as? NSTextParagraph else { return true }
-      
-      // Get the content of the paragraph
-      let paragraphRange = paragraph.elementRange
-      guard let content = tcm.attributedString(in: paragraphRange)?.string else { return true }
-      
-      // Check if the paragraph starts with three backticks
-      if content.hasPrefix("```") {
-        codeBlockCount += 1
-      }
-      
-      return true
-    }
-    tcm.performEditingTransaction {
-      
-    }
-  }
   
   
   
