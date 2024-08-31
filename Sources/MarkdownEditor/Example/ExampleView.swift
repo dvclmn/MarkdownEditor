@@ -6,8 +6,6 @@
 //
 
 import SwiftUI
-import Scrolling
-import Geometry
 
 struct ExampleView: View {
   

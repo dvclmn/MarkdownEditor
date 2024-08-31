@@ -7,6 +7,7 @@
 
 import AppKit
 import BaseHelpers
+import STTextKitPlus
 import TextCore
 
 extension MarkdownTextView {

@@ -9,7 +9,6 @@ import Foundation
 import SwiftUI
 import Testing
 import XCTest
-import Logging
 
 @testable import MarkdownEditor
 

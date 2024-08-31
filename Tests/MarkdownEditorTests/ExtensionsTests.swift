@@ -10,8 +10,6 @@ import SwiftUI
 import Testing
 import BaseHelpers
 
-import Logging
-
 @testable import MarkdownEditor
 
 
