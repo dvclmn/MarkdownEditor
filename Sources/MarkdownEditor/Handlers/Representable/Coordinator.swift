@@ -25,6 +25,7 @@ public extension MarkdownEditor {
     init(_ parent: MarkdownEditor) {
       self.parent = parent
     }
+    
         
     public func textDidChange(_ notification: Notification) {
       
@@ -34,6 +35,12 @@ public extension MarkdownEditor {
       
       self.parent.text = textView.string
       self.selectedRanges = textView.selectedRanges
+      
+      print("`func textDidChange` — at \(Date.now)")
+      
+      Task { @MainActor in
+        await textView.applyMarkdownStyles()
+      }
       
       /// I have learned, and need to remember, that this `Coordinator` is
       /// a delegate, for my ``MarkdownTextView``. Which means I can take

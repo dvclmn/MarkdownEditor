@@ -47,13 +47,13 @@ extension MarkdownTextView {
     self.parsingTask?.cancel()
     self.parsingTask = Task {
       
+      let removableRenderingAttributes: [Attributes.Key] = [
+        .foregroundColor,
+        .backgroundColor
+      ]
+
+
       tcm.performEditingTransaction {
-        
-        
-        let removableRenderingAttributes: [Attributes.Key] = [
-          .foregroundColor,
-          .backgroundColor
-        ]
         
         /// I need to verify whether I treat certain attributes differently, based
         /// on whether they are rendering vs
@@ -70,13 +70,15 @@ extension MarkdownTextView {
         
         guard let defaultFontAttributes = self.configuration.fontAttributes.getAttributes(),
               let defaultRenderingAttributes = self.configuration.renderingAttributes.getAttributes()
-        else { break }
+        else { return }
         
-        tcs.textStorage?.addAttributes(defaultFontAttributes, range: contentNSRange)
-        
-        let contentNSRange = NSRange(markdownNSTextRange.content, in: tcm)
         
         tlm.setRenderingAttributes(defaultRenderingAttributes, for: viewportRange)
+
+        tcs.textStorage?.addAttributes(defaultFontAttributes, range: nsViewportRange)
+        
+        
+
         
         /// What am I trying to do?
         /// 1. The app starts, text is there, should be styled via a first pass
@@ -99,7 +101,7 @@ extension MarkdownTextView {
           
           guard markdownNSTextRange.content.intersects(viewportRange) else { break }
           
-          
+          let contentNSRange = NSRange(markdownNSTextRange.content, in: tcm)
           
           //          print("Text range, for rendering attributes: \(markdownNSTextRange.content)")
           
@@ -115,7 +117,7 @@ extension MarkdownTextView {
           
           tlm.setRenderingAttributes(element.syntax.contentRenderingAttributes, for: markdownNSTextRange.content)
           
-          
+
           
           //          tlm.setRenderingAttributes(element.syntax.contentAttributes, for: markdownNSTextRange.content)
           //          tlm.setRenderingAttributes(element.syntax.syntaxAttributes, for: markdownNSTextRange.leading)
@@ -125,8 +127,8 @@ extension MarkdownTextView {
           
           
           
-          
-        }
+        } // END loop over elements
+
       } // END perform editing
     } // END task
   }

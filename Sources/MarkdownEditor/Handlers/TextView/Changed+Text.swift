@@ -14,21 +14,18 @@ extension MarkdownTextView {
     
     super.didChangeText()
     
-
+    print("`override func didChangeText()` — at \(Date.now)")
+    
     Task { @MainActor in
-
-      try await Task.sleep(for: .seconds(0.1))
       
-      await self.applyMarkdownStyles()
+//      await self.applyMarkdownStyles()
       
       let info = self.generateTextInfo()
       await infoHandler.update(info)
-      
 
     }
     
     Task {
-      // TODO: Consider adding a debounce to this as well as all the rest
       await self.parseMarkdown()
     }
   }
