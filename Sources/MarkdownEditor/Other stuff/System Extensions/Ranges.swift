@@ -14,9 +14,17 @@ import AppKit
 /// Having this here (at least for now) seems to avoid conflicts between `STTextKitPlus`
 /// and `Rearrange`.
 ///
+
+
+
+
 public extension Range where Bound == String.Index {
-  
-  func textRange(in string: String, provider: NSTextElementProvider) -> NSTextRange? {
+
+  func textRange(
+    in string: String,
+    syntax: Markdown.Syntax,
+    provider: NSTextElementProvider
+  ) -> NSTextRange? {
     
     // Check if the range is valid for the given string
     guard self.lowerBound >= string.startIndex && self.upperBound <= string.endIndex else {

@@ -36,12 +36,16 @@ extension MarkdownTextView {
         
         for element in self.elements {
           
-          guard let textRange = element.range.textRange(in: viewportString, provider: tcm),
-                textRange.intersects(viewportRange)
+          guard let markdownNSTextRange = element.nsTextRange(element.range, in: viewportString, syntax: element.syntax, provider: tcm),
+                markdownNSTextRange.content.intersects(viewportRange)
+                
           else { break }
           
-          print("Text range, for rendering attributes: \(textRange)")
-          tlm.setRenderingAttributes(element.syntax.contentAttributes, for: textRange)
+          print("Text range, for rendering attributes: \(markdownNSTextRange.content)")
+          
+          tlm.setRenderingAttributes(element.syntax.contentAttributes, for: markdownNSTextRange.content)
+          tlm.setRenderingAttributes(element.syntax.syntaxAttributes, for: markdownNSTextRange.leading)
+          tlm.setRenderingAttributes(element.syntax.syntaxAttributes, for: markdownNSTextRange.trailing)
           
           
         }
@@ -98,36 +102,68 @@ extension String {
     in range: NSTextRange? = nil,
     textContentManager tcm: NSTextContentManager
   ) -> [Markdown.Element] {
-    
 
-//    printHeader("Let's find markdown elements in a string: \(self.prefix(20))...", value: syntax, diagnostics: .init())
-    
     var elements: [Markdown.Element] = []
     
     /// If no range is supplied, we default to the `documentRange`
     ///
     let textRange = range ?? tcm.documentRange
     
+    /// This uses a custom init from `STTextKitPlus`, to get an
+    /// `NSRange` from a `NSTextRange`
+    ///
     let nsRange = NSRange(textRange, in: tcm)
     
+    /// Gets `stringRange`, of type `Range<String.Index>`
+    ///
     guard let stringRange = nsRange.range(in: self) else {
       print("Couldn't get `Range<String.Index>` from NSRange")
       return []
     }
     
+    /// `match` here gives us this rather complex type:
+    /// `Regex<Regex<(Substring, leading: Substring, content: Substring, trailing: Substring)>.RegexOutput>.Match`
+    ///
     for match in self[stringRange].matches(of: syntax.regex) {
       
-      let contentMatch = match.output.content
+      let overallRange = match.range
+      let output = match.output
       
-      let range = match.range
+      // Calculate the ranges for leading, content, and trailing
+      let leadingEndIndex = self.index(overallRange.lowerBound, offsetBy: output.leading.count)
+      let leadingRange = overallRange.lowerBound..<leadingEndIndex
       
-      let newElement = Markdown.Element(syntax: syntax, range: range)
+      let contentEndIndex = self.index(leadingEndIndex, offsetBy: output.content.count)
+      let contentRange = leadingEndIndex..<contentEndIndex
       
-      elements.append(newElement)
+      let trailingRange = contentEndIndex..<overallRange.upperBound
+
+      let markdownRange: MarkdownRange = (
+        leading: leadingRange,
+        content: contentRange,
+        trailing: trailingRange
+      )
+      
+//      let contentMatch = match.output.content
+      
+//      let range = match.range
+      
+      // Now you can use this markdownRange to create your Markdown.Element
+       let element = Markdown.Element(syntax: syntax, range: markdownRange)
+       elements.append(element)
+
+      
+      
+      print("Match: \(match)")
+//      let range: Range<String.Index> = match.range
+      
+//      let newElement = Markdown.Element(syntax: syntax, range: range)
+      
+//      elements.append(newElement)
       
       let headerInfo: String = """
-      Content match: \(String(contentMatch))
-      Syntax: \(newElement.syntax.name)
+      Content match: \\(String(contentMatch))
+      Syntax: \\(newElement.syntax.name)
       """
       
 //      print(match.boxedDescription(header: headerInfo))

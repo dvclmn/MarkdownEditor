@@ -5,7 +5,9 @@
 //  Created by Dave Coleman on 20/8/2024.
 //
 
-import RegexBuilder
+//import RegexBuilder
+import Foundation
+import AppKit
 
 public typealias MarkdownRegex = Regex<(
   Substring,
@@ -14,7 +16,40 @@ public typealias MarkdownRegex = Regex<(
   trailing: Substring
 )>
 
-public typealias MarkdownRange = Range<String.Index>
+//public typealias MarkdownRange = Range<String.Index>
+public typealias MarkdownRange = (
+  leading: Range<String.Index>,
+  content: Range<String.Index>,
+  trailing: Range<String.Index>
+)
+
+public typealias MarkdownNSTextRange = (
+  leading: NSTextRange,
+  content: NSTextRange,
+  trailing: NSTextRange
+)
+
+extension Markdown.Element {
+  /// Let's convert `typealias MarkdownRange = (content: Range<String.Index>, syntax: Range<String.Index>)` to a tuple of `NSTextRange`
+  ///
+  public func nsTextRange(
+    _ range: MarkdownRange,
+    in string: String,
+    syntax: Markdown.Syntax,
+    provider: NSTextElementProvider
+  ) -> MarkdownNSTextRange? {
+    
+    guard let content = range.content.textRange(in: string, syntax: syntax, provider: provider),
+          let leading = range.leading.textRange(in: string, syntax: syntax, provider: provider),
+          let trailing = range.trailing.textRange(in: string, syntax: syntax, provider: provider)
+    else { return nil }
+    
+    let result: MarkdownNSTextRange = (leading, content, trailing)
+    
+    return result
+    
+  }
+}
 
 extension Markdown.Syntax {
   
