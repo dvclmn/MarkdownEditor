@@ -6,7 +6,8 @@
 //
 
 import AppKit
-import STTextKitPlus
+import BaseHelpers
+import TextCore
 
 class LineNumberView: NSRulerView {
   

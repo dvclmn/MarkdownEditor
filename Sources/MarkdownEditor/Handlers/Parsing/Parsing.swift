@@ -7,25 +7,7 @@
 
 import AppKit
 import BaseHelpers
-
-extension Range where Bound == String.Index {
-  func textRange(in string: String, provider: NSTextElementProvider) -> NSTextRange? {
-      
-    let documentLocation: NSTextLocation = provider.documentRange.location
-    
-    let oldStart: Int = self.lowerBound.utf16Offset(in: string)
-    let oldEnd: Int = self.upperBound.utf16Offset(in: string)
-    
-    guard let newStart = provider.location?(documentLocation, offsetBy: oldStart),
-    let newEnd = provider.location?(documentLocation, offsetBy: oldEnd)
-    else { return nil }
-    
-    let finalResult = NSTextRange(location: newStart, end: newEnd)
-    
-    return finalResult
-    
-  }
-}
+import TextCore
 
 extension MarkdownTextView {
   
@@ -38,19 +20,24 @@ extension MarkdownTextView {
 
     else { return }
     
-
-    
     self.parsingTask?.cancel()
     self.parsingTask = Task {
       
       tcm.performEditingTransaction {
         
+        let removableAttributes: [Attributes.Key] = [
+          .backgroundColor
+        ]
+
+        for attribute in removableAttributes {
+          tlm.removeRenderingAttribute(attribute, for: viewportRange)
+        }
         
         for element in self.elements {
           
-          guard let textRange = element.range.textRange(in: viewportString, provider: tcm) else { break }
-          
-          guard textRange.intersects(viewportRange) else { break }
+          guard let textRange = element.range.textRange(in: viewportString, provider: tcm),
+                textRange.intersects(viewportRange)
+          else { break }
           
           tlm.setRenderingAttributes(element.syntax.contentAttributes, for: textRange)
         }
@@ -63,6 +50,8 @@ extension MarkdownTextView {
     in range: NSTextRange? = nil
   ) async {
     
+//    printHeader("Let's parse markdown", diagnostics: .init())
+    
     guard let tlm = self.textLayoutManager,
           let tcm = tlm.textContentManager
     else { return }
@@ -71,12 +60,10 @@ extension MarkdownTextView {
     
     self.parsingTask?.cancel()
     
-    
     self.parsingTask = Task {
       
       self.elements.removeAll()
       self.rangeIndex.removeAll()
-      
       
       for syntax in Markdown.Syntax.testCases {
         
@@ -90,13 +77,14 @@ extension MarkdownTextView {
           self.elements.append(element)
         }
       }
-      //        self.elements.sort { $0.range.location.compare($1.range.location) == .orderedAscending }
     } // END task
+    
+    printCollection(elements, keyPaths: [\.range.description, \.syntax.name])
     
     await self.parsingTask?.value
     
+    printFooter("Finished parsing markdown")
   }
-  
 }
 
 extension String {
@@ -108,7 +96,7 @@ extension String {
   ) -> [Markdown.Element] {
     
 
-    printHeader("Let's find markdown elements in a string: \(self.prefix(20))...", value: syntax, diagnostics: .init())
+//    printHeader("Let's find markdown elements in a string: \(self.prefix(20))...", value: syntax, diagnostics: .init())
     
     var elements: [Markdown.Element] = []
     
@@ -123,18 +111,22 @@ extension String {
       return []
     }
     
-    print("Got string range: \(stringRange)")
-    
     for match in self[stringRange].matches(of: syntax.regex) {
+      
       let contentMatch = match.output.content
       
       let range = match.range
       
-      let newElement = Markdown.Element(syntax: syntax, range: match.range)
+      let newElement = Markdown.Element(syntax: syntax, range: range)
       
       elements.append(newElement)
       
-      print(match.boxedDescription(header: "Hello"))
+      let headerInfo: String = """
+      Content match: \(String(contentMatch))
+      Syntax: \(newElement.syntax.name)
+      """
+      
+//      print(match.boxedDescription(header: headerInfo))
       
     }
     

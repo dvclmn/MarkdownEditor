@@ -6,6 +6,51 @@
 ////
 //
 //import SwiftUI
+
+import AppKit
+
+
+
+
+public extension Range where Bound == String.Index {
+  
+  func textRange(in string: String, provider: NSTextElementProvider) -> NSTextRange? {
+    
+    // Check if the range is valid for the given string
+    guard self.lowerBound >= string.startIndex && self.upperBound <= string.endIndex else {
+      print("Range is out of bounds for the given string")
+      return nil
+    }
+    
+    let documentLocation: NSTextLocation = provider.documentRange.location
+    
+//    let oldStart: Int = self.lowerBound.utf16Offset(in: string)
+//    let oldEnd: Int = self.upperBound.utf16Offset(in: string)
+    
+    // Use a safer method to get UTF-16 offsets
+    let oldStart: Int = string.distance(from: string.startIndex, to: self.lowerBound)
+    let oldEnd: Int = string.distance(from: string.startIndex, to: self.upperBound)
+
+    // Ensure offsets are non-negative
+    guard oldStart >= 0 && oldEnd >= 0 else {
+      print("Calculated offsets are negative")
+      return nil
+    }
+
+    
+    guard let newStart = provider.location?(documentLocation, offsetBy: oldStart),
+          let newEnd = provider.location?(documentLocation, offsetBy: oldEnd)
+    else { return nil }
+    
+    let finalResult = NSTextRange(location: newStart, end: newEnd)
+    
+    return finalResult
+    
+  }
+}
+
+
+
 //
 //extension NSTextContentManager {
 //  func range(for textRange: NSTextRange) -> NSRange? {

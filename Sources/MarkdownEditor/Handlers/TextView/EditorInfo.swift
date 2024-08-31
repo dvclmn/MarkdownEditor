@@ -30,6 +30,7 @@ public struct EditorInfo: Sendable {
     //  var selectedRange: NSTextRange?
     var selectedElement: [Markdown.Element] = []
     var location: Location? = nil
+    var scratchPad: String = ""
     
     public struct Location: Sendable {
       var line: Int

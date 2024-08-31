@@ -7,6 +7,8 @@
 
 import AppKit
 import Foundation
+import BaseHelpers
+import TextCore
 
 public struct MarkdownDefaults: Sendable {
   

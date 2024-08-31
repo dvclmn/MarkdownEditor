@@ -56,7 +56,7 @@ extension MarkdownTextView {
     
     
     guard let tlm = self.textLayoutManager,
-          let tcm = tlm.textContentManager,
+//          let tcm = tlm.textContentManager,
           let viewportRange = tlm.textViewportLayoutController.viewportRange
     else { return .init() }
     

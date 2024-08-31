@@ -8,6 +8,7 @@
 import Foundation
 import SwiftUI
 import Testing
+import BaseHelpers
 
 import Logging
 
@@ -22,11 +23,11 @@ extension MarkdownTextViewTests {
   func findMarkdownMatches() async {
     guard let tcm = textView.textLayoutManager?.textContentManager else { return }
     
-    textView.string = "Here is one sentence."
+    textView.string = TestStrings.Markdown.anotherMarkdownString
     
-    var elements: [Markdown.Element] = []
+    await textView.parseMarkdown()
     
-    elements = exampleString02.markdownMatches(of: Markdown.Syntax.bold, textContentManager: tcm)
+//    printCollection(textView.elements)
 
   }
   

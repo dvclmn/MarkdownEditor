@@ -55,6 +55,7 @@ extension EditorInfo.Selection {
       Selection: \(selection)
       Selected Syntax: [\\(formattedSyntaxNames)]
       Line: \(location?.line.description ?? "nil"), Column: \(location?.column.description ?? "nil")
+      Scratch pad: \(scratchPad)
       """
   }
   
@@ -73,6 +74,9 @@ extension MarkdownTextView {
     //    let selectedRange = self.selectedRange()
     let selectedRange = self.selectedTextRange()
     
+    let scratchPad: String = """
+    Typing attributes: \(self.typingAttributes.prettyPrinted(keyPaths: [\.key, \.value]))
+    """
     
     //    guard let selectedLocation = self.selectedTextLocation(),
     //          let textSelections = self.textLayoutManager?.textSelections,
