@@ -9,7 +9,7 @@ import SwiftUI
 
 struct ExampleView: View {
   
-  @State private var text: String = Self.shortSample
+  @State private var text: String = Self.twoInlineCode
   @State private var editorInfo: EditorInfo? = nil
   
   var body: some View {
@@ -57,6 +57,14 @@ struct ExampleView: View {
 }
 
 extension ExampleView {
+  
+  static let twoInlineCode: String = """
+  This brief `inline code`, with text contents, lines `advance expanding` the view in the current writing direction.
+  
+  It does have more than two paragraphs, which I'm hoping will help me to verify that the code is able to count elements of a particular kind of markdown syntax, not just fragments or paragraphs.
+  
+  We'll have to just see if it works.
+  """
   
   static let shortSample: String = """
   This *brief* block quote, with ==text contents==, lines `advance 

@@ -74,16 +74,18 @@ public extension MarkdownEditor {
 //    }
     
     
-    public func textLayoutManager(_ textLayoutManager: NSTextLayoutManager, textLayoutFragmentFor location: NSTextLocation, in textElement: NSTextElement) -> NSTextLayoutFragment {
-      
-      let fragment = CodeBlockBackground(
-        textElement: textElement,
-        range: textElement.elementRange,
-        paragraphStyle: .default
-      )
-      return fragment
+//    public func textLayoutManager(_ textLayoutManager: NSTextLayoutManager, textLayoutFragmentFor location: NSTextLocation, in textElement: NSTextElement) -> NSTextLayoutFragment {
       
       
+
+//      let fragment = CodeBlockBackground(
+//        textElement: textElement,
+//        range: textElement.elementRange,
+//        paragraphStyle: .default
+//      )
+//      return fragment
+//      
+//      
 //      if let markdownElement = textElement as? MarkdownElement {
         
 //        switch markdownElement.syntax {
@@ -105,7 +107,7 @@ public extension MarkdownEditor {
 //        }
 //      }
 //      return NSTextLayoutFragment(textElement: textElement, range: textElement.elementRange)
-    }
+//    }
     
     
     

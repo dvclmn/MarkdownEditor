@@ -48,7 +48,7 @@ extension Markdown {
       
       switch self {
         case .heading(let level):
-          var hashSymbols = String(repeating: "#", count: level)
+          let hashSymbols = String(repeating: "#", count: level)
           return "Heading \(hashSymbols)"
           
         case .bold: return "Bold"

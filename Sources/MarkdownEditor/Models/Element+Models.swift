@@ -8,16 +8,12 @@
 import Foundation
 import AppKit
 
-//public typealias Markdown.Element = (any MarkdownElement)
-
-
 public protocol MarkdownElement: Sendable {
   associatedtype MarkdownRegexOutput
   var regex: Regex<MarkdownRegexOutput> { get }
 }
 
 public protocol MarkdownHeading {
-  
   var level: Int { get }
 }
 

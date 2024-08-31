@@ -8,6 +8,7 @@
 import SwiftUI
 
 extension AttributeContainer {
+  
   func getAttributes<S: AttributeScope>(for scope: KeyPath<AttributeScopes, S.Type>) -> [NSAttributedString.Key: Any]? {
     do {
       return try Dictionary(self, including: scope)
@@ -54,18 +55,19 @@ extension MarkdownTextView {
 //    font = NSFont.systemFont(ofSize: 14, weight: .regular)
 //    textColor = NSColor.textColor
     
-    let paragraphStyle = NSMutableParagraphStyle()
+//    let paragraphStyle = NSMutableParagraphStyle()
+//    
+//    // TODO: Obvs exaggerated value for testing
+//    paragraphStyle.lineHeightMultiple = self.configuration.lineHeight
     
-    // TODO: Obvs exaggerated value for testing
-    paragraphStyle.lineHeightMultiple = 2.0
+    var attributes = self.configuration.attributes
     
-    var attributes = AttributeContainer()
-    attributes.foregroundColor = NSColor.textColor
-    attributes.paragraphStyle = paragraphStyle
-    attributes.font = NSFont.systemFont(ofSize: 15, weight: NSFont.Weight.init(0.0))
+//    attributes.foregroundColor = NSColor.textColor
+//    attributes.paragraphStyle = paragraphStyle
+//    attributes.font = NSFont.systemFont(ofSize: 15, weight: NSFont.Weight.init(0.0))
     
     typingAttributes = attributes.getAttributes() ?? [:]
-    defaultParagraphStyle = paragraphStyle
+    defaultParagraphStyle = attributes.paragraphStyle
 
   }
 }

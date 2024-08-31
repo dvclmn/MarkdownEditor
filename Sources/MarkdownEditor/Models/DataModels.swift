@@ -53,103 +53,11 @@ extension NSTextRange: @unchecked @retroactive Sendable {
 
 public typealias MarkdownRegexOutput = Regex<Substring>
 
-public protocol MarkdownIntent: Equatable, Sendable {
-  associatedtype StructureType
-  var syntax: Markdown.Syntax { get }
-  var type: StructureType { get }
-}
-
-//public typealias AnyMarkdownIntent = (any MarkdownIntent)
-
-public extension Markdown {
-  
-  /// E.g. code blocks, quote blocks, headings
-  ///
-  struct BlockIntent: MarkdownIntent {
-    public var syntax: Markdown.Syntax
-    public var type: PresentationIntent
-  }
-  
-  /// E.g. bold, italic, strikethrough
-  ///
-  struct InlineIntent: MarkdownIntent {
-    public var syntax: Markdown.Syntax
-    public var type: InlinePresentationIntent
-  }
-  
-  
-  /// Usage:
-  /// ```
-  /// let link = MarkdownInlineElement(
-  ///   intent: .link(url: URL(string: "https://example.com")!, title: "Example"),
-  ///   range: NSRange(location: 0, length: 10),
-  ///   additionalInfo: ["url": URL(string: "https://example.com")!, "title": "Example"]
-  /// )
-  ///
-  /// let image = MarkdownInlineElement(
-  ///   intent: .image(url: URL(string: "https://example.com/image.jpg")!, altText: "An example /// image", title: "Example"),
-  ///   range: NSRange(location: 0, length: 20),
-  ///   additionalInfo: ["url": URL(string: "https://example.com/image.jpg")!, "altText": "An /// example image", "title": "Example"]
-  /// )
-  /// ```
-  /// My approach atm is to write up a struct will all the propreties I may need, then i'll work out how to seperate it out logically
-  
-  
-  
-}
-
 
 
 public struct Markdown {
 
-//  struct Element: Sendable {
-//    var type: Markdown.Element
-//    nonisolated(unsafe) var fullRange: NSTextRange
-//    
-//    
-//  }
-  
 }
-
-//extension PresentationIntent {
-//  static func list(style: Markdown.Syntax.ListStyle) -> PresentationIntent {
-//    
-//    var kind: PresentationIntent.Kind
-//    
-//    switch style {
-//      case .ordered:
-//        kind = .orderedList
-//      case .unordered:
-//        kind = .unorderedList
-//    }
-//    
-//    return PresentationIntent(kind, identity: Markdown.Syntax.list(style: style).intentIdentity)
-//    
-//  }
-//}
-//
-//
-//extension InlinePresentationIntent {
-//  
-//  static var link: InlinePresentationIntent {
-//    var intent = InlinePresentationIntent()
-//    // Set some custom bit or combine with other intents as needed
-//    return intent
-//  }
-//  
-//  static var image: InlinePresentationIntent {
-//    var intent = InlinePresentationIntent()
-//    // Set some custom bit or combine with other intents as needed
-//    return intent
-//  }
-//  
-//  static var highlight: InlinePresentationIntent {
-//    var intent = InlinePresentationIntent()
-//    // Set some custom bit or combine with other intents as needed
-//    return intent
-//  }
-//  
-//}
 
 
 
