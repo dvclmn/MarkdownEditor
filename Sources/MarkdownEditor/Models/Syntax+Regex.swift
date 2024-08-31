@@ -32,7 +32,7 @@ public typealias MarkdownNSTextRange = (
 extension Markdown.Element {
   /// Let's convert `typealias MarkdownRange = (content: Range<String.Index>, syntax: Range<String.Index>)` to a tuple of `NSTextRange`
   ///
-  public func nsTextRange(
+  public func markdownNSTextRange(
     _ range: MarkdownRange,
     in string: String,
     syntax: Markdown.Syntax,
