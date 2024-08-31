@@ -15,7 +15,7 @@ public class MarkdownTextView: NSTextView {
   
   let infoHandler = EditorInfoHandler()
 
-  var configuration: EditorConfiguration
+  var configuration: MarkdownEditorConfiguration
   
   var editorInfo = EditorInfo()
   
@@ -27,7 +27,7 @@ public class MarkdownTextView: NSTextView {
   public init(
     frame frameRect: NSRect,
     textContainer container: NSTextContainer?,
-    configuration: EditorConfiguration = .init()
+    configuration: MarkdownEditorConfiguration = .init()
   ) {
     self.configuration = configuration
 

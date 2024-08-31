@@ -14,12 +14,12 @@ public struct MarkdownEditor: NSViewRepresentable {
   public typealias InfoUpdate = (_ info: EditorInfo) -> Void
   
   @Binding var text: String
-  var configuration: EditorConfiguration
+  var configuration: MarkdownEditorConfiguration
   var info: InfoUpdate
   
   public init(
     text: Binding<String>,
-    configuration: EditorConfiguration = EditorConfiguration(),
+    configuration: MarkdownEditorConfiguration = MarkdownEditorConfiguration(),
     info: @escaping InfoUpdate = { _ in }
   ) {
     self._text = text

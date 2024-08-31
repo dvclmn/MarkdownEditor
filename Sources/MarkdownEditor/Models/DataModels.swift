@@ -238,18 +238,6 @@ public enum LanguageHint: String, CaseIterable, Sendable {
   }
 }
 
-public struct EditorConfiguration: Sendable, Equatable {
-  var isShowingFrames: Bool
-  var insets: CGFloat
-  
-  public init(
-    isShowingFrames: Bool = false,
-    insets: CGFloat = 20
-  ) {
-    self.isShowingFrames = isShowingFrames
-    self.insets = insets
-  }
-}
 
 
 

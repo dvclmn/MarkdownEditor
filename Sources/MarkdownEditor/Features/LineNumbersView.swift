@@ -1,5 +1,5 @@
 //
-//  GutterView.swift
+//  LineNumberView.swift
 //  MarkdownEditor
 //
 //  Created by Dave Coleman on 17/8/2024.

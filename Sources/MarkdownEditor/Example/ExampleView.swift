@@ -20,7 +20,7 @@ struct ExampleView: View {
       
       MarkdownEditor(
         text: $text,
-        configuration: EditorConfiguration(isShowingFrames: false)) { info in
+        configuration: MarkdownEditorConfiguration(isShowingFrames: false)) { info in
           self.editorInfo = info
         }
 //        .frame(height: 300)

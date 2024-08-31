@@ -15,7 +15,7 @@ public class MarkdownContainerView: NSView {
     
     let scrollView = MarkdownScrollView(frame: .zero)
     
-    let gridView = InfiniteGridView(scrollView: scrollView)
+//    let gridView = InfiniteGridView(scrollView: scrollView)
     
     self.scrollView = scrollView
 //    self.gridView = gridView

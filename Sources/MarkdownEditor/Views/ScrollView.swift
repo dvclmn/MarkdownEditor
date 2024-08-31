@@ -12,17 +12,18 @@ import SwiftUI
 public class MarkdownScrollView: NSScrollView {
   
   var textView: MarkdownTextView!
-  var gutterView: LineNumberView!
+  var lineNumberView: LineNumberView!
   
   // MARK: - Initialization
   
   override init(frame frameRect: NSRect) {
     
     let textView = MarkdownTextView(frame: .zero, textContainer: nil)
-    let gutterView = LineNumberView(scrollView: nil, orientation: .verticalRuler)
+    
+    let lineNumbers = LineNumberView(scrollView: nil, orientation: .verticalRuler)
     
     self.textView = textView
-    self.gutterView = gutterView
+    self.lineNumberView = lineNumbers
     
     super.init(frame: frameRect)
     setupScrollView()
@@ -61,7 +62,7 @@ public class MarkdownScrollView: NSScrollView {
   
   
   private func setupScrollView() {
- 
+    
     hasVerticalScroller = true
     hasHorizontalScroller = false
     autohidesScrollers = true
@@ -70,23 +71,35 @@ public class MarkdownScrollView: NSScrollView {
     
     documentView = textView
     
-    gutterView.scrollView = self
-    gutterView.clientView = textView
-    
-    // Set the ruler view
-    verticalRulerView = gutterView
-    rulersVisible = true
+    if textView.configuration.hasLineNumbers {
+      lineNumberView.scrollView = self
+      lineNumberView.clientView = textView
+      
+      // Set the ruler view
+      verticalRulerView = lineNumberView
+      rulersVisible = true
+      
+    }
     
     NotificationCenter.default.addObserver(self, selector: #selector(textDidChange), name: NSText.didChangeNotification, object: textView)
   }
   
-  var gutterWidth: CGFloat {
-    return (textView.configuration.insets) - 10
+  var lineNumbersWidth: CGFloat {
+    
+    var result: CGFloat
+    
+    if textView.configuration.hasLineNumbers {
+      result = .zero
+    } else {
+      result = textView.configuration.insets - 10
+    }
+    
+    return result
   }
   
   
   @objc private func textDidChange(_ notification: Notification) {
-    gutterView.needsDisplay = true
+    lineNumberView.needsDisplay = true
   }
   
   public override func tile() {
@@ -143,20 +156,20 @@ public class MarkdownScrollView: NSScrollView {
   
   // MARK: - Custom Methods
   
-//  /// Add constraints to make the document view match the clip view's bounds
-//  func setupDocumentViewConstraints() {
-//    
-//    guard let documentView = documentView else { return }
-//    
-//    documentView.translatesAutoresizingMaskIntoConstraints = false
-//    
-//    NSLayoutConstraint.activate([
-//      documentView.topAnchor.constraint(equalTo: contentView.topAnchor),
-//      documentView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
-//      documentView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
-//      documentView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor)
-//    ])
-//  }
+  //  /// Add constraints to make the document view match the clip view's bounds
+  //  func setupDocumentViewConstraints() {
+  //
+  //    guard let documentView = documentView else { return }
+  //
+  //    documentView.translatesAutoresizingMaskIntoConstraints = false
+  //
+  //    NSLayoutConstraint.activate([
+  //      documentView.topAnchor.constraint(equalTo: contentView.topAnchor),
+  //      documentView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
+  //      documentView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
+  //      documentView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor)
+  //    ])
+  //  }
   // MARK: - Additional Custom Methods
   
   /// Set the scroll offset programmatically
