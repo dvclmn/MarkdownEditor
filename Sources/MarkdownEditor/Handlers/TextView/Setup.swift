@@ -42,30 +42,10 @@ extension MarkdownTextView {
     textContainer?.heightTracksTextView = false
     
     textContainer?.lineFragmentPadding = self.configuration.insets
-//    textContainerInset = NSSize(width: 0, height: self.configuration.insets)
+    textContainerInset = NSSize(width: 0, height: self.configuration.insets)
     
-    
-    
-//    standard.titleTextAttributes = try? Dictionary(container, including: \.uiKit)
-    
-    
-    
-    
-    
-//    font = NSFont.systemFont(ofSize: 14, weight: .regular)
-//    textColor = NSColor.textColor
-    
-//    let paragraphStyle = NSMutableParagraphStyle()
-//    
-//    // TODO: Obvs exaggerated value for testing
-//    paragraphStyle.lineHeightMultiple = self.configuration.lineHeight
-    
-    var attributes = self.configuration.attributes
-    
-//    attributes.foregroundColor = NSColor.textColor
-//    attributes.paragraphStyle = paragraphStyle
-//    attributes.font = NSFont.systemFont(ofSize: 15, weight: NSFont.Weight.init(0.0))
-    
+    let attributes = self.configuration.attributes
+
     typingAttributes = attributes.getAttributes() ?? [:]
     defaultParagraphStyle = attributes.paragraphStyle
 

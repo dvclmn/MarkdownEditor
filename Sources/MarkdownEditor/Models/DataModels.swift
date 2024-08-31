@@ -19,6 +19,10 @@ extension NSTextRange: @unchecked @retroactive Sendable {
   
 }
 
+extension NSParagraphStyle: @unchecked @retroactive Sendable {
+  
+}
+
 
 
 /// In keeping with Apple's convention, my idea of `Syntax` ==  their idea of `PresentationIntent.Kind`

@@ -42,16 +42,17 @@ public struct MarkdownEditorConfiguration: Sendable, Equatable {
 public extension AttributeContainer {
   static var markdownEditorDefaults: AttributeContainer {
     
+    
     let paragraphStyle = NSMutableParagraphStyle()
     
-    let lineHeight: CGFloat = 1.1
-    
     // TODO: Obvs exaggerated value for testing
-    paragraphStyle.lineHeightMultiple = lineHeight
+    paragraphStyle.lineHeightMultiple = MarkdownDefaults.lineHeightMultiplier
     
     var container = AttributeContainer()
-    container.foregroundColor = .white
-    container.font = .systemFont(ofSize: 14)
+    
+    container.foregroundColor = NSColor.textColor
+    container.paragraphStyle = paragraphStyle
+    container.font = MarkdownDefaults.defaultFont
     
     return container
     

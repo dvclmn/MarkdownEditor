@@ -9,6 +9,7 @@ import AppKit
 import Foundation
 import BaseHelpers
 import TextCore
+import BaseStyles
 
 public struct MarkdownDefaults: Sendable {
   
@@ -25,7 +26,8 @@ public struct MarkdownDefaults: Sendable {
   public static let backgroundInlineCode:     Double = 0.2
   public static let backgroundCodeBlock:      Double = 0.4
   
-  public static let lineSpacing:              Double = 6
+  public static let lineHeightMultiplier:     Double = 1.3
+//  public static let lineSpacing:              Double = 6
   public static let paragraphSpacing:         Double = 0
   
   public static let paddingX: Double = 30
@@ -45,6 +47,8 @@ public extension Markdown.Syntax {
   }
   var foreGroundColor: NSColor {
     switch self {
+      case .inlineCode:
+        NSColor(Swatch.peachVibrant.colour)
       default:
           .textColor.withAlphaComponent(0.85)
     }
@@ -52,7 +56,6 @@ public extension Markdown.Syntax {
 
   var contentAttributes: Attributes {
         
-    
         switch self {
             
           case .heading:

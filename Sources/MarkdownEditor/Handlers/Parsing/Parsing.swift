@@ -40,7 +40,10 @@ extension MarkdownTextView {
                 textRange.intersects(viewportRange)
           else { break }
           
+          print("Text range, for rendering attributes: \(textRange)")
           tlm.setRenderingAttributes(element.syntax.contentAttributes, for: textRange)
+          
+          
         }
       } // END perform editing
     } // END task
@@ -80,11 +83,11 @@ extension MarkdownTextView {
       }
     } // END task
     
-    printCollection(elements, keyPaths: [\.range.description, \.syntax.name])
+//    printCollection(elements, keyPaths: [\.range.description, \.syntax.name])
     
     await self.parsingTask?.value
     
-    printFooter("Finished parsing markdown")
+//    printFooter("Finished parsing markdown")
   }
 }
 
@@ -159,11 +162,11 @@ extension String {
 //    }
     
     
-    print("Finished this function")
+//    print("Finished this function")
     
-    //    print("Here are the elements: \(elements)")
+        print("Here are the elements: \(elements)")
     
-    printFooter()
+//    printFooter()
     
     return elements
     
