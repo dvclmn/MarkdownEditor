@@ -37,32 +37,42 @@ extension MarkdownTextView {
 
     else { return }
     
+    /// Whilst this is 'only' the viewport range, we can/should squeeze out more
+    /// performance here, by only affecting the range absolutely neccesary, right
+    /// where the user is making edits.
+    ///
+    let nsViewportRange = NSRange(viewportRange, in: tcm)
+    
+    
     self.parsingTask?.cancel()
     self.parsingTask = Task {
       
       tcm.performEditingTransaction {
         
-        let removableAttributes: [Attributes.Key] = [
+
+        let removableRenderingAttributes: [Attributes.Key] = [
+          .foregroundColor,
           .backgroundColor
         ]
 
         /// I need to verify whether I treat certain attributes differently, based
         /// on whether they are rendering vs
-        for attribute in removableAttributes {
+        for attribute in removableRenderingAttributes {
           tlm.removeRenderingAttribute(attribute, for: viewportRange)
         }
         
-        /// Whilst this is 'only' the viewport range, we can/should squeeze out more
-        /// performance here, by only affecting the range absolutely neccesary, right
-        /// where the user is making edits.
-        ///
-        let nsViewportRange = NSRange(viewportRange, in: tcm)
         
-        /// This is great — this does verifyably remove all specified attributes, for
-        /// the specified range (`NSRange`).
+        /// This (`tcs.textStorage?.removeAttribute`) is great —
+        /// this does verifyably remove all specified attributes, for the
+        /// specified range (`NSRange`).
         ///
         tcs.textStorage?.removeAttribute(.font, range: nsViewportRange)
-        
+
+
+        /// What am I trying to do?
+        /// 1. The app starts, text is there, should be styled via a first pass
+        /// 2. I think the code should know what markdown syntax the user's
+        /// insertion point is in right now
         
         
         /// `element` here is type `Markdown.Element`
@@ -87,6 +97,10 @@ extension MarkdownTextView {
 //          tcs.textStorage?.invalidateAttributes(in: contentNSRange)
           
 //          tcs.textStorage?.removeAttribute(.font, range: contentNSRange)
+          
+          guard let attributes = self.configuration.attributes.getAttributes() else { break }
+          
+          tcs.textStorage?.addAttributes(attributes, range: contentNSRange)
           
           tcs.textStorage?.addAttributes(element.syntax.contentAttributes, range: contentNSRange)
           
@@ -178,9 +192,17 @@ extension String {
     /// `match` here gives us this rather complex type:
     /// `Regex<Regex<(Substring, leading: Substring, content: Substring, trailing: Substring)>.RegexOutput>.Match`
     ///
+    /// Because of our typealias ``MarkdownRegex``, we can also write it like this:
+    /// `Regex<MarkdownRegex.RegexOutput>.Match`.
+    ///
+    /// So, still overwhelming-looking, but slightly less verbose.
+    ///
     for match in self[stringRange].matches(of: syntax.regex) {
       
+      /// Get whole match, as `Range<String.Index>`
       let overallRange = match.range
+      
+      /// `output` is of type `MarkdownRegex.RegexOutput`
       let output = match.output
       
       // Calculate the ranges for leading, content, and trailing

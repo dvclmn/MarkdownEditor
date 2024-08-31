@@ -65,6 +65,22 @@ extension EditorInfo.Selection {
 }
 
 
+extension Markdown.Element {
+  func isSelected(
+    tlm: NSTextLayoutManager
+  ) -> Bool {
+    
+    /// To get `Range<String.Index>` and `any NSTextLocation`
+    /// to work together here, I will need to supply the original string they
+    /// were in, as a reference point — I think.
+    
+    let location = tlm.insertionPointLocations
+    
+    self.range.content
+    
+  }
+}
+
 extension MarkdownTextView {
   
   func generateSelectionInfo() -> EditorInfo.Selection {
@@ -74,8 +90,10 @@ extension MarkdownTextView {
     //    let selectedRange = self.selectedRange()
     let selectedRange = self.selectedTextRange()
     
+    let insertionPointLocations = tlm.insertionPointLocations
+    
     let scratchPad: String = """
-    Typing attributes: \(self.typingAttributes.prettyPrinted(keyPaths: [\.key, \.value]))
+    \(insertionPointLocations)
     """
     
     //    guard let selectedLocation = self.selectedTextLocation(),
@@ -102,7 +120,8 @@ extension MarkdownTextView {
       selection: (selectedString?.string.count ?? 0).description,
       //      selection: currentBlock?.description ?? "nil",
       selectedElement: [],
-      location: EditorInfo.Selection.Location(line: 0, column: 0)
+      location: EditorInfo.Selection.Location(line: 0, column: 0),
+      scratchPad: scratchPad
       //      lineNumber: self.getLineAndColumn(for: selectedLocation)?.0,
       //      columnNumber: self.getLineAndColumn(for: selectedLocation)?.1
     )

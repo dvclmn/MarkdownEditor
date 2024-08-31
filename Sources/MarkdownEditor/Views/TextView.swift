@@ -93,33 +93,7 @@ extension MarkdownTextView {
     self.viewportLayoutController = NSTextViewportLayoutController(textLayoutManager: textLayoutManager)
     self.viewportLayoutController?.delegate = viewportDelegate
   }
-  
-  
-  
-//  public override func layout() {
-//    super.layout()
-//    //    updateViewport()
-//  }
-//  
-  
-  
-//  public override func keyDown(with event: NSEvent) {
-//    onKeyDown(event) {
-//      super.keyDown(with: event)
-//    }
-//  }
-//  
-//  public override func flagsChanged(with event: NSEvent) {
-//    onFlagsChanged(event) {
-//      super.flagsChanged(with: event)
-//    }
-//  }
-//  
-//  public override func mouseDown(with event: NSEvent) {
-//    onMouseDown(event) {
-//      super.mouseDown(with: event)
-//    }
-//  }
+
   
   public override func draw(_ rect: NSRect) {
     super.draw(rect)

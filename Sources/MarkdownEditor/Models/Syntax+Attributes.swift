@@ -36,6 +36,18 @@ public struct MarkdownDefaults: Sendable {
 
 
 
+public extension AttributeSet {
+  
+  static let markdownDefaults: AttributeSet = [
+    .foregroundColor: NSColor.white,
+    .backgroundColor: NSColor.clear,
+    .font: MarkdownDefaults.defaultFont
+  ]
+}
+
+
+
+
 public extension Markdown.Syntax {
   
   var fontSize: Double {
