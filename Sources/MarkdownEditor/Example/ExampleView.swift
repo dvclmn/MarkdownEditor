@@ -9,7 +9,7 @@ import SwiftUI
 
 struct ExampleView: View {
   
-  @State private var text: String = Self.twoInlineCode
+  @State private var text: String = Self.exampleMarkdown
   @State private var editorInfo: EditorInfo? = nil
   
   var body: some View {

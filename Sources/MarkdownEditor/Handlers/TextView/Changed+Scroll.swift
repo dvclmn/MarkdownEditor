@@ -16,7 +16,7 @@ extension MarkdownTextView {
   
   @objc func handleScrollViewDidScroll() {
     
-    guard let scrollView = enclosingScrollView else { return }
+    guard let _ = enclosingScrollView else { return }
     
     Task {
       await self.scrollDebouncer.processTask { [weak self] in

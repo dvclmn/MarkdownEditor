@@ -22,7 +22,7 @@ extension MarkdownTextView {
     
     setupViewportLayoutController()
     
-        onAppearAndTextChange()
+    onAppearAndTextChange()
     
     
   }

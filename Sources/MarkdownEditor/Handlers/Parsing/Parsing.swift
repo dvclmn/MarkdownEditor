@@ -35,7 +35,7 @@ extension MarkdownTextView {
   
   func parseAndStyleMarkdownLite(
     in range: NSTextRange? = nil,
-    shouldPrint: Bool = false
+    shouldPrint: Bool = true
   ) {
     guard let tlm = self.textLayoutManager,
           let tcm = tlm.textContentManager,
@@ -99,7 +99,8 @@ extension MarkdownTextView {
         
         /// We need to loop over the syntax that we want to be on the lookout for
         ///
-        for syntax in Markdown.Syntax.testCases {
+        for syntax in Markdown.Syntax.allCases {
+//        for syntax in Markdown.Syntax.testCases {
           
           if shouldPrint { print("5. Loop over syntax. Current syntax: \(syntax.name)") }
           
