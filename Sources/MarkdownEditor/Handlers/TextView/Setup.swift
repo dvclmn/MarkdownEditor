@@ -21,10 +21,15 @@ extension AttributeContainer {
   func getAttributes() -> [NSAttributedString.Key: Any]? {
     return getAttributes(for: \.appKit)
   }
+  
+  
+  
 }
 
 extension MarkdownTextView {
   func textViewSetup() {
+    
+//    print("Running textView setup")
     
     isEditable = true
     drawsBackground = false
@@ -46,8 +51,10 @@ extension MarkdownTextView {
     
     let renderingAttributes = self.configuration.renderingAttributes
     let fontAttributes = self.configuration.fontAttributes
+    
+    let allAttributes = renderingAttributes.merging(fontAttributes)
 
-    typingAttributes = renderingAttributes.getAttributes() ?? [:]
+    typingAttributes = allAttributes.getAttributes() ?? [:]
     defaultParagraphStyle = fontAttributes.paragraphStyle
 
   }

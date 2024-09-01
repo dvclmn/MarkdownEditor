@@ -21,7 +21,7 @@ extension Markdown {
   
   struct Element {
     var syntax: Markdown.Syntax
-    var range: MarkdownRange
+    var range: MarkdownNSTextRange
   }
   
   /// What I've learned so far, defining a very specific per-syntax Regex output type seems

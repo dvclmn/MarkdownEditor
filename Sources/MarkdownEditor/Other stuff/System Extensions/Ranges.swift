@@ -18,6 +18,7 @@ import AppKit
 
 
 
+
 public extension Range where Bound == String.Index {
 
   func textRange(

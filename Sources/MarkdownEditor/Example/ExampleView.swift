@@ -29,12 +29,13 @@ struct ExampleView: View {
       
       
       HStack(alignment: .bottom) {
-        Text(self.editorInfo?.selection.summary ?? "nil")
-        Spacer()
-        Text(self.editorInfo?.scroll.summary ?? "nil")
-        Spacer()
-        Text(self.editorInfo?.text.summary ?? "nil")
+//        Text(self.editorInfo?.selection.summary ?? "nil")
+//        Spacer()
+//        Text(self.editorInfo?.scroll.summary ?? "nil")
+//        Spacer()
+//        Text(self.editorInfo?.text.summary ?? "nil")
       }
+      .textSelection(.enabled)
       .foregroundStyle(.secondary)
       .font(.callout)
       .frame(maxWidth: .infinity, alignment: .leading)
@@ -52,7 +53,7 @@ struct ExampleView: View {
 //    }
     .background(.black.opacity(0.5))
     .background(.purple.opacity(0.1))
-    .frame(width: 400, height: 700)
+    .frame(width: 300, height: 600)
     
     /// Interestingly, the below 'simulates' text being added to the NSTextView, but NOT
     /// in the same as a user actually focusing the view and typing into it. There appears
@@ -78,6 +79,16 @@ extension ExampleView {
   It does have more than two paragraphs, which I'm hoping will help me to verify that the code is able to count elements of a particular kind of markdown syntax, not just fragments or paragraphs.
   
   We'll have to just see if it works.
+  
+  Thank you for sharing your code and explaining your setup. It's great to see you're working on a markdown parsing and styling system using TextKit 2. Let's address your questions and then discuss some ideas for your implementation.
+  
+  Invalidating Attributes:
+  
+  When you call invalidateAttributes(in: NSRange) on a text storage, you're essentially telling the text system that the attributes in the specified range may have changed and need to be recalculated. This doesn't remove or modify the attributes directly; instead, it triggers the text system to update its internal caches and redraw the affected text. This is useful when you've made changes to the text or its attributes and want to ensure that the display is updated correctly.
+  
+  Regarding your markdown parsing and styling setup:
+  
+  Your approach of separating the parsing (which is more expensive) and the styling (which should be more nimble) is a good strategy. Here are some ideas and suggestions to potentially improve your implementation.
   """
   
   static let shortSample: String = """

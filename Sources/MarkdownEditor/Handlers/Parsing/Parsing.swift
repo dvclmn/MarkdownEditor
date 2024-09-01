@@ -27,119 +27,92 @@ extension MarkdownTextView {
   /// `textContentStorage.textStorage?.typingAttributes`
   ///
   
-  func applyMarkdownStyles() async {
-    
-    guard let tlm = self.textLayoutManager,
-          let tcm = tlm.textContentManager,
-          let tcs = self.textContentStorage,
-          let viewportRange = tlm.textViewportLayoutController.viewportRange,
-          let viewportString = tcm.attributedString(in: viewportRange)?.string
-            
-    else { return }
-    
-    /// Whilst this is 'only' the viewport range, we can/should squeeze out more
-    /// performance here, by only affecting the range absolutely neccesary, right
-    /// where the user is making edits.
-    ///
-    let nsViewportRange = NSRange(viewportRange, in: tcm)
-    
-    
-    self.parsingTask?.cancel()
-    self.parsingTask = Task {
-      
-      let removableRenderingAttributes: [Attributes.Key] = [
-        .foregroundColor,
-        .backgroundColor
-      ]
-
-
-      tcm.performEditingTransaction {
-        
-        /// I need to verify whether I treat certain attributes differently, based
-        /// on whether they are rendering vs
-        for attribute in removableRenderingAttributes {
-          tlm.removeRenderingAttribute(attribute, for: viewportRange)
-        }
-        
-        
-        /// This (`tcs.textStorage?.removeAttribute`) is great —
-        /// this does verifyably remove all specified attributes, for the
-        /// specified range (`NSRange`).
-        ///
-        tcs.textStorage?.removeAttribute(.font, range: nsViewportRange)
-        
-        guard let defaultFontAttributes = self.configuration.fontAttributes.getAttributes(),
-              let defaultRenderingAttributes = self.configuration.renderingAttributes.getAttributes()
-        else { return }
-        
-        
-        tlm.setRenderingAttributes(defaultRenderingAttributes, for: viewportRange)
-
-        tcs.textStorage?.addAttributes(defaultFontAttributes, range: nsViewportRange)
-        
-        
-
-        
-        /// What am I trying to do?
-        /// 1. The app starts, text is there, should be styled via a first pass
-        /// 2. I think the code should know what markdown syntax the user's
-        /// insertion point is in right now
-        
-        
-        /// `element` here is type `Markdown.Element`
-        ///
-        /// We are looping through all elements found by the `parseMarkdown` function.
-        ///
-        for element in self.elements {
-          
-          guard let markdownNSTextRange = element.markdownNSTextRange(
-            element.range,
-            in: viewportString,
-            syntax: element.syntax,
-            provider: tcm
-          ) else { break }
-          
-          guard markdownNSTextRange.content.intersects(viewportRange) else { break }
-          
-          let contentNSRange = NSRange(markdownNSTextRange.content, in: tcm)
-          
-          //          print("Text range, for rendering attributes: \(markdownNSTextRange.content)")
-          
-          //          tcs.textStorage?.invalidateAttributes(in: contentNSRange)
-          
-          //          tcs.textStorage?.removeAttribute(.font, range: contentNSRange)
-          
-         
-          
-          if let fontAttributes = element.syntax.contentFontAttributes {
-            tcs.textStorage?.addAttributes(fontAttributes, range: contentNSRange)
-          }
-          
-          tlm.setRenderingAttributes(element.syntax.contentRenderingAttributes, for: markdownNSTextRange.content)
-          
-
-          
-          //          tlm.setRenderingAttributes(element.syntax.contentAttributes, for: markdownNSTextRange.content)
-          //          tlm.setRenderingAttributes(element.syntax.syntaxAttributes, for: markdownNSTextRange.leading)
-          //          tlm.setRenderingAttributes(element.syntax.syntaxAttributes, for: markdownNSTextRange.trailing)
-          
-          //          tcm.attributedString(in: markdownNSTextRange.content).attr
-          
-          
-          
-        } // END loop over elements
-
-      } // END perform editing
-    } // END task
-  }
+  
   
   /// Ideally, this can/should be used both for parsing the *whole* document (used sparingly),
   /// and for parsing smaller portions, based on where the user is editing.
   ///
+  
+  func parseAndStyleMarkdownLite(
+    in range: NSTextRange? = nil
+  ) {
+    guard let tlm = self.textLayoutManager,
+          let tcm = tlm.textContentManager,
+          let viewportRange = tlm.textViewportLayoutController.viewportRange,
+          let visibleString = self.visibleString
+    else { return }
+    
+    let parseRange = range ?? viewportRange
+    
+    let nsRange = NSRange(parseRange, in: tcm)
+    
+    guard let stringRange = nsRange.range(in: visibleString) else { return }
+    
+    /// This removes all elements within the visible range.
+    ///
+    //    for element in self.elements {
+    //      if element.range.content.overlaps(stringRange) {
+    //        self.elements.removeAll(where: { $0.range == element.range })
+    //      }
+    //    }
+    
+    let elementCountBefore: Int = self.elements.count
+    var matchDescription: String = ""
+    
+    DispatchQueue.main.async {
+      
+      tcm.performEditingTransaction {
+        
+        /// For testing, I will start with a clean slate, but this feels wasteful and should be changed
+        ///
+        
+        self.elements.removeAll()
+        
+        /// We need to loop over the syntax that we want to be on the lookout for
+        ///
+        for syntax in Markdown.Syntax.testCases {
+          
+          for match in self.string[stringRange].matches(of: syntax.regex) {
+
+            matchDescription += match.briefDescription
+            
+            
+            
+            let markdownRange: MarkdownNSTextRange = self.getMarkdownStringRange(in: match)
+            
+            let newElement = Markdown.Element(syntax: syntax, range: markdownRange)
+            
+            self.elements.append(newElement)
+            
+            
+            
+          } // END match loop
+          
+        } // END syntax loop
+        
+        let elementCountAfter: Int = self.elements.count
+        
+        let metrics: String = """
+      
+      ---
+      \(matchDescription)
+      Element count Before: \(elementCountBefore), After: \(elementCountAfter)
+      ---
+      """
+        
+        print(metrics)
+        
+      } // END performEditingTransaction
+      
+    } // END dispatch
+    
+    
+  } // parseAndStyleMarkdownLite
+  
   func parseMarkdown(
     in range: NSTextRange? = nil
   ) async {
-
+    
     guard let tlm = self.textLayoutManager,
           let tcm = tlm.textContentManager
     else { return }
@@ -150,33 +123,31 @@ extension MarkdownTextView {
     
     self.parsingTask = Task {
       
+      // TODO: This could be made to be much more efficient I'm sure, by not deleting everything wholesale each time
       self.elements.removeAll()
-      self.rangeIndex.removeAll()
+      //      self.rangeIndex.removeAll()
       
       for syntax in Markdown.Syntax.testCases {
         
-        let newElements: [Markdown.Element] = self.string.markdownMatches(
+        let newElements: [Markdown.Element] = markdownMatches(
+          in: self.string,
           of: syntax,
-          in: searchRange,
+          range: searchRange,
           textContentManager: tcm
         )
         
-        newElements.forEach { element in
-          self.elements.append(element)
-        }
+        self.elements.append(contentsOf: newElements)
       }
     } // END task
     
     await self.parsingTask?.value
     
   }
-}
-
-extension String {
   
   func markdownMatches(
+    in string: String,
     of syntax: Markdown.Syntax,
-    in range: NSTextRange? = nil,
+    range: NSTextRange? = nil,
     textContentManager tcm: NSTextContentManager
   ) -> [Markdown.Element] {
     
@@ -193,7 +164,7 @@ extension String {
     
     /// Gets `stringRange`, of type `Range<String.Index>`
     ///
-    guard let stringRange = nsRange.range(in: self) else {
+    guard let stringRange = nsRange.range(in: string) else {
       print("Couldn't get `Range<String.Index>` from NSRange")
       return []
     }
@@ -206,13 +177,14 @@ extension String {
     ///
     /// So, still overwhelming-looking, but slightly less verbose.
     ///
-    for match in self[stringRange].matches(of: syntax.regex) {
+    for match in string[stringRange].matches(of: syntax.regex) {
       
       
-      let finalRange: MarkdownRange = getMarkdownRange(in: match)
+      let markdownRange: MarkdownRange = getMarkdownStringRange(in: match)
       
-      let element = Markdown.Element(syntax: syntax, range: finalRange)
-      elements.append(element)
+      let newElement = Markdown.Element(syntax: syntax, range: markdownRange)
+      
+      elements.append(newElement)
       
       
       
@@ -222,7 +194,14 @@ extension String {
     
   } // END markdownMatches
   
-  func getMarkdownRange(in match: Regex<MarkdownRegex.RegexOutput>.Match) -> MarkdownRange {
+  func getMarkdownNSTextRange(in match: Regex<MarkdownRegex.RegexOutput>.Match) -> MarkdownNSTextRange {
+    
+    match.range
+    
+  }
+  
+  
+  func getMarkdownStringRange(in match: Regex<MarkdownRegex.RegexOutput>.Match) -> MarkdownRange {
     
     /// Get whole match, as `Range<String.Index>`
     let fullRange = match.range
@@ -234,10 +213,10 @@ extension String {
     ///
     /// Indices in `String.Index` format, ranges as `Range<String.Index>`
     ///
-    let leadingEndIndex = self.index(fullRange.lowerBound, offsetBy: output.leading.count)
+    let leadingEndIndex = string.index(fullRange.lowerBound, offsetBy: output.leading.count)
     let leadingRange = fullRange.lowerBound..<leadingEndIndex
     
-    let contentEndIndex = self.index(leadingEndIndex, offsetBy: output.content.count)
+    let contentEndIndex = string.index(leadingEndIndex, offsetBy: output.content.count)
     let contentRange = leadingEndIndex..<contentEndIndex
     
     let trailingRange = contentEndIndex..<fullRange.upperBound

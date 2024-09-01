@@ -14,7 +14,7 @@ public class MarkdownTextView: NSTextView {
   var parsingTask: Task<Void, Never>?
   
   let infoHandler = EditorInfoHandler()
-
+  
   var configuration: MarkdownEditorConfiguration
   
   var editorInfo = EditorInfo()
@@ -24,13 +24,24 @@ public class MarkdownTextView: NSTextView {
   
   public var onInfoUpdate: MarkdownEditor.InfoUpdate = { _ in }
   
+  public var visibleString: String? {
+    
+    guard let tlm = self.textLayoutManager,
+          let visibleRange = tlm.textViewportLayoutController.viewportRange,
+          let tcm = tlm.textContentManager,
+          let visibleString = tcm.attributedString(in: visibleRange)?.string
+    else { return nil }
+    
+    return visibleString
+  }
+  
   public init(
     frame frameRect: NSRect,
     textContainer container: NSTextContainer?,
     configuration: MarkdownEditorConfiguration = .init()
   ) {
     self.configuration = configuration
-
+    
     /// First, we provide TextKit with a frame
     ///
     let container = NSTextContainer()
@@ -83,7 +94,7 @@ extension Notification.Name {
 
 
 extension MarkdownTextView {
-
+  
   func setupViewportLayoutController() {
     guard let textLayoutManager = self.textLayoutManager else { return }
     
@@ -93,7 +104,7 @@ extension MarkdownTextView {
     self.viewportLayoutController = NSTextViewportLayoutController(textLayoutManager: textLayoutManager)
     self.viewportLayoutController?.delegate = viewportDelegate
   }
-
+  
   
   public override func draw(_ rect: NSRect) {
     super.draw(rect)

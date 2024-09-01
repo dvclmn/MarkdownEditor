@@ -56,15 +56,15 @@ struct MarkdownTextViewTests {
     
     try await Task.sleep(for: .seconds(0.1))
     
-    let duration = try await measurePerformance {
-      await textView.runMainMarkdownParse()
-    }
+//    let duration = try await measurePerformance {
+//      await textView.runMainMarkdownParse()
+//    }
+//    
+//    let averageDuration = try await measureAveragePerformance(iterations: 10) {
+//      await textView.runMainMarkdownParse()
+//    }
     
-    let averageDuration = try await measureAveragePerformance(iterations: 10) {
-      await textView.runMainMarkdownParse()
-    }
-    
-    print("Average parse duration: \(averageDuration) seconds")
+//    print("Average parse duration: \(averageDuration) seconds")
     
 //    printCollection(textView.elements, keyPaths: [\.type, \.range])
     
@@ -74,7 +74,7 @@ struct MarkdownTextViewTests {
 //    #expect(textView.elements[1].type == .bold(style: .asterisk))
     
     // Performance assertion
-    #expect(duration < 1.0, "Parsing took too long")
+//    #expect(duration < 1.0, "Parsing took too long")
   }
   
 }

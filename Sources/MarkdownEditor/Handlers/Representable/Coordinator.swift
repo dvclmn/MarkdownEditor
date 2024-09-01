@@ -26,6 +26,8 @@ public extension MarkdownEditor {
       self.parent = parent
     }
     
+    
+    
         
     public func textDidChange(_ notification: Notification) {
       
@@ -37,7 +39,7 @@ public extension MarkdownEditor {
       self.parent.text = textView.string
       self.selectedRanges = textView.selectedRanges
       
-      print("`func textDidChange` — at \(Date.now)")
+//      print("`func textDidChange` — at \(Date.now)")
       
 //      Task { @MainActor in
 //        await textView.applyMarkdownStyles()
