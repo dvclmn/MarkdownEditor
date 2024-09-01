@@ -31,7 +31,7 @@ struct ExampleView: View {
       HStack(alignment: .bottom) {
 //        Text(self.editorInfo?.selection.summary ?? "nil")
 //        Spacer()
-        Text(self.editorInfo?.scroll.summary ?? "nil")
+//        Text(self.editorInfo?.scroll.summary ?? "nil")
 //        Spacer()
 //        Text(self.editorInfo?.text.scratchPad ?? "nil")
       }

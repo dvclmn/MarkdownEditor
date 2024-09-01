@@ -7,26 +7,85 @@
 
 import SwiftUI
 
+
+
+
+extension MarkdownTextView {
+  
+
+  
+  @objc func handleScrollViewDidScroll() {
+    
+    guard let scrollView = enclosingScrollView else { return }
+    
+    Task {
+      await self.scrollDebouncer.processTask { [weak self] in
+        
+        guard let self = self else { return }
+        
+        await self.onAppearAndTextChange()
+        
+        
+        
+//        let scrollInfo = await self.textView.generateScrollInfo()
+        //
+//        Task { @MainActor in
+//          await self.textView.infoHandler.update(scrollInfo)
+//        }
+        
+      } // END process scroll
+    } // END Task
+    
+    
+    
+    // Your custom code here
+    // For example:
+    // updateVisibleRange()
+    // refreshSyntaxHighlighting()
+    // etc.
+    
+    
+    //    let verticalOffset = scrollView.contentView.bounds.origin.y
+    //    print("Scroll offset updated: \(verticalOffset)")
+    
+    // Update visible range
+    //    if let layoutManager = self.layoutManager,
+    //       let container = self.textContainer {
+    //      let visibleRect = self.visibleRect
+    //      let glyphRange = layoutManager.glyphRange(forBoundingRect: visibleRect, in: container)
+    //      let characterRange = layoutManager.characterRange(forGlyphRange: glyphRange, actualGlyphRange: nil)
+    //
+    //      print("Visible character range: \(characterRange)")
+    //
+    // Do something with the visible range
+    // For example, update syntax highlighting for visible text
+    // updateSyntaxHighlighting(for: characterRange)
+    //    }
+    
+  }
+  
+  
+  
+}
+
 extension MarkdownScrollView {
   
-//  public override func scrollWheel(with event: NSEvent) {
-//    super.scrollWheel(with: event)
-//    
-//    // Notify about scroll offset change
+  public override func scrollWheel(with event: NSEvent) {
+    super.scrollWheel(with: event)
+    
+    // Notify about scroll offset change
 //    scrollOffsetDidChange?(contentView.bounds.origin)
-//    
-//    //    print("Scrolling happened: \(self.verticalScrollOffset)")
-//    
+    
+    //    print("Scrolling happened: \(self.verticalScrollOffset)")
+    
 //    Task {
 //      await self.textView.scrollDebouncer.processTask { [weak self] in
 //        
 //        guard let self = self else { return }
 //        
-////        await self.textView.onAppearAndTextChange()
+//        await self.textView.onAppearAndTextChange()
 //        
-//        DispatchQueue.main.async {
-//          self.textView.parseAndStyleMarkdownLite()
-//        }
+//        
 //        
 //        let scrollInfo = await self.textView.generateScrollInfo()
 //        //
@@ -37,9 +96,9 @@ extension MarkdownScrollView {
 //      } // END process scroll
 //    } // END Task
 //    
-//    
-//  }
-//  
+    
+  }
+  
 }
 
 

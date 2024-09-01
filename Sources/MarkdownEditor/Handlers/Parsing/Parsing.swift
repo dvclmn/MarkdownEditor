@@ -35,7 +35,7 @@ extension MarkdownTextView {
   
   func parseAndStyleMarkdownLite(
     in range: NSTextRange? = nil,
-    shouldPrint: Bool = true
+    shouldPrint: Bool = false
   ) {
     guard let tlm = self.textLayoutManager,
           let tcm = tlm.textContentManager,
@@ -67,12 +67,26 @@ extension MarkdownTextView {
     //        self.elements.removeAll(where: { $0.range == element.range })
     //      }
     //    }
-
-    var matchDescription: String = ""
     
-    
-      
       tcm.performEditingTransaction {
+        
+        /// IMPORTANT:
+        ///
+        /// Ah this is useful: I was trying to 'reset' a certain range of styles back to
+        /// defaults — which was driven by the broader goal of: "When I add or
+        /// remove some markdown syntax, I want the styles to wipe away, or add
+        /// back in, straight away depending on my edits.
+        ///
+        /// However, the below `tlm.setRenderingAttributes`, when using the markdown range, will of course only 'reset' the markdown range. *However*,
+        /// vitally, the rendering attribute's colours will spill out when the bounding of
+        /// matching syntax characters is broken. *Something* needs to be able to come
+        /// in and tidy up that 'spilt' styling, that spreads out out of bounds.
+        ///
+        // tlm.setRenderingAttributes(defaultRenderingAttributes, for: parseRange)
+        guard let defaultRenderingAttributes = self.configuration.renderingAttributes.getAttributes()
+        else { return }
+        
+        tlm.setRenderingAttributes(defaultRenderingAttributes, for: parseRange)
         
         if shouldPrint { print("3. Perform editing transaction (begin)") }
         
@@ -92,56 +106,26 @@ extension MarkdownTextView {
           for match in self.string[stringRange].matches(of: syntax.regex) {
             if shouldPrint { print("6. Loop over matches. Current match: \(match.briefDescription)") }
             
-            matchDescription += match.briefDescription
-            
-            
             guard let markdownRange: MarkdownNSTextRange = self.getMarkdownNSTextRange(in: match) else {
               
               print("Error converting ranges to `MarkdownNSTextRange`")
               break
             }
+
+            tlm.setRenderingAttributes(syntax.contentRenderingAttributes, for: markdownRange.content)
+            tlm.setRenderingAttributes(syntax.syntaxAttributes, for: markdownRange.leading)
+            tlm.setRenderingAttributes(syntax.syntaxAttributes, for: markdownRange.trailing)
             
-            if shouldPrint { print("7. Use `getMarkdownNSTextRange` to build the leading, content and trailing ranges in tuple of type `NSTextRange`.") }
             
-            let newElement = Markdown.Element(syntax: syntax, range: markdownRange)
-            
-            if shouldPrint { print("8. Created new element: \(newElement)") }
-            
-            self.elements.append(newElement)
-            
-            if shouldPrint { print("9. Added element to list. Current count is now: \(self.elements.count)") }
-            
-            tlm.enumerateRenderingAttributes(from: parseRange.location, reverse: false) { manager, attributes, range in
-              
-              if shouldPrint { print("Looking at the rendering attributes: Manager: \(manager) \n Attributes: \(attributes) \n Range: \(range)") }
-              
-              return true
-            }
-            
-            if shouldPrint { print("10. Apply rendering styles") }
-            self.applyRenderingStyles(to: newElement)
             
             
           } // END match loop
           
         } // END syntax loop
         
-        let elementCountAfter: Int = self.elements.count
-        
-        let metrics: String = """
-      
-      ---
-      \(matchDescription)
-      ---
-      """
-        
-        print(metrics)
-        
       } // END performEditingTransaction
       
-    
-    
-    
+
   } // parseAndStyleMarkdownLite
   
   //  func parseMarkdown(

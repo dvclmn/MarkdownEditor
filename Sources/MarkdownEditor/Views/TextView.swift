@@ -14,7 +14,7 @@ public class MarkdownTextView: NSTextView {
   var rangeIndex: [NSTextRange: Markdown.Element] = [:]
   var parsingTask: Task<Void, Never>?
   
-  var scrollDebouncer = Debouncer()
+  var scrollDebouncer = Debouncer(interval: 0.1)
   
   let infoHandler = EditorInfoHandler()
   
@@ -25,8 +25,8 @@ public class MarkdownTextView: NSTextView {
   private var viewportLayoutController: NSTextViewportLayoutController?
   var viewportDelegate: CustomViewportDelegate?
   
-  var viewportObservation: NSKeyValueObservation?
-  var scrollObservation: NSKeyValueObservation?
+//  var viewportObservation: NSKeyValueObservation?
+//  var scrollObservation: NSKeyValueObservation?
 
   public var onInfoUpdate: MarkdownEditor.InfoUpdate = { _ in }
   
@@ -93,9 +93,9 @@ public class MarkdownTextView: NSTextView {
   }
   
   deinit {
-    viewportObservation?.invalidate()
+//    viewportObservation?.invalidate()
     NotificationCenter.default.removeObserver(self)
-    scrollObservation?.invalidate()
+//    scrollObservation?.invalidate()
   }
   
   
