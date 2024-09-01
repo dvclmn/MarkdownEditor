@@ -18,18 +18,29 @@ class CustomViewportDelegate: NSObject, @preconcurrency  NSTextViewportLayoutCon
     return textView.visibleRect
   }
   
+  // This method is called for each text layout fragment that needs to be rendered
+  // Called when a new layout fragment enters the viewport
   func textViewportLayoutController(_ textViewportLayoutController: NSTextViewportLayoutController, configureRenderingSurfaceFor textLayoutFragment: NSTextLayoutFragment) {
-    // This method is called for each text layout fragment that needs to be rendered
     print("Rendering fragment: \(textLayoutFragment)")
   }
   
+  // Called just before layout occurs
   func textViewportLayoutControllerWillLayout(_ textViewportLayoutController: NSTextViewportLayoutController) {
     
     self.statusString = "Layout process is about to begin"
   }
   
+  // Called just after layout occurs
   func textViewportLayoutControllerDidLayout(_ textViewportLayoutController: NSTextViewportLayoutController) {
     
     self.statusString = "Layout process has completed"
   }
+  
+  func textViewportLayoutController(
+    _ textViewportLayoutController: NSTextViewportLayoutController,
+    viewportBoundsDidChange previousViewportBounds: CGRect
+  ) {
+    // Called when the viewport bounds change
+  }
+
 }

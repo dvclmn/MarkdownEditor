@@ -7,25 +7,19 @@
 
 import SwiftUI
 
-extension MarkdownTextView {
+extension MarkdownScrollView {
   
-//  func didChangeScroll() {
-//    Task {
-//      await scrollHandler.processTask { [weak self] in
-//        
-//        guard let self = self else { return }
-//        
-//        let info = await self.generateScrollInfo()
-//        Task { @MainActor in
-//          await self.infoHandler.update(info)
-//        }
-//        
-//      } // END process scroll
-//    } // END Task
-//  } // END did change scroll
+  public override func scrollWheel(with event: NSEvent) {
+    super.scrollWheel(with: event)
+    
+    // Notify about scroll offset change
+    scrollOffsetDidChange?(contentView.bounds.origin)
+    
+    print("Scrolling happened: \(self.horizontalScrollOffset)")
+  }
+  
   
 }
-
 
 extension MarkdownTextView {
   

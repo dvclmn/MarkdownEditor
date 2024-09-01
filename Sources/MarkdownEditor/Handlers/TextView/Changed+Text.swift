@@ -14,16 +14,16 @@ extension MarkdownTextView {
     super.shouldChangeText(in: affectedCharRange, replacementString: replacementString)
     
     
-//    self.applyMarkdownStyles()
-//    Task {
-//
-//      await MainActor.run {
-//
-//      }
-//
-//    }
+    //    self.applyMarkdownStyles()
+    //    Task {
+    //
+    //      await MainActor.run {
+    //
+    //      }
+    //
+    //    }
     print("`Should change text` \(Date.now)")
-    parseAndStyleMarkdownLite()
+    
     
     return true
     
@@ -33,46 +33,35 @@ extension MarkdownTextView {
     
     super.didChangeText()
     
-        print("`override func didChangeText()` — at \(Date.now)")
+    print("`override func didChangeText()` — at \(Date.now)")
+    onAppearAndTextChange()
     
-//    Task { @MainActor in
-//      
-//            
-//      
-//      let info = self.generateTextInfo()
-//      await infoHandler.update(info)
-//      
-//    }
-//    
-//    Task {
-//      await self.parseMarkdown(in: self.textLayoutManager?.textViewportLayoutController.viewportRange)
-//    }
-  }
-}
-
-extension EditorInfo.Text {
-  public var summary: String {
-      """
-      Characters: \(characterCount)
-      Paragraphs: \(textElementCount)
-      Viewport Range: \(viewportRange)
-      
-      \(scratchPad)
-      """
   }
 }
 
 extension MarkdownTextView {
   
   
+  func onAppearAndTextChange() {
+    
+    DispatchQueue.main.async {
+      self.parseAndStyleMarkdownLite()
+    }
+    
+    Task { @MainActor in
+      
+      let info = self.generateTextInfo()
+      await infoHandler.update(info)
+      
+    }
+
+  }
+  
+  
   
   func generateTextInfo() -> EditorInfo.Text {
     
-    //    TCM's attString char. count: \(tcm.attributedString(in: documentRange)?.string.count ?? 0)
-    
-    
     guard let tlm = self.textLayoutManager,
-          //          let tcm = tlm.textContentManager,
           let viewportRange = tlm.textViewportLayoutController.viewportRange
     else { return .init() }
     
@@ -84,19 +73,16 @@ extension MarkdownTextView {
       textElementCount += 1
       return true
     })
-
+    
     let scratchPad: String = """
-    Insets: \(self.textContainer?.lineFragmentPadding.description ?? "")
-    Total elements: \(self.elements.count)
+    Character count: \(self.string.count)
+    TextElement count: \(textElementCount)
+
+    Markdown.Elements count: \(self.elements.count)
     Elements: \(self.condensedElementSummary)
     """
     
     return EditorInfo.Text(
-      characterCount: self.string.count,
-      textElementCount: textElementCount,
-      //      codeBlocks: self.elements.filter { $0.type == .codeBlock(language: nil) }.count,
-      documentRange: documentRange.description,
-      viewportRange: viewportRange.description,
       scratchPad: scratchPad
     )
   }
@@ -107,7 +93,7 @@ extension MarkdownTextView {
     let elementCounts = Dictionary(grouping: elements, by: { $0.syntax })
       .mapValues { $0.count }
     /// The below sorts by frequency within the source text
-//      .sorted { $0.value > $1.value }
+    //      .sorted { $0.value > $1.value }
     
     /// This sorts alphabetically
       .sorted { $0.key.name < $1.key.name }

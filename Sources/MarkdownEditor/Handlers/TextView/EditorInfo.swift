@@ -17,12 +17,11 @@ public struct EditorInfo: Sendable {
   
   
   public struct Text: Sendable {
-    var characterCount: Int = 0
-    var textElementCount: Int = 0
-    var codeBlocks: Int = 0
-    var documentRange: String = ""
-    var viewportRange: String = ""
     var scratchPad: String = ""
+    
+    /// Previous useful metrics
+    ///
+//    Insets: \(self.textContainer?.lineFragmentPadding.description ?? "")
   }
   
   public struct Selection: Sendable {

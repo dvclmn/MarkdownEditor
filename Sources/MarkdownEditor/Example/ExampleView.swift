@@ -9,7 +9,7 @@ import SwiftUI
 
 struct ExampleView: View {
   
-  @State private var text: String = Self.twoInlineCode
+  @State private var text: String = Self.exampleMarkdown
   @State private var editorInfo: EditorInfo? = nil
   
   var body: some View {
@@ -29,11 +29,11 @@ struct ExampleView: View {
       
       
       HStack(alignment: .bottom) {
-//        Text(self.editorInfo?.selection.summary ?? "nil")
-//        Spacer()
+        Text(self.editorInfo?.selection.summary ?? "nil")
+        Spacer()
 //        Text(self.editorInfo?.scroll.summary ?? "nil")
 //        Spacer()
-//        Text(self.editorInfo?.text.summary ?? "nil")
+        Text(self.editorInfo?.text.scratchPad ?? "nil")
       }
       .textSelection(.enabled)
       .foregroundStyle(.secondary)

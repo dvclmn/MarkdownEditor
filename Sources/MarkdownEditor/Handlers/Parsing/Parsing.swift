@@ -59,7 +59,7 @@ extension MarkdownTextView {
     let elementCountBefore: Int = self.elements.count
     var matchDescription: String = ""
     
-    DispatchQueue.main.async {
+    
       
       tcm.performEditingTransaction {
         
@@ -78,7 +78,7 @@ extension MarkdownTextView {
             
             
             
-//            let markdownRange: MarkdownNSTextRange = self.getMarkdownStringRange(in: match)
+            //            let markdownRange: MarkdownNSTextRange = self.getMarkdownStringRange(in: match)
             
             guard let markdownRange: MarkdownNSTextRange = self.getMarkdownNSTextRange(in: match) else { break }
             
@@ -86,6 +86,7 @@ extension MarkdownTextView {
             
             self.elements.append(newElement)
             
+            self.applyRenderingStyles(to: newElement)
             
             
           } // END match loop
@@ -106,45 +107,45 @@ extension MarkdownTextView {
         
       } // END performEditingTransaction
       
-    } // END dispatch
+    
     
     
   } // parseAndStyleMarkdownLite
   
-//  func parseMarkdown(
-//    in range: NSTextRange? = nil
-//  ) async {
-//    
-//    guard let tlm = self.textLayoutManager,
-//          let tcm = tlm.textContentManager
-//    else { return }
-//    
-//    let searchRange = range ?? tlm.documentRange
-//    
-//    self.parsingTask?.cancel()
-//    
-//    self.parsingTask = Task {
-//      
-//      // TODO: This could be made to be much more efficient I'm sure, by not deleting everything wholesale each time
-//      self.elements.removeAll()
-//      //      self.rangeIndex.removeAll()
-//      
-//      for syntax in Markdown.Syntax.testCases {
-//        
-//        let newElements: [Markdown.Element] = markdownMatches(
-//          in: self.string,
-//          of: syntax,
-//          range: searchRange,
-//          textContentManager: tcm
-//        )
-//        
-//        self.elements.append(contentsOf: newElements)
-//      }
-//    } // END task
-//    
-//    await self.parsingTask?.value
-//    
-//  }
+  //  func parseMarkdown(
+  //    in range: NSTextRange? = nil
+  //  ) async {
+  //
+  //    guard let tlm = self.textLayoutManager,
+  //          let tcm = tlm.textContentManager
+  //    else { return }
+  //
+  //    let searchRange = range ?? tlm.documentRange
+  //
+  //    self.parsingTask?.cancel()
+  //
+  //    self.parsingTask = Task {
+  //
+  //      // TODO: This could be made to be much more efficient I'm sure, by not deleting everything wholesale each time
+  //      self.elements.removeAll()
+  //      //      self.rangeIndex.removeAll()
+  //
+  //      for syntax in Markdown.Syntax.testCases {
+  //
+  //        let newElements: [Markdown.Element] = markdownMatches(
+  //          in: self.string,
+  //          of: syntax,
+  //          range: searchRange,
+  //          textContentManager: tcm
+  //        )
+  //
+  //        self.elements.append(contentsOf: newElements)
+  //      }
+  //    } // END task
+  //
+  //    await self.parsingTask?.value
+  //
+  //  }
   
   //  func markdownMatches(
   //    in string: String,
@@ -202,9 +203,7 @@ extension MarkdownTextView {
     
     let markdownStringRange = getMarkdownStringRange(in: match)
     
-    guard let tcm = self.textLayoutManager?.textContentManager,
-          
-            let nsLeadingRange = getNSTextRange(from: markdownStringRange.leading, in: self.string),
+    guard let nsLeadingRange = getNSTextRange(from: markdownStringRange.leading, in: self.string),
           let nsContentRange = getNSTextRange(from: markdownStringRange.content, in: self.string),
           let nsTrailingRange = getNSTextRange(from: markdownStringRange.trailing, in: self.string)
             

@@ -140,13 +140,7 @@ public class MarkdownScrollView: NSScrollView {
   
   // MARK: - NSScrollView Overrides
   
-  //  public override func scrollWheel(with event: NSEvent) {
-  //    super.scrollWheel(with: event)
-  //
-  //    // Notify about scroll offset change
-  //    scrollOffsetDidChange?(contentView.bounds.origin)
-  //  }
-  
+
   public override func viewDidEndLiveResize() {
     super.viewDidEndLiveResize()
     
@@ -154,22 +148,7 @@ public class MarkdownScrollView: NSScrollView {
     scrollOffsetDidChange?(contentView.bounds.origin)
   }
   
-  // MARK: - Custom Methods
-  
-  //  /// Add constraints to make the document view match the clip view's bounds
-  //  func setupDocumentViewConstraints() {
-  //
-  //    guard let documentView = documentView else { return }
-  //
-  //    documentView.translatesAutoresizingMaskIntoConstraints = false
-  //
-  //    NSLayoutConstraint.activate([
-  //      documentView.topAnchor.constraint(equalTo: contentView.topAnchor),
-  //      documentView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
-  //      documentView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
-  //      documentView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor)
-  //    ])
-  //  }
+
   // MARK: - Additional Custom Methods
   
   /// Set the scroll offset programmatically
