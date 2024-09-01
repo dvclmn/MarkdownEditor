@@ -15,7 +15,7 @@ extension MarkdownScrollView {
     // Notify about scroll offset change
     scrollOffsetDidChange?(contentView.bounds.origin)
     
-    print("Scrolling happened: \(self.horizontalScrollOffset)")
+    print("Scrolling happened: \(self.verticalScrollOffset)")
   }
   
   

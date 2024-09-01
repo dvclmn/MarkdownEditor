@@ -103,7 +103,7 @@ extension MarkdownTextView {
       ---
       """
         
-        print(metrics)
+//        print(metrics)
         
       } // END performEditingTransaction
       

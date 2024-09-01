@@ -22,6 +22,9 @@ public class MarkdownTextView: NSTextView {
   private var viewportLayoutController: NSTextViewportLayoutController?
   var viewportDelegate: CustomViewportDelegate?
   
+  var viewportObservation: NSKeyValueObservation?
+
+  
   public var onInfoUpdate: MarkdownEditor.InfoUpdate = { _ in }
   
   public var visibleString: String? {
@@ -84,6 +87,10 @@ public class MarkdownTextView: NSTextView {
   public override var layoutManager: NSLayoutManager? {
     assertionFailure("TextKit 1 is not supported")
     return nil
+  }
+  
+  deinit {
+    viewportObservation?.invalidate()
   }
   
 }
