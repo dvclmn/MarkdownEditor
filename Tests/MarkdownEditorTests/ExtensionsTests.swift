@@ -23,7 +23,7 @@ extension MarkdownTextViewTests {
     
     textView.string = TestStrings.Markdown.anotherMarkdownString
     
-    await textView.parseMarkdown()
+//    await textView.parseMarkdown()
     
 //    printCollection(textView.elements)
 

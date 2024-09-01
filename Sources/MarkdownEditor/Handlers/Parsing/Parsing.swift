@@ -73,12 +73,14 @@ extension MarkdownTextView {
         for syntax in Markdown.Syntax.testCases {
           
           for match in self.string[stringRange].matches(of: syntax.regex) {
-
+            
             matchDescription += match.briefDescription
             
             
             
-            let markdownRange: MarkdownNSTextRange = self.getMarkdownStringRange(in: match)
+//            let markdownRange: MarkdownNSTextRange = self.getMarkdownStringRange(in: match)
+            
+            guard let markdownRange: MarkdownNSTextRange = self.getMarkdownNSTextRange(in: match) else { break }
             
             let newElement = Markdown.Element(syntax: syntax, range: markdownRange)
             
@@ -109,95 +111,112 @@ extension MarkdownTextView {
     
   } // parseAndStyleMarkdownLite
   
-  func parseMarkdown(
-    in range: NSTextRange? = nil
-  ) async {
-    
-    guard let tlm = self.textLayoutManager,
-          let tcm = tlm.textContentManager
-    else { return }
-    
-    let searchRange = range ?? tlm.documentRange
-    
-    self.parsingTask?.cancel()
-    
-    self.parsingTask = Task {
-      
-      // TODO: This could be made to be much more efficient I'm sure, by not deleting everything wholesale each time
-      self.elements.removeAll()
-      //      self.rangeIndex.removeAll()
-      
-      for syntax in Markdown.Syntax.testCases {
-        
-        let newElements: [Markdown.Element] = markdownMatches(
-          in: self.string,
-          of: syntax,
-          range: searchRange,
-          textContentManager: tcm
-        )
-        
-        self.elements.append(contentsOf: newElements)
-      }
-    } // END task
-    
-    await self.parsingTask?.value
-    
-  }
+//  func parseMarkdown(
+//    in range: NSTextRange? = nil
+//  ) async {
+//    
+//    guard let tlm = self.textLayoutManager,
+//          let tcm = tlm.textContentManager
+//    else { return }
+//    
+//    let searchRange = range ?? tlm.documentRange
+//    
+//    self.parsingTask?.cancel()
+//    
+//    self.parsingTask = Task {
+//      
+//      // TODO: This could be made to be much more efficient I'm sure, by not deleting everything wholesale each time
+//      self.elements.removeAll()
+//      //      self.rangeIndex.removeAll()
+//      
+//      for syntax in Markdown.Syntax.testCases {
+//        
+//        let newElements: [Markdown.Element] = markdownMatches(
+//          in: self.string,
+//          of: syntax,
+//          range: searchRange,
+//          textContentManager: tcm
+//        )
+//        
+//        self.elements.append(contentsOf: newElements)
+//      }
+//    } // END task
+//    
+//    await self.parsingTask?.value
+//    
+//  }
   
-  func markdownMatches(
-    in string: String,
-    of syntax: Markdown.Syntax,
-    range: NSTextRange? = nil,
-    textContentManager tcm: NSTextContentManager
-  ) -> [Markdown.Element] {
-    
-    var elements: [Markdown.Element] = []
-    
-    /// If no range is supplied, we default to the `documentRange`
-    ///
-    let textRange = range ?? tcm.documentRange
-    
-    /// This uses a custom init from `STTextKitPlus`, to get an
-    /// `NSRange` from a `NSTextRange`
-    ///
-    let nsRange = NSRange(textRange, in: tcm)
-    
-    /// Gets `stringRange`, of type `Range<String.Index>`
-    ///
-    guard let stringRange = nsRange.range(in: string) else {
-      print("Couldn't get `Range<String.Index>` from NSRange")
-      return []
-    }
-    
-    /// `match` here gives us this rather complex type:
-    /// `Regex<Regex<(Substring, leading: Substring, content: Substring, trailing: Substring)>.RegexOutput>.Match`
-    ///
-    /// Because of our typealias ``MarkdownRegex``, we can also write it like this:
-    /// `Regex<MarkdownRegex.RegexOutput>.Match`.
-    ///
-    /// So, still overwhelming-looking, but slightly less verbose.
-    ///
-    for match in string[stringRange].matches(of: syntax.regex) {
-      
-      
-      let markdownRange: MarkdownRange = getMarkdownStringRange(in: match)
-      
-      let newElement = Markdown.Element(syntax: syntax, range: markdownRange)
-      
-      elements.append(newElement)
-      
-      
-      
-    } // END loop over string matches
-    
-    return elements
-    
-  } // END markdownMatches
+  //  func markdownMatches(
+  //    in string: String,
+  //    of syntax: Markdown.Syntax,
+  //    range: NSTextRange? = nil,
+  //    textContentManager tcm: NSTextContentManager
+  //  ) -> [Markdown.Element] {
+  //
+  //    var elements: [Markdown.Element] = []
+  //
+  //    /// If no range is supplied, we default to the `documentRange`
+  //    ///
+  //    let textRange = range ?? tcm.documentRange
+  //
+  //    /// This uses a custom init from `STTextKitPlus`, to get an
+  //    /// `NSRange` from a `NSTextRange`
+  //    ///
+  //    let nsRange = NSRange(textRange, in: tcm)
+  //
+  //    /// Gets `stringRange`, of type `Range<String.Index>`
+  //    ///
+  //    guard let stringRange = nsRange.range(in: string) else {
+  //      print("Couldn't get `Range<String.Index>` from NSRange")
+  //      return []
+  //    }
+  //
+  //    /// `match` here gives us this rather complex type:
+  //    /// `Regex<Regex<(Substring, leading: Substring, content: Substring, trailing: Substring)>.RegexOutput>.Match`
+  //    ///
+  //    /// Because of our typealias ``MarkdownRegex``, we can also write it like this:
+  //    /// `Regex<MarkdownRegex.RegexOutput>.Match`.
+  //    ///
+  //    /// So, still overwhelming-looking, but slightly less verbose.
+  //    ///
+  //    for match in string[stringRange].matches(of: syntax.regex) {
+  //
+  //
+  //      let markdownRange: MarkdownRange = getMarkdownStringRange(in: match)
+  //
+  //      let newElement = Markdown.Element(syntax: syntax, range: markdownRange)
+  //
+  //      elements.append(newElement)
+  //
+  //
+  //
+  //    } // END loop over string matches
+  //
+  //    return elements
+  //
+  //  } // END markdownMatches
   
-  func getMarkdownNSTextRange(in match: Regex<MarkdownRegex.RegexOutput>.Match) -> MarkdownNSTextRange {
+  func getMarkdownNSTextRange(
+    in match: Regex<MarkdownRegex.RegexOutput>.Match
+  ) -> MarkdownNSTextRange? {
     
-    match.range
+    let markdownStringRange = getMarkdownStringRange(in: match)
     
+    guard let tcm = self.textLayoutManager?.textContentManager,
+          
+            let nsLeadingRange = getNSTextRange(from: markdownStringRange.leading, in: self.string),
+          let nsContentRange = getNSTextRange(from: markdownStringRange.content, in: self.string),
+          let nsTrailingRange = getNSTextRange(from: markdownStringRange.trailing, in: self.string)
+            
+    else { return nil }
+    
+    let markdownNSTextRange: MarkdownNSTextRange = (
+      leading: nsLeadingRange,
+      content: nsContentRange,
+      trailing: nsTrailingRange
+    )
+    
+    return markdownNSTextRange
   }
   
   
@@ -229,6 +248,17 @@ extension MarkdownTextView {
     
     return markdownRange
     
+  }
+  
+  
+  func getNSTextRange(from range: Range<String.Index>, in string: String) -> NSTextRange? {
+    
+    guard let tcm = self.textLayoutManager?.textContentManager,
+          let startLocation = tcm.location(at: string.distance(from: string.startIndex, to: range.lowerBound)),
+          let endLocation = tcm.location(at: string.distance(from: string.startIndex, to: range.upperBound))
+    else { return nil }
+    
+    return NSTextRange(location: startLocation, end: endLocation)
   }
   
 }
