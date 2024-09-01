@@ -53,6 +53,20 @@ struct ExampleView: View {
     .background(.black.opacity(0.5))
     .background(.purple.opacity(0.1))
     .frame(width: 400, height: 700)
+    
+    /// Interestingly, the below 'simulates' text being added to the NSTextView, but NOT
+    /// in the same as a user actually focusing the view and typing into it. There appears
+    /// to be a difference between these two methods of the text being mutated.
+    ///
+//    .task {
+//      do {
+//        try await Task.sleep(for: .seconds(0.8))
+//        
+//        self.text += "Hello"
+//      } catch {
+//        
+//      }
+//    }
   }
 }
 

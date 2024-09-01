@@ -31,6 +31,7 @@ public extension MarkdownEditor {
       
       guard let textView = notification.object as? MarkdownTextView,
             !updatingNSView
+              
       else { return }
       
       self.parent.text = textView.string
@@ -38,9 +39,9 @@ public extension MarkdownEditor {
       
       print("`func textDidChange` — at \(Date.now)")
       
-      Task { @MainActor in
-        await textView.applyMarkdownStyles()
-      }
+//      Task { @MainActor in
+//        await textView.applyMarkdownStyles()
+//      }
       
       /// I have learned, and need to remember, that this `Coordinator` is
       /// a delegate, for my ``MarkdownTextView``. Which means I can take

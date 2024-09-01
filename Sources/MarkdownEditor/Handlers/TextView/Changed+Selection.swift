@@ -47,8 +47,8 @@ extension MarkdownTextView {
 extension EditorInfo.Selection {
   public var summary: String {
     
-//    let formattedSyntaxNames: String = selectedElement.map { syntax in
-//      syntax.regex
+//    let formattedSyntaxNames: String = selectedElement.map { element in
+//      element.syntax.name
 //    }.joined(separator: ", ")
     
     return """
@@ -119,7 +119,6 @@ extension MarkdownTextView {
     return EditorInfo.Selection(
       selection: (selectedString?.string.count ?? 0).description,
       //      selection: currentBlock?.description ?? "nil",
-      selectedElement: [],
       location: EditorInfo.Selection.Location(line: 0, column: 0),
       scratchPad: scratchPad
       //      lineNumber: self.getLineAndColumn(for: selectedLocation)?.0,
