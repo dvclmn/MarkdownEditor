@@ -13,27 +13,17 @@ extension MarkdownTextView {
   public override func shouldChangeText(in affectedCharRange: NSRange, replacementString: String?) -> Bool {
     super.shouldChangeText(in: affectedCharRange, replacementString: replacementString)
     
-    
-    //    self.applyMarkdownStyles()
-    //    Task {
-    //
-    //      await MainActor.run {
-    //
-    //      }
-    //
-    //    }
-    print("`Should change text` \(Date.now)")
-    
-    
+//    print("`Should change text` \(Date.now)")
     return true
-    
-  }
+  } // END shouldChangeText
+  
   
   public override func didChangeText() {
     
     super.didChangeText()
     
-    print("`override func didChangeText()` — at \(Date.now)")
+//    print("`override func didChangeText()` — at \(Date.now)")
+    
     onAppearAndTextChange()
     
   }
@@ -44,16 +34,18 @@ extension MarkdownTextView {
   
   func onAppearAndTextChange() {
     
+//    print("`onAppearAndTextChange()`")
+    
     DispatchQueue.main.async {
       self.parseAndStyleMarkdownLite()
     }
     
-    Task { @MainActor in
-      
-      let info = self.generateTextInfo()
-      await infoHandler.update(info)
-      
-    }
+//    Task { @MainActor in
+//      
+//      let info = self.generateTextInfo()
+//      await infoHandler.update(info)
+//      
+//    }
 
   }
   

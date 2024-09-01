@@ -6,12 +6,15 @@
 //
 
 import SwiftUI
+import BaseHelpers
 
 public class MarkdownTextView: NSTextView {
   
   var elements: [Markdown.Element] = []
   var rangeIndex: [NSTextRange: Markdown.Element] = [:]
   var parsingTask: Task<Void, Never>?
+  
+  var scrollDebouncer = Debouncer()
   
   let infoHandler = EditorInfoHandler()
   
@@ -23,8 +26,8 @@ public class MarkdownTextView: NSTextView {
   var viewportDelegate: CustomViewportDelegate?
   
   var viewportObservation: NSKeyValueObservation?
+  var scrollObservation: NSKeyValueObservation?
 
-  
   public var onInfoUpdate: MarkdownEditor.InfoUpdate = { _ in }
   
   public var visibleString: String? {
@@ -91,7 +94,10 @@ public class MarkdownTextView: NSTextView {
   
   deinit {
     viewportObservation?.invalidate()
+    NotificationCenter.default.removeObserver(self)
+    scrollObservation?.invalidate()
   }
+  
   
 }
 

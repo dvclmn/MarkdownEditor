@@ -9,7 +9,7 @@ import SwiftUI
 
 struct ExampleView: View {
   
-  @State private var text: String = Self.exampleMarkdown
+  @State private var text: String = Self.twoInlineCode
   @State private var editorInfo: EditorInfo? = nil
   
   var body: some View {
@@ -29,11 +29,11 @@ struct ExampleView: View {
       
       
       HStack(alignment: .bottom) {
-        Text(self.editorInfo?.selection.summary ?? "nil")
-        Spacer()
-//        Text(self.editorInfo?.scroll.summary ?? "nil")
+//        Text(self.editorInfo?.selection.summary ?? "nil")
 //        Spacer()
-        Text(self.editorInfo?.text.scratchPad ?? "nil")
+        Text(self.editorInfo?.scroll.summary ?? "nil")
+//        Spacer()
+//        Text(self.editorInfo?.text.scratchPad ?? "nil")
       }
       .textSelection(.enabled)
       .foregroundStyle(.secondary)
@@ -84,11 +84,11 @@ extension ExampleView {
   
   Invalidating Attributes:
   
-  When you call invalidateAttributes(in: NSRange) on a text storage, you're essentially telling the text system that the attributes in the specified range may have changed and need to be recalculated. This doesn't remove or modify the attributes directly; instead, it triggers the text system to update its internal caches and redraw the affected text. This is useful when you've made changes to the text or its attributes and want to ensure that the display is updated correctly.
+  When you call invalidateAttributes(in: NSRange) on a text storage, you're essentially telling the text system that the attributes in the specified range may have changed and need to be recalculated. This doesn't `remove` or modify the attributes directly; instead, it triggers the text system to update its internal caches and redraw the affected text. This is useful when you've made `changes` to the text or its `attributes and want` to ensure that the display is updated correctly.
   
   Regarding your markdown parsing and styling setup:
   
-  Your approach of separating the parsing (which is more expensive) and the styling (which should be more nimble) is a good strategy. Here are some ideas and suggestions to potentially improve your implementation.
+  Your approach of separating the parsing (which is more expensive) and the styling (which should be more nimble) is a good strategy. Here are some ideas and suggestions to potentially improve `your implementation`.
   """
   
   static let shortSample: String = """

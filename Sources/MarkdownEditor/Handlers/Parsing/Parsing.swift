@@ -34,19 +34,31 @@ extension MarkdownTextView {
   ///
   
   func parseAndStyleMarkdownLite(
-    in range: NSTextRange? = nil
+    in range: NSTextRange? = nil,
+    shouldPrint: Bool = true
   ) {
     guard let tlm = self.textLayoutManager,
           let tcm = tlm.textContentManager,
-          let viewportRange = tlm.textViewportLayoutController.viewportRange,
-          let visibleString = self.visibleString
+          let viewportRange = tlm.textViewportLayoutController.viewportRange
     else { return }
+    
+    if shouldPrint { print("Parse and style markdown.") }
     
     let parseRange = range ?? viewportRange
     
+    if shouldPrint { print("1. Parse range (as `NSTextRange`): \(parseRange)") }
+    
     let nsRange = NSRange(parseRange, in: tcm)
     
-    guard let stringRange = nsRange.range(in: visibleString) else { return }
+    
+    /// IMPORTANT:
+    /// I previously had the below set to `nsRange.range(in: self.visibleString)`,
+    /// which I believe caused incorrect range calculations. I think it needs to be
+    /// provided the whole string, to calculate the correct start/end locations etc.
+    ///
+    guard let stringRange = nsRange.range(in: self.string) else { return }
+    
+    if shouldPrint { print("2. Parse range (as `Range<String.Index>`): \(stringRange)") }
     
     /// This removes all elements within the visible range.
     ///
@@ -55,16 +67,19 @@ extension MarkdownTextView {
     //        self.elements.removeAll(where: { $0.range == element.range })
     //      }
     //    }
-    
-    let elementCountBefore: Int = self.elements.count
+
     var matchDescription: String = ""
     
     
       
       tcm.performEditingTransaction {
         
+        if shouldPrint { print("3. Perform editing transaction (begin)") }
+        
         /// For testing, I will start with a clean slate, but this feels wasteful and should be changed
         ///
+        
+        if shouldPrint { print("4. Elements before removing all: \(self.elements.prettyPrinted(keyPaths: [\.syntax]))") }
         
         self.elements.removeAll()
         
@@ -72,20 +87,38 @@ extension MarkdownTextView {
         ///
         for syntax in Markdown.Syntax.testCases {
           
+          if shouldPrint { print("5. Loop over syntax. Current syntax: \(syntax.name)") }
+          
           for match in self.string[stringRange].matches(of: syntax.regex) {
+            if shouldPrint { print("6. Loop over matches. Current match: \(match.briefDescription)") }
             
             matchDescription += match.briefDescription
             
             
+            guard let markdownRange: MarkdownNSTextRange = self.getMarkdownNSTextRange(in: match) else {
+              
+              print("Error converting ranges to `MarkdownNSTextRange`")
+              break
+            }
             
-            //            let markdownRange: MarkdownNSTextRange = self.getMarkdownStringRange(in: match)
-            
-            guard let markdownRange: MarkdownNSTextRange = self.getMarkdownNSTextRange(in: match) else { break }
+            if shouldPrint { print("7. Use `getMarkdownNSTextRange` to build the leading, content and trailing ranges in tuple of type `NSTextRange`.") }
             
             let newElement = Markdown.Element(syntax: syntax, range: markdownRange)
             
+            if shouldPrint { print("8. Created new element: \(newElement)") }
+            
             self.elements.append(newElement)
             
+            if shouldPrint { print("9. Added element to list. Current count is now: \(self.elements.count)") }
+            
+            tlm.enumerateRenderingAttributes(from: parseRange.location, reverse: false) { manager, attributes, range in
+              
+              if shouldPrint { print("Looking at the rendering attributes: Manager: \(manager) \n Attributes: \(attributes) \n Range: \(range)") }
+              
+              return true
+            }
+            
+            if shouldPrint { print("10. Apply rendering styles") }
             self.applyRenderingStyles(to: newElement)
             
             
@@ -99,11 +132,10 @@ extension MarkdownTextView {
       
       ---
       \(matchDescription)
-      Element count Before: \(elementCountBefore), After: \(elementCountAfter)
       ---
       """
         
-//        print(metrics)
+        print(metrics)
         
       } // END performEditingTransaction
       

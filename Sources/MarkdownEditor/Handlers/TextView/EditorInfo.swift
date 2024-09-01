@@ -38,7 +38,7 @@ public struct EditorInfo: Sendable {
   }
   
   public struct Scroll: Sendable {
-    var summary: String = ""
+    var summary: String = "Summary here"
   }
   
   public struct Frame: Sendable {
