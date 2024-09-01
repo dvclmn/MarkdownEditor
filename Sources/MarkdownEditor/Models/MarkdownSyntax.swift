@@ -34,7 +34,8 @@ extension Markdown {
     // case tableHeaderRow
     // case tableRow(rowIndex: Int
     
-    case codeBlock(language: LanguageHint?)
+    case codeBlock
+//    case codeBlock(language: LanguageHint?)
     case quoteBlock
     
     case link
@@ -59,12 +60,14 @@ extension Markdown {
         case .inlineCode: return "Inline code"
         case .list(let style): return "List \(style.name)"
         case .horizontalRule: return "Horizontal rule"
-        case .codeBlock(let language):
-          if let language = language {
-            return "Code block (\(language)"
-          } else {
-            return "Code block"
-          }
+                  case .codeBlock: return "Code block"
+          
+//        case .codeBlock(let language):
+//          if let language = language {
+//            return "Code block (\(language)"
+//          } else {
+//            return "Code block"
+//          }
         case .quoteBlock: return "Quote"
         case .link: return "Link"
         case .image: return "Image"
@@ -113,7 +116,7 @@ extension Markdown {
         case .horizontalRule:
           return .none
           
-        case .codeBlock(let language):
+        case .codeBlock:
           return .enclosed(.symmetrical)
           
         case .link, .image:
@@ -327,7 +330,7 @@ extension Markdown.Syntax {
       
         .list(style: .ordered),
       .horizontalRule,
-      .codeBlock(language: nil),
+      .codeBlock,
       .quoteBlock,
       .link,
       .image
@@ -336,11 +339,14 @@ extension Markdown.Syntax {
   
   static public var testCases: [Markdown.Syntax] {
     return [
+      .codeBlock,
+      .heading(level: 1),
       .heading(level: 2),
-      .bold,
-      .italic,
-      .inlineCode,
-      .strikethrough
+      .link,
+//      .bold,
+//      .italic,
+//      .inlineCode,
+//      .strikethrough
     ]
   }
   

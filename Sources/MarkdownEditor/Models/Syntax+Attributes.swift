@@ -120,52 +120,50 @@ public extension Markdown.Syntax {
           case .bold:
             return [
 
-              .foregroundColor: self.foreGroundColor,
+              .foregroundColor: NSColor.systemPink,
+//              .foregroundColor: self.foreGroundColor,
               .backgroundColor: NSColor.clear
             ]
             
           case .italic:
             
             return [
-              .foregroundColor: self.foreGroundColor,
+              .foregroundColor: NSColor.systemTeal,
+//              .foregroundColor: self.foreGroundColor,
               .backgroundColor: NSColor.clear
             ]
             
           case .boldItalic:
             
             return [
-              .foregroundColor: self.foreGroundColor,
+              .foregroundColor: NSColor.systemMint,
+//              .foregroundColor: self.foreGroundColor,
               .backgroundColor: NSColor.clear
             ]
             
           case .strikethrough:
             return [
-              .strikethroughStyle: NSUnderlineStyle.thick.rawValue,
-              .strikethroughColor: NSColor.red,
               .foregroundColor: NSColor.green,
-              .baselineOffset: 0
-              //            .foregroundColor: self.foreGroundColor,
             ]
             
           case .highlight:
             return [
-              .foregroundColor: self.foreGroundColor,
-              .backgroundColor: NSColor.yellow.withAlphaComponent(0.3)
+              .foregroundColor: NSColor.black,
+              .backgroundColor: NSColor.yellow.withAlphaComponent(0.7)
             ]
             
           case .inlineCode:
             return [
-              .foregroundColor: self.foreGroundColor,
-              .backgroundColor: NSColor.black.withAlphaComponent(MarkdownDefaults.backgroundInlineCode)
+              .foregroundColor: NSColor.blue
             ]
           case .codeBlock:
             return [
-              .foregroundColor: self.foreGroundColor,
+              .foregroundColor: NSColor.systemBrown,
             ]
             
           case .quoteBlock:
             return [
-              .backgroundColor: NSColor.black.withAlphaComponent(MarkdownDefaults.backgroundCodeBlock)
+              .foregroundColor: NSColor.systemIndigo,
             ]
             
           case .link:

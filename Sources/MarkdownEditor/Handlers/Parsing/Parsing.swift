@@ -35,14 +35,14 @@ extension MarkdownTextView {
   
   func parseAndStyleMarkdownLite(
     in range: NSTextRange? = nil,
-    shouldPrint: Bool = true
+    shouldPrint: Bool = false
   ) {
     guard let tlm = self.textLayoutManager,
           let tcm = tlm.textContentManager,
           let viewportRange = tlm.textViewportLayoutController.viewportRange
     else { return }
     
-    if shouldPrint { print("Parse and style markdown.") }
+    print("\n\n------\nParse and style markdown.")
     
     let parseRange = range ?? viewportRange
     
@@ -50,13 +50,14 @@ extension MarkdownTextView {
     
     let nsRange = NSRange(parseRange, in: tcm)
     
-    
     /// IMPORTANT:
     /// I previously had the below set to `nsRange.range(in: self.visibleString)`,
     /// which I believe caused incorrect range calculations. I think it needs to be
     /// provided the whole string, to calculate the correct start/end locations etc.
     ///
-    guard let stringRange = nsRange.range(in: self.string) else { return }
+    guard let stringRange = nsRange.range(in: self.string) else {
+      fatalError("Couldn't get string range")
+    }
     
     if shouldPrint { print("2. Parse range (as `Range<String.Index>`): \(stringRange)") }
     
@@ -89,44 +90,78 @@ extension MarkdownTextView {
         tlm.setRenderingAttributes(defaultRenderingAttributes, for: parseRange)
         
         if shouldPrint { print("3. Perform editing transaction (begin)") }
-        
-        /// For testing, I will start with a clean slate, but this feels wasteful and should be changed
-        ///
-        
-        if shouldPrint { print("4. Elements before removing all: \(self.elements.prettyPrinted(keyPaths: [\.syntax]))") }
+
         
         self.elements.removeAll()
         
         /// We need to loop over the syntax that we want to be on the lookout for
         ///
-        for syntax in Markdown.Syntax.allCases {
+//        for syntax in Markdown.Syntax.testCases {
+//          
+//          if shouldPrint { print("5. Loop over syntax. Current syntax: \(syntax.name)") }
+//          
+//          for match in self.string[stringRange].matches(of: syntax.regex) {
+//            
+//            if shouldPrint { print("6. Loop over matches. Current match: \(match.briefDescription)") }
+//            
+//            guard let markdownRange: MarkdownNSTextRange = self.getMarkdownNSTextRange(in: match) else {
+//              
+//              print("Error converting ranges to `MarkdownNSTextRange`")
+//              break
+//            }
+//
+//            tlm.setRenderingAttributes(syntax.contentRenderingAttributes, for: markdownRange.content)
+//            tlm.setRenderingAttributes(syntax.syntaxAttributes, for: markdownRange.leading)
+//            tlm.setRenderingAttributes(syntax.syntaxAttributes, for: markdownRange.trailing)
+//            
+//            
+//            
+//            
+//          } // END match loop
+//          
+//        } // END syntax loop
+        
+        
+        
 //        for syntax in Markdown.Syntax.testCases {
           
-          if shouldPrint { print("5. Loop over syntax. Current syntax: \(syntax.name)") }
+//          if is a code block
+        let codeBlockRegex: Regex<Substring> = /```/
           
-          for match in self.string[stringRange].matches(of: syntax.regex) {
-            if shouldPrint { print("6. Loop over matches. Current match: \(match.briefDescription)") }
+          for match in self.string[stringRange].matches(of: codeBlockRegex) {
             
-            guard let markdownRange: MarkdownNSTextRange = self.getMarkdownNSTextRange(in: match) else {
-              
-              print("Error converting ranges to `MarkdownNSTextRange`")
+            print("match: \(match.output)")
+            
+            guard let nsTextRange = getSingleNSTextRange(in: match) else {
+              print("Couldn't get it!")
               break
             }
-
-            tlm.setRenderingAttributes(syntax.contentRenderingAttributes, for: markdownRange.content)
-            tlm.setRenderingAttributes(syntax.syntaxAttributes, for: markdownRange.leading)
-            tlm.setRenderingAttributes(syntax.syntaxAttributes, for: markdownRange.trailing)
             
-            
-            
+            tlm.setRenderingAttributes(Markdown.Syntax.codeBlock.contentRenderingAttributes, for: nsTextRange)
+//
+//            if shouldPrint { print("6. Loop over matches. Current match: \(match.briefDescription)") }
+//            
+//            guard let markdownRange: MarkdownNSTextRange = self.getMarkdownNSTextRange(in: match) else {
+//              
+//              print("Error converting ranges to `MarkdownNSTextRange`")
+//              break
+//            }
+//            
+//            tlm.setRenderingAttributes(syntax.contentRenderingAttributes, for: markdownRange.content)
+//            tlm.setRenderingAttributes(syntax.syntaxAttributes, for: markdownRange.leading)
+//            tlm.setRenderingAttributes(syntax.syntaxAttributes, for: markdownRange.trailing)
+//            
+//            
+//            
             
           } // END match loop
           
-        } // END syntax loop
+//        } // END syntax loop
         
       } // END performEditingTransaction
       
 
+    print("Finished parsing and styling\n------\n")
   } // parseAndStyleMarkdownLite
   
   //  func parseMarkdown(
@@ -213,6 +248,32 @@ extension MarkdownTextView {
   //    return elements
   //
   //  } // END markdownMatches
+
+  func getSingleNSTextRange(
+  in match: Regex<Regex<Substring>.RegexOutput>.Match
+  ) -> NSTextRange? {
+    
+    
+    /// Get whole match, as `Range<String.Index>`
+    let fullRange = match.range
+    
+    /// `output` is of type `MarkdownRegex.RegexOutput`
+    let output = match.output
+    
+    /// Calculate the indices/ranges for leading, content, and trailing
+    ///
+    /// Indices in `String.Index` format, ranges as `Range<String.Index>`
+    ///
+    
+    let endIndex = string.index(fullRange.lowerBound, offsetBy: output.count)
+    let range = fullRange.lowerBound..<endIndex
+
+    guard let nsTextRange = getNSTextRange(from: range, in: self.string) else { return nil }
+
+    return nsTextRange
+    
+    
+  }
   
   func getMarkdownNSTextRange(
     in match: Regex<MarkdownRegex.RegexOutput>.Match
