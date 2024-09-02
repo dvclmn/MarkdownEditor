@@ -15,10 +15,10 @@ extension MarkdownTextView {
     
     super.setSelectedRanges(ranges, affinity: affinity, stillSelecting: stillSelecting)
     
-    let info = self.generateSelectionInfo()
-    Task { @MainActor in
-      await infoHandler.update(info)
-    }
+//    let info = self.generateSelectionInfo()
+//    Task { @MainActor in
+//      await infoHandler.update(info)
+//    }
     
     
 

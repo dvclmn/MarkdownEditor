@@ -33,6 +33,8 @@ extension MarkdownTextView {
     
     tcm.performEditingTransaction {
       
+      
+      
       for element in self.elements {
         
         //      print("Current element: \(element.syntax.name)")
@@ -40,20 +42,23 @@ extension MarkdownTextView {
         let range = element.range
         let syntax = element.syntax
         
+        DispatchQueue.main.async {
         // Apply content attributes
-        applyAttributesIfNeeded(syntax.contentRenderingAttributes, for: range.content)
+          self.applyAttributesIfNeeded(syntax.contentRenderingAttributes, for: range.content)
         
         // Apply leading syntax attributes
         if let leading = range.leading {
-          applyAttributesIfNeeded(syntax.syntaxRenderingAttributes, for: leading)
+          self.applyAttributesIfNeeded(syntax.syntaxRenderingAttributes, for: leading)
         } else {
           //        print("No value found for leading range, for syntax '\(syntax.name)'")
         }
         
         // Apply trailing syntax attributes
-        if let trailing = range.trailing {
-          applyAttributesIfNeeded(syntax.syntaxRenderingAttributes, for: trailing)
-        }
+          if let trailing = range.trailing {
+            self.applyAttributesIfNeeded(syntax.syntaxRenderingAttributes, for: trailing)
+            
+          }
+        } // END dispatch
       } // END element loop
     } // END editing transaction
     

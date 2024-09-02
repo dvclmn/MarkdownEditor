@@ -13,7 +13,7 @@ extension MarkdownTextView {
   public override func shouldChangeText(in affectedCharRange: NSRange, replacementString: String?) -> Bool {
     super.shouldChangeText(in: affectedCharRange, replacementString: replacementString)
     
-//    print("`Should change text` \(Date.now)")
+    //    print("`Should change text` \(Date.now)")
     return true
   } // END shouldChangeText
   
@@ -22,15 +22,38 @@ extension MarkdownTextView {
     
     super.didChangeText()
     
-//    print("`override func didChangeText()` — at \(Date.now)")
+    //    print("`override func didChangeText()` — at \(Date.now)")
     
-//    onAppearAndTextChange()
+    //    onAppearAndTextChange()
     
-        DispatchQueue.main.async {
-          self.parseAndStyleMarkdownLite(trigger: .text)
-          self.styleElements(trigger: .text)
-        }
+    Task { @MainActor in
+      let heightUpdate = self.updateEditorHeight()
+      await self.infoHandler.update(heightUpdate)
+    }
     
+    self.parseAndStyleMarkdownLite(trigger: .text)
+    self.styleElements(trigger: .text)
+    
+    
+  }
+}
+
+extension MarkdownTextView {
+  func updateEditorHeight() -> EditorInfo.Frame {
+    
+    guard let tlm = self.textLayoutManager else { return .init() }
+    
+    let bounds = tlm.usageBoundsForTextContainer
+    
+    let frame = EditorInfo.Frame(
+      width: bounds.width,
+      height: bounds.height
+    )
+    
+    print("Updating editor size. Width: \(frame.width), Height: \(frame.height)")
+    
+    
+    return frame
   }
 }
 
@@ -38,20 +61,20 @@ extension MarkdownTextView {
 //
 //
 //  func generateTextInfo() -> EditorInfo.Text {
-//    
+//
 //    guard let tlm = self.textLayoutManager,
 //          let viewportRange = tlm.textViewportLayoutController.viewportRange
 //    else { return .init() }
-//    
+//
 //    let documentRange = tlm.documentRange
-//    
+//
 //    var textElementCount: Int = 0
-//    
+//
 //    tlm.textContentManager?.enumerateTextElements(from: documentRange.location, using: { _ in
 //      textElementCount += 1
 //      return true
 //    })
-//    
+//
 //    let scratchPad: String = """
 //    Character count: \(self.string.count)
 //    TextElement count: \(textElementCount)
@@ -59,7 +82,7 @@ extension MarkdownTextView {
 //    Markdown.Elements count: \(self.elements.count)
 //    Elements: \(self.condensedElementSummary)
 //    """
-//    
+//
 //    return EditorInfo.Text(
 //      scratchPad: scratchPad
 //    )

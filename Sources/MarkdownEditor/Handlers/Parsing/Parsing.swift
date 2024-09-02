@@ -45,22 +45,41 @@ extension MarkdownTextView {
     
     let nsRange = NSRange(parseRange, in: tcm)
     
-    /// IMPORTANT:
-    /// I previously had the below set to `nsRange.range(in: self.visibleString)`,
-    /// which I believe caused incorrect range calculations. I think it needs to be
-    /// provided the whole string, to calculate the correct start/end locations etc.
-    ///
-    guard let stringRange = nsRange.range(in: self.string) else {
-      fatalError("Couldn't get string range")
+    // Add safety check
+    guard nsRange.location != NSNotFound && nsRange.length != NSNotFound else {
+      print("Invalid NSRange: \(nsRange)")
+      return
     }
+
+    
     
     tcm.performEditingTransaction {
       
+      // Add more detailed logging
+      print("String length: \(self.string.count)")
+      print("NSRange: \(nsRange)")
+
+      guard let stringRange = nsRange.range(in: self.string) else {
+        print("Couldn't convert NSRange to String.Index range. NSRange: \(nsRange), String length: \(self.string.count)")
+        return // Instead of fatalError, we return to avoid crashing
+      }
+      
+      
+      /// IMPORTANT:
+      /// I previously had the below set to `nsRange.range(in: self.visibleString)`,
+      /// which I believe caused incorrect range calculations. I think it needs to be
+      /// provided the whole string, to calculate the correct start/end locations etc.
+      ///
+//      guard let stringRange = nsRange.range(in: self.string) else {
+//        fatalError("Couldn't get string range")
+//      }
       
       guard let defaultRenderingAttributes = self.configuration.renderingAttributes.getAttributes()
       else { return }
       
-      tlm.setRenderingAttributes(defaultRenderingAttributes, for: parseRange)
+      DispatchQueue.main.async {
+        tlm.setRenderingAttributes(defaultRenderingAttributes, for: parseRange)
+      }
       
       if trigger == .text {
         self.elements.removeAll()

@@ -9,7 +9,7 @@ import SwiftUI
 
 struct ExampleView: View {
   
-  @State private var text: String = Self.exampleMarkdown
+  @State private var text: String = Self.shortSample
   @State private var editorInfo: EditorInfo? = nil
   @State private var config = MarkdownEditorConfiguration(
     fontSize: 13,
@@ -31,6 +31,10 @@ struct ExampleView: View {
       MarkdownEditor(text: $text, configuration:config) { info in
           self.editorInfo = info
         }
+      .overlay(alignment: .topLeading) {
+        Rectangle()
+          .frame(height: self.editorInfo?.frame.height, alignment: .topLeading)
+      }
 //        .frame(height: 300)
         .frame(maxWidth: .infinity, alignment: .top)
 //        .border(Color.green.opacity(0.3))

@@ -22,11 +22,16 @@ extension MarkdownTextView {
     
     setupViewportLayoutController()
     
-    DispatchQueue.main.async {
-      self.parseAndStyleMarkdownLite(trigger: .appeared)
-      
-      self.styleElements(trigger: .appeared)
+    
+    self.parseAndStyleMarkdownLite(trigger: .appeared)
+    
+    self.styleElements(trigger: .appeared)
+    
+    Task { @MainActor in
+      let heightUpdate = self.updateEditorHeight()
+      await self.infoHandler.update(heightUpdate)
     }
+    
     
     
   }
@@ -40,7 +45,7 @@ extension MarkdownTextView {
       name: NSView.boundsDidChangeNotification,
       object: enclosingScrollView?.contentView
     )
-
+    
   }
   
   
