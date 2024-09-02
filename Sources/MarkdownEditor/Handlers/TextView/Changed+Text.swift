@@ -28,6 +28,7 @@ extension MarkdownTextView {
     
         DispatchQueue.main.async {
           self.parseAndStyleMarkdownLite(trigger: .text)
+          self.styleElements(trigger: .text)
         }
     
   }

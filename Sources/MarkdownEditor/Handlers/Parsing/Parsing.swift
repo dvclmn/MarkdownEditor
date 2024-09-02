@@ -11,6 +11,8 @@ import BaseHelpers
 import STTextKitPlus
 import TextCore
 
+
+
 extension MarkdownTextView {
   
   enum ChangeTrigger {
@@ -27,10 +29,10 @@ extension MarkdownTextView {
   }
   
   
-  func styleElements() {
+  func styleElements(trigger: ChangeTrigger) {
     
     guard let tlm = self.textLayoutManager
-//          let tcm = tlm.textContentManager
+            //          let tcm = tlm.textContentManager
     else { return }
     
     /// Having now gone in one direction, and another, I think it's good having the array of elements
@@ -43,28 +45,35 @@ extension MarkdownTextView {
     ///
     for element in self.elements {
       
+//      print("Current element: \(element.syntax.name)")
+      
       let range = element.range
       let syntax = element.syntax
       
-      tlm.enumerateRenderingAttributes(from: range.content.location, reverse: false, using: { tlm, attributes, range in
-        <#code#>
-      })
+      // Apply content attributes
+      applyAttributesIfNeeded(syntax.contentRenderingAttributes, for: range.content)
       
-      
-      
-      tlm.setRenderingAttributes(syntax.contentRenderingAttributes, for: range.content)
-      
+      // Apply leading syntax attributes
       if let leading = range.leading {
-        tlm.setRenderingAttributes(syntax.syntaxRenderingAttributes, for: leading)
+        applyAttributesIfNeeded(syntax.syntaxRenderingAttributes, for: leading)
       } else {
         print("No value found for leading range, for syntax '\(syntax.name)'")
       }
-      if let trailing = range.trailing {
-        tlm.setRenderingAttributes(syntax.syntaxRenderingAttributes, for: trailing)
-      }
       
+      // Apply trailing syntax attributes
+      if let trailing = range.trailing {
+        applyAttributesIfNeeded(syntax.syntaxRenderingAttributes, for: trailing)
+      }
     }
+    
   }
+  
+  
+  
+  
+  
+  
+  
   
   
   func parseAndStyleMarkdownLite(

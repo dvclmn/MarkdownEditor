@@ -14,6 +14,56 @@ import TextCore
 
 extension MarkdownTextView {
   
+  
+  // Helper function to compare Any values
+  func isEqual(_ lhs: Any?, _ rhs: Any) -> Bool {
+    switch (lhs, rhs) {
+      case let (lhs as NSColor, rhs as NSColor):
+        return lhs == rhs
+      case let (lhs as NSFont, rhs as NSFont):
+        return lhs == rhs
+      case let (lhs as NSParagraphStyle, rhs as NSParagraphStyle):
+        return lhs == rhs
+      case let (lhs as NSNumber, rhs as NSNumber):
+        return lhs == rhs
+      case let (lhs as String, rhs as String):
+        return lhs == rhs
+        // Add more cases as needed for other attribute types
+      default:
+        return false
+    }
+  }
+  
+  // Helper function to apply attributes if needed
+  func applyAttributesIfNeeded(_ newAttributes: [NSAttributedString.Key: Any], for range: NSTextRange) {
+    guard let tlm = self.textLayoutManager else { return }
+    
+    var needsUpdate = false
+    tlm.enumerateRenderingAttributes(from: range.location, reverse: false) { _, currentAttributes, attributeRange in
+      guard attributeRange.contains(range) else {
+        needsUpdate = true
+        return false // Stop enumeration
+      }
+      
+      for (key, value) in newAttributes {
+        if let currentValue = currentAttributes[key], !isEqual(currentValue, value) {
+          needsUpdate = true
+          return false // Stop enumeration
+        } else if currentAttributes[key] == nil {
+          needsUpdate = true
+          return false // Stop enumeration
+        }
+      }
+      return true // Continue enumeration if needed
+    }
+    
+    if needsUpdate {
+      tlm.setRenderingAttributes(newAttributes, for: range)
+    }
+  }
+  
+  
+  
 //  func applyRenderingStyles(to element: Markdown.Element) {
 //    
 //    guard let tlm = self.textLayoutManager,
