@@ -19,7 +19,7 @@ public struct MarkdownEditor: NSViewRepresentable {
   
   public init(
     text: Binding<String>,
-    configuration: MarkdownEditorConfiguration = MarkdownEditorConfiguration(),
+    configuration: MarkdownEditorConfiguration,
     info: @escaping InfoUpdate = { _ in }
   ) {
     self._text = text
@@ -33,7 +33,7 @@ public struct MarkdownEditor: NSViewRepresentable {
     
     nsView.scrollView.textView.delegate = context.coordinator
     nsView.scrollView.textView.textLayoutManager?.delegate = context.coordinator
-    nsView.scrollView.textView.configuration = configuration
+    nsView.scrollView.textView.configuration = self.configuration
     
     nsView.scrollView.textView.onInfoUpdate = { info in
       DispatchQueue.main.async { self.info(info) }
@@ -58,8 +58,8 @@ public struct MarkdownEditor: NSViewRepresentable {
       textView.configuration = self.configuration
     }
     
-//    textView.needsLayout = true
-//    textView.needsDisplay = true
+    textView.needsLayout = true
+    textView.needsDisplay = true
     
     context.coordinator.updatingNSView = false
   }

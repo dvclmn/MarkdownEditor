@@ -8,10 +8,12 @@
 
 import Foundation
 import SwiftUI
+import TextCore
 
 public struct MarkdownEditorConfiguration: Sendable, Equatable {
   
-  public var fontAttributes: AttributeContainer
+  public var font: NSFont
+  public var lineHeight: CGFloat
   public var renderingAttributes: AttributeContainer
   
   public var insertionPointColour: Color
@@ -21,7 +23,8 @@ public struct MarkdownEditorConfiguration: Sendable, Equatable {
   public var insets: CGFloat
   
   public init(
-    fontAttributes: AttributeContainer = .markdownFontDefaults,
+    font: NSFont = NSFont.systemFont(ofSize: 15),
+    lineHeight: CGFloat = 1.3,
     renderingAttributes: AttributeContainer = .markdownRenderingDefaults,
     
     insertionPointColour: Color = .blue,
@@ -31,7 +34,8 @@ public struct MarkdownEditorConfiguration: Sendable, Equatable {
     isShowingFrames: Bool = false,
     insets: CGFloat = 20
   ) {
-    self.fontAttributes = fontAttributes
+    self.font = font
+    self.lineHeight = lineHeight
     self.renderingAttributes = renderingAttributes
     
     self.insertionPointColour = insertionPointColour
@@ -39,6 +43,33 @@ public struct MarkdownEditorConfiguration: Sendable, Equatable {
     self.hasLineNumbers = hasLineNumbers
     self.isShowingFrames = isShowingFrames
     self.insets = insets
+  }
+}
+
+extension MarkdownEditorConfiguration {
+  
+  var defaultTypingAttributes: Attributes {
+    
+    let renderingAttributes: Attributes = self.renderingAttributes.getAttributes() ?? [:]
+    
+    let fontAttributes: Attributes = [.font: self.font]
+    
+    let allAttributes: Attributes = renderingAttributes.merging(fontAttributes) { currentValue, newValue in
+      return true
+    }
+    
+    return allAttributes
+    
+  }
+  
+  var defaultParagraphStyle: NSParagraphStyle {
+    
+    let paragraphStyle = NSMutableParagraphStyle()
+    paragraphStyle.lineHeightMultiple = self.lineHeight
+    
+
+    return paragraphStyle
+    
   }
 }
 
@@ -52,19 +83,33 @@ public extension AttributeContainer {
     return container
   }
   
-  static var markdownFontDefaults: AttributeContainer {
-    
-    let paragraphStyle = NSMutableParagraphStyle()
-    
-    // TODO: Obvs exaggerated value for testing
-    paragraphStyle.lineHeightMultiple = MarkdownDefaults.lineHeightMultiplier
-    
-    var container = AttributeContainer()
-    
-    container.paragraphStyle = paragraphStyle
-    container.font = MarkdownDefaults.defaultFont
-    
-    return container
-    
-  }
+//  static var markdownFontDefaults: AttributeContainer {
+//    
+//    let paragraphStyle = NSMutableParagraphStyle()
+//    
+//    paragraphStyle.lineHeightMultiple = MarkdownDefaults.lineHeightMultiplier
+//    
+//    var container = AttributeContainer()
+//    
+//    container.paragraphStyle = paragraphStyle
+//    container.font = MarkdownDefaults.defaultFont
+//    
+//    return container
+//    
+//  }
+//  
+//  static var markdownFontDefaultsSmall: AttributeContainer {
+//    
+//    let paragraphStyle = NSMutableParagraphStyle()
+//    
+//    paragraphStyle.lineHeightMultiple = 1.1
+//    
+//    var container = AttributeContainer()
+//    
+//    container.paragraphStyle = paragraphStyle
+//    container.font = NSFont.systemFont(ofSize: 13)
+//    
+//    return container
+//    
+//  }
 }

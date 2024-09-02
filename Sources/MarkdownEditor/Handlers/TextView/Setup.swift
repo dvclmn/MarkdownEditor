@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import TextCore
 
 extension AttributeContainer {
   
@@ -48,14 +49,9 @@ extension MarkdownTextView {
     
     textContainer?.lineFragmentPadding = self.configuration.insets
     textContainerInset = NSSize(width: 0, height: self.configuration.insets)
-    
-    let renderingAttributes = self.configuration.renderingAttributes
-    let fontAttributes = self.configuration.fontAttributes
-    
-    let allAttributes = renderingAttributes.merging(fontAttributes)
 
-    typingAttributes = allAttributes.getAttributes() ?? [:]
-    defaultParagraphStyle = fontAttributes.paragraphStyle
+    typingAttributes = self.configuration.defaultTypingAttributes
+    defaultParagraphStyle = self.configuration.defaultParagraphStyle
 
   }
 }

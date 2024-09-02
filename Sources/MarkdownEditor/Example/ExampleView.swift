@@ -12,15 +12,24 @@ struct ExampleView: View {
   @State private var text: String = Self.exampleMarkdown
   @State private var editorInfo: EditorInfo? = nil
   
+  let config = MarkdownEditorConfiguration(
+    font: NSFont.systemFont(ofSize: 12),
+    lineHeight: 1.0,
+    renderingAttributes: .markdownRenderingDefaults,
+    insertionPointColour: .pink,
+    codeColour: .green,
+    hasLineNumbers: false,
+    isShowingFrames: true,
+    insets: 20
+  )
+  
   var body: some View {
     
     VStack(spacing: 0) {
       
 //      Spacer()
       
-      MarkdownEditor(
-        text: $text,
-        configuration: MarkdownEditorConfiguration(isShowingFrames: false)) { info in
+      MarkdownEditor(text: $text, configuration:config) { info in
           self.editorInfo = info
         }
 //        .frame(height: 300)

@@ -54,19 +54,11 @@ public extension MarkdownEditor {
         return NSTextLayoutFragment(textElement: textElement, range: textElement.elementRange)
       }
       
-      let text = tcm.attributedString(in: textRange)?.string ?? "nil"
-      
-      
-      
-      // Return a regular fragment for the closing ```
-      return NSTextLayoutFragment(textElement: textElement, range: textElement.elementRange)
-      
-      
+      let text = tcm.attributedString(in: textRange)?.string ?? ""
       
       switch parsingState {
         case .normal:
           if text.trimmingCharacters(in: .whitespacesAndNewlines) == "```" {
-            
             parsingState = .inCodeBlock(startLocation: location)
             // Return a regular fragment for the opening ```
             return NSTextLayoutFragment(textElement: textElement, range: textElement.elementRange)
@@ -78,22 +70,21 @@ public extension MarkdownEditor {
           if text.trimmingCharacters(in: .whitespacesAndNewlines) == "```" {
             // End of code block found
             parsingState = .normal
-            
-            // Apply code block styling to all fragments from startLocation to current location
-//            applyCodeBlockStyling(textLayoutManager, from: startLocation, to: location)
-            
-            let fragment = CodeBlockBackground(
-                      textElement: textElement,
-                      range: textElement.elementRange,
-                      paragraphStyle: .default
-                    )
-                    return fragment
-            
 
+            // Return a regular fragment for the closing ```
+            return NSTextLayoutFragment(textElement: textElement, range: textElement.elementRange)
           }
           
-         
+          let fragment = CodeBlockBackground(
+            textElement: textElement,
+            range: textElement.elementRange,
+            paragraphStyle: .default
+          )
+          return fragment
+          
       }
+//    }
+    
     }
     
 //    private func applyCodeBlockStyling(

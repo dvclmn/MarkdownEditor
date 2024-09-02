@@ -14,38 +14,38 @@ import TextCore
 
 extension MarkdownTextView {
   
-  func applyRenderingStyles(to element: Markdown.Element) {
-    
-    guard let tlm = self.textLayoutManager,
-          let tcm = tlm.textContentManager
-
-    else { return }
-    
-
-    let removableRenderingAttributes: [Attributes.Key] = [
-      .foregroundColor,
-      .backgroundColor
-    ]
-    
-    tcm.performEditingTransaction {
-
-      for attribute in removableRenderingAttributes {
-        tlm.removeRenderingAttribute(attribute, for: element.range.content)
-      }
-
-      guard let defaultRenderingAttributes = self.configuration.renderingAttributes.getAttributes()
-      else { return }
-      
-      
-      tlm.setRenderingAttributes(defaultRenderingAttributes, for: element.range.content)
-      
-
-      tlm.setRenderingAttributes(element.syntax.contentRenderingAttributes, for: element.range.content)
-
-    } // END perform editing
-    //    } // END task
-  }
-  
+//  func applyRenderingStyles(to element: Markdown.Element) {
+//    
+//    guard let tlm = self.textLayoutManager,
+//          let tcm = tlm.textContentManager
+//
+//    else { return }
+//    
+//
+//    let removableRenderingAttributes: [Attributes.Key] = [
+//      .foregroundColor,
+//      .backgroundColor
+//    ]
+//    
+//    tcm.performEditingTransaction {
+//
+//      for attribute in removableRenderingAttributes {
+//        tlm.removeRenderingAttribute(attribute, for: element.range.content)
+//      }
+//
+//      guard let defaultRenderingAttributes = self.configuration.renderingAttributes.getAttributes()
+//      else { return }
+//      
+//      
+//      tlm.setRenderingAttributes(defaultRenderingAttributes, for: element.range.content)
+//      
+//
+//      tlm.setRenderingAttributes(element.syntax.contentRenderingAttributes, for: element.range.content)
+//
+//    } // END perform editing
+//    //    } // END task
+//  }
+//  
 //  func applyMarkdownStyles() {
 //    
 //    guard let tlm = self.textLayoutManager,
