@@ -11,9 +11,8 @@ struct ExampleView: View {
   
   @State private var text: String = Self.exampleMarkdown
   @State private var editorInfo: EditorInfo? = nil
-  
-  let config = MarkdownEditorConfiguration(
-    font: NSFont.systemFont(ofSize: 12),
+  @State private var config = MarkdownEditorConfiguration(
+    fontSize: 11,
     lineHeight: 1.0,
     renderingAttributes: .markdownRenderingDefaults,
     insertionPointColour: .pink,

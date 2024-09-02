@@ -11,103 +11,12 @@ import BaseHelpers
 import TextCore
 import BaseStyles
 
-public struct MarkdownDefaults: Sendable {
-  
-  @MainActor public static let defaultFont =               NSFont.systemFont(ofSize: MarkdownDefaults.fontSize, weight: MarkdownDefaults.fontWeight)
-  public static let fontSize:                 Double = 15
-  public static let fontWeight:               NSFont.Weight = .regular
-  public static let fontOpacity:              Double = 0.85
-  
-  public static let headerSyntaxSize:         Double = 20
-  
-  public static let fontSizeMono:             Double = 14.5
-  
-  public static let syntaxAlpha:              Double = 0.3
-  public static let backgroundInlineCode:     Double = 0.2
-  public static let backgroundCodeBlock:      Double = 0.4
-  
-  public static let lineHeightMultiplier:     Double = 1.3
-//  public static let lineSpacing:              Double = 6
-  public static let paragraphSpacing:         Double = 0
-  
-  public static let paddingX: Double = 30
-  public static let paddingY: Double = 30
-}
-
-
-
-public extension AttributeSet {
-  
-  static let markdownDefaults: AttributeSet = [
-    .foregroundColor: NSColor.white,
-    .backgroundColor: NSColor.clear,
-    .font: MarkdownDefaults.defaultFont
-  ]
-}
-
-
-
 
 public extension Markdown.Syntax {
   
-  var fontSize: Double {
-    switch self {
-      case .inlineCode, .codeBlock:
-        14
-      default: MarkdownDefaults.fontSize
-    }
-  }
-  var foreGroundColor: NSColor {
-    switch self {
-      case .inlineCode:
-        NSColor(Swatch.peachVibrant.colour)
-      default:
-          .textColor.withAlphaComponent(0.85)
-    }
-  }
+  static let syntaxColour: NSColor = NSColor.gray
+  static let codeBackground: NSColor = NSColor.black.withAlphaComponent(0.4)
 
-  var contentFontAttributes: Attributes? {
-    
-    switch self {
-        
-      case .heading:
-        return [
-          .font: NSFont.systemFont(ofSize: self.fontSize, weight: .medium),
-        ]
-        
-      case .bold:
-        return [
-          .font: NSFont.systemFont(ofSize: self.fontSize, weight: .bold),
-        ]
-        
-      case .italic:
-        let bodyDescriptor = NSFontDescriptor.preferredFontDescriptor(forTextStyle: .body)
-        let italicDescriptor = bodyDescriptor.withSymbolicTraits(.italic)
-        let mediumWeightDescriptor = italicDescriptor.addingAttributes([
-          .traits: [
-            NSFontDescriptor.TraitKey.weight: NSFont.Weight.medium
-          ]
-        ])
-        let font = NSFont(descriptor: mediumWeightDescriptor, size: self.fontSize)
-        return [
-          .font: font as Any,
-        ]
-        
-      case .boldItalic:
-        
-        return [
-          .font: NSFont.systemFont(ofSize: self.fontSize, weight: .bold),
-        ]
-        
-      case .inlineCode, .codeBlock:
-        return [
-          .font: NSFont.monospacedSystemFont(ofSize: self.fontSize, weight: .medium)
-        ]
-      
-      case .link, .image, .list, .strikethrough, .horizontalRule, .highlight, .quoteBlock:
-        return nil
-    }
-  }
   var contentRenderingAttributes: Attributes {
         
         switch self {
@@ -177,7 +86,7 @@ public extension Markdown.Syntax {
         }
       } // END content attributes
       
-  var syntaxAttributes: [NSAttributedString.Key : Any]  {
+  var syntaxRenderingAttributes: [NSAttributedString.Key : Any]  {
     
     switch self {
       case .heading:
@@ -186,20 +95,17 @@ public extension Markdown.Syntax {
         ]
       case .inlineCode:
         return [
-          .font: NSFont.monospacedSystemFont(ofSize: self.fontSize, weight: .regular),
-          .foregroundColor: NSColor.textColor.withAlphaComponent(MarkdownDefaults.syntaxAlpha),
-          .backgroundColor: NSColor.black.withAlphaComponent(MarkdownDefaults.backgroundInlineCode)
+          .foregroundColor: Markdown.Syntax.syntaxColour,
+          .backgroundColor: Markdown.Syntax.codeBackground
         ]
       case .codeBlock:
         return [
-          .font: NSFont.monospacedSystemFont(ofSize: self.fontSize, weight: .regular),
-          .foregroundColor: NSColor.textColor.withAlphaComponent(MarkdownDefaults.syntaxAlpha),
-          .backgroundColor: NSColor.black.withAlphaComponent(MarkdownDefaults.backgroundCodeBlock)
+          .foregroundColor: Markdown.Syntax.syntaxColour,
+          .backgroundColor: Markdown.Syntax.codeBackground
         ]
       default:
         return [
-          .font: NSFont.monospacedSystemFont(ofSize: self.fontSize, weight: .regular),
-          .foregroundColor: NSColor.textColor.withAlphaComponent(MarkdownDefaults.syntaxAlpha)
+          .foregroundColor: Markdown.Syntax.syntaxColour
         ]
     }
   }

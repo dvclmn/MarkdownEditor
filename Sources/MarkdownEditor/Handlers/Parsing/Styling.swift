@@ -161,16 +161,16 @@ extension MarkdownEditor {
   
   /// Style syntax characters
   ///
-  private static func applySyntaxAttributes(
-    for syntax: Markdown.Syntax,
-    to attributedString: NSMutableAttributedString,
-    in range: NSRange
-  ) {
-    
-    for (key, value) in syntax.syntaxAttributes {
-      attributedString.addAttribute(key, value: value, range: range)
-    }
-  }
+//  private static func applySyntaxAttributes(
+//    for syntax: Markdown.Syntax,
+//    to attributedString: NSMutableAttributedString,
+//    in range: NSRange
+//  ) {
+//    
+//    for (key, value) in syntax.syntaxRenderingAttributes {
+//      attributedString.addAttribute(key, value: value, range: range)
+//    }
+//  }
   
   //  func setCodeBlockBackgrounds(for textView: MDTextView) {
   

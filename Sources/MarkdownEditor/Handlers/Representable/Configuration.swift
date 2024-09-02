@@ -12,7 +12,7 @@ import TextCore
 
 public struct MarkdownEditorConfiguration: Sendable, Equatable {
   
-  public var font: NSFont
+  public var fontSize: CGFloat
   public var lineHeight: CGFloat
   public var renderingAttributes: AttributeContainer
   
@@ -23,7 +23,7 @@ public struct MarkdownEditorConfiguration: Sendable, Equatable {
   public var insets: CGFloat
   
   public init(
-    font: NSFont = NSFont.systemFont(ofSize: 15),
+    fontSize: CGFloat = 15,
     lineHeight: CGFloat = 1.3,
     renderingAttributes: AttributeContainer = .markdownRenderingDefaults,
     
@@ -34,7 +34,7 @@ public struct MarkdownEditorConfiguration: Sendable, Equatable {
     isShowingFrames: Bool = false,
     insets: CGFloat = 20
   ) {
-    self.font = font
+    self.fontSize = fontSize
     self.lineHeight = lineHeight
     self.renderingAttributes = renderingAttributes
     
@@ -52,7 +52,8 @@ extension MarkdownEditorConfiguration {
     
     let renderingAttributes: Attributes = self.renderingAttributes.getAttributes() ?? [:]
     
-    let fontAttributes: Attributes = [.font: self.font]
+    let font = NSFont.systemFont(ofSize: self.fontSize)
+    let fontAttributes: Attributes = [.font: font]
     
     let allAttributes: Attributes = renderingAttributes.merging(fontAttributes) { currentValue, newValue in
       return true
@@ -82,34 +83,5 @@ public extension AttributeContainer {
 
     return container
   }
-  
-//  static var markdownFontDefaults: AttributeContainer {
-//    
-//    let paragraphStyle = NSMutableParagraphStyle()
-//    
-//    paragraphStyle.lineHeightMultiple = MarkdownDefaults.lineHeightMultiplier
-//    
-//    var container = AttributeContainer()
-//    
-//    container.paragraphStyle = paragraphStyle
-//    container.font = MarkdownDefaults.defaultFont
-//    
-//    return container
-//    
-//  }
-//  
-//  static var markdownFontDefaultsSmall: AttributeContainer {
-//    
-//    let paragraphStyle = NSMutableParagraphStyle()
-//    
-//    paragraphStyle.lineHeightMultiple = 1.1
-//    
-//    var container = AttributeContainer()
-//    
-//    container.paragraphStyle = paragraphStyle
-//    container.font = NSFont.systemFont(ofSize: 13)
-//    
-//    return container
-//    
-//  }
+
 }
