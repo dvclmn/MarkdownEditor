@@ -21,7 +21,7 @@ public extension MarkdownEditor {
     var selections: [NSTextSelection] = []
     
     var updatingNSView = false
-
+    
     init(_ parent: MarkdownEditor) {
       self.parent = parent
     }
@@ -32,7 +32,95 @@ public extension MarkdownEditor {
     }
     private var parsingState: ParsingState = .normal
     
-        
+    
+    
+    /// This method (`textLayoutManager`, defined on protocol `NSTextLayoutManagerDelegate`)
+    /// is called by the system when it needs to create a layout fragment for a specific portion of text.
+    /// It gives you an opportunity to provide a custom NSTextLayoutFragment subclass for different parts of your text.
+    ///
+    /// The method the framework calls to give the delegate an opportunity to return a custom text layout fragment.
+    /// https://developer.apple.com/documentation/uikit/nstextlayoutmanagerdelegate/3810024-textlayoutmanager
+    ///
+    /// Use this to provide an NSTextLayoutFragment specialized for an NSTextElement subclass
+    /// targeted for the rendering surface.
+    ///
+    
+    
+    
+    public func textLayoutManager(_ textLayoutManager: NSTextLayoutManager, textLayoutFragmentFor location: NSTextLocation, in textElement: NSTextElement) -> NSTextLayoutFragment {
+      
+      guard let tcm = textLayoutManager.textContentManager,
+            let textRange = textElement.elementRange else {
+        return NSTextLayoutFragment(textElement: textElement, range: textElement.elementRange)
+      }
+      
+      let text = tcm.attributedString(in: textRange)?.string ?? "nil"
+      
+      
+      
+      // Return a regular fragment for the closing ```
+      return NSTextLayoutFragment(textElement: textElement, range: textElement.elementRange)
+      
+      
+      
+      switch parsingState {
+        case .normal:
+          if text.trimmingCharacters(in: .whitespacesAndNewlines) == "```" {
+            
+            parsingState = .inCodeBlock(startLocation: location)
+            // Return a regular fragment for the opening ```
+            return NSTextLayoutFragment(textElement: textElement, range: textElement.elementRange)
+          }
+          // Apply normal styling
+          return NSTextLayoutFragment(textElement: textElement, range: textElement.elementRange)
+          
+        case .inCodeBlock(let startLocation):
+          if text.trimmingCharacters(in: .whitespacesAndNewlines) == "```" {
+            // End of code block found
+            parsingState = .normal
+            
+            // Apply code block styling to all fragments from startLocation to current location
+//            applyCodeBlockStyling(textLayoutManager, from: startLocation, to: location)
+            
+            let fragment = CodeBlockBackground(
+                      textElement: textElement,
+                      range: textElement.elementRange,
+                      paragraphStyle: .default
+                    )
+                    return fragment
+            
+
+          }
+          
+         
+      }
+    }
+    
+//    private func applyCodeBlockStyling(
+//      _ textLayoutManager: NSTextLayoutManager,
+//      from startLocation: NSTextLocation,
+//      to endLocation: NSTextLocation
+//    ) {
+//      
+//      guard let tcm = textLayoutManager.textContentManager,
+//            let range = NSTextRange(location: startLocation, end: endLocation) else {
+//        return
+//      }
+//      
+//      // Apply code block styling attributes
+//      tcm.performEditingTransaction {
+//        let attributes: [NSAttributedString.Key: Any] = [
+//          .foregroundColor: NSColor.systemBlue,
+////          .font: NSFont.monospacedSystemFont(ofSize: 12, weight: .regular)
+//        ]
+//        tcm.primaryTextLayoutManager?.setRenderingAttributes(attributes, for: range)
+//      }
+//    }
+    
+    
+    
+    
+    
     public func textDidChange(_ notification: Notification) {
       
       guard let textView = notification.object as? MarkdownTextView,
@@ -43,19 +131,10 @@ public extension MarkdownEditor {
       self.parent.text = textView.string
       self.selectedRanges = textView.selectedRanges
       
-//      print("`func textDidChange` — at \(Date.now)")
-      
-//      Task { @MainActor in
-//        await textView.applyMarkdownStyles()
-//      }
-      
       /// I have learned, and need to remember, that this `Coordinator` is
       /// a delegate, for my ``MarkdownTextView``. Which means I can take
       /// full advantage of methods here, just like I can with overrides in `MarkdownTextView`. They often have different functionalities to
       /// experiment with.
-      //      Task {
-      //        textView.processingTime = await textView.processFullDocumentWithTiming(textView.string)
-      //      }
       
     }
     
@@ -68,56 +147,7 @@ public extension MarkdownEditor {
       
     }
     
-
-    /// This method (`textLayoutManager`, defined on protocol `NSTextLayoutManagerDelegate`)
-    /// is called by the system when it needs to create a layout fragment for a specific portion of text.
-    /// It gives you an opportunity to provide a custom NSTextLayoutFragment subclass for different parts of your text.
-    ///
-    /// The method the framework calls to give the delegate an opportunity to return a custom text layout fragment.
-    /// https://developer.apple.com/documentation/uikit/nstextlayoutmanagerdelegate/3810024-textlayoutmanager
-    ///
-    /// Use this to provide an NSTextLayoutFragment specialized for an NSTextElement subclass
-    /// targeted for the rendering surface.
-    ///
     
-    public func textLayoutManager(
-      _ textLayoutManager: NSTextLayoutManager,
-      textLayoutFragmentFor location: NSTextLocation,
-      in textElement: NSTextElement
-    ) -> NSTextLayoutFragment {
-      
-      
-
-      let fragment = CodeBlockBackground(
-        textElement: textElement,
-        range: textElement.elementRange,
-        paragraphStyle: .default
-      )
-      return fragment
-//      
-//      
-//      if let markdownElement = textElement as? MarkdownElement {
-        
-//        switch markdownElement.syntax {
-//          case .codeBlock:
-//            return CodeBlockBackground(textElement: markdownElement, range: markdownElement.elementRange, paragraphStyle: .default)
-//          default:
-//            return NSTextLayoutFragment(textElement: textElement, range: textElement.elementRange)
-//        }
-        
-//        switch markdownElement.type {
-//          case .codeBlock:
-//            return CodeBlockLayoutFragment(textElement: textElement, range: textElement.elementRange)
-//          case .blockQuote:
-//            return BlockQuoteLayoutFragment(textElement: textElement, range: textElement.elementRange)
-//          case .heading(let level):
-//            return HeadingLayoutFragment(textElement: textElement, range: textElement.elementRange, level: level)
-//          case .paragraph:
-//            return NSTextLayoutFragment(textElement: textElement, range: textElement.elementRange)
-//        }
-//      }
-//      return NSTextLayoutFragment(textElement: textElement, range: textElement.elementRange)
-    }
     
     
     
