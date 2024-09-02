@@ -6,7 +6,7 @@
 //
 
 import SwiftUI
-
+import TextCore
 
 public extension MarkdownEditor {
   
@@ -15,14 +15,17 @@ public extension MarkdownEditor {
   }
   
   final class Coordinator: NSObject, NSTextViewDelegate, NSTextContentStorageDelegate, NSTextLayoutManagerDelegate {
+    
     var parent: MarkdownEditor
+    weak var textView: MarkdownTextView?
     var selectedRanges: [NSValue] = []
     
     var selections: [NSTextSelection] = []
     
     var updatingNSView = false
     
-    init(_ parent: MarkdownEditor) {
+    init(_ parent: MarkdownEditor)
+    {
       self.parent = parent
     }
 
@@ -48,11 +51,14 @@ public extension MarkdownEditor {
       
       let defaultFragment = NSTextLayoutFragment(textElement: textElement, range: textElement.elementRange)
       
-      guard let tcm = textLayoutManager.textContentManager,
+      let tlm = textLayoutManager
+      
+      guard let tcm = tlm.textContentManager,
               let textRange = textElement.elementRange
       else { return defaultFragment }
       
       let text = tcm.attributedString(in: textRange)?.string ?? "nil"
+
       
       if text.hasPrefix("# ") {
         
@@ -60,8 +66,27 @@ public extension MarkdownEditor {
           textElement: textElement,
           range: textElement.elementRange,
           paragraphStyle: .default,
-          isActive: true
+          isActive: false
         )
+        
+        guard let newMarkdownRange = Markdown.Element.markdownNSTextRange(
+          textRange,
+          in: text,
+          syntax: .heading(level: 1),
+          tcm: tcm
+        ) else { return defaultFragment }
+        
+        let newElement = Markdown.Element(syntax: .heading(level: 1), range: newMarkdownRange)
+        
+        
+        DispatchQueue.main.async { [weak self] in
+          
+          guard let self = self else { return }
+          
+          self.textView?.addMarkdownElement(newElement)
+
+        }
+        
         
         /// Attempt to 'highlight' the drawn background, if selected.
         /// Didn't work, leaving for now.

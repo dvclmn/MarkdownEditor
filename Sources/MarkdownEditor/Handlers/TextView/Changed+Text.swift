@@ -24,7 +24,11 @@ extension MarkdownTextView {
     
 //    print("`override func didChangeText()` — at \(Date.now)")
     
-    onAppearAndTextChange()
+//    onAppearAndTextChange()
+    
+        DispatchQueue.main.async {
+          self.parseAndStyleMarkdownLite(trigger: .text)
+        }
     
   }
 }
@@ -36,9 +40,9 @@ extension MarkdownTextView {
     
 //    print("`onAppearAndTextChange()`")
     
-    DispatchQueue.main.async {
-      self.parseAndStyleMarkdownLite()
-    }
+//    DispatchQueue.main.async {
+//      self.parseAndStyleMarkdownLite()
+//    }
     
 //    Task { @MainActor in
 //      

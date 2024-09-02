@@ -31,10 +31,14 @@ public struct MarkdownEditor: NSViewRepresentable {
     
     let nsView = MarkdownContainerView(frame: .zero, configuration: self.configuration)
     
-    nsView.scrollView.textView.delegate = context.coordinator
-    nsView.scrollView.textView.textLayoutManager?.delegate = context.coordinator
+    let textView = nsView.scrollView.textView
     
-    nsView.scrollView.textView.onInfoUpdate = { info in
+    textView?.delegate = context.coordinator
+    textView?.textLayoutManager?.delegate = context.coordinator
+    
+    context.coordinator.textView = textView
+    
+    textView?.onInfoUpdate = { info in
       DispatchQueue.main.async { self.info(info) }
     }
     
@@ -46,6 +50,7 @@ public struct MarkdownEditor: NSViewRepresentable {
     guard let textView = nsView.scrollView.textView else { return }
     
     context.coordinator.parent = self
+    context.coordinator.textView = textView
     
     context.coordinator.updatingNSView = true
     

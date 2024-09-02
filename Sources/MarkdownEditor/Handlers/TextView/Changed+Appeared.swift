@@ -22,7 +22,10 @@ extension MarkdownTextView {
     
     setupViewportLayoutController()
     
-    onAppearAndTextChange()
+    
+    DispatchQueue.main.async {
+      self.parseAndStyleMarkdownLite(trigger: .appeared)
+    }
     
     
   }

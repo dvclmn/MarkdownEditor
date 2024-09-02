@@ -23,8 +23,7 @@ extension MarkdownTextView {
         
         guard let self = self else { return }
         
-        await self.onAppearAndTextChange()
-        
+        await self.styleElements()
         
         
 //        let scrollInfo = await self.textView.generateScrollInfo()

@@ -60,7 +60,7 @@ class CodeBlockBackground: NSTextLayoutFragment {
     context.strokePath()
     context.restoreGState()
     
-    print("Drawing a code background. Is it active? \(isActive)")
+//    print("Drawing a code background. Is it active? \(isActive)")
     
     // Draw the actual text content
     super.draw(at: point, in: context)

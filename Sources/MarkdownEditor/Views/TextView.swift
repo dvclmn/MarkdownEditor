@@ -11,7 +11,7 @@ import BaseHelpers
 public class MarkdownTextView: NSTextView {
   
   var elements: [Markdown.Element] = []
-  var rangeIndex: [NSTextRange: Markdown.Element] = [:]
+//  var rangeIndex: [NSTextRange: Markdown.Element] = [:]
   var parsingTask: Task<Void, Never>?
   
   var scrollDebouncer = Debouncer(interval: 0.1)

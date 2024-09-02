@@ -24,7 +24,7 @@ public extension Range where Bound == String.Index {
   func textRange(
     in string: String,
     syntax: Markdown.Syntax,
-    provider: NSTextElementProvider
+    tcm: NSTextElementProvider
   ) -> NSTextRange? {
     
     // Check if the range is valid for the given string
@@ -33,7 +33,7 @@ public extension Range where Bound == String.Index {
       return nil
     }
     
-    let documentLocation: NSTextLocation = provider.documentRange.location
+    let documentLocation: NSTextLocation = tcm.documentRange.location
     
     // Use a safer method to get UTF-16 offsets
     let oldStart: Int = string.distance(from: string.startIndex, to: self.lowerBound)
@@ -46,8 +46,8 @@ public extension Range where Bound == String.Index {
     }
 
     
-    guard let newStart = provider.location?(documentLocation, offsetBy: oldStart),
-          let newEnd = provider.location?(documentLocation, offsetBy: oldEnd)
+    guard let newStart = tcm.location?(documentLocation, offsetBy: oldStart),
+          let newEnd = tcm.location?(documentLocation, offsetBy: oldEnd)
     else { return nil }
     
     let finalResult = NSTextRange(location: newStart, end: newEnd)
