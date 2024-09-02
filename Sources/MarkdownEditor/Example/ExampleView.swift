@@ -12,8 +12,8 @@ struct ExampleView: View {
   @State private var text: String = Self.exampleMarkdown
   @State private var editorInfo: EditorInfo? = nil
   @State private var config = MarkdownEditorConfiguration(
-    fontSize: 11,
-    lineHeight: 1.0,
+    fontSize: 13,
+    lineHeight: 1.1,
     renderingAttributes: .markdownRenderingDefaults,
     insertionPointColour: .pink,
     codeColour: .green,
@@ -120,6 +120,8 @@ extension ExampleView {
     @State private var selectionInfo: EditorInfo.Selection? = nil
     // @State private var editorHeight: CGFloat = .zero
     ```
+    # This is also a heading
+    With other stuff below
     
     Usually, `NSTextView` manages the *layout* process inside **the viewport** interacting ~~with its delegate~~.
     

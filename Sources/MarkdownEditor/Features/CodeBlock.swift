@@ -17,14 +17,18 @@ class CodeBlockBackground: NSTextLayoutFragment {
   let backgroundColor: NSColor = .lightGray.withAlphaComponent(0.2)
   let cornerRadius: CGFloat = 5
   
+  var isActive: Bool
+  
   init(
     textElement: NSTextElement,
     range rangeInElement: NSTextRange?,
-    paragraphStyle: NSParagraphStyle
+    paragraphStyle: NSParagraphStyle,
+    isActive: Bool
   ) {
     CodeBlockBackground.fragmentCount += 1
     self.fragmentIndex = CodeBlockBackground.fragmentCount
     self.paragraphStyle = paragraphStyle
+    self.isActive = isActive
     super.init(textElement: textElement, range: rangeInElement)
   }
   
@@ -37,8 +41,10 @@ class CodeBlockBackground: NSTextLayoutFragment {
     
     let rect = renderingSurfaceBounds
     
+    let colour = isActive ? NSColor.blue.withAlphaComponent(0.4) : backgroundColor
+    
     let path = NSBezierPath(roundedRect: rect, xRadius: cornerRadius, yRadius: cornerRadius)
-    backgroundColor.setFill()
+    colour.setFill()
     path.fill()
     
     // Draw the fragment index
@@ -53,6 +59,8 @@ class CodeBlockBackground: NSTextLayoutFragment {
     
     context.strokePath()
     context.restoreGState()
+    
+    print("Drawing a code background. Is it active? \(isActive)")
     
     // Draw the actual text content
     super.draw(at: point, in: context)

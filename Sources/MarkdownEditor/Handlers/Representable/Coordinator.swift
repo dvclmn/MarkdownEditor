@@ -25,14 +25,7 @@ public extension MarkdownEditor {
     init(_ parent: MarkdownEditor) {
       self.parent = parent
     }
-    
-    private enum ParsingState {
-      case normal
-      case inCodeBlock(startLocation: NSTextLocation)
-    }
-    private var parsingState: ParsingState = .normal
-    
-    
+
     
     /// This method (`textLayoutManager`, defined on protocol `NSTextLayoutManagerDelegate`)
     /// is called by the system when it needs to create a layout fragment for a specific portion of text.
@@ -47,69 +40,52 @@ public extension MarkdownEditor {
     
     
     
-    public func textLayoutManager(_ textLayoutManager: NSTextLayoutManager, textLayoutFragmentFor location: NSTextLocation, in textElement: NSTextElement) -> NSTextLayoutFragment {
+    public func textLayoutManager(
+      _ textLayoutManager: NSTextLayoutManager,
+      textLayoutFragmentFor location: NSTextLocation,
+      in textElement: NSTextElement
+    ) -> NSTextLayoutFragment {
+      
+      let defaultFragment = NSTextLayoutFragment(textElement: textElement, range: textElement.elementRange)
       
       guard let tcm = textLayoutManager.textContentManager,
-            let textRange = textElement.elementRange else {
-        return NSTextLayoutFragment(textElement: textElement, range: textElement.elementRange)
+              let textRange = textElement.elementRange
+      else { return defaultFragment }
+      
+      let text = tcm.attributedString(in: textRange)?.string ?? "nil"
+      
+      if text.hasPrefix("# ") {
+        
+        let fragment = CodeBlockBackground(
+          textElement: textElement,
+          range: textElement.elementRange,
+          paragraphStyle: .default,
+          isActive: true
+        )
+        
+        /// Attempt to 'highlight' the drawn background, if selected.
+        /// Didn't work, leaving for now.
+        ///
+//        if let currentSelection = textLayoutManager.insertionPointLocations.first {
+//          
+//          if textRange.contains(currentSelection) {
+//            fragment.isActive = true
+//          } else {
+//            fragment.isActive = false
+//          }
+//        }
+        
+        
+        print("Text as defined by `tcm.attributedString(in: textRange)?.string`: \(text)")
+        
+        return fragment
+      } else {
+        return defaultFragment
+        
       }
-      
-      let text = tcm.attributedString(in: textRange)?.string ?? ""
-      
-      switch parsingState {
-        case .normal:
-          if text.trimmingCharacters(in: .whitespacesAndNewlines) == "```" {
-            parsingState = .inCodeBlock(startLocation: location)
-            // Return a regular fragment for the opening ```
-            return NSTextLayoutFragment(textElement: textElement, range: textElement.elementRange)
-          }
-          // Apply normal styling
-          return NSTextLayoutFragment(textElement: textElement, range: textElement.elementRange)
-          
-        case .inCodeBlock(let startLocation):
-          if text.trimmingCharacters(in: .whitespacesAndNewlines) == "```" {
-            // End of code block found
-            parsingState = .normal
 
-            // Return a regular fragment for the closing ```
-            return NSTextLayoutFragment(textElement: textElement, range: textElement.elementRange)
-          }
-          
-          let fragment = CodeBlockBackground(
-            textElement: textElement,
-            range: textElement.elementRange,
-            paragraphStyle: .default
-          )
-          return fragment
-          
-      }
-//    }
-    
     }
-    
-//    private func applyCodeBlockStyling(
-//      _ textLayoutManager: NSTextLayoutManager,
-//      from startLocation: NSTextLocation,
-//      to endLocation: NSTextLocation
-//    ) {
-//      
-//      guard let tcm = textLayoutManager.textContentManager,
-//            let range = NSTextRange(location: startLocation, end: endLocation) else {
-//        return
-//      }
-//      
-//      // Apply code block styling attributes
-//      tcm.performEditingTransaction {
-//        let attributes: [NSAttributedString.Key: Any] = [
-//          .foregroundColor: NSColor.systemBlue,
-////          .font: NSFont.monospacedSystemFont(ofSize: 12, weight: .regular)
-//        ]
-//        tcm.primaryTextLayoutManager?.setRenderingAttributes(attributes, for: range)
-//      }
-//    }
-    
-    
-    
+
     
     
     public func textDidChange(_ notification: Notification) {

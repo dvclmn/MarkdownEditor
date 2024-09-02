@@ -339,14 +339,27 @@ extension Markdown.Syntax {
   
   static public var testCases: [Markdown.Syntax] {
     return [
-      .codeBlock,
       .heading(level: 1),
       .heading(level: 2),
+      .heading(level: 3),
+      .heading(level: 4),
+      .heading(level: 5),
+      .heading(level: 6),
+      
+        .bold,
+      .italic,
+      .boldItalic,
+      
+        .strikethrough,
+      .highlight,
+      .inlineCode,
+      
+        .list(style: .ordered),
+      .horizontalRule,
+      .codeBlock,
+      .quoteBlock,
       .link,
-//      .bold,
-//      .italic,
-//      .inlineCode,
-//      .strikethrough
+      .image
     ]
   }
   
