@@ -126,7 +126,7 @@ extension MarkdownTextView {
 //        for syntax in Markdown.Syntax.testCases {
           
 //          if is a code block
-        let codeBlockRegex: Regex<Substring> = /```/
+        let codeBlockRegex: Regex<Substring> = /(?m)^```[\s\S]*?^```/
           
           for match in self.string[stringRange].matches(of: codeBlockRegex) {
             

@@ -26,7 +26,11 @@ public extension MarkdownEditor {
       self.parent = parent
     }
     
-    
+    private enum ParsingState {
+      case normal
+      case inCodeBlock(startLocation: NSTextLocation)
+    }
+    private var parsingState: ParsingState = .normal
     
         
     public func textDidChange(_ notification: Notification) {
@@ -64,36 +68,32 @@ public extension MarkdownEditor {
       
     }
     
-    /// From LLM, not sure if true:
-    /// This method (`textLayoutManager`, defined on protocol `NSTextLayoutManagerDelegate`) is called by the system when it needs to create a layout fragment for a specific portion of text. It gives you an opportunity to provide a custom NSTextLayoutFragment subclass for different parts of your text.
+
+    /// This method (`textLayoutManager`, defined on protocol `NSTextLayoutManagerDelegate`)
+    /// is called by the system when it needs to create a layout fragment for a specific portion of text.
+    /// It gives you an opportunity to provide a custom NSTextLayoutFragment subclass for different parts of your text.
     ///
     /// The method the framework calls to give the delegate an opportunity to return a custom text layout fragment.
+    /// https://developer.apple.com/documentation/uikit/nstextlayoutmanagerdelegate/3810024-textlayoutmanager
     ///
-//    public func textLayoutManager(
-//      _ textLayoutManager: NSTextLayoutManager,
-//      textLayoutFragmentFor location: NSTextLocation,
-//      in textElement: NSTextElement
-//    ) -> NSTextLayoutFragment {
-//      
-//      let fragment = CodeBlockBackground(
-//        textElement: textElement,
-//        range: textElement.elementRange,
-//        paragraphStyle: .default
-//      )
-//      return fragment
-//    }
+    /// Use this to provide an NSTextLayoutFragment specialized for an NSTextElement subclass
+    /// targeted for the rendering surface.
+    ///
     
-    
-//    public func textLayoutManager(_ textLayoutManager: NSTextLayoutManager, textLayoutFragmentFor location: NSTextLocation, in textElement: NSTextElement) -> NSTextLayoutFragment {
+    public func textLayoutManager(
+      _ textLayoutManager: NSTextLayoutManager,
+      textLayoutFragmentFor location: NSTextLocation,
+      in textElement: NSTextElement
+    ) -> NSTextLayoutFragment {
       
       
 
-//      let fragment = CodeBlockBackground(
-//        textElement: textElement,
-//        range: textElement.elementRange,
-//        paragraphStyle: .default
-//      )
-//      return fragment
+      let fragment = CodeBlockBackground(
+        textElement: textElement,
+        range: textElement.elementRange,
+        paragraphStyle: .default
+      )
+      return fragment
 //      
 //      
 //      if let markdownElement = textElement as? MarkdownElement {
@@ -117,7 +117,7 @@ public extension MarkdownEditor {
 //        }
 //      }
 //      return NSTextLayoutFragment(textElement: textElement, range: textElement.elementRange)
-//    }
+    }
     
     
     
