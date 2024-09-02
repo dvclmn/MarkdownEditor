@@ -20,62 +20,7 @@ extension MarkdownTextView {
     case appeared
     case scroll
   }
-  
-  func addMarkdownElement(_ element: Markdown.Element) {
-    elements.append(element)
-    //    rangeIndex[element.range] = element
-    //    elements.sort { $0.range.location < $1.range.location }
-    needsDisplay = true
-  }
-  
-  
-  func styleElements(trigger: ChangeTrigger) {
-    
-    guard let tlm = self.textLayoutManager
-            //          let tcm = tlm.textContentManager
-    else { return }
-    
-    /// Having now gone in one direction, and another, I think it's good having the array of elements
-    /// as the way to establish what should be styled. Rather than styling right at the point where
-    /// ranges/matches are found (aka parsing).
-    ///
-    /// I think this will allow me to centralise the logic for styling, and allow the styling code to be
-    /// less concerned with how parsing is ahiceved. It will simply focus on appropriately styling
-    /// what is there in the elements array.
-    ///
-    for element in self.elements {
-      
-//      print("Current element: \(element.syntax.name)")
-      
-      let range = element.range
-      let syntax = element.syntax
-      
-      // Apply content attributes
-      applyAttributesIfNeeded(syntax.contentRenderingAttributes, for: range.content)
-      
-      // Apply leading syntax attributes
-      if let leading = range.leading {
-        applyAttributesIfNeeded(syntax.syntaxRenderingAttributes, for: leading)
-      } else {
-        print("No value found for leading range, for syntax '\(syntax.name)'")
-      }
-      
-      // Apply trailing syntax attributes
-      if let trailing = range.trailing {
-        applyAttributesIfNeeded(syntax.syntaxRenderingAttributes, for: trailing)
-      }
-    }
-    
-  }
-  
-  
-  
-  
-  
-  
-  
-  
-  
+
   func parseAndStyleMarkdownLite(
     in range: NSTextRange? = nil,
     trigger: ChangeTrigger
@@ -85,9 +30,19 @@ extension MarkdownTextView {
           let viewportRange = tlm.textViewportLayoutController.viewportRange
     else { return }
     
-    print("\n\n------\nParse and style markdown.")
+//    print("\n\n------\nParse and style markdown.")
     
-    let parseRange = range ?? viewportRange
+    var parseRange: NSTextRange
+    
+    switch trigger {
+      case .text:
+        parseRange = range ?? viewportRange
+      case .appeared:
+        parseRange = tlm.documentRange
+      case .scroll:
+        parseRange = range ?? viewportRange
+    }
+    
     let nsRange = NSRange(parseRange, in: tcm)
     
     /// IMPORTANT:
@@ -109,6 +64,9 @@ extension MarkdownTextView {
       
       if trigger == .text {
         self.elements.removeAll()
+        
+//        self.removeElements(in: parseRange)
+        
       }
       
       /// We need to loop over the syntax that we want to be on the lookout for
@@ -118,9 +76,12 @@ extension MarkdownTextView {
       ///
       for syntax in Markdown.Syntax.testCases {
         
+        guard let regex = syntax.regex else {
+//          print("No regex (currently) for this syntax type: \(syntax.name)")
+          continue
+        }
         
-        for match in self.string[stringRange].matches(of: syntax.regex) {
-          
+        for match in self.string[stringRange].matches(of: regex) {
           
           //          print("\(match.briefDescription)")
           
@@ -133,8 +94,6 @@ extension MarkdownTextView {
           let newElement = Markdown.Element(syntax: syntax, range: markdownRange)
           
           self.addMarkdownElement(newElement)
-          
-          print("Element count: \(self.elements.count)")
           
         } // END match loop
         
@@ -158,93 +117,10 @@ extension MarkdownTextView {
       
     } // END performEditingTransaction
     
-    print("Finished parsing and styling\n------\n")
+//    print("Finished parsing and styling\n------\n")
   } // parseAndStyleMarkdownLite
   
-  //  func parseMarkdown(
-  //    in range: NSTextRange? = nil
-  //  ) async {
-  //
-  //    guard let tlm = self.textLayoutManager,
-  //          let tcm = tlm.textContentManager
-  //    else { return }
-  //
-  //    let searchRange = range ?? tlm.documentRange
-  //
-  //    self.parsingTask?.cancel()
-  //
-  //    self.parsingTask = Task {
-  //
-  //      // TODO: This could be made to be much more efficient I'm sure, by not deleting everything wholesale each time
-  //      self.elements.removeAll()
-  //      //      self.rangeIndex.removeAll()
-  //
-  //      for syntax in Markdown.Syntax.testCases {
-  //
-  //        let newElements: [Markdown.Element] = markdownMatches(
-  //          in: self.string,
-  //          of: syntax,
-  //          range: searchRange,
-  //          textContentManager: tcm
-  //        )
-  //
-  //        self.elements.append(contentsOf: newElements)
-  //      }
-  //    } // END task
-  //
-  //    await self.parsingTask?.value
-  //
-  //  }
-  
-  //  func markdownMatches(
-  //    in string: String,
-  //    of syntax: Markdown.Syntax,
-  //    range: NSTextRange? = nil,
-  //    textContentManager tcm: NSTextContentManager
-  //  ) -> [Markdown.Element] {
-  //
-  //    var elements: [Markdown.Element] = []
-  //
-  //    /// If no range is supplied, we default to the `documentRange`
-  //    ///
-  //    let textRange = range ?? tcm.documentRange
-  //
-  //    /// This uses a custom init from `STTextKitPlus`, to get an
-  //    /// `NSRange` from a `NSTextRange`
-  //    ///
-  //    let nsRange = NSRange(textRange, in: tcm)
-  //
-  //    /// Gets `stringRange`, of type `Range<String.Index>`
-  //    ///
-  //    guard let stringRange = nsRange.range(in: string) else {
-  //      print("Couldn't get `Range<String.Index>` from NSRange")
-  //      return []
-  //    }
-  //
-  //    /// `match` here gives us this rather complex type:
-  //    /// `Regex<Regex<(Substring, leading: Substring, content: Substring, trailing: Substring)>.RegexOutput>.Match`
-  //    ///
-  //    /// Because of our typealias ``MarkdownRegex``, we can also write it like this:
-  //    /// `Regex<MarkdownRegex.RegexOutput>.Match`.
-  //    ///
-  //    /// So, still overwhelming-looking, but slightly less verbose.
-  //    ///
-  //    for match in string[stringRange].matches(of: syntax.regex) {
-  //
-  //
-  //      let markdownRange: MarkdownRange = getMarkdownStringRange(in: match)
-  //
-  //      let newElement = Markdown.Element(syntax: syntax, range: markdownRange)
-  //
-  //      elements.append(newElement)
-  //
-  //
-  //
-  //    } // END loop over string matches
-  //
-  //    return elements
-  //
-  //  } // END markdownMatches
+
   
   func getSingleNSTextRange(
     in match: Regex<Regex<Substring>.RegexOutput>.Match

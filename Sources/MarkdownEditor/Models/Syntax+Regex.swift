@@ -139,32 +139,14 @@ extension Markdown.Syntax {
   /// pattern to match any character, including newlines.
   ///
   ///
-  public var regex: MarkdownRegex {
+  public var regex: MarkdownRegex? {
     switch self {
         
         /// `^# ` The caret ensures this only matches if the string starts on a new line
         /// The `$` matches the end of a line.
         ///
-      case .heading(let level):
-        
-        if level == 1 {
-          return /^(?<leading>#) (?<content>.*$)(?<trailing>)/
-          
-        } else if level == 2 {
-          return /^(?<leading>##) (?<content>.*$)(?<trailing>)/
-          
-        } else if level == 3 {
-          return /^(?<leading>###) (?<content>.*$)(?<trailing>)/
-          
-        } else if level == 4 {
-          return /^(?<leading>####) (?<content>.*$)(?<trailing>)/
-          
-        } else if level == 5 {
-          return /^(?<leading>#####) (?<content>.*$)(?<trailing>)/
-          
-        } else {
-          return /^(?<leading>######) (?<content>.*$)(?<trailing>)/
-        }
+      case .heading:
+        return nil
         
       case .bold:
         
@@ -213,17 +195,18 @@ extension Markdown.Syntax {
         /// Matches a simple list item: A hyphen followed by a space and any characters until the end of the line
         /// Note: This is a placeholder and needs proper implementation for nested lists
       case .list(_):
-        return /(?<leading>`)(?<content>(?:[^`\n])+?)(?<trailing>`)/
+        return nil
         
         /// Matches a horizontal rule: Three hyphens
       case .horizontalRule:
-        return /(?<leading>`)(?<content>(?:[^`\n])+?)(?<trailing>`)/
+        return nil
         
         /// Matches a code block: Starts with three backticks, includes any characters (including newlines),
         /// and ends with three backticks at the start of a line
         /// Note: (?m) enables multiline mode, [\s\S] matches any character including newlines
       case .codeBlock:
-        return /(?<leading>(?m)^```)(?<content>[\s\S]*?)(?<trailing>^```)/
+        return nil
+//        /(?<leading>(?m)^```)(?<content>[\s\S]*?)(?<trailing>^```)/
         
         /// Matches a quote block: A '>' followed by a space at the start of a line, then any characters until the end of the line
       case .quoteBlock:

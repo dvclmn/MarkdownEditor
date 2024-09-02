@@ -11,10 +11,9 @@ import BaseHelpers
 public class MarkdownTextView: NSTextView {
   
   var elements: [Markdown.Element] = []
-//  var rangeIndex: [NSTextRange: Markdown.Element] = [:]
   var parsingTask: Task<Void, Never>?
   
-  var scrollDebouncer = Debouncer(interval: 0.1)
+  var scrollDebouncer = Debouncer(interval: 0.2)
   
   let infoHandler = EditorInfoHandler()
   
@@ -24,9 +23,6 @@ public class MarkdownTextView: NSTextView {
   
   private var viewportLayoutController: NSTextViewportLayoutController?
   var viewportDelegate: CustomViewportDelegate?
-  
-//  var viewportObservation: NSKeyValueObservation?
-//  var scrollObservation: NSKeyValueObservation?
 
   public var onInfoUpdate: MarkdownEditor.InfoUpdate = { _ in }
   

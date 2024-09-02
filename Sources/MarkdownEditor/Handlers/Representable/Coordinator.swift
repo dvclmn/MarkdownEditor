@@ -101,7 +101,7 @@ public extension MarkdownEditor {
 //        }
         
         
-        print("Text as defined by `tcm.attributedString(in: textRange)?.string`: \(text)")
+//        print("Text as defined by `tcm.attributedString(in: textRange)?.string`: \(text)")
         
         return fragment
       } else {

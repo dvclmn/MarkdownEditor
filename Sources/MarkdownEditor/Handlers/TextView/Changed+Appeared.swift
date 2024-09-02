@@ -22,7 +22,6 @@ extension MarkdownTextView {
     
     setupViewportLayoutController()
     
-    
     DispatchQueue.main.async {
       self.parseAndStyleMarkdownLite(trigger: .appeared)
       
@@ -41,11 +40,7 @@ extension MarkdownTextView {
       name: NSView.boundsDidChangeNotification,
       object: enclosingScrollView?.contentView
     )
-    
-    // Method 2: Using KVO
-    //    scrollObservation = enclosingScrollView?.contentView.observe(\.bounds) { [weak self] (contentView, change) in
-    //      self?.handleScrollViewDidScroll()
-    //    }
+
   }
   
   
