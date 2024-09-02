@@ -10,15 +10,18 @@ import AppKit
 public class MarkdownContainerView: NSView {
   let scrollView: MarkdownScrollView
   
-  override init(frame: NSRect) {
+  init(frame: NSRect, configuration: MarkdownEditorConfiguration) {
     
-    let scrollView = MarkdownScrollView(frame: .zero)
+    let scrollView = MarkdownScrollView(frame: .zero, configuration: configuration)
     self.scrollView = scrollView
     
     super.init(frame: frame)
     
     setupViews()
   }
+
+  
+  
   
   required init?(coder: NSCoder) {
     fatalError("init(coder:) has not been implemented")

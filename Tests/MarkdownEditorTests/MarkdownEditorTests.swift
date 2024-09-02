@@ -16,7 +16,7 @@ import XCTest
 
 struct MarkdownTextViewTests {
   
-  let textView = MarkdownTextView(frame: .zero, textContainer: nil)
+  let textView = MarkdownTextView(frame: .zero, textContainer: nil, configuration: .init())
   let exampleString = """
     # Header
     

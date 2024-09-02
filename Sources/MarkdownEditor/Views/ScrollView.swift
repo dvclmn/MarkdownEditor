@@ -16,19 +16,19 @@ public class MarkdownScrollView: NSScrollView {
   
   // MARK: - Initialization
   
-  override init(frame frameRect: NSRect) {
+  init(frame frameRect: NSRect, configuration: MarkdownEditorConfiguration) {
+    super.init(frame: frameRect)
     
-    let textView = MarkdownTextView(frame: .zero, textContainer: nil)
-    
+    let textView = MarkdownTextView(frame: .zero, textContainer: nil, configuration: configuration)
     let lineNumbers = LineNumberView(scrollView: nil, orientation: .verticalRuler)
+    
     
     self.textView = textView
     self.lineNumberView = lineNumbers
     
-    super.init(frame: frameRect)
     setupScrollView()
   }
-  
+
   required init?(coder: NSCoder) {
     assertionFailure("This init not supported")
     super.init(coder: coder)

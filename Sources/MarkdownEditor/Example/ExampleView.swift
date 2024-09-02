@@ -18,7 +18,7 @@ struct ExampleView: View {
     insertionPointColour: .pink,
     codeColour: .green,
     hasLineNumbers: false,
-    isShowingFrames: true,
+    isShowingFrames: false,
     insets: 20
   )
   
@@ -36,21 +36,21 @@ struct ExampleView: View {
 //        .border(Color.green.opacity(0.3))
       
       
-      HStack(alignment: .bottom) {
+//      HStack(alignment: .bottom) {
 //        Text(self.editorInfo?.selection.summary ?? "nil")
 //        Spacer()
 //        Text(self.editorInfo?.scroll.summary ?? "nil")
 //        Spacer()
 //        Text(self.editorInfo?.text.scratchPad ?? "nil")
-      }
-      .textSelection(.enabled)
-      .foregroundStyle(.secondary)
-      .font(.callout)
-      .frame(maxWidth: .infinity, alignment: .leading)
-      .padding(.horizontal, 30)
-      .padding(.top, 10)
-      .padding(.bottom, 14)
-      .background(.black.opacity(0.5))
+//      }
+//      .textSelection(.enabled)
+//      .foregroundStyle(.secondary)
+//      .font(.callout)
+//      .frame(maxWidth: .infinity, alignment: .leading)
+//      .padding(.horizontal, 30)
+//      .padding(.top, 10)
+//      .padding(.bottom, 14)
+//      .background(.black.opacity(0.5))
     }
 //    .overlay(alignment: .topTrailing) {
 //      VStack {

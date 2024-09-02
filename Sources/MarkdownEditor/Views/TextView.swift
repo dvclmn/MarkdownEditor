@@ -44,7 +44,7 @@ public class MarkdownTextView: NSTextView {
   public init(
     frame frameRect: NSRect,
     textContainer container: NSTextContainer?,
-    configuration: MarkdownEditorConfiguration = .init()
+    configuration: MarkdownEditorConfiguration
   ) {
     self.configuration = configuration
     
@@ -107,6 +107,8 @@ extension Notification.Name {
 
 
 extension MarkdownTextView {
+  
+  
   
   func setupViewportLayoutController() {
     guard let textLayoutManager = self.textLayoutManager else { return }
