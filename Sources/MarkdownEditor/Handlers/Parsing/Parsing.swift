@@ -12,7 +12,6 @@ import STTextKitPlus
 import TextCore
 
 
-
 extension MarkdownTextView {
   
   enum ChangeTrigger {
@@ -59,11 +58,11 @@ extension MarkdownTextView {
       print("String length: \(self.string.count)")
       print("NSRange: \(nsRange)")
 
-      guard let stringRange = nsRange.range(in: self.string) else {
-        print("Couldn't convert NSRange to String.Index range. NSRange: \(nsRange), String length: \(self.string.count)")
-        return // Instead of fatalError, we return to avoid crashing
-      }
-      
+//      guard let stringRange = nsRange.range(in: self.string) else {
+//        print("Couldn't convert NSRange to String.Index range. NSRange: \(nsRange), String length: \(self.string.count)")
+//        return // Instead of fatalError, we return to avoid crashing
+//      }
+//      
       
       /// IMPORTANT:
       /// I previously had the below set to `nsRange.range(in: self.visibleString)`,
@@ -88,36 +87,86 @@ extension MarkdownTextView {
         
       }
       
-      /// We need to loop over the syntax that we want to be on the lookout for
-      ///
-      /// I think that longer-spanning elements like code blocks, may need their own logic
-      /// for parsing and styling, so they are not inhibited by viewport range issues.
-      ///
-      for syntax in Markdown.Syntax.testCases {
+//      self.enumerateTextElements(from: range.location, options: []) { element in
+        //
+        //      guard let textRange = element.elementRange else { return false }
+        //
+        //      if textRange.endLocation >= range.endLocation {
+        //
+        //        print("Returning false. I wonder what is in here? \(element)")
+        //
+        //        return false
+        //      }
+        //
+        //      print("Otherwise, returning true. \(element)")
+        //      return true
+        //    }
+        //  }
+      
+      tcm.enumerateTextElements(from: parseRange.location) { element in
+        guard let textParagraph = element as? NSTextParagraph,
+              let textContent = textParagraph.attributedString.string as String?,
+              let textRange = element.elementRange
         
-        guard let regex = syntax.regex else {
-//          print("No regex (currently) for this syntax type: \(syntax.name)")
-          continue
+        else { return false }
+        
+        if textRange.endLocation >= parseRange.endLocation {
+          return false
         }
         
-        for match in self.string[stringRange].matches(of: regex) {
+        for syntax in Markdown.Syntax.testCases {
           
-          //          print("\(match.briefDescription)")
+          guard let regex = syntax.regex else { continue }
           
-          guard let markdownRange: MarkdownNSTextRange = self.getMarkdownNSTextRange(in: match)
-          else {
-            print("Error converting ranges to `MarkdownNSTextRange`")
-            break
-          }
+          let matches = textContent.matches(of: regex)
           
-          let newElement = Markdown.Element(syntax: syntax, range: markdownRange)
-          
-          self.addMarkdownElement(newElement)
-          
-        } // END match loop
+          for match in matches {
+            
+//            print("Text: \(textContent)")
+//            print("Matches: \(match.briefDescription)")
+            
+            
+            
+//            if let markdownRange = self.convertToMarkdownNSTextRange(match.range, in: textRange, contentManager: tcm) {
+//              let newElement = Markdown.Element(syntax: syntax, range: markdownRange)
+//              self.addMarkdownElement(newElement)
+//            }
+          } // END match loop
+        } // END syntax loop
         
-      } // END syntax loop
-      
+        return true
+      }
+//
+//      /// We need to loop over the syntax that we want to be on the lookout for
+//      ///
+//      /// I think that longer-spanning elements like code blocks, may need their own logic
+//      /// for parsing and styling, so they are not inhibited by viewport range issues.
+//      ///
+//      for syntax in Markdown.Syntax.testCases {
+//        
+//        guard let regex = syntax.regex else {
+////          print("No regex (currently) for this syntax type: \(syntax.name)")
+//          continue
+//        }
+//        
+//        for match in self.string[stringRange].matches(of: regex) {
+//          
+//          //          print("\(match.briefDescription)")
+//          
+//          guard let markdownRange: MarkdownNSTextRange = self.getMarkdownNSTextRange(in: match)
+//          else {
+//            print("Error converting ranges to `MarkdownNSTextRange`")
+//            break
+//          }
+//          
+//          let newElement = Markdown.Element(syntax: syntax, range: markdownRange)
+//          
+//          self.addMarkdownElement(newElement)
+//          
+//        } // END match loop
+//        
+//      } // END syntax loop
+//      
       
       
       //      let codeBlockRegex: Regex<Substring> = /(?m)^```[\s\S]*?^```/
@@ -139,7 +188,21 @@ extension MarkdownTextView {
 //    print("Finished parsing and styling\n------\n")
   } // parseAndStyleMarkdownLite
   
-
+  
+//  func convertToMarkdownNSTextRange(_ matchRange: Range<String.Index>, in textRange: NSTextRange, contentManager: NSTextContentManager) -> MarkdownNSTextRange? {
+//    guard let startOffset = contentManager.offset(from: textRange.location, to: matchRange.lowerBound),
+//          let endOffset = contentManager.offset(from: textRange.location, to: matchRange.upperBound)
+//    else { return nil }
+//    
+//    let startLocation = contentManager.location(textRange.location, offsetBy: startOffset)
+//    let endLocation = contentManager.location(textRange.location, offsetBy: endOffset)
+//    
+//    guard let start = startLocation, let end = endLocation else { return nil }
+//    
+//    return MarkdownNSTextRange(location: start, endLocation: end)
+//  }
+  
+  
   
   func getSingleNSTextRange(
     in match: Regex<Regex<Substring>.RegexOutput>.Match

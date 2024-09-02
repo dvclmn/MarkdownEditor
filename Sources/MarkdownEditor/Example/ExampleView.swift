@@ -31,8 +31,9 @@ struct ExampleView: View {
       MarkdownEditor(text: $text, configuration:config) { info in
           self.editorInfo = info
         }
-      .overlay(alignment: .topLeading) {
+      .background(alignment: .topLeading) {
         Rectangle()
+          .fill(.blue.opacity(0.2))
           .frame(height: self.editorInfo?.frame.height, alignment: .topLeading)
       }
 //        .frame(height: 300)

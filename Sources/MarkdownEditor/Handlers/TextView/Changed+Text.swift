@@ -26,6 +26,10 @@ extension MarkdownTextView {
     
     //    onAppearAndTextChange()
     
+    DispatchQueue.main.async {
+      self.updateEditorHeightIfNeeded()
+    }
+    
     Task { @MainActor in
       let heightUpdate = self.updateEditorHeight()
       await self.infoHandler.update(heightUpdate)
@@ -34,24 +38,62 @@ extension MarkdownTextView {
     self.parseAndStyleMarkdownLite(trigger: .text)
     self.styleElements(trigger: .text)
     
-    
   }
 }
 
-extension MarkdownTextView {
-  func updateEditorHeight() -> EditorInfo.Frame {
+extension MarkdownTextView: NSTextContentStorageDelegate {
+  func textContentStorage(_ textContentStorage: NSTextContentStorage, didInvalidate range: NSTextRange) {
     
+    print("Does this ever get called?")
+    DispatchQueue.main.async {
+      self.updateEditorHeightIfNeeded()
+    }
+  }
+}
+
+
+extension MarkdownTextView {
+
+  func updateEditorHeightIfNeeded() {
+    let newFrame = updateEditorHeight()
+    
+    if abs(newFrame.height - frame.height) > 1 {
+      self.frame.size.height = newFrame.height
+      self.invalidateIntrinsicContentSize()
+      
+      // Update scroll view content size if necessary
+      if let scrollView = self.enclosingScrollView {
+        scrollView.documentView?.frame.size.height = newFrame.height
+        scrollView.contentView.needsDisplay = true
+      }
+      
+      self.superview?.needsLayout = true
+      self.superview?.needsLayout = true
+    }
+  }
+
+
+  
+  func updateEditorHeight() -> EditorInfo.Frame {
     guard let tlm = self.textLayoutManager else { return .init() }
+    
+    // Force layout update
+    tlm.ensureLayout(for: tlm.documentRange)
     
     let bounds = tlm.usageBoundsForTextContainer
     
+    let extraHeight: CGFloat = 80
+    
     let frame = EditorInfo.Frame(
       width: bounds.width,
-      height: bounds.height
+      height: bounds.height + extraHeight
     )
     
-    print("Updating editor size. Width: \(frame.width), Height: \(frame.height)")
+    print("Editor size — Width: \(frame.width), Height: \(frame.height)")
     
+    // Mark view for layout and display update
+    self.needsLayout = true
+    self.needsDisplay = true
     
     return frame
   }

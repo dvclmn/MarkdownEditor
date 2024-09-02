@@ -14,7 +14,7 @@ public class MarkdownTextView: NSTextView {
   var parsingTask: Task<Void, Never>?
   
   var scrollDebouncer = Debouncer(interval: 0.2)
-  
+
   let infoHandler = EditorInfoHandler()
   
   var configuration: MarkdownEditorConfiguration

@@ -139,6 +139,10 @@ public extension MarkdownEditor {
       
     }
     
+    public func textViewWillChangeText() {
+      
+    }
+    
     
     
     
