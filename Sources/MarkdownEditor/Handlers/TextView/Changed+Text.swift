@@ -58,6 +58,8 @@ extension MarkdownTextView {
       await self.infoHandler.update(heightUpdate)
     }
     
+    exploreTextSegments()
+    
     //    self.parseAndStyleMarkdownLite(trigger: .text)
     //    self.styleElements(trigger: .text)
     

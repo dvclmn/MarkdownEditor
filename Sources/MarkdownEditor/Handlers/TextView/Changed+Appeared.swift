@@ -40,13 +40,57 @@ extension MarkdownTextView {
   
   func exploreTextSegments() {
     
-    guard let tlm = self.textLayoutManager
+    guard let tlm = self.textLayoutManager,
+          let tcm = tlm.textContentManager
     else { return }
     
     
     
     tlm.enumerateTextLayoutFragments(from: tlm.documentRange.location) { fragment in
-//      print("I want to know what a text segment is: \(fragment)")
+      
+      guard let paragraph = fragment.textElement as? NSTextParagraph else { return false }
+      
+      let string = paragraph.attributedString.string
+      
+      guard let paragraphRange = paragraph.elementRange,
+            let range = NSTextRange(location: paragraphRange.location, end: paragraphRange.endLocation)
+              
+      else {
+        print("Returned false: \(string)")
+        return false
+      }
+      
+      tcm.performEditingTransaction {
+        
+        
+        for syntax in Markdown.Syntax.allCases {
+          
+          guard let regex = syntax.regex else { continue }
+          
+          if string.contains(regex) {
+            print(string)
+            
+            tlm.setRenderingAttributes(syntax.contentRenderingAttributes, for: range)
+            
+          } else {
+//            tlm.removeRenderingAttribute(.foregroundColor, for: range)
+          }
+          
+        }
+        
+
+      } // END perform edit
+
+      
+//      for lineFragment in fragment.textLineFragments {
+//        print("Line fragment: \(lineFragment)")
+        
+//        lineFragment
+//      }
+      
+//      print("\(paragraph.attributedString)")
+      
+//      print("I want to know what a text segment is: \(fragment.)")
       
       return true
 

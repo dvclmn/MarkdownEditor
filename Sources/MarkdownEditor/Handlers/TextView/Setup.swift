@@ -41,9 +41,6 @@ extension MarkdownTextView {
     
   }
 
-  
-  
-  
   func textViewSetup() {
     
     isEditable = true

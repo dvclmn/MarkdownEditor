@@ -14,7 +14,6 @@ public class MarkdownContainerView: NSView {
   init(frame: NSRect, configuration: MarkdownEditorConfiguration) {
     
     let textView = MarkdownTextView(frame: .zero, textContainer: nil, configuration: configuration)
-    
     self.textView = textView
     
     let scrollView = MarkdownScrollView(frame: .zero, configuration: configuration)
@@ -33,7 +32,6 @@ public class MarkdownContainerView: NSView {
   private func setupViews() {
 
     addSubview(scrollView)
-    
     
     scrollView.hasVerticalScroller = true
     scrollView.hasHorizontalScroller = false

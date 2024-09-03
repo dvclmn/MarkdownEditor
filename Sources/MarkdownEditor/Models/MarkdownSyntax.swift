@@ -72,6 +72,11 @@ extension Markdown {
     
   }
   
+  
+  
+}
+
+extension Markdown.Syntax {
   static public var allCases: [Markdown.Syntax] {
     return [
       .heading(level: 1),
@@ -116,5 +121,4 @@ extension Markdown {
       .image
     ]
   }
-  
 }
