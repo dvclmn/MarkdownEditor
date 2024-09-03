@@ -6,7 +6,6 @@
 //
 
 import SwiftUI
-import STTextKitPlus
 
 extension MarkdownTextView {
   
@@ -90,10 +89,8 @@ extension MarkdownTextView {
     //    let selectedRange = self.selectedRange()
     let selectedRange = self.selectedTextRange()
     
-    let insertionPointLocations = tlm.insertionPointLocations
-    
     let scratchPad: String = """
-    \(insertionPointLocations)
+    
     """
     
     //    guard let selectedLocation = self.selectedTextLocation(),
@@ -109,15 +106,13 @@ extension MarkdownTextView {
     //
     //    let currentBlock = self.getMarkdownElement(for: selectedTextRange) ?? .none
     
-    let selectedString = tlm.textContentManager?.attributedString(in: selectedRange)
-    
     
     //    let fullString = self.string as NSString
     
     //    let tcs = self.textContentStorage
     
     return EditorInfo.Selection(
-      selection: (selectedString?.string.count ?? 0).description,
+//      selection: (selectedString?.string.count ?? 0).description,
       //      selection: currentBlock?.description ?? "nil",
       location: EditorInfo.Selection.Location(line: 0, column: 0),
       scratchPad: scratchPad

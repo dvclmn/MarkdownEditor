@@ -114,19 +114,10 @@ extension MarkdownTextView {
     
     let visibleRange = tlm.documentRange.intersection(viewportRange)
     
-    guard let visibleString = tcm.attributedString(in: visibleRange)?.string else { return .init() }
-    
-    let stringPreviewLength = 10
-    let stringStart = visibleString.prefix(stringPreviewLength)
-    let stringEnd = visibleString.suffix(stringPreviewLength)
     
     return EditorInfo.Scroll(
       summary: """
       Characters
-      Visible: \(visibleString.count), Total: \(self.string.count)
-      Visible preview:
-      \(stringStart)...
-      ...\(stringEnd)
       """
     )
     

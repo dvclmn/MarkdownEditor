@@ -33,12 +33,11 @@ struct ExampleView: View {
         }
       .background(alignment: .topLeading) {
         Rectangle()
-          .fill(.blue.opacity(0.2))
+          .fill(.blue.opacity(0.05))
           .frame(height: self.editorInfo?.frame.height, alignment: .topLeading)
+          .border(Color.blue.opacity(0.2))
       }
-//        .frame(height: 300)
         .frame(maxWidth: .infinity, alignment: .top)
-//        .border(Color.green.opacity(0.3))
       
       
 //      HStack(alignment: .bottom) {

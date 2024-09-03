@@ -32,6 +32,26 @@ extension MarkdownTextView {
       await self.infoHandler.update(heightUpdate)
     }
     
+    exploreTextSegments()
+    
+    
+  }
+  
+  
+  func exploreTextSegments() {
+    
+    guard let tlm = self.textLayoutManager
+    else { return }
+    
+    
+    
+    tlm.enumerateTextLayoutFragments(from: tlm.documentRange.location) { fragment in
+      print("I want to know what a text segment is.")
+      
+      return true
+
+    }
+    
   }
   
   

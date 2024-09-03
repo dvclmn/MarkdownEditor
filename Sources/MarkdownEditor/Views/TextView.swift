@@ -26,17 +26,6 @@ public class MarkdownTextView: NSTextView {
 
   public var onInfoUpdate: MarkdownEditor.InfoUpdate = { _ in }
   
-  public var visibleString: String? {
-    
-    guard let tlm = self.textLayoutManager,
-          let visibleRange = tlm.textViewportLayoutController.viewportRange,
-          let tcm = tlm.textContentManager,
-          let visibleString = tcm.attributedString(in: visibleRange)?.string
-    else { return nil }
-    
-    return visibleString
-  }
-  
   public init(
     frame frameRect: NSRect,
     textContainer container: NSTextContainer?,

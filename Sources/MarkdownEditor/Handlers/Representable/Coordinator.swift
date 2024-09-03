@@ -49,58 +49,23 @@ public extension MarkdownEditor {
       in textElement: NSTextElement
     ) -> NSTextLayoutFragment {
       
-      let defaultFragment = NSTextLayoutFragment(textElement: textElement, range: textElement.elementRange)
+//      let defaultFragment = NSTextLayoutFragment(textElement: textElement, range: textElement.elementRange)
       
-      let tlm = textLayoutManager
+//      let tlm = textLayoutManager
       
-      guard let tcm = tlm.textContentManager,
-              let textRange = textElement.elementRange
-      else { return defaultFragment }
+//      guard let tcm = tlm.textContentManager,
+//              let textRange = textElement.elementRange
+//      else { return defaultFragment }
       
-      let text = tcm.attributedString(in: textRange)?.string ?? "nil"
 
+      let fragment = CodeBlockBackground(
+        textElement: textElement,
+        range: textElement.elementRange,
+        paragraphStyle: .default,
+        isActive: false
+      )
       
-      if text.hasPrefix("# ") {
-        
-        let fragment = CodeBlockBackground(
-          textElement: textElement,
-          range: textElement.elementRange,
-          paragraphStyle: .default,
-          isActive: false
-        )
-        
-//        guard let newMarkdownRange = Markdown.Element.markdownNSTextRange(
-//          textRange,
-//          in: text,
-//          syntax: .heading(level: 1),
-//          tcm: tcm
-//        ) else { return defaultFragment }
-//        
-//        let newElement = Markdown.Element(syntax: .heading(level: 1), range: newMarkdownRange)
-        
-        
-        
-        
-        /// Attempt to 'highlight' the drawn background, if selected.
-        /// Didn't work, leaving for now.
-        ///
-//        if let currentSelection = textLayoutManager.insertionPointLocations.first {
-//          
-//          if textRange.contains(currentSelection) {
-//            fragment.isActive = true
-//          } else {
-//            fragment.isActive = false
-//          }
-//        }
-        
-        
-//        print("Text as defined by `tcm.attributedString(in: textRange)?.string`: \(text)")
-        
-        return fragment
-      } else {
-        return defaultFragment
-        
-      }
+      return fragment
 
     }
 
