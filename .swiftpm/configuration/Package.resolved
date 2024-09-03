@@ -1,0 +1,23 @@
+{
+  "pins" : [
+    {
+      "identity" : "rearrange",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/ChimeHQ/Rearrange.git",
+      "state" : {
+        "revision" : "5ff7f3363f7a08f77e0d761e38e6add31c2136e1",
+        "version" : "1.8.1"
+      }
+    },
+    {
+      "identity" : "sttextkitplus",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/krzyzanowskim/STTextKitPlus.git",
+      "state" : {
+        "revision" : "60e1e790c4a77ffd10176849719eb3c52bbfb2c3",
+        "version" : "0.1.5"
+      }
+    }
+  ],
+  "version" : 2
+}

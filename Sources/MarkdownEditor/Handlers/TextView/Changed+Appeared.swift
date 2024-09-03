@@ -6,6 +6,8 @@
 //
 
 import SwiftUI
+//import Rearrange
+//import STTextKitPlus
 
 extension MarkdownTextView {
   
@@ -37,6 +39,7 @@ extension MarkdownTextView {
     
   }
   
+
   
   func exploreTextSegments() {
     
@@ -48,59 +51,38 @@ extension MarkdownTextView {
     tcm.performEditingTransaction {
       
       tlm.enumerateTextLayoutFragments(from: tlm.documentRange.location) { fragment in
+        guard let paragraph = fragment.textElement as? NSTextParagraph else { return true }
         
-        guard let paragraph = fragment.textElement as? NSTextParagraph else { return false }
-        
-        let string = paragraph.attributedString.string
-        
-        guard let paragraphRange = paragraph.elementRange,
-              let range = NSTextRange(location: paragraphRange.location, end: paragraphRange.endLocation),
-              let nsRange = tcm.range(for: range)
-                
-        else {
-          print("Returned false: \(string)")
-          return false
-        }
-
-//        for syntax in Markdown.Syntax.testCases {
-          
-          do {
-            
-            guard let regexPattern = Markdown.Syntax.inlineCode.nsRegex else { return false }
-//            guard let regexPattern = syntax.nsRegex else { continue }
-            
-            let regex = try NSRegularExpression(pattern: regexPattern, options: [.anchorsMatchLines])
-            
-            regex.enumerateMatches(in: string, range: nsRange) { result, flags, stop in
-              
-              if let result = result {
-                print("""
-              Results of matching `NSRegularExpression`:
-              Result: \(result)
-              Flags: \(flags)
-              Stop: \(stop)
-              """)
-                
-//                guard let nsTextRange = tcm.textRange(for: result.range) else { return }
-                
-//                tlm.setRenderingAttributes(syntax.contentRenderingAttributes, for: nsTextRange)
-                
-              }
-              
-            } // END enumerate matches
-          } catch {
-            print("Error with regex")
-          }
-          
-          
-//        } // END syntax loop
-        
-        
+        styleParagraph(paragraph, textLayoutManager: tlm)
         
         return true
-        
-      } // END enumerate fragments
+      }
       
+//      tlm.enumerateTextLayoutFragments(from: tlm.documentRange.location) { fragment in
+//        
+//        guard let paragraph = fragment.textElement as? NSTextParagraph else { return false }
+//        
+//        let string = paragraph.attributedString.string
+//        
+//        guard let paragraphRange = paragraph.elementRange,
+//              let nsRange = tcm.range(for: paragraphRange)
+//                
+//        else {
+//          print("Returned false: \(string)")
+//          return false
+//        }
+//        
+//        if string.contains("`") {
+//          
+//        }
+//        
+//        print("NSRange: \(nsRange), preview: \(string.preview(10))")
+//
+//        
+//        return true
+//        
+//      } // END enumerate fragments
+//      
     } // END perform edit
   }
   
@@ -133,4 +115,105 @@ extension NSTextContentManager {
           let endLocation = location(textRangeLocation, offsetBy: range.length) else { return nil }
     return NSTextRange(location: textRangeLocation, end: endLocation)
   }
+}
+
+
+extension MarkdownTextView {
+  
+  
+  func styleParagraph(_ paragraph: NSTextParagraph, textLayoutManager: NSTextLayoutManager) {
+    guard let range = paragraph.elementRange else { return }
+    let string = paragraph.attributedString.string
+    
+    var currentIndex = range.location
+    let endIndex = range.endLocation
+    
+    while currentIndex < endIndex {
+      
+      
+//      if let (syntaxRange, syntax) = findNextSyntax(from: currentIndex, in: string, endIndex: endIndex) {
+      textLayoutManager.setRenderingAttributes(Markdown.Syntax.inlineCode.contentRenderingAttributes, for: range)
+//        currentIndex = syntaxRange.endLocation
+//      } else {
+//        break
+//      }
+    }
+  }
+  
+//  func findNextSyntax(from startLocation: NSTextLocation, in string: String, endIndex: NSTextLocation) -> (NSTextRange, Markdown.Syntax)? {
+//    var currentIndex = startLocation
+//    while currentIndex < endIndex {
+//      let character = string[string.index(string.startIndex, offsetBy: textLayoutManager.offset(from: range.location, to: currentIndex))]
+//      
+//      switch character {
+//        case "`":
+//          if let endLocation = findClosingCharacter("`", from: currentIndex, in: string, endIndex: endIndex) {
+//            return (NSTextRange(location: currentIndex, end: endLocation), .inlineCode)
+//          }
+//        case "*":
+//          if let endLocation = findClosingCharacter("*", from: currentIndex, in: string, endIndex: endIndex) {
+//            return (NSTextRange(location: currentIndex, end: endLocation), .italic)
+//          }
+//        case "~":
+//          if let endLocation = findClosingPair("~~", from: currentIndex, in: string, endIndex: endIndex) {
+//            return (NSTextRange(location: currentIndex, end: endLocation), .strikethrough)
+//          }
+//        default:
+//          break
+//      }
+//      
+//      currentIndex = textLayoutManager.location(currentIndex, offsetBy: 1)
+//    }
+//    return nil
+//  }
+  
+//  func findClosingCharacter(_ character: Character, from startLocation: NSTextLocation, in string: String, endIndex: NSTextLocation) -> NSTextLocation? {
+//    var currentIndex = textLayoutManager.location(startLocation, offsetBy: 1)
+//    while currentIndex < endIndex {
+//      let currentChar = string[string.index(string.startIndex, offsetBy: textLayoutManager.offset(from: range.location, to: currentIndex))]
+//      if currentChar == character {
+//        return textLayoutManager.location(currentIndex, offsetBy: 1)
+//      }
+//      currentIndex = textLayoutManager.location(currentIndex, offsetBy: 1)
+//    }
+//    return nil
+//  }
+//  
+//  func findClosingPair(_ pair: String, from startLocation: NSTextLocation, in string: String, endIndex: NSTextLocation) -> NSTextLocation? {
+//    var currentIndex = textLayoutManager.location(startLocation, offsetBy: pair.count)
+//    while currentIndex < endIndex {
+//      let endOfPairIndex = textLayoutManager.location(currentIndex, offsetBy: pair.count)
+//      if endOfPairIndex <= endIndex {
+//        let range = NSTextRange(location: currentIndex, end: endOfPairIndex)
+//        let substring = string[string.index(string.startIndex, offsetBy: textLayoutManager.offset(from: range.location, to: currentIndex))..<string.index(string.startIndex, offsetBy: textLayoutManager.offset(from: range.location, to: endOfPairIndex))]
+//        if substring == pair {
+//          return endOfPairIndex
+//        }
+//      }
+//      currentIndex = textLayoutManager.location(currentIndex, offsetBy: 1)
+//    }
+//    return nil
+//  }
+  
+//  enum MarkdownSyntax {
+//    case inlineCode
+//    case italic
+//    case bold
+//    case strikethrough
+//    
+//    var renderingAttributes: [NSAttributedString.Key: Any] {
+//      switch self {
+//        case .inlineCode:
+//          return [.backgroundColor: NSColor.lightGray, .font: NSFont.monospacedSystemFont(ofSize: 12, weight: .regular)]
+//        case .italic:
+//          return [.font: NSFont.italicSystemFont(ofSize: 12)]
+//        case .bold:
+//          return [.font: NSFont.boldSystemFont(ofSize: 12)]
+//        case .strikethrough:
+//          return [.strikethroughStyle: NSUnderlineStyle.single.rawValue]
+//      }
+//    }
+//  }
+
+
 }
