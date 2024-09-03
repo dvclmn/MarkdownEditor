@@ -15,6 +15,9 @@ public typealias MarkdownRegex = Regex<(
   content: Substring,
   trailing: Substring
 )>
+
+
+
 //
 //public typealias MarkdownStringRange = (
 //  leading: Range<String.Index>,
@@ -29,48 +32,78 @@ public typealias MarkdownRegex = Regex<(
 //)
 
 //extension Markdown.Element {
-  /// Let's convert `typealias MarkdownStringRange = (content: Range<String.Index>, syntax: Range<String.Index>)` to a tuple of `NSTextRange`
-  ///
+/// Let's convert `typealias MarkdownStringRange = (content: Range<String.Index>, syntax: Range<String.Index>)` to a tuple of `NSTextRange`
+///
 //  public static func markdownNSTextRange(
 //    _ range: MarkdownStringRange,
 //    in string: String,
 //    syntax: Markdown.Syntax,
 //    tcm: NSTextElementProvider
 //  ) -> MarkdownNSTextRange? {
-//    
+//
 //    guard let content = range.content.textRange(in: string, syntax: syntax, tcm: tcm),
 //          let leading = range.leading.textRange(in: string, syntax: syntax, tcm: tcm),
 //          let trailing = range.trailing.textRange(in: string, syntax: syntax, tcm: tcm)
 //    else { return nil }
-//    
+//
 //    let result: MarkdownNSTextRange = (leading, content, trailing)
-//    
+//
 //    return result
-//    
+//
 //  } // END markdownNSTextRange
-  
-  /// Trying out this version (overload) of the above `markdownNSTextRange`
-  /// for times when I don't need the full tuple version.
-  ///
+
+/// Trying out this version (overload) of the above `markdownNSTextRange`
+/// for times when I don't need the full tuple version.
+///
 //  public static func markdownNSTextRange(
 //    _ range: NSTextRange,
 //    in string: String,
 //    syntax: Markdown.Syntax,
 //    tcm: NSTextElementProvider
 //  ) -> MarkdownNSTextRange? {
-//    
+//
 //    let result: MarkdownNSTextRange = (nil, range, nil)
-//    
+//
 //    return result
-//    
+//
 //  } // END markdownNSTextRange
-  
-  
-  
+
+
+
 //}
 
 
 extension Markdown.Syntax {
+  //
+  
+  
+  var nsRegex: String? {
+    
+    
+    switch self {
+      case .bold:
+        "(?<leading>__|\\*\\*)(?<content>[^_|\\*]*?)(?<trailing>__|\\*\\*)"
+      case .italic:
+        "(?<leading>_|\\*)(?<content>[^_|\\*]*?)(?<trailing>_|\\*)"
+      case .boldItalic:
+        "(?<leading>___|\\*\\*\\*)(?<content>[^_|\\*]*?)(?<trailing>___|\\*\\*\\*)"
+      case .strikethrough:
+        "(?<leading>~~)(?<content>[^~]*?)(?<trailing>~~)"
+      case .highlight:
+        "(?<leading>==)(?<content>[^=]*?)(?<trailing>==)"
+      case .inlineCode:
+        "(?<leading>`)(?<content>(?:[^`\\n])+?)(?<trailing>`)"
+      case .quoteBlock:
+        "(?<leading>^>)(?<content>[^>\\n]+)(?<trailing>)"
+      case .link:
+        "(?<leading>\\[)(?<content>[^\\]]+)(?<trailing>\\]\\([^\\)]+\\))"
+      case .image:
+        "(?<leading>!\\[)(?<content>[^\\]]+)(?<trailing>\\]\\([^\\)]+\\))"
+      case .list, .heading, .horizontalRule, .codeBlock:
+        nil
+    }
+  }
+  
   
   public var regex: MarkdownRegex? {
     switch self {

@@ -112,13 +112,13 @@ extension Markdown.Syntax {
         .strikethrough,
       .highlight,
       .inlineCode,
-      
-        .list,
-      .horizontalRule,
-      .codeBlock,
-      .quoteBlock,
-      .link,
-      .image
+//      
+//        .list,
+//      .horizontalRule,
+//      .codeBlock,
+//      .quoteBlock,
+//      .link,
+//      .image
     ]
   }
 }
