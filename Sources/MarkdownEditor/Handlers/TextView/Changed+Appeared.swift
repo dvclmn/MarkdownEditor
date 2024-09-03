@@ -46,7 +46,7 @@ extension MarkdownTextView {
     
     
     tlm.enumerateTextLayoutFragments(from: tlm.documentRange.location) { fragment in
-      print("I want to know what a text segment is.")
+//      print("I want to know what a text segment is: \(fragment)")
       
       return true
 

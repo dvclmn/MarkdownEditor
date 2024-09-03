@@ -16,12 +16,14 @@ extension MarkdownTextView {
   
   @objc func handleScrollViewDidScroll() {
     
-    guard let _ = enclosingScrollView else { return }
+    guard let scrollView = enclosingScrollView else { return }
     
     Task {
       await self.scrollDebouncer.processTask { [weak self] in
         
         guard let self = self else { return }
+        
+       await scrollInfo(scrollView: scrollView)
         
 //        await self.styleElements(trigger: .scroll)
         
@@ -35,32 +37,14 @@ extension MarkdownTextView {
       } // END process scroll
     } // END Task
     
+  } // END handle scroll view
+  
+  func scrollInfo(scrollView: NSScrollView) {
+    let scrollInfo: String = """
+        
+        """
     
-    
-    // Your custom code here
-    // For example:
-    // updateVisibleRange()
-    // refreshSyntaxHighlighting()
-    // etc.
-    
-    
-    //    let verticalOffset = scrollView.contentView.bounds.origin.y
-    //    print("Scroll offset updated: \(verticalOffset)")
-    
-    // Update visible range
-    //    if let layoutManager = self.layoutManager,
-    //       let container = self.textContainer {
-    //      let visibleRect = self.visibleRect
-    //      let glyphRange = layoutManager.glyphRange(forBoundingRect: visibleRect, in: container)
-    //      let characterRange = layoutManager.characterRange(forGlyphRange: glyphRange, actualGlyphRange: nil)
-    //
-    //      print("Visible character range: \(characterRange)")
-    //
-    // Do something with the visible range
-    // For example, update syntax highlighting for visible text
-    // updateSyntaxHighlighting(for: characterRange)
-    //    }
-    
+    print(scrollInfo)
   }
   
   

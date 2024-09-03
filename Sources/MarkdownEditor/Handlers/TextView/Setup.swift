@@ -52,14 +52,70 @@ extension MarkdownTextView {
     isRichText = false
     
     isVerticallyResizable = true
-    isHorizontallyResizable = true
+    isHorizontallyResizable = false
     
     smartInsertDeleteEnabled = false
     
-    autoresizingMask = [.width, .height]
+    autoresizingMask = [.width]
     textContainer?.widthTracksTextView = true
     textContainer?.heightTracksTextView = false
+    wrapsTextToHorizontalBounds = true
+
+    
+    textContainer?.containerSize = NSSize(width: frame.width, height: CGFloat.greatestFiniteMagnitude)
     
     self.applyConfiguration()
+  }
+}
+
+
+/// Credit: https://github.com/ChimeHQ/TextViewPlus
+extension NSTextView {
+  private var maximumUsableWidth: CGFloat {
+    guard let scrollView = enclosingScrollView else {
+      return bounds.width
+    }
+    
+    let usableWidth = scrollView.contentSize.width - textContainerInset.width
+    
+    guard scrollView.rulersVisible, let rulerView = scrollView.verticalRulerView else {
+      return usableWidth
+    }
+    
+    return usableWidth - rulerView.requiredThickness
+  }
+  
+  /// Controls the relative sizing behavior of the NSTextView and its NSTextContainer
+  ///
+  /// NSTextView size changes/scrolling behavior is tricky. This adjusts:
+  /// - `textContainer.widthTracksTextView`
+  /// - `textContainer?.size`: to allow unlimited height/width growth
+  /// - `maxSize`: to allow unlimited height/width growth
+  /// - `frame`: to account for `NSScrollView` rulers
+  ///
+  /// Check out: https://developer.apple.com/library/archive/documentation/Cocoa/Conceptual/TextUILayer/Tasks/TextInScrollView.html
+  public var wrapsTextToHorizontalBounds: Bool {
+    get {
+      guard let container = textContainer else {
+        return false
+      }
+      
+      return container.widthTracksTextView
+    }
+    set {
+      textContainer?.widthTracksTextView = newValue
+      
+      let max = CGFloat.greatestFiniteMagnitude
+      let size = NSSize(width: max, height: max)
+      
+      textContainer?.size = size
+      maxSize = size
+
+      if newValue {
+        let newSize = NSSize(width: maximumUsableWidth, height: frame.height)
+        
+        self.frame = NSRect(origin: frame.origin, size: newSize)
+      }
+    }
   }
 }

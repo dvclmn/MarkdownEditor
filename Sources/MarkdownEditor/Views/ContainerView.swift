@@ -8,9 +8,14 @@
 import AppKit
 
 public class MarkdownContainerView: NSView {
+  var textView: MarkdownTextView
   let scrollView: MarkdownScrollView
   
   init(frame: NSRect, configuration: MarkdownEditorConfiguration) {
+    
+    let textView = MarkdownTextView(frame: .zero, textContainer: nil, configuration: configuration)
+    
+    self.textView = textView
     
     let scrollView = MarkdownScrollView(frame: .zero, configuration: configuration)
     self.scrollView = scrollView
@@ -21,28 +26,30 @@ public class MarkdownContainerView: NSView {
   }
 
   
-  
-  
   required init?(coder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
   
   private func setupViews() {
 
-    // Set up ScrollView and TextView
-    scrollView.translatesAutoresizingMaskIntoConstraints = false
     addSubview(scrollView)
-
-    // Make ScrollView the same size as this view
-    NSLayoutConstraint.activate([
-      scrollView.topAnchor.constraint(equalTo: topAnchor),
-      scrollView.leadingAnchor.constraint(equalTo: leadingAnchor),
-      scrollView.trailingAnchor.constraint(equalTo: trailingAnchor),
-      scrollView.bottomAnchor.constraint(equalTo: bottomAnchor)
-    ])
     
-    // Make ScrollView transparent
+    
+    scrollView.hasVerticalScroller = true
+    scrollView.hasHorizontalScroller = false
+    scrollView.autohidesScrollers = true
+    
+    scrollView.documentView = textView
+    
+    scrollView.translatesAutoresizingMaskIntoConstraints = false
+
+    scrollView.leadingAnchor.constraint(equalTo: self.leadingAnchor).isActive = true
+    scrollView.trailingAnchor.constraint(equalTo: self.trailingAnchor).isActive = true
+    scrollView.topAnchor.constraint(equalTo: self.topAnchor).isActive = true
+    scrollView.bottomAnchor.constraint(equalTo: self.bottomAnchor).isActive = true
+    
     scrollView.drawsBackground = false
+
   }
   
 

@@ -9,7 +9,7 @@ import SwiftUI
 
 struct ExampleView: View {
   
-  @State private var text: String = Self.shortSample
+  @State private var text: String = Self.exampleMarkdown
   @State private var editorInfo: EditorInfo? = nil
   @State private var config = MarkdownEditorConfiguration(
     fontSize: 13,
