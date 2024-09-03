@@ -43,7 +43,6 @@ public class MarkdownContainerView: NSView {
     
     // Make ScrollView transparent
     scrollView.drawsBackground = false
-    
   }
   
 

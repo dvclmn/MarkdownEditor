@@ -63,9 +63,8 @@ public struct MarkdownEditor: NSViewRepresentable {
       nsView.scrollView.textView.applyConfiguration()
     }
 
-    
-//    textView.needsLayout = true
-//    textView.needsDisplay = true
+    textView.needsLayout = true
+    textView.needsDisplay = true
     
     context.coordinator.updatingNSView = false
   }

@@ -30,7 +30,6 @@ public extension Markdown.Syntax {
             return [
 
               .foregroundColor: NSColor.systemPink,
-//              .foregroundColor: self.foreGroundColor,
               .backgroundColor: NSColor.clear
             ]
             
@@ -38,7 +37,6 @@ public extension Markdown.Syntax {
             
             return [
               .foregroundColor: NSColor.systemTeal,
-//              .foregroundColor: self.foreGroundColor,
               .backgroundColor: NSColor.clear
             ]
             
@@ -46,7 +44,6 @@ public extension Markdown.Syntax {
             
             return [
               .foregroundColor: NSColor.systemMint,
-//              .foregroundColor: self.foreGroundColor,
               .backgroundColor: NSColor.clear
             ]
             

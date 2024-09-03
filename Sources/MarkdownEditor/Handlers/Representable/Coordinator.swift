@@ -69,23 +69,16 @@ public extension MarkdownEditor {
           isActive: false
         )
         
-        guard let newMarkdownRange = Markdown.Element.markdownNSTextRange(
-          textRange,
-          in: text,
-          syntax: .heading(level: 1),
-          tcm: tcm
-        ) else { return defaultFragment }
+//        guard let newMarkdownRange = Markdown.Element.markdownNSTextRange(
+//          textRange,
+//          in: text,
+//          syntax: .heading(level: 1),
+//          tcm: tcm
+//        ) else { return defaultFragment }
+//        
+//        let newElement = Markdown.Element(syntax: .heading(level: 1), range: newMarkdownRange)
         
-        let newElement = Markdown.Element(syntax: .heading(level: 1), range: newMarkdownRange)
         
-        
-        DispatchQueue.main.async { [weak self] in
-          
-          guard let self = self else { return }
-          
-          self.textView?.addMarkdownElement(newElement)
-
-        }
         
         
         /// Attempt to 'highlight' the drawn background, if selected.

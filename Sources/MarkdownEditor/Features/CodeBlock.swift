@@ -66,23 +66,4 @@ class CodeBlockBackground: NSTextLayoutFragment {
     super.draw(at: point, in: context)
   }
   
-  
-  //  override func draw(at point: CGPoint, in context: CGContext) {
-  //    // Draw the grid
-  //    context.saveGState()
-  //
-  //    let rect = renderingSurfaceBounds
-  //
-  //
-  //
-  //    let path = NSBezierPath(roundedRect: rect, xRadius: cornerRadius, yRadius: cornerRadius)
-  //    backgroundColor.setFill()
-  //    path.fill()
-  //
-  //    context.strokePath()
-  //    context.restoreGState()
-  //
-  //    // Draw the actual text content
-  //    super.draw(at: point, in: context)
-  //  }
 }

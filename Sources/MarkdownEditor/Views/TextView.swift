@@ -66,7 +66,7 @@ public class MarkdownTextView: NSTextView {
     textLayoutManager.textContainer = container
     textContentStorage.addTextLayoutManager(textLayoutManager)
     textContentStorage.primaryTextLayoutManager = textLayoutManager
-    container.containerSize = NSSize(width: frameRect.width, height: CGFloat.greatestFiniteMagnitude)
+//    container.containerSize = NSSize(width: frameRect.width, height: CGFloat.greatestFiniteMagnitude)
     
     super.init(frame: frameRect, textContainer: container)
     
@@ -89,21 +89,13 @@ public class MarkdownTextView: NSTextView {
   }
   
   deinit {
-//    viewportObservation?.invalidate()
     NotificationCenter.default.removeObserver(self)
-//    scrollObservation?.invalidate()
   }
   
   
 }
 
-extension Notification.Name {
-  static let metricsDidChange = Notification.Name("metricsDidChange")
-}
-
-
 extension MarkdownTextView {
-  
   
   
   func setupViewportLayoutController() {

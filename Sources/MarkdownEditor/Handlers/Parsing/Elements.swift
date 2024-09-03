@@ -45,17 +45,17 @@ extension MarkdownTextView {
     needsDisplay = true
   }
   
-  func removeElements(in range: NSTextRange) {
-    
-    let lastElementCount: Int = self.elements.count
-    self.elements.removeAll(where: { $0.range.content.intersects(range)})
-    
-    let removedCount: Int = self.elements.count - lastElementCount
-    
-    print("Removed \(removedCount) elements.")
-    
-    
-  }
+//  func removeElements(in range: NSTextRange) {
+//    
+//    let lastElementCount: Int = self.elements.count
+//    self.elements.removeAll(where: { $0.range.content.intersects(range)})
+//    
+//    let removedCount: Int = self.elements.count - lastElementCount
+//    
+//    print("Removed \(removedCount) elements.")
+//    
+//    
+//  }
   
   
   

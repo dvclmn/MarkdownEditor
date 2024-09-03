@@ -23,14 +23,11 @@ extension AttributeContainer {
     return getAttributes(for: \.appKit)
   }
   
-  
-  
 }
 
 extension MarkdownTextView {
   
   func applyConfiguration() {
-    
     
     self.font = NSFont.systemFont(ofSize: self.configuration.fontSize)
     self.defaultParagraphStyle = self.configuration.defaultParagraphStyle
@@ -41,8 +38,6 @@ extension MarkdownTextView {
     
     typingAttributes = self.configuration.defaultTypingAttributes
     defaultParagraphStyle = self.configuration.defaultParagraphStyle
-
-    self.needsDisplay = true
     
   }
 
@@ -51,8 +46,6 @@ extension MarkdownTextView {
   
   func textViewSetup() {
     
-//    print("Running textView setup")
-    
     isEditable = true
     drawsBackground = false
     allowsUndo = true
@@ -60,7 +53,6 @@ extension MarkdownTextView {
     
     isVerticallyResizable = true
     isHorizontallyResizable = true
-    wrapsTextToHorizontalBounds = true
     
     smartInsertDeleteEnabled = false
     
