@@ -23,16 +23,14 @@ extension MarkdownTextView {
     setupViewportLayoutController()
     
     
-    self.parseAndStyleMarkdownLite(trigger: .appeared)
+//    self.parseAndStyleMarkdownLite(trigger: .appeared)
     
-    self.styleElements(trigger: .appeared)
+//    self.styleElements(trigger: .appeared)
     
     Task { @MainActor in
       let heightUpdate = self.updateEditorHeight()
       await self.infoHandler.update(heightUpdate)
     }
-    
-    
     
   }
   
