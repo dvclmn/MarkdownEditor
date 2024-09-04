@@ -7,6 +7,8 @@
 
 import SwiftUI
 import TextCore
+import Rearrange
+//import STTextKitPlus
 
 public extension MarkdownEditor {
   
@@ -28,7 +30,7 @@ public extension MarkdownEditor {
     {
       self.parent = parent
     }
-
+    
     
     /// This method (`textLayoutManager`, defined on protocol `NSTextLayoutManagerDelegate`)
     /// is called by the system when it needs to create a layout fragment for a specific portion of text.
@@ -49,26 +51,63 @@ public extension MarkdownEditor {
       in textElement: NSTextElement
     ) -> NSTextLayoutFragment {
       
-//      let defaultFragment = NSTextLayoutFragment(textElement: textElement, range: textElement.elementRange)
+      let tlm = textLayoutManager
       
-//      let tlm = textLayoutManager
+      let defaultFragment = NSTextLayoutFragment(textElement: textElement, range: textElement.elementRange)
       
-//      guard let tcm = tlm.textContentManager,
-//              let textRange = textElement.elementRange
-//      else { return defaultFragment }
+      guard let tcm = tlm.textContentManager,
+            let tcs = textView?.textContentStorage,
+            let paragraph = textElement as? NSTextParagraph,
+            let fullAttrString = tcs.textStorage?.attributedSubstring(from: NSRange(tlm.documentRange, in: tcm)),
+            let textRange = textElement.elementRange
+              
+      else { return defaultFragment }
       
-
-      let fragment = CodeBlockBackground(
-        textElement: textElement,
-        range: textElement.elementRange,
-        paragraphStyle: .default,
-        isActive: false
-      )
+      let text = fullAttrString.string
       
-      return fragment
-
+      tcm.performEditingTransaction {
+        
+        
+        
+        let finder = InlineCodeFinder(text: text, provider: tcm)
+        let inlineCodeRanges = finder.findInlineCode()
+        
+        tlm.removeRenderingAttribute(.foregroundColor, for: tlm.documentRange)
+        
+        for range in inlineCodeRanges {
+          
+          
+          tlm.setRenderingAttributes(Markdown.Syntax.inlineCode.contentRenderingAttributes, for: range)
+          
+          
+          //        print("NSTextRange: \(range)")
+          //        print("---")
+        }
+        
+        
+        
+        
+        //      let tlm = textLayoutManager
+        
+        //      guard let tcm = tlm.textContentManager,
+        //              let textRange = textElement.elementRange
+        //      else { return defaultFragment }
+        
+        
+        //      let fragment = CodeBlockBackground(
+        //        textElement: textElement,
+        //        range: textElement.elementRange,
+        //        paragraphStyle: .default,
+        //        isActive: false
+        //      )
+        
+      }
+      
+      return defaultFragment
+      
+      
     }
-
+    
     
     
     public func textDidChange(_ notification: Notification) {
@@ -109,3 +148,41 @@ public extension MarkdownEditor {
   }
 }
 
+
+class InlineCodeFinder {
+  let text: String
+  let provider: NSTextElementProvider
+  
+  init(text: String, provider: NSTextElementProvider) {
+    self.text = text
+    self.provider = provider
+  }
+  
+  func findInlineCode() -> [NSTextRange] {
+    var ranges: [NSTextRange] = []
+    var currentIndex = text.startIndex
+    
+    while currentIndex < text.endIndex {
+      if let openingBacktick = text[currentIndex...].firstIndex(of: "`") {
+        let afterOpeningBacktick = text.index(after: openingBacktick)
+        if let closingBacktick = text[afterOpeningBacktick...].firstIndex(of: "`") {
+          let startOffset = text.distance(from: text.startIndex, to: openingBacktick)
+          let endOffset = text.distance(from: text.startIndex, to: closingBacktick) + 1
+          
+          if let textRange = NSTextRange(NSRange(location: startOffset, length: endOffset - startOffset), provider: provider) {
+            ranges.append(textRange)
+          }
+          currentIndex = text.index(after: closingBacktick)
+        } else {
+          // No closing backtick found, move to next character
+          currentIndex = text.index(after: openingBacktick)
+        }
+      } else {
+        // No more backticks found
+        break
+      }
+    }
+    
+    return ranges
+  }
+}

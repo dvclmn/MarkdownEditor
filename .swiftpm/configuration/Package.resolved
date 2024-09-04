@@ -1,6 +1,15 @@
 {
   "pins" : [
     {
+      "identity" : "glyph",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/ChimeHQ/Glyph.git",
+      "state" : {
+        "branch" : "main",
+        "revision" : "154d332e4fdcec2766150f52e0c248d8482a2a49"
+      }
+    },
+    {
       "identity" : "rearrange",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/ChimeHQ/Rearrange.git",

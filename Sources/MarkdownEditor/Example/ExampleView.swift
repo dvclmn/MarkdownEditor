@@ -6,10 +6,11 @@
 //
 
 import SwiftUI
+import BaseHelpers
 
 struct ExampleView: View {
   
-  @State private var text: String = Self.exampleMarkdown
+  @State private var text: String = TestStrings.Markdown.basicMarkdown
   @State private var editorInfo: EditorInfo? = nil
   @State private var config = MarkdownEditorConfiguration(
     fontSize: 13,
@@ -65,7 +66,7 @@ struct ExampleView: View {
 //    }
     .background(.black.opacity(0.5))
     .background(.purple.opacity(0.1))
-    .frame(width: 300, height: 600)
+    .frame(width: 440, height: 600)
     
     /// Interestingly, the below 'simulates' text being added to the NSTextView, but NOT
     /// in the same as a user actually focusing the view and typing into it. There appears
