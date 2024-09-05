@@ -13,22 +13,7 @@ import TextCore
 
 extension MarkdownTextView {
   
-  
-  
-  func styleElements(trigger: ChangeTrigger) {
-    
-    guard let tlm = self.textLayoutManager,
-          let tcm = tlm.textContentManager
-    else { return }
 
-    tcm.performEditingTransaction {
-      
-      print("Perform editing transaction")
-      
-
-    } // END editing transaction
-    
-  }
   
   
   

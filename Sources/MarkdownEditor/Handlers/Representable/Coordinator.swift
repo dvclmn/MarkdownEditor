@@ -68,16 +68,12 @@ public extension MarkdownEditor {
       tcm.performEditingTransaction {
         
         
-        let finder = MarkdownSyntaxFinder(
-          text: text,
-          provider: tcm,
-          syntax: .bold
-        )
-        let inlineCodeRanges = finder.findInlineCode()
+        let finder = MarkdownSyntaxFinder(text: text, provider: tcm)
+        let boldRanges = finder.findSyntaxRanges(for: .bold)
         
         tlm.removeRenderingAttribute(.foregroundColor, for: tlm.documentRange)
         
-        for range in inlineCodeRanges {
+        for range in boldRanges {
           
           
           tlm.setRenderingAttributes(Markdown.Syntax.inlineCode.contentRenderingAttributes, for: range)
@@ -148,118 +144,5 @@ public extension MarkdownEditor {
     
     
     
-  }
-}
-
-enum MarkdownSyntax {
-  
-  case heading(level: Int)
-  case bold
-  case italic
-  case inlineCode
-  case highlight
-  case strikethrough
-  
-  var leadingCharacters: String {
-    switch self {
-      case .heading(let level):
-        for level in 1..<level {
-          return String(repeating: "#", count: level)
-        }
-        
-      case .bold:
-        return "**"
-      case .italic:
-        return "*"
-      case .inlineCode:
-        return "`"
-      case .highlight:
-        return "=="
-      case .strikethrough:
-        return "~~"
-    }
-  }
-  
-  var trailingCharacters: String {
-    switch self {
-      case .heading:
-        "\n"
-      case .bold, .italic, .inlineCode, .highlight, .strikethrough: self.leadingCharacters
-    }
-  }
-  
-}
-
-
-class MarkdownSyntaxFinder {
-  let text: String
-  let provider: NSTextElementProvider
-  let syntax: MarkdownSyntax
-  
-  init(
-    text: String,
-    provider: NSTextElementProvider,
-    syntax: MarkdownSyntax
-  ) {
-    self.text = text
-    self.provider = provider
-    self.syntax = syntax
-  }
-  
-  func findSyntaxRanges() -> [Range<String.Index>] {
-    var ranges: [Range<String.Index>] = []
-    var currentIndex = text.startIndex
-    var inSyntax = false
-    var syntaxStartIndex: String.Index?
-    
-    while currentIndex < text.endIndex {
-      
-      let currentChar = text[currentIndex]
-      if currentChar == syntaxMarker && !inSyntax {
-        inSyntax = true
-        syntaxStartIndex = currentIndex
-      } else if currentChar == endMarker && inSyntax {
-        if let start = syntaxStartIndex {
-          let end = text.index(after: currentIndex)
-          ranges.append(start..<end)
-          inSyntax = false
-        }
-      }
-      currentIndex = text.index(after: currentIndex)
-    }
-    
-    return ranges
-  }
-  
-  
-  func findInlineCode() -> [NSTextRange] {
-    
-    var ranges: [NSTextRange] = []
-    
-    var currentIndex = text.startIndex
-    
-    while currentIndex < text.endIndex {
-      
-      if let openingBacktick = text[currentIndex...].firstIndex(of: "#") {
-        let afterOpeningBacktick = text.index(after: openingBacktick)
-        if let closingBacktick = text[afterOpeningBacktick...].firstIndex(of: "\n") {
-          let startOffset = text.distance(from: text.startIndex, to: openingBacktick)
-          let endOffset = text.distance(from: text.startIndex, to: closingBacktick) + 1
-          
-          if let textRange = NSTextRange(NSRange(location: startOffset, length: endOffset - startOffset), provider: provider) {
-            ranges.append(textRange)
-          }
-          currentIndex = text.index(after: closingBacktick)
-        } else {
-          // No closing backtick found, move to next character
-          currentIndex = text.index(after: openingBacktick)
-        }
-      } else {
-        // No more backticks found
-        break
-      }
-    }
-    
-    return ranges
   }
 }
