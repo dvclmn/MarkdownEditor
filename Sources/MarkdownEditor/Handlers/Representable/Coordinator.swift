@@ -8,7 +8,7 @@
 import SwiftUI
 import TextCore
 import Rearrange
-//import STTextKitPlus
+import STTextKitPlus
 
 public extension MarkdownEditor {
   
@@ -21,6 +21,7 @@ public extension MarkdownEditor {
     var parent: MarkdownEditor
     weak var textView: MarkdownTextView?
     var selectedRanges: [NSValue] = []
+
     
     var selections: [NSTextSelection] = []
     
@@ -30,6 +31,10 @@ public extension MarkdownEditor {
     {
       self.parent = parent
     }
+    
+
+    
+    
     
     
     /// This method (`textLayoutManager`, defined on protocol `NSTextLayoutManagerDelegate`)
@@ -65,10 +70,7 @@ public extension MarkdownEditor {
       
       //      let text = fullAttrString.string
       
-      if let textView = textView, let shortcut = textView.shortcutPressed {
-        
-        wrapSelection(in: shortcut, tlm: tlm, textView: textView)
-      }
+      
       
       let finder = MarkdownSyntaxFinder(text: paragraph.attributedString.string, provider: tcm)
       let boldRanges = finder.findSyntaxRanges(for: .inlineCode, in: textRange)
@@ -153,35 +155,7 @@ public extension MarkdownEditor {
 
 extension MarkdownEditor.Coordinator {
   
-  func wrapSelection(
-    in syntax: MarkdownSyntax,
-    tlm: NSTextLayoutManager,
-    textView: MarkdownTextView
-  ) {
-    
-    guard let tcm = tlm.textContentManager,
-          let tcs = textView.textContentStorage,
-          let selection = tlm.textSelections.first,
-          let selectedRange = selection.textRanges.first,
-          let selectedText = tcs.attributedString?.string
-    else { return }
-    
-    let leading: String = syntax.leadingCharacters
-    let trailing: String = syntax.trailingCharacters
-    
-    
-    print("Selected text: \(selectedText)")
-    
-    let newText = syntax.leadingCharacters + selectedText + syntax.trailingCharacters
-    let newAttrString = NSAttributedString(string: newText)
-    
-    tcm.performEditingTransaction {
-      tcm.replaceContents(
-        in: selectedRange,
-        with: [NSTextParagraph(attributedString: newAttrString)]
-      )
-    }
-  }
+  
   
   //      // Update the selection to exclude the new wrapper characters
   //      let newSelectionRange = NSRange(location: range.location + wrapper.count, length: range.length)

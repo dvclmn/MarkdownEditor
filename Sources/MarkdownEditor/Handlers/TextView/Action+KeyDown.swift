@@ -11,39 +11,52 @@ extension MarkdownTextView {
   
   public override func keyDown(with event: NSEvent) {
     
-    guard let characters = event.charactersIgnoringModifiers else {
+    guard let characters = event.charactersIgnoringModifiers,
+          let tlm = self.textLayoutManager,
+          let selectionRange = tlm.textSelections.first?.textRanges.first
+    else {
       super.keyDown(with: event)
       return
     }
     
-    let commandKey = NSEvent.ModifierFlags.command.rawValue
-    let commandPressed = event.modifierFlags.rawValue & commandKey == commandKey
+    let modifierFlags = event.modifierFlags.intersection(.deviceIndependentFlagsMask)
+    let shortcut = KeyboardShortcut(key: characters, modifier: modifierFlags)
+    let hasSelection: Bool = !selectionRange.isEmpty
     
-    var reservedCharacters: String {
-      
-      var result: String = ""
-      
-      for syntax in MarkdownSyntax.allCases {
-        
-        if let key = syntax.shortcut?.key {
-          result = key
-        }
-      }
-      return result
+    
+    if let syntax = MarkdownSyntax.syntax(for: shortcut) {
+      syntaxToWrap = syntax
+    } else {
+      super.keyDown(with: event)
     }
     
     
-    if commandPressed {
-      
-      if characters.contains(reservedCharacters) {
-        
-        self.syntaxToWrap = KeyboardShortcut(key: characters, modifier: .command, syntax: <#T##MarkdownSyntax#>)
-        
-        print("Shortcut pressed: \(self)")
-        
-      } else {
-        super.keyDown(with: event)
-      }
+  }
+  
+  
+  func wrapSelection(in syntax: MarkdownSyntax) {
+    
+    guard let tlm = self.textLayoutManager,
+          let tcm = tlm.textContentManager,
+          let tcs = self.textContentStorage,
+          let selection = tlm.textSelections.first,
+          let selectedRange = selection.textRanges.first,
+          let selectedText = tcm.attributedString(in: selectedRange)?.string
+    else { return }
+    
+    let leading: String = syntax.leadingCharacters
+    let trailing: String = syntax.trailingCharacters
+    
+    print("Selected text: \(selectedText)")
+    
+    let newText = leading + selectedText + trailing
+    let newAttrString = NSAttributedString(string: newText)
+    
+    tcm.performEditingTransaction {
+      tcm.replaceContents(
+        in: selectedRange,
+        with: [NSTextParagraph(attributedString: newAttrString)]
+      )
     }
   }
   
