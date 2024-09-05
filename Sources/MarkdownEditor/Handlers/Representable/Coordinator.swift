@@ -68,8 +68,11 @@ public extension MarkdownEditor {
       tcm.performEditingTransaction {
         
         
-        
-        let finder = InlineCodeFinder(text: text, provider: tcm)
+        let finder = SymmetricalSyntaxFinder(
+          text: text,
+          provider: tcm,
+          syntax: .bold
+        )
         let inlineCodeRanges = finder.findInlineCode()
         
         tlm.removeRenderingAttribute(.foregroundColor, for: tlm.documentRange)
@@ -148,14 +151,25 @@ public extension MarkdownEditor {
   }
 }
 
+enum SymmetricalSyntax {
+  case bold
+  case italic
+}
 
-class InlineCodeFinder {
+
+class SymmetricalSyntaxFinder {
   let text: String
   let provider: NSTextElementProvider
+  let syntax: SymmetricalSyntax
   
-  init(text: String, provider: NSTextElementProvider) {
+  init(
+    text: String,
+    provider: NSTextElementProvider,
+    syntax: SymmetricalSyntax
+  ) {
     self.text = text
     self.provider = provider
+    self.syntax = syntax
   }
   
   func findInlineCode() -> [NSTextRange] {
@@ -163,9 +177,9 @@ class InlineCodeFinder {
     var currentIndex = text.startIndex
     
     while currentIndex < text.endIndex {
-      if let openingBacktick = text[currentIndex...].firstIndex(of: "`") {
+      if let openingBacktick = text[currentIndex...].firstIndex(of: "#") {
         let afterOpeningBacktick = text.index(after: openingBacktick)
-        if let closingBacktick = text[afterOpeningBacktick...].firstIndex(of: "`") {
+        if let closingBacktick = text[afterOpeningBacktick...].firstIndex(of: "\n") {
           let startOffset = text.distance(from: text.startIndex, to: openingBacktick)
           let endOffset = text.distance(from: text.startIndex, to: closingBacktick) + 1
           
