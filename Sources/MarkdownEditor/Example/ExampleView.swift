@@ -7,6 +7,7 @@
 
 import SwiftUI
 import BaseHelpers
+import BaseStyles
 
 struct ExampleView: View {
   
@@ -27,6 +28,14 @@ struct ExampleView: View {
     
     VStack(spacing: 0) {
       
+//      HStack {
+//        Button {
+//          
+//        } label: {
+//          Label("Bold", systemImage: Icons.text.icon)
+//        }
+//      }
+//      .padding()
 //      Spacer()
       
       MarkdownEditor(text: $text, configuration:config) { info in

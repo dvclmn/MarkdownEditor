@@ -82,7 +82,7 @@ enum MarkdownSyntax: Equatable {
       case .boldItalic:
         return KeyboardShortcut(key: "b", modifier: [.command, .shift])
       case .inlineCode:
-        return KeyboardShortcut(key: "`")
+        return KeyboardShortcut(key: "`", modifier: nil)
       case .highlight:
         return KeyboardShortcut(key: "h", modifier: .command)
       case .strikethrough:
@@ -91,7 +91,12 @@ enum MarkdownSyntax: Equatable {
   }
   
   static func syntax(for shortcut: KeyboardShortcut) -> MarkdownSyntax? {
-    return MarkdownSyntax.allCases.first { $0.shortcut == shortcut }
+    
+    let result = MarkdownSyntax.allCases.first { $0.shortcut == shortcut }
+    
+    print("Got a matching shortcut: \(String(describing: result))")
+    
+    return result
   }
 
 }
