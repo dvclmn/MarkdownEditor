@@ -8,6 +8,8 @@
 import SwiftUI
 import BaseHelpers
 
+
+
 public class MarkdownTextView: NSTextView {
   
   var elements: [Markdown.Element] = []
@@ -18,6 +20,8 @@ public class MarkdownTextView: NSTextView {
   let infoHandler = EditorInfoHandler()
   
   var configuration: MarkdownEditorConfiguration
+  
+  var syntaxToWrap: MarkdownSyntax?
   
   var editorInfo = EditorInfo()
   

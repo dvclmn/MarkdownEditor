@@ -58,31 +58,33 @@ public extension MarkdownEditor {
       guard let tcm = tlm.textContentManager,
             let tcs = textView?.textContentStorage,
             let paragraph = textElement as? NSTextParagraph,
-//            let fullAttrString = tcs.textStorage?.attributedSubstring(from: NSRange(tlm.documentRange, in: tcm)),
+            //            let fullAttrString = tcs.textStorage?.attributedSubstring(from: NSRange(tlm.documentRange, in: tcm)),
             let textRange = textElement.elementRange
               
       else { return defaultFragment }
       
-//      let text = fullAttrString.string
+      //      let text = fullAttrString.string
       
-      tcm.performEditingTransaction {
+      if let textView = textView, let shortcut = textView.shortcutPressed {
+        
+        wrapSelection(in: shortcut, tlm: tlm, textView: textView)
+      }
+      
+      let finder = MarkdownSyntaxFinder(text: paragraph.attributedString.string, provider: tcm)
+      let boldRanges = finder.findSyntaxRanges(for: .inlineCode, in: textRange)
+      
+      
+      tlm.removeRenderingAttribute(.foregroundColor, for: textRange)
+      
+      for range in boldRanges {
         
         
-        let finder = MarkdownSyntaxFinder(text: paragraph.attributedString.string, provider: tcm)
-        let boldRanges = finder.findSyntaxRanges(for: .bold, in: textRange)
+        tlm.setRenderingAttributes(Markdown.Syntax.inlineCode.contentRenderingAttributes, for: range)
         
         
-        tlm.removeRenderingAttribute(.foregroundColor, for: textRange)
+        //        print("NSTextRange: \(range)")
+        //        print("---")
         
-        for range in boldRanges {
-          
-          
-          tlm.setRenderingAttributes(Markdown.Syntax.inlineCode.contentRenderingAttributes, for: range)
-          
-          
-          //        print("NSTextRange: \(range)")
-          //        print("---")
-        }
         
         
         
@@ -146,4 +148,43 @@ public extension MarkdownEditor {
     
     
   }
+}
+
+
+extension MarkdownEditor.Coordinator {
+  
+  func wrapSelection(
+    in syntax: MarkdownSyntax,
+    tlm: NSTextLayoutManager,
+    textView: MarkdownTextView
+  ) {
+    
+    guard let tcm = tlm.textContentManager,
+          let tcs = textView.textContentStorage,
+          let selection = tlm.textSelections.first,
+          let selectedRange = selection.textRanges.first,
+          let selectedText = tcs.attributedString?.string
+    else { return }
+    
+    let leading: String = syntax.leadingCharacters
+    let trailing: String = syntax.trailingCharacters
+    
+    
+    print("Selected text: \(selectedText)")
+    
+    let newText = syntax.leadingCharacters + selectedText + syntax.trailingCharacters
+    let newAttrString = NSAttributedString(string: newText)
+    
+    tcm.performEditingTransaction {
+      tcm.replaceContents(
+        in: selectedRange,
+        with: [NSTextParagraph(attributedString: newAttrString)]
+      )
+    }
+  }
+  
+  //      // Update the selection to exclude the new wrapper characters
+  //      let newSelectionRange = NSRange(location: range.location + wrapper.count, length: range.length)
+  //      setSelectedRange(newSelectionRange)
+  
 }

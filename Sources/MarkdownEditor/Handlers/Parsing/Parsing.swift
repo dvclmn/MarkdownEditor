@@ -11,94 +11,24 @@ import BaseHelpers
 import TextCore
 import Rearrange
 
-//enum TextScope {
-//  case paragraph
-//  case fullText
-//}
-//
-//struct ScopedTextRange {
-//  let range: Range<String.Index>
-//  let scope: TextScope
-//  let paragraphIndex: Int?  // Only relevant for paragraph scope
-//
-//  init(range: Range<String.Index>, scope: TextScope, paragraphIndex: Int? = nil) {
-//    self.range = range
-//    self.scope = scope
-//    self.paragraphIndex = paragraphIndex
-//
-//    if scope == .paragraph && paragraphIndex == nil {
-//      fatalError("Paragraph index must be provided for paragraph scope")
-//    }
-//  }
-//}
-
-//extension ScopedTextRange {
-//  func toNSTextRange(in provider: NSTextElementProvider) -> NSTextRange? {
-//    let nsRange = NSRange(range, in: provider)
-//    return NSTextRange(nsRange, provider: provider)
-//  }
-//}
-//
-//class TextScopeConverter {
-//  let fullText: String
-//  let paragraphs: [String]
-//
-//  init(fullText: String) {
-//    self.fullText = fullText
-//    self.paragraphs = fullText.components(separatedBy: .newlines)
-//  }
-//
-//  func convertToFullTextScope(_ range: Range<String.Index>, fromParagraph index: Int) -> ScopedTextRange {
-//    let paragraphStartIndex = paragraphs[0..<index].reduce(0) { $0 + $1.count + 1 }  // +1 for newline
-//    let fullTextStartIndex = fullText.index(fullText.startIndex, offsetBy: paragraphStartIndex)
-//    let fullTextRange = Range(
-//      uncheckedBounds: (
-//        lower: fullText.index(fullTextStartIndex, offsetBy: range.lowerBound.utf16Offset(in: paragraphs[index])),
-//        upper: fullText.index(fullTextStartIndex, offsetBy: range.upperBound.utf16Offset(in: paragraphs[index]))
-//      )
-//    )
-//    return ScopedTextRange(range: fullTextRange, scope: .fullText)
-//  }
-//
-//  func convertToParagraphScope(_ range: Range<String.Index>) -> ScopedTextRange? {
-//    guard let paragraphIndex = paragraphs.firstIndex(where: { paragraph in
-//      let paragraphRange = fullText.range(of: paragraph)!
-//      return paragraphRange.overlaps(range)
-//    }) else {
-//      return nil
-//    }
-//
-//    let paragraphStartIndex = paragraphs[0..<paragraphIndex].reduce(0) { $0 + $1.count + 1 }  // +1 for newline
-//    let fullTextStartIndex = fullText.index(fullText.startIndex, offsetBy: paragraphStartIndex)
-//    let paragraphRange = Range(
-//      uncheckedBounds: (
-//        lower: fullText.index(range.lowerBound, offsetBy: -paragraphStartIndex),
-//        upper: fullText.index(range.upperBound, offsetBy: -paragraphStartIndex)
-//      )
-//    )
-//    return ScopedTextRange(range: paragraphRange, scope: .paragraph, paragraphIndex: paragraphIndex)
-//  }
-//}
-
-//// Extension to MarkdownSyntaxFinder to work with ScopedTextRange
-//extension MarkdownSyntaxFinder {
-//  func findScopedSyntaxRanges(for syntax: MarkdownSyntax, in scope: TextScope, paragraphIndex: Int? = nil) -> [ScopedTextRange] {
-//    let ranges = findSyntaxRanges(for: syntax)
-//    return ranges.compactMap { range in
-//      switch scope {
-//        case .fullText:
-//          return ScopedTextRange(range: range, scope: .fullText)
-//        case .paragraph:
-//          guard let paragraphIndex = paragraphIndex else { return nil }
-//          let converter = TextScopeConverter(fullText: text)
-//          return converter.convertToParagraphScope(range.range(in: text)!)
-//      }
-//    }
-//  }
-//}
-
-
-enum MarkdownSyntax {
+enum MarkdownSyntax: Equatable {
+  
+  static var allCases: [MarkdownSyntax] {
+    [
+      .heading(level: 1),
+      .heading(level: 2),
+      .heading(level: 3),
+      .heading(level: 4),
+      .heading(level: 5),
+      .heading(level: 6),
+      .bold,
+      .italic,
+      .boldItalic,
+      .inlineCode,
+      .highlight,
+      .strikethrough
+    ]
+  }
   
   case heading(level: Int)
   case bold
@@ -140,7 +70,49 @@ enum MarkdownSyntax {
     }
   }
   
+  var shortcut: KeyboardShortcut? {
+    switch self {
+      case .heading(let level):
+        return KeyboardShortcut(key: "\(level)", modifier: .command)
+        
+      case .bold:
+        return KeyboardShortcut(key: "b", modifier: .command)
+      case .italic:
+        return KeyboardShortcut(key: "i", modifier: .command)
+      case .boldItalic:
+        return KeyboardShortcut(key: "b", modifier: [.command, .shift])
+      case .inlineCode:
+        return KeyboardShortcut(key: "`")
+      case .highlight:
+        return KeyboardShortcut(key: "h", modifier: .command)
+      case .strikethrough:
+        return KeyboardShortcut(key: "s", modifier: .command)
+    }
+  }
+  
+  static func syntax(for shortcut: KeyboardShortcut) -> MarkdownSyntax? {
+    return MarkdownSyntax.allCases.first { $0.shortcut == shortcut }
+  }
+
 }
+
+
+struct KeyboardShortcut: Equatable {
+  var key: String
+  var modifier: NSEvent.ModifierFlags?
+//  var syntax: MarkdownSyntax
+  
+  init(
+    key: String,
+    modifier: NSEvent.ModifierFlags? = nil
+//    syntax: MarkdownSyntax
+  ) {
+    self.key = key
+    self.modifier = modifier
+//    self.syntax = syntax
+  }
+}
+
 
 
 class MarkdownSyntaxFinder {
@@ -167,38 +139,34 @@ class MarkdownSyntaxFinder {
     
     while currentIndex < text.endIndex {
       
-      
       guard let openingIndex = text[currentIndex...].range(of: leadingChars)?.lowerBound else { break } // No more opening delimiters found
       
-      
+      /// This uses the `count` of the leading/trailing syntax characters
+      /// provided, to determine that we are 'inside' the syntax content now.
+      ///
       let afterOpening = text.index(openingIndex, offsetBy: leadingChars.count)
       
+      
+
+      
+      /// If this guard is found to be true, then the current loop iteration will end,
+      /// but not the whole loop. Execution will continue from the next character
+      /// in the text.
+      ///
       guard let closingIndex = text[afterOpening...].range(of: trailingChars)?.lowerBound else {
-        // No closing delimiter found, move to next character
         currentIndex = text.index(after: openingIndex)
         continue
       }
       
-      // Check if the opening delimiter is part of a longer sequence
-      //      guard isStandaloneDelimiter(at: openingIndex, for: syntax) else {
-      //        currentIndex = afterOpening
-      //        continue
-      //      }
+      /// If we are here, then the above `guard let closingIndex =`
+      /// must have evaluted `true`.
+      ///
       
-      // Check if the closing delimiter is part of a longer sequence
-      //      guard isStandaloneDelimiter(at: closingIndex, for: syntax) else {
-      //        currentIndex = text.index(after: openingIndex)
-      //        continue
-      //      }
-      
+
       
       let startOffset = text.distance(from: text.startIndex, to: openingIndex)
       let endOffset = text.distance(from: text.startIndex, to: closingIndex) + trailingChars.count
-      
-      
-      
       let nsRange = NSRange(location: startOffset, length: endOffset - startOffset)
-      
       
       if let textRange = NSTextRange(
         nsRange,
@@ -237,15 +205,6 @@ public extension NSTextRange {
     
     self.init(location: start, end: end)
   }
-  
-//  convenience init?(_ offset: Int, provider: NSTextElementProvider) {
-//    let docLocation = provider.documentRange.location
-//    
-//    guard let start = provider.location?(docLocation, offsetBy: offset) else {
-//      return nil
-//    }
-//    
-//    self.init(location: start)
-//  }
+
 }
 
