@@ -20,12 +20,12 @@ import Rearrange
 //  let range: Range<String.Index>
 //  let scope: TextScope
 //  let paragraphIndex: Int?  // Only relevant for paragraph scope
-//  
+//
 //  init(range: Range<String.Index>, scope: TextScope, paragraphIndex: Int? = nil) {
 //    self.range = range
 //    self.scope = scope
 //    self.paragraphIndex = paragraphIndex
-//    
+//
 //    if scope == .paragraph && paragraphIndex == nil {
 //      fatalError("Paragraph index must be provided for paragraph scope")
 //    }
@@ -42,12 +42,12 @@ import Rearrange
 //class TextScopeConverter {
 //  let fullText: String
 //  let paragraphs: [String]
-//  
+//
 //  init(fullText: String) {
 //    self.fullText = fullText
 //    self.paragraphs = fullText.components(separatedBy: .newlines)
 //  }
-//  
+//
 //  func convertToFullTextScope(_ range: Range<String.Index>, fromParagraph index: Int) -> ScopedTextRange {
 //    let paragraphStartIndex = paragraphs[0..<index].reduce(0) { $0 + $1.count + 1 }  // +1 for newline
 //    let fullTextStartIndex = fullText.index(fullText.startIndex, offsetBy: paragraphStartIndex)
@@ -59,7 +59,7 @@ import Rearrange
 //    )
 //    return ScopedTextRange(range: fullTextRange, scope: .fullText)
 //  }
-//  
+//
 //  func convertToParagraphScope(_ range: Range<String.Index>) -> ScopedTextRange? {
 //    guard let paragraphIndex = paragraphs.firstIndex(where: { paragraph in
 //      let paragraphRange = fullText.range(of: paragraph)!
@@ -67,7 +67,7 @@ import Rearrange
 //    }) else {
 //      return nil
 //    }
-//    
+//
 //    let paragraphStartIndex = paragraphs[0..<paragraphIndex].reduce(0) { $0 + $1.count + 1 }  // +1 for newline
 //    let fullTextStartIndex = fullText.index(fullText.startIndex, offsetBy: paragraphStartIndex)
 //    let paragraphRange = Range(
@@ -155,7 +155,10 @@ class MarkdownSyntaxFinder {
     self.provider = provider
   }
   
-  func findSyntaxRanges(for syntax: MarkdownSyntax) -> [NSTextRange] {
+  func findSyntaxRanges(
+    for syntax: MarkdownSyntax,
+    in scopeRange: NSTextRange
+  ) -> [NSTextRange] {
     var ranges: [NSTextRange] = []
     var currentIndex = text.startIndex
     
@@ -163,30 +166,86 @@ class MarkdownSyntaxFinder {
     let trailingChars = syntax.trailingCharacters
     
     while currentIndex < text.endIndex {
-      if let openingIndex = text[currentIndex...].range(of: leadingChars)?.lowerBound {
-        let afterOpening = text.index(openingIndex, offsetBy: leadingChars.count)
-        if let closingIndex = text[afterOpening...].range(of: trailingChars)?.lowerBound {
-          let startOffset = text.distance(from: text.startIndex, to: openingIndex)
-          let endOffset = text.distance(from: text.startIndex, to: closingIndex) + trailingChars.count
-          
-          if let textRange = NSTextRange(NSRange(location: startOffset, length: endOffset - startOffset), provider: provider) {
-            ranges.append(textRange)
-          }
-          currentIndex = text.index(closingIndex, offsetBy: trailingChars.count)
-        } else {
-          // No closing delimiter found, move to next character
-          currentIndex = text.index(after: openingIndex)
-        }
-      } else {
-        // No more opening delimiters found
-        break
+      
+      
+      guard let openingIndex = text[currentIndex...].range(of: leadingChars)?.lowerBound else { break } // No more opening delimiters found
+      
+      
+      let afterOpening = text.index(openingIndex, offsetBy: leadingChars.count)
+      
+      guard let closingIndex = text[afterOpening...].range(of: trailingChars)?.lowerBound else {
+        // No closing delimiter found, move to next character
+        currentIndex = text.index(after: openingIndex)
+        continue
       }
+      
+      // Check if the opening delimiter is part of a longer sequence
+      //      guard isStandaloneDelimiter(at: openingIndex, for: syntax) else {
+      //        currentIndex = afterOpening
+      //        continue
+      //      }
+      
+      // Check if the closing delimiter is part of a longer sequence
+      //      guard isStandaloneDelimiter(at: closingIndex, for: syntax) else {
+      //        currentIndex = text.index(after: openingIndex)
+      //        continue
+      //      }
+      
+      
+      let startOffset = text.distance(from: text.startIndex, to: openingIndex)
+      let endOffset = text.distance(from: text.startIndex, to: closingIndex) + trailingChars.count
+      
+      
+      
+      let nsRange = NSRange(location: startOffset, length: endOffset - startOffset)
+      
+      
+      if let textRange = NSTextRange(
+        nsRange,
+        scopeRange: scopeRange,
+        provider: provider
+      ) {
+        ranges.append(textRange)
+      }
+      currentIndex = text.index(closingIndex, offsetBy: trailingChars.count)
+      
     }
     
     return ranges
   }
   
   
+  
 }
 
+public extension NSTextRange {
+  
+  convenience init?(
+    _ range: NSRange,
+    scopeRange: NSTextRange,
+    provider: NSTextElementProvider
+  ) {
+    let docLocation = scopeRange.location
+    
+    guard let start = provider.location?(docLocation, offsetBy: range.location) else {
+      return nil
+    }
+    
+    guard let end = provider.location?(start, offsetBy: range.length) else {
+      return nil
+    }
+    
+    self.init(location: start, end: end)
+  }
+  
+//  convenience init?(_ offset: Int, provider: NSTextElementProvider) {
+//    let docLocation = provider.documentRange.location
+//    
+//    guard let start = provider.location?(docLocation, offsetBy: offset) else {
+//      return nil
+//    }
+//    
+//    self.init(location: start)
+//  }
+}
 

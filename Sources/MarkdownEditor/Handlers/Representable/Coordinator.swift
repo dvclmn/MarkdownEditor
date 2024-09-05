@@ -58,20 +58,21 @@ public extension MarkdownEditor {
       guard let tcm = tlm.textContentManager,
             let tcs = textView?.textContentStorage,
             let paragraph = textElement as? NSTextParagraph,
-            let fullAttrString = tcs.textStorage?.attributedSubstring(from: NSRange(tlm.documentRange, in: tcm)),
+//            let fullAttrString = tcs.textStorage?.attributedSubstring(from: NSRange(tlm.documentRange, in: tcm)),
             let textRange = textElement.elementRange
               
       else { return defaultFragment }
       
-      let text = fullAttrString.string
+//      let text = fullAttrString.string
       
       tcm.performEditingTransaction {
         
         
-        let finder = MarkdownSyntaxFinder(text: text, provider: tcm)
-        let boldRanges = finder.findSyntaxRanges(for: .bold)
+        let finder = MarkdownSyntaxFinder(text: paragraph.attributedString.string, provider: tcm)
+        let boldRanges = finder.findSyntaxRanges(for: .bold, in: textRange)
         
-        tlm.removeRenderingAttribute(.foregroundColor, for: tlm.documentRange)
+        
+        tlm.removeRenderingAttribute(.foregroundColor, for: textRange)
         
         for range in boldRanges {
           
