@@ -68,7 +68,7 @@ public extension MarkdownEditor {
       tcm.performEditingTransaction {
         
         
-        let finder = SymmetricalSyntaxFinder(
+        let finder = MarkdownSyntaxFinder(
           text: text,
           provider: tcm,
           syntax: .bold
@@ -151,32 +151,95 @@ public extension MarkdownEditor {
   }
 }
 
-enum SymmetricalSyntax {
+enum MarkdownSyntax {
+  
+  case heading(level: Int)
   case bold
   case italic
+  case inlineCode
+  case highlight
+  case strikethrough
+  
+  var leadingCharacters: String {
+    switch self {
+      case .heading(let level):
+        for level in 1..<level {
+          return String(repeating: "#", count: level)
+        }
+        
+      case .bold:
+        return "**"
+      case .italic:
+        return "*"
+      case .inlineCode:
+        return "`"
+      case .highlight:
+        return "=="
+      case .strikethrough:
+        return "~~"
+    }
+  }
+  
+  var trailingCharacters: String {
+    switch self {
+      case .heading:
+        "\n"
+      case .bold, .italic, .inlineCode, .highlight, .strikethrough: self.leadingCharacters
+    }
+  }
+  
 }
 
 
-class SymmetricalSyntaxFinder {
+class MarkdownSyntaxFinder {
   let text: String
   let provider: NSTextElementProvider
-  let syntax: SymmetricalSyntax
+  let syntax: MarkdownSyntax
   
   init(
     text: String,
     provider: NSTextElementProvider,
-    syntax: SymmetricalSyntax
+    syntax: MarkdownSyntax
   ) {
     self.text = text
     self.provider = provider
     self.syntax = syntax
   }
   
+  func findSyntaxRanges() -> [Range<String.Index>] {
+    var ranges: [Range<String.Index>] = []
+    var currentIndex = text.startIndex
+    var inSyntax = false
+    var syntaxStartIndex: String.Index?
+    
+    while currentIndex < text.endIndex {
+      
+      let currentChar = text[currentIndex]
+      if currentChar == syntaxMarker && !inSyntax {
+        inSyntax = true
+        syntaxStartIndex = currentIndex
+      } else if currentChar == endMarker && inSyntax {
+        if let start = syntaxStartIndex {
+          let end = text.index(after: currentIndex)
+          ranges.append(start..<end)
+          inSyntax = false
+        }
+      }
+      currentIndex = text.index(after: currentIndex)
+    }
+    
+    return ranges
+  }
+  
+  
   func findInlineCode() -> [NSTextRange] {
+    
     var ranges: [NSTextRange] = []
+    
     var currentIndex = text.startIndex
     
     while currentIndex < text.endIndex {
+      
       if let openingBacktick = text[currentIndex...].firstIndex(of: "#") {
         let afterOpeningBacktick = text.index(after: openingBacktick)
         if let closingBacktick = text[afterOpeningBacktick...].firstIndex(of: "\n") {
