@@ -76,12 +76,15 @@ public extension MarkdownEditor {
       let boldRanges = finder.findSyntaxRanges(for: .inlineCode, in: textRange)
       
       
+      
       tlm.removeRenderingAttribute(.foregroundColor, for: textRange)
       
       for range in boldRanges {
         
         
-        tlm.setRenderingAttributes(Markdown.Syntax.inlineCode.contentRenderingAttributes, for: range)
+        
+          tlm.setRenderingAttributes(Markdown.Syntax.inlineCode.contentRenderingAttributes, for: range)
+        
         
         
         //        print("NSTextRange: \(range)")

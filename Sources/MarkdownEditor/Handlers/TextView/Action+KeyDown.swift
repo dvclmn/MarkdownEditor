@@ -15,21 +15,15 @@ extension MarkdownTextView {
           let tlm = self.textLayoutManager,
           let selectionRange = tlm.textSelections.first?.textRanges.first
     else {
-      
       print("Wasn't one of the above, for shortcuts?")
       super.keyDown(with: event)
       return
     }
     
-    print("Key pressed: \(characters)")
-    
-//    let modifierFlags = event.modifierFlags.intersection(.deviceIndependentFlagsMask)
-//    let shortcut = KeyboardShortcut(key: characters, modifier: modifierFlags)
-    
     if characters == "`" && !selectionRange.isEmpty {
       self.wrapSelection(in: .inlineCode)
     } else {
-      print("Character wasn't a backtick, do the normal thing.")
+
       super.keyDown(with: event)
     }
   }
@@ -52,6 +46,7 @@ extension MarkdownTextView {
     
     let leading: String = syntax.leadingCharacters
     let trailing: String = syntax.trailingCharacters
+    let selectedNSRange = NSRange(selectedRange, in: tcm)
     
     print("Selected text: \(selectedText)")
     
@@ -59,17 +54,37 @@ extension MarkdownTextView {
     
     
     let newText = leading + selectedText + trailing
-    let newAttrString = NSAttributedString(string: newText)
+    
+    guard let newStartLocation = tcm.location(selectedRange.location, offsetBy: leading.count),
+    let newEndLocation = tcm.location(selectedRange.endLocation, offsetBy: leading.count),
+            let adjustedRange = NSTextRange(location: newStartLocation, end: newEndLocation)
+    else { return }
+    
     
     print("Here is the new text: \(newText)")
-    print("The new attributed string: \(newAttrString)")
     
     tcm.performEditingTransaction {
       
-      textStorage?.replaceCharacters(in: NSRange(selectedRange, in: tcm), with: newText)
+      
+      
+      textStorage?.replaceCharacters(in: selectedNSRange, with: newText)
+      
+      // Register undo operation
+//      let undoManager = self.undoManager
+//      undoManager?.registerUndo(withTarget: self, handler: { (targetSelf) in
+//        targetSelf.textStorage?.replaceCharacters(in: newRange, with: selectedText)
+//        targetSelf.setSelectedRange(selectedRange)
+//      })
+//      undoManager?.setActionName("Wrap with \(syntax)")
 
+      setSelectedRange(NSRange(adjustedRange, in: tcm))
+      
+      
+      
+      needsDisplay = true
+      tlm.ensureLayout(for: tlm.documentRange)
 
-    }
+    } // END perform edit
   }
   
 }
