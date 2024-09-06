@@ -20,17 +20,12 @@ public extension MarkdownEditor {
     
     var parent: MarkdownEditor
     weak var textView: MarkdownTextView?
+    
     var selectedRanges: [NSValue] = []
-
-    
     var selections: [NSTextSelection] = []
-    
     var updatingNSView = false
     
-    init(_ parent: MarkdownEditor)
-    {
-      self.parent = parent
-    }
+    init(_ parent: MarkdownEditor) { self.parent = parent }
     
 
     
@@ -47,8 +42,6 @@ public extension MarkdownEditor {
     /// Use this to provide an NSTextLayoutFragment specialized for an NSTextElement subclass
     /// targeted for the rendering surface.
     ///
-    
-    
     
     public func textLayoutManager(
       _ textLayoutManager: NSTextLayoutManager,

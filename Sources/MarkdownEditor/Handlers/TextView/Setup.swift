@@ -67,6 +67,7 @@ extension MarkdownTextView {
 
 
 /// Credit: https://github.com/ChimeHQ/TextViewPlus
+///
 extension NSTextView {
   private var maximumUsableWidth: CGFloat {
     guard let scrollView = enclosingScrollView else {
