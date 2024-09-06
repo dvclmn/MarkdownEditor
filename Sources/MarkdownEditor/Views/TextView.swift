@@ -20,17 +20,7 @@ public class MarkdownTextView: NSTextView {
   let infoHandler = EditorInfoHandler()
   
   var configuration: MarkdownEditorConfiguration
-//  
-//  
-//  var syntaxToWrap: MarkdownSyntax? {
-//    didSet {
-//      if let syntax = syntaxToWrap {
-//        self.wrapSelection(in: syntax)
-//        syntaxToWrap = nil
-//      }
-//    }
-//  }
-  
+
   var editorInfo = EditorInfo()
   
   private var viewportLayoutController: NSTextViewportLayoutController?

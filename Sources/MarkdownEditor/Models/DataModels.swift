@@ -25,4 +25,10 @@ public typealias MarkdownRegexOutput = Regex<Substring>
 
 public struct Markdown {
 
+  struct Element {
+    var syntax: Markdown.Syntax
+    var range: NSTextRange
+  }
+  
 }
+

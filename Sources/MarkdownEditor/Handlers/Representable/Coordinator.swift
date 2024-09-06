@@ -60,57 +60,59 @@ public extension MarkdownEditor {
       
       let defaultFragment = NSTextLayoutFragment(textElement: textElement, range: textElement.elementRange)
       
-      guard let tcm = tlm.textContentManager,
-            let tcs = textView?.textContentStorage,
-            let paragraph = textElement as? NSTextParagraph,
-            //            let fullAttrString = tcs.textStorage?.attributedSubstring(from: NSRange(tlm.documentRange, in: tcm)),
-            let textRange = textElement.elementRange
-              
-      else { return defaultFragment }
-      
-      //      let text = fullAttrString.string
-      
-      
-      
-      let finder = MarkdownSyntaxFinder(text: paragraph.attributedString.string, provider: tcm)
-      let boldRanges = finder.findSyntaxRanges(for: .inlineCode, in: textRange)
-      
-      
-      
-      tlm.removeRenderingAttribute(.foregroundColor, for: textRange)
-      
-      for range in boldRanges {
-        
-        
-        
-          tlm.setRenderingAttributes(Markdown.Syntax.inlineCode.contentRenderingAttributes, for: range)
-        
-        
-        
-        //        print("NSTextRange: \(range)")
-        //        print("---")
-        
-        
-        
-        
-        
-        //      let tlm = textLayoutManager
-        
-        //      guard let tcm = tlm.textContentManager,
-        //              let textRange = textElement.elementRange
-        //      else { return defaultFragment }
-        
-        
-        //      let fragment = CodeBlockBackground(
-        //        textElement: textElement,
-        //        range: textElement.elementRange,
-        //        paragraphStyle: .default,
-        //        isActive: false
-        //      )
-        
-      }
-      
       return defaultFragment
+      
+//      guard let tcm = tlm.textContentManager,
+//            let tcs = textView?.textContentStorage,
+//            let paragraph = textElement as? NSTextParagraph,
+//            //            let fullAttrString = tcs.textStorage?.attributedSubstring(from: NSRange(tlm.documentRange, in: tcm)),
+//            let textRange = textElement.elementRange
+//              
+//      else { return defaultFragment }
+//      
+//      //      let text = fullAttrString.string
+//      
+//      
+//      
+//      let finder = MarkdownSyntaxFinder(text: paragraph.attributedString.string, provider: tcm)
+//      let boldRanges = finder.findSyntaxRanges(for: .inlineCode, in: textRange)
+//      
+//      
+//      
+//      tlm.removeRenderingAttribute(.foregroundColor, for: textRange)
+//      
+//      for range in boldRanges {
+//        
+//        
+//        
+//          tlm.setRenderingAttributes(Markdown.Syntax.inlineCode.contentRenderingAttributes, for: range)
+//        
+//        
+//        
+//        //        print("NSTextRange: \(range)")
+//        //        print("---")
+//        
+//        
+//        
+//        
+//        
+//        //      let tlm = textLayoutManager
+//        
+//        //      guard let tcm = tlm.textContentManager,
+//        //              let textRange = textElement.elementRange
+//        //      else { return defaultFragment }
+//        
+//        
+//        //      let fragment = CodeBlockBackground(
+//        //        textElement: textElement,
+//        //        range: textElement.elementRange,
+//        //        paragraphStyle: .default,
+//        //        isActive: false
+//        //      )
+//        
+//      }
+//      
+//      return defaultFragment
       
       
     }

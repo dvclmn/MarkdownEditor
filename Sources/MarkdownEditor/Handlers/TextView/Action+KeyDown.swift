@@ -29,7 +29,7 @@ extension MarkdownTextView {
   }
   
   
-  func wrapSelection(in syntax: MarkdownSyntax) {
+  func wrapSelection(in syntax: Markdown.Syntax) {
     
     print("Let's wrap syntax, for \(syntax)")
     
@@ -44,8 +44,12 @@ extension MarkdownTextView {
       return
     }
     
-    let leading: String = syntax.leadingCharacters
+    guard let leading: String = syntax.leadingCharacters,
     let trailing: String = syntax.trailingCharacters
+    else {
+      print("")
+      return
+    }
     let selectedNSRange = NSRange(selectedRange, in: tcm)
     
     print("Selected text: \(selectedText)")
