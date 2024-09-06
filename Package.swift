@@ -16,20 +16,30 @@ let package = Package(
     dependencies: [
 //            .package(url: "https://github.com/raspu/Highlightr.git", from: "2.1.2"),
             .package(url: "https://github.com/ChimeHQ/Rearrange.git", from: "1.8.1"),
-//            .package(url: "https://github.com/ChimeHQ/Glyph.git", branch: "main"),
+            .package(url: "https://github.com/mattmassicotte/nsui.git", branch: "main"),
             
+            .package(url: "https://github.com/tree-sitter-grammars/tree-sitter-markdown.git", branch: "split_parser"),
+            .package(url: "https://github.com/alex-pinkus/tree-sitter-swift", branch: "with-generated-files"),
             .package(url: "https://github.com/krzyzanowskim/STTextKitPlus.git", from: "0.1.4"),
             .package(name: "TextCore", path: "../TextCore"),
+            
 //            .package(name: "Utilities", path: "../SwiftCollection/Utilities"),
 //            .package(name: "Styles", path: "../Styles"),
 //            .package(name: "Networking", path: "../Networking"),
             .package(name: "Helpers", path: "../SwiftCollection/Helpers"),
+            .package(name: "Neon", path: "../Neon"),
             
         ],
     targets: [
         .target(
             name: "MarkdownEditor",
-            dependencies: ["Helpers", "TextCore", "STTextKitPlus", "Rearrange"]
+            dependencies: [
+              "Helpers", "TextCore", "STTextKitPlus", "Rearrange", "Neon",
+              .product(name: "TreeSitterMarkdown", package: "tree-sitter-markdown"),
+              .product(name: "TreeSitterSwift", package: "tree-sitter-swift"),
+              .product(name: "NSUI", package: "nsui"),
+            ]
+            
         ),
         .testTarget(
           name: "MarkdownEditorTests",

@@ -1,6 +1,15 @@
 {
   "pins" : [
     {
+      "identity" : "nsui",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/mattmassicotte/nsui.git",
+      "state" : {
+        "branch" : "main",
+        "revision" : "8792b2f789bf03be1be9ecb4df43d2bfe0e5d361"
+      }
+    },
+    {
       "identity" : "rearrange",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/ChimeHQ/Rearrange.git",
@@ -16,6 +25,32 @@
       "state" : {
         "revision" : "60e1e790c4a77ffd10176849719eb3c52bbfb2c3",
         "version" : "0.1.5"
+      }
+    },
+    {
+      "identity" : "swifttreesitter",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/ChimeHQ/SwiftTreeSitter",
+      "state" : {
+        "revision" : "b01904a3737649c1d8520106bbb285724fe5b0bb"
+      }
+    },
+    {
+      "identity" : "tree-sitter-markdown",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/tree-sitter-grammars/tree-sitter-markdown.git",
+      "state" : {
+        "branch" : "split_parser",
+        "revision" : "7fe453beacecf02c86f7736439f238f5bb8b5c9b"
+      }
+    },
+    {
+      "identity" : "tree-sitter-swift",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/alex-pinkus/tree-sitter-swift",
+      "state" : {
+        "branch" : "with-generated-files",
+        "revision" : "33e56e4e2a6455f3fd4e04cfe5c7a314d498612d"
       }
     }
   ],

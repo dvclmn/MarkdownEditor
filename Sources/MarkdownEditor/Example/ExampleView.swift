@@ -9,220 +9,253 @@ import SwiftUI
 import BaseHelpers
 import BaseStyles
 
-struct ExampleView: View {
+import Neon
+import NSUI
+import SwiftTreeSitter
+import TreeSitterSwift
+
+import TreeSitterMarkdown
+import TreeSitterMarkdownInline
+
+@MainActor
+struct TextView: NSUIViewControllerRepresentable {
+  typealias NSUIViewControllerType = TextViewController
+  func makeNSUIViewController(context: Context) -> TextViewController {
+    TextViewController()
+  }
   
-  @State private var text: String = TestStrings.Markdown.basicMarkdown
-  @State private var editorInfo: EditorInfo? = nil
-  @State private var config = MarkdownEditorConfiguration(
-    fontSize: 13,
-    lineHeight: 1.1,
-    renderingAttributes: .markdownRenderingDefaults,
-    insertionPointColour: .pink,
-    codeColour: .green,
-    hasLineNumbers: false,
-    isShowingFrames: false,
-    insets: 20
-  )
-  
-  var body: some View {
-    
-    VStack(spacing: 0) {
-      
-//      HStack {
-//        Button {
-//          
-//        } label: {
-//          Label("Bold", systemImage: Icons.text.icon)
-//        }
-//      }
-//      .padding()
-//      Spacer()
-      
-      MarkdownEditor(text: $text, configuration:config) { info in
-          self.editorInfo = info
-        }
-      .background(alignment: .topLeading) {
-        Rectangle()
-          .fill(.blue.opacity(0.05))
-          .frame(height: self.editorInfo?.frame.height, alignment: .topLeading)
-          .border(Color.blue.opacity(0.2))
-      }
-        .frame(maxWidth: .infinity, alignment: .top)
-      
-      
-//      HStack(alignment: .bottom) {
-//        Text(self.editorInfo?.selection.summary ?? "nil")
-//        Spacer()
-//        Text(self.editorInfo?.scroll.summary ?? "nil")
-//        Spacer()
-//        Text(self.editorInfo?.text.scratchPad ?? "nil")
-//      }
-//      .textSelection(.enabled)
-//      .foregroundStyle(.secondary)
-//      .font(.callout)
-//      .frame(maxWidth: .infinity, alignment: .leading)
-//      .padding(.horizontal, 30)
-//      .padding(.top, 10)
-//      .padding(.bottom, 14)
-//      .background(.black.opacity(0.5))
-    }
-//    .overlay(alignment: .topTrailing) {
-//      VStack {
-//        //              Text("Local editor height \(self.editorInfo?.frame.height.description ?? "nil")")
-//      }
-//      .allowsHitTesting(false)
-//      .foregroundStyle(.secondary)
-//    }
-    .background(.black.opacity(0.5))
-    .background(.purple.opacity(0.1))
-    .frame(width: 440, height: 600)
-    
-    /// Interestingly, the below 'simulates' text being added to the NSTextView, but NOT
-    /// in the same as a user actually focusing the view and typing into it. There appears
-    /// to be a difference between these two methods of the text being mutated.
-    ///
-//    .task {
-//      do {
-//        try await Task.sleep(for: .seconds(0.8))
-//        
-//        self.text += "Hello"
-//      } catch {
-//        
-//      }
-//    }
+  func updateNSUIViewController(_ viewController: TextViewController, context: Context) {
   }
 }
 
-extension ExampleView {
+public final class TextViewController: NSUIViewController {
+  private let textView: NSUITextView
+  private let highlighter: TextViewHighlighter
   
-  static let twoInlineCode: String = """
-  This brief `inline code`, with text contents, lines `advance expanding` the view in the current writing direction.
-  
-  It does have more than two paragraphs, which I'm hoping will help me to verify that the code is able to count elements of a particular kind of markdown syntax, not just fragments or paragraphs.
-  
-  We'll have to just see if it works.
-  
-  Thank you for sharing your code and explaining your setup. It's great to see you're working on a markdown parsing and styling system using TextKit 2. Let's address your questions and then discuss some ideas for your implementation.
-  
-  Invalidating Attributes:
-  
-  When you call invalidateAttributes(in: NSRange) on a text storage, you're essentially telling the text system that the attributes in the specified range may have changed and need to be recalculated. This doesn't `remove` or modify the attributes directly; instead, it triggers the text system to update its internal caches and redraw the affected text. This is useful when you've made `changes` to the text or its `attributes and want` to ensure that the display is updated correctly.
-  
-  Regarding your markdown parsing and styling setup:
-  
-  Your approach of separating the parsing (which is more expensive) and the styling (which should be more nimble) is a good strategy. Here are some ideas and suggestions to potentially improve `your implementation`.
-  """
-  
-  static let shortSample: String = """
-  This *brief* block quote, with ==text contents==, lines `advance 
-  expanding` the view in the current writing direction.ExampleView".
-  
-  Includes one line break.
-  
-  Followed by another. In addition, here is a list:
-  
-  - [AttributeContainer](http://apple.com) is a container for attributes.
-  - By configuring the container, we can set, replace, and merge
-  - A large number of attributes for a string (or fragment) at once.
-  """
-  
-  static let exampleMarkdown: String = """
-    # Markdown samples
-    ## Overview of the sample
+  init() {
+    if #available(iOS 16.0, *) {
+      self.textView = NSUITextView(usingTextLayoutManager: false)
+    } else {
+      self.textView = NSUITextView()
+    }
     
-    ```swift
-    @State private var selectionInfo: EditorInfo.Selection? = nil
-    // @State private var editorHeight: CGFloat = .zero
-    ```
-    # This is also a heading
-    With other stuff below
+    self.highlighter = try! Self.makeHighlighter(for: textView)
     
-    Usually, `NSTextView` manages the *layout* process inside **the viewport** interacting ~~with its delegate~~.
+    super.init(nibName: nil, bundle: nil)
     
-    - [AttributeContainer](http://apple.com) is a container for attributes.
-    - By configuring the container, we can set, replace, and merge
-    - A large number of attributes for a string (or fragment) at once.
+    // enable non-continguous layout for TextKit 1
+    if #available(macOS 12.0, iOS 16.0, *), textView.textLayoutManager == nil {
+      textView.nsuiLayoutManager?.allowsNonContiguousLayout = true
+    }
+  }
+  
+  @available(*, unavailable)
+  required init?(coder: NSCoder) {
+    fatalError("init(coder:) has not been implemented")
+  }
+  
+  private static func makeHighlighter(for textView: NSUITextView) throws -> TextViewHighlighter {
+    let regularFont = NSUIFont.monospacedSystemFont(ofSize: 16, weight: .regular)
+    let boldFont = NSUIFont.monospacedSystemFont(ofSize: 16, weight: .bold)
+    let italicDescriptor = regularFont.fontDescriptor.nsuiWithSymbolicTraits(.traitItalic) ?? regularFont.fontDescriptor
     
-    ```python
-    // There is also some basic code
-    var x = y
-    ```
+    let italicFont = NSUIFont(nsuiDescriptor: italicDescriptor, size: 16) ?? regularFont
     
-    ### Markdown syntax summary
-    A `viewport` is a _rectangular_ area within a ==flipped coordinate system== expanding along the y-axis, with __bold alternate__, as well as ***bold italic*** emphasis.
+    // Set the default styles. This is applied by stock `NSTextStorage`s during
+    // so-called "attribute fixing" when you type, and we emulate that as
+    // part of the highlighting process in `TextViewSystemInterface`.
+    textView.typingAttributes = [
+      .foregroundColor: NSUIColor.darkGray,
+      .font: regularFont,
+    ]
     
-    1. You’d mentioned this is rendered within an OpenGL window
-    2. Despite the implementation details under the hood
-    3. They can only speculate, but perhaps OpenGL here is useful
-    
-    > This *brief* block quote, with ==text contents==, lines `advance expanding` the view in the current writing direction.ExampleView
-    
-    ```swift
-    import SwiftUI
-    import Combine
-    
-    class ChatsViewModel: ObservableObject {
-      @Dependency(.carerDatabase) var carerDatabase
-      @Published var chats = [Chat]()
-      @Published var messagesByChatId = [Int64: [Message]]()
-    
-      func loadChatsAndMessages(forCarer carerId: Int64) async {
-          do {
-              let chats = try await carerDatabase.fetchChatsForCarer(carerId)
-              self.chats = chats
-              for chat in chats {
-                  let messages = try await carerDatabase.fetchMessagesForChat(chat.id)
-                  messagesByChatId[chat.id] = messages
-              }
-          } catch {
-              print("Error fetching chats or messages: ")
-          }
+    let provider: TokenAttributeProvider = { token in
+      return switch token.name {
+        case let keyword where keyword.hasPrefix("keyword"): [.foregroundColor: NSUIColor.red, .font: boldFont]
+        case "comment", "spell": [.foregroundColor: NSUIColor.green, .font: italicFont]
+          // Note: Default is not actually applied to unstyled/untokenized text.
+        default: [.foregroundColor: NSUIColor.blue, .font: regularFont]
       }
     }
-    ```
     
-    ### Step 2: Create the SwiftUI View
+    // this is doing both synchronous language initialization everything, but TreeSitterClient supports lazy loading for embedded languages
+    let markdownConfig = try! LanguageConfiguration(
+      tree_sitter_markdown(),
+      name: "Markdown"
+    )
     
-    Now, let's create a SwiftUI view that uses this ViewModel to display the chats and their corresponding messages.
+    let markdownInlineConfig = try! LanguageConfiguration(
+      tree_sitter_markdown_inline(),
+      name: "MarkdownInline",
+      bundleName: "TreeSitterMarkdown_TreeSitterMarkdownInline"
+    )
     
-    1. You’d mentioned this is rendered within an OpenGL window
-    2. Despite the implementation details under the hood
-    3. They can only speculate, but perhaps OpenGL here is useful
+    let swiftConfig = try! LanguageConfiguration(
+      tree_sitter_swift(),
+      name: "Swift"
+    )
     
-    > This *brief* block quote, with ==text contents==, lines `advance expanding` the view in the current writing direction.ExampleView
+    let highlighterConfig = TextViewHighlighter.Configuration(
+      languageConfiguration: swiftConfig, // the root language
+      attributeProvider: provider,
+      languageProvider: { name in
+        print("embedded language: ", name)
+        
+        switch name {
+          case "swift":
+            return swiftConfig
+          case "markdown_inline":
+            return markdownInlineConfig
+          default:
+            return nil
+        }
+      },
+      locationTransformer: { _ in nil }
+    )
     
-    ```swift
-    import SwiftUI
-    import Combine
+    return try TextViewHighlighter(textView: textView, configuration: highlighterConfig)
+  }
+  
+  override func loadView() {
+#if canImport(AppKit) && !targetEnvironment(macCatalyst)
+    let scrollView = NSScrollView()
     
-    class ChatsViewModel: ObservableObject {
-      @Dependency(.carerDatabase) var carerDatabase
-      @Published var chats = [Chat]()
-      @Published var messagesByChatId = [Int64: [Message]]()
+    scrollView.hasVerticalScroller = true
+    scrollView.documentView = textView
     
-      func loadChatsAndMessages(forCarer carerId: Int64) async {
-          do {
-              let chats = try await carerDatabase.fetchChatsForCarer(carerId)
-              self.chats = chats
-              for chat in chats {
-                  let messages = try await carerDatabase.fetchMessagesForChat(chat.id)
-                  messagesByChatId[chat.id] = messages
-              }
-          } catch {
-              print("Error fetching chats or messages: ")
-          }
-      }
+    let max = CGFloat.greatestFiniteMagnitude
+    
+    textView.minSize = NSSize.zero
+    textView.maxSize = NSSize(width: max, height: max)
+    textView.isVerticallyResizable = true
+    textView.isHorizontallyResizable = true
+    
+    textView.isRichText = false  // Discards any attributes when pasting.
+    
+    self.view = scrollView
+#else
+    self.view = textView
+#endif
+    
+    // this has to be done after the textview has been embedded in the scrollView if
+    // it wasn't that way on creation
+    highlighter.observeEnclosingScrollView()
+    
+    regularTest()
+  }
+  
+  func regularTest() {
+    let url = Bundle.main.url(forResource: "test", withExtension: "code")!
+    let content = try! String(contentsOf: url)
+    
+    textView.text = content
+  }
+  
+  func doBigTest() {
+    let url = Bundle.main.url(forResource: "big_test", withExtension: "md")!
+    let content = try! String(contentsOf: url)
+    
+    textView.text = content
+    
+    DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(2)) {
+      let range = NSRange(location: content.utf16.count, length: 0)
+      
+      self.textView.scrollRangeToVisible(range)
     }
-    ```
-    
-    ### Step 2: Create the SwiftUI View
-    
-    Now, let's create a SwiftUI view that uses this ViewModel to display the chats and their corresponding messages.
-    
-    """
+  }
 }
 
-#Preview {
-  ExampleView()
-  
-}
+
+//
+//struct ExampleView: View {
+//  
+//  @State private var text: String = TestStrings.Markdown.basicMarkdown
+//  @State private var editorInfo: EditorInfo? = nil
+//  @State private var config = MarkdownEditorConfiguration(
+//    fontSize: 13,
+//    lineHeight: 1.1,
+//    renderingAttributes: .markdownRenderingDefaults,
+//    insertionPointColour: .pink,
+//    codeColour: .green,
+//    hasLineNumbers: false,
+//    isShowingFrames: false,
+//    insets: 20
+//  )
+//  
+//  var body: some View {
+//    
+//    VStack(spacing: 0) {
+//      
+//      
+//      
+//      
+////      HStack {
+////        Button {
+////          
+////        } label: {
+////          Label("Bold", systemImage: Icons.text.icon)
+////        }
+////      }
+////      .padding()
+////      Spacer()
+//      
+//      MarkdownEditor(text: $text, configuration:config) { info in
+//          self.editorInfo = info
+//        }
+//      .background(alignment: .topLeading) {
+//        Rectangle()
+//          .fill(.blue.opacity(0.05))
+//          .frame(height: self.editorInfo?.frame.height, alignment: .topLeading)
+//          .border(Color.blue.opacity(0.2))
+//      }
+//        .frame(maxWidth: .infinity, alignment: .top)
+//      
+//      
+////      HStack(alignment: .bottom) {
+////        Text(self.editorInfo?.selection.summary ?? "nil")
+////        Spacer()
+////        Text(self.editorInfo?.scroll.summary ?? "nil")
+////        Spacer()
+////        Text(self.editorInfo?.text.scratchPad ?? "nil")
+////      }
+////      .textSelection(.enabled)
+////      .foregroundStyle(.secondary)
+////      .font(.callout)
+////      .frame(maxWidth: .infinity, alignment: .leading)
+////      .padding(.horizontal, 30)
+////      .padding(.top, 10)
+////      .padding(.bottom, 14)
+////      .background(.black.opacity(0.5))
+//    }
+////    .overlay(alignment: .topTrailing) {
+////      VStack {
+////        //              Text("Local editor height \(self.editorInfo?.frame.height.description ?? "nil")")
+////      }
+////      .allowsHitTesting(false)
+////      .foregroundStyle(.secondary)
+////    }
+//    .background(.black.opacity(0.5))
+//    .background(.purple.opacity(0.1))
+//    .frame(width: 440, height: 600)
+//    
+//    /// Interestingly, the below 'simulates' text being added to the NSTextView, but NOT
+//    /// in the same as a user actually focusing the view and typing into it. There appears
+//    /// to be a difference between these two methods of the text being mutated.
+//    ///
+////    .task {
+////      do {
+////        try await Task.sleep(for: .seconds(0.8))
+////        
+////        self.text += "Hello"
+////      } catch {
+////        
+////      }
+////    }
+//  }
+//}
+//
+//
+//#Preview {
+//  ExampleView()
+//  
+//}
