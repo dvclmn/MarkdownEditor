@@ -69,45 +69,67 @@ extension Markdown {
       
     }
     
-    var leadingCharacters: String? {
+    var leadingCharacter: Character? {
       switch self {
-        case .heading(let level):
-          return String(repeating: "#", count: level)
+        case .heading:
+          return "#"
           
-        case .bold:
-          return "**"
-          
-        case .italic:
+        case .bold, .italic, .boldItalic:
           return "*"
-          
-        case .boldItalic:
-          return "***"
-          
+
         case .inlineCode:
           return "`"
         case .highlight:
-          return "=="
+          return "="
         case .strikethrough:
-          return "~~"
+          return "~"
         default:
           return nil
           
       }
     }
     
-    var trailingCharacters: String? {
+    var trailingCharacter: Character? {
       switch self {
         case .heading:
           return "\n"
         case .bold, .italic, .boldItalic, .inlineCode, .highlight, .strikethrough:
-          return self.leadingCharacters
+          return self.leadingCharacter
           
         default:
           return nil
       }
     }
     
+    var leadingRepeatCount: Int? {
+      switch self {
+        case .heading(let level): level
+        case .bold, .strikethrough, .highlight:
+          2
+        case .italic, .inlineCode:
+          1
+        case .boldItalic:
+          3
+          
+        default:
+          nil
+      }
+    }
     
+    var trailingRepeatCount: Int? {
+      switch self {
+        case .heading(let level): level
+        case .bold, .strikethrough, .highlight:
+          2
+        case .italic, .inlineCode:
+          1
+        case .boldItalic:
+          3
+          
+        default:
+          nil
+      }
+    }
     
     
     var shortcut: KeyboardShortcut? {
@@ -137,6 +159,15 @@ extension Markdown {
       let result = Self.allCases.first { $0.shortcut == shortcut }
       print("Got a matching shortcut: \(String(describing: result))")
       return result
+    }
+    
+    var isWrappable: Bool {
+      switch self {
+        case .inlineCode, .bold, .italic, .highlight, .strikethrough:
+          true
+        default:
+          false
+      }
     }
     
     

@@ -54,9 +54,9 @@ public class MarkdownScrollView: NSScrollView {
   
   private func setupScrollView() {
     
-    let textView = MarkdownTextView(frame: .zero, textContainer: nil, configuration: configuration)
+//    let textView = MarkdownTextView(frame: .zero, textContainer: nil, configuration: configuration)
     
-    self.documentView = textView
+//    self.documentView = textView
     
     self.hasVerticalScroller = true
     self.hasHorizontalScroller = false

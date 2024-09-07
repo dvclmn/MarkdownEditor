@@ -21,20 +21,14 @@ extension MarkdownTextView {
     
     super.viewDidMoveToWindow()
     
-    
     setupViewportLayoutController()
-    
-    
-    //    self.parseAndStyleMarkdownLite(trigger: .appeared)
-    
-    //    self.styleElements(trigger: .appeared)
     
     Task { @MainActor in
       let heightUpdate = self.updateEditorHeight()
       await self.infoHandler.update(heightUpdate)
     }
     
-//    exploreTextSegments()
+    exploreTextSegments()
     
     
   }
@@ -56,13 +50,16 @@ extension MarkdownTextView {
         
         let string = paragraph.attributedString.string
         
-        guard let paragraphRange = paragraph.elementRange,
-              let nsRange = tcm.range(for: paragraphRange)
-                
+        guard let paragraphRange = paragraph.elementRange
         else {
           print("Returned false: \(string)")
           return false
         }
+        
+        let nsRange = NSRange(paragraphRange, provider: tcm)
+        
+        
+        
         
         return true
         //
@@ -84,20 +81,4 @@ extension MarkdownTextView {
   }
   
   
-}
-
-
-extension NSTextContentManager {
-  func range(for textRange: NSTextRange) -> NSRange? {
-    let location = offset(from: documentRange.location, to: textRange.location)
-    let length = offset(from: textRange.location, to: textRange.endLocation)
-    if location == NSNotFound || length == NSNotFound { return nil }
-    return NSRange(location: location, length: length)
-  }
-  
-  func textRange(for range: NSRange) -> NSTextRange? {
-    guard let textRangeLocation = location(documentRange.location, offsetBy: range.location),
-          let endLocation = location(textRangeLocation, offsetBy: range.length) else { return nil }
-    return NSTextRange(location: textRangeLocation, end: endLocation)
-  }
 }

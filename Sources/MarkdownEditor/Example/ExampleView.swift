@@ -9,8 +9,6 @@ import SwiftUI
 import BaseHelpers
 import BaseStyles
 
-import Neon
-
 struct ExampleView: View {
   
   @State private var text: String = TestStrings.Markdown.basicMarkdown
