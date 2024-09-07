@@ -16,16 +16,16 @@ public class MarkdownTextView: NSTextView {
   var parsingTask: Task<Void, Never>?
   
   var scrollDebouncer = Debouncer(interval: 0.2)
-
+  
   let infoHandler = EditorInfoHandler()
   
   var configuration: MarkdownEditorConfiguration
-
+  
   var editorInfo = EditorInfo()
   
   private var viewportLayoutController: NSTextViewportLayoutController?
   var viewportDelegate: MarkdownViewportDelegate?
-
+  
   public var onInfoUpdate: MarkdownEditor.InfoUpdate = { _ in }
   
   public init(
@@ -57,7 +57,7 @@ public class MarkdownTextView: NSTextView {
     textLayoutManager.textContainer = container
     textContentStorage.addTextLayoutManager(textLayoutManager)
     textContentStorage.primaryTextLayoutManager = textLayoutManager
-
+    
     super.init(frame: frameRect, textContainer: container)
     
     self.textViewSetup()
@@ -82,11 +82,11 @@ public class MarkdownTextView: NSTextView {
     NotificationCenter.default.removeObserver(self)
   }
   
-  var scrollView: MarkdownScrollView? {
-    guard let result = enclosingScrollView as? MarkdownScrollView,
-            result.documentView == self
+  var scrollView: NSScrollView {
+    guard let result = enclosingScrollView,
+          result.documentView == self
     else {
-      return nil
+      fatalError("The text view needs a scroll view.")
     }
     return result
   }

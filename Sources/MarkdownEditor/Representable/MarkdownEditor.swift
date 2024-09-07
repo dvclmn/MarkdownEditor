@@ -9,7 +9,10 @@ import SwiftUI
 import OSLog
 import BaseHelpers
 
-public struct MarkdownEditor: NSViewRepresentable {
+public struct MarkdownEditor: NSViewControllerRepresentable {
+  
+  public typealias NSViewControllerType = MarkdownViewController
+  
   
   public typealias InfoUpdate = (_ info: EditorInfo) -> Void
   
@@ -27,7 +30,7 @@ public struct MarkdownEditor: NSViewRepresentable {
     self.info = info
   }
   
-  public func makeNSView(context: Context) -> MarkdownScrollView {
+  public func makeNSViewController(context: Context) -> MarkdownViewController {
     
     let viewController = MarkdownViewController(configuration: self.configuration)
     viewController.loadView()
@@ -45,12 +48,12 @@ public struct MarkdownEditor: NSViewRepresentable {
       DispatchQueue.main.async { self.info(info) }
     }
     
-    return viewController.view as! MarkdownScrollView
+    return viewController
   }
   
-  public func updateNSView(_ scrollView: MarkdownScrollView, context: Context) {
+  public func updateNSViewController(_ nsView: MarkdownViewController, context: Context) {
     
-    let textView = scrollView.documentView as! MarkdownTextView
+    let textView = nsView.textView
     
     context.coordinator.parent = self
     context.coordinator.textView = textView

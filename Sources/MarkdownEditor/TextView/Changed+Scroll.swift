@@ -27,11 +27,11 @@ extension MarkdownTextView {
   
 }
 
-extension MarkdownScrollView {
-  
-  public override func scrollWheel(with event: NSEvent) {
-    super.scrollWheel(with: event)
-
-  }
-  
-}
+//extension MarkdownScrollView {
+//  
+//  public override func scrollWheel(with event: NSEvent) {
+//    super.scrollWheel(with: event)
+//
+//  }
+//  
+//}

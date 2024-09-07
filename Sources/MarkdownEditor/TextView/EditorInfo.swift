@@ -27,30 +27,30 @@ public struct EditorInfo: Sendable {
 //    self.scroll = scroll
   }
   
-  public struct Text: Sendable {
-    var scratchPad: String = ""
+//  public struct Text: Sendable {
+//    var scratchPad: String = ""
     
     /// Previous useful metrics
     ///
 //    Insets: \(self.textContainer?.lineFragmentPadding.description ?? "")
-  }
+//  }
   
-  public struct Selection: Sendable {
-    var selection: String = ""
-    //  var selectedRange: NSTextRange?
-//    var selectedElement: [Markdown.Element] = []
-    var location: Location? = nil
-    var scratchPad: String = ""
-    
-    public struct Location: Sendable {
-      var line: Int
-      var column: Int
-    }
-  }
-  
-  public struct Scroll: Sendable {
-    var summary: String = "Summary here"
-  }
+//  public struct Selection: Sendable {
+//    var selection: String = ""
+//    //  var selectedRange: NSTextRange?
+////    var selectedElement: [Markdown.Element] = []
+//    var location: Location? = nil
+//    var scratchPad: String = ""
+//    
+//    public struct Location: Sendable {
+//      var line: Int
+//      var column: Int
+//    }
+//  }
+//  
+//  public struct Scroll: Sendable {
+//    var summary: String = "Summary here"
+//  }
   
   public struct Frame: Sendable {
     public var width: CGFloat

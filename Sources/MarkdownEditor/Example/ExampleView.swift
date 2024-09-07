@@ -12,8 +12,17 @@ import BaseStyles
 struct ExampleView: View {
   
   @State private var text: String = TestStrings.Markdown.basicMarkdown
+  
+  /// From AppKit —> SwiftUI
+  /// This currently only returns a frame (`CGSize`), to provide SwiftUI with
+  /// the height of the editor.
+  ///
   @State private var editorInfo: EditorInfo? = nil
-  @State private var config = MarkdownEditorConfiguration(
+  
+  /// From SwiftUI —> AppKit
+  /// Current method to set options for how the editor should look and feel
+  ///
+  let config = MarkdownEditorConfiguration(
     fontSize: 13,
     lineHeight: 1.1,
     renderingAttributes: .markdownRenderingDefaults,
@@ -27,7 +36,6 @@ struct ExampleView: View {
   var body: some View {
     
     VStack(spacing: 0) {
-      
       
       MarkdownEditor(text: $text, configuration:config) { info in
         self.editorInfo = info

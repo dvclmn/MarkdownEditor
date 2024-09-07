@@ -26,6 +26,11 @@ public class MarkdownViewController: NSViewController {
     
     self.textView = MarkdownTextView(frame: .zero, textContainer: nil, configuration: configuration)
     
+    let scrollView = NSScrollView()
+    
+    scrollView.hasVerticalScroller = true
+    scrollView.documentView = textView
+    
     self.highlighter = try! Self.makeHighlighter(for: textView)
     
     super.init(nibName: nil, bundle: nil)
@@ -90,10 +95,7 @@ public class MarkdownViewController: NSViewController {
   
   public override func loadView() {
 
-    let scrollView = NSScrollView()
-    
-    scrollView.hasVerticalScroller = true
-    scrollView.documentView = textView
+   
     
     let max = CGFloat.greatestFiniteMagnitude
     
@@ -104,7 +106,7 @@ public class MarkdownViewController: NSViewController {
     
     textView.isRichText = false  // Discards any attributes when pasting.
     
-    self.view = scrollView
+    self.view = textView.scrollView
     
     assert(self.textView.enclosingScrollView != nil, "I need the textView to have a scrollview.")
     
