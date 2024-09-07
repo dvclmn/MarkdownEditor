@@ -50,15 +50,14 @@ public class MarkdownTextView: NSTextView {
     
     /// Finally we connect these parts together.
     ///
-    /// > Important: Access to the text container is through the `textLayoutManager`. There is
-    /// > still a `textContainer` property directly on `NSTextView`, but as I understand it,
-    /// > that isn't the one we use.
+    /// > Important: Access to the text container is through the `textLayoutManager`.
+    /// > There is still a `textContainer` property directly on `NSTextView`, but as
+    /// > I understand it, that isn't the one we use.
     ///
     textLayoutManager.textContainer = container
     textContentStorage.addTextLayoutManager(textLayoutManager)
     textContentStorage.primaryTextLayoutManager = textLayoutManager
-//    container.containerSize = NSSize(width: frameRect.width, height: CGFloat.greatestFiniteMagnitude)
-    
+
     super.init(frame: frameRect, textContainer: container)
     
     self.textViewSetup()
@@ -81,6 +80,15 @@ public class MarkdownTextView: NSTextView {
   
   deinit {
     NotificationCenter.default.removeObserver(self)
+  }
+  
+  var scrollView: MarkdownScrollView? {
+    guard let result = enclosingScrollView as? MarkdownScrollView,
+            result.documentView == self
+    else {
+      return nil
+    }
+    return result
   }
   
   

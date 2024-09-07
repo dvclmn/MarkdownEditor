@@ -34,7 +34,7 @@ extension MarkdownTextView {
       await self.infoHandler.update(heightUpdate)
     }
     
-    exploreTextSegments()
+//    exploreTextSegments()
     
     
   }

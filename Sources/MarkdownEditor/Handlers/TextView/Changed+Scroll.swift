@@ -18,24 +18,24 @@ extension MarkdownTextView {
     
     guard let scrollView = enclosingScrollView else { return }
     
-    Task {
-      await self.scrollDebouncer.processTask { [weak self] in
-        
-        guard let self = self else { return }
-        
-       await scrollInfo(scrollView: scrollView)
-        
-//        await self.styleElements(trigger: .scroll)
-        
-        
-//        let scrollInfo = await self.textView.generateScrollInfo()
-        //
-//        Task { @MainActor in
-//          await self.textView.infoHandler.update(scrollInfo)
-//        }
-        
-      } // END process scroll
-    } // END Task
+//    Task {
+//      await self.scrollDebouncer.processTask { [weak self] in
+//        
+//        guard let self = self else { return }
+//        
+//       await scrollInfo(scrollView: scrollView)
+//        
+////        await self.styleElements(trigger: .scroll)
+//        
+//        
+////        let scrollInfo = await self.textView.generateScrollInfo()
+//        //
+////        Task { @MainActor in
+////          await self.textView.infoHandler.update(scrollInfo)
+////        }
+//        
+//      } // END process scroll
+//    } // END Task
     
   } // END handle scroll view
   

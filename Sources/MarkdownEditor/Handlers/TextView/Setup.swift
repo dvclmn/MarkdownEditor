@@ -53,13 +53,17 @@ extension MarkdownTextView {
     
     smartInsertDeleteEnabled = false
     
-    autoresizingMask = [.width]
+//    autoresizingMask = [.width]
+    autoresizingMask = [.width, .height]
+    
     textContainer?.widthTracksTextView = true
     textContainer?.heightTracksTextView = false
+    
+    let containerSize = self.enclosingScrollView?.frame.size ?? .zero
+    textLayoutManager?.textContainer?.containerSize = containerSize
+
     wrapsTextToHorizontalBounds = true
 
-    
-    textContainer?.containerSize = NSSize(width: frame.width, height: CGFloat.greatestFiniteMagnitude)
     
     self.applyConfiguration()
   }

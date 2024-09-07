@@ -1,8 +1,8 @@
 //
-//  MainView.swift
+//  ViewController.swift
 //  MarkdownEditor
 //
-//  Created by Dave Coleman on 17/8/2024.
+//  Created by Dave Coleman on 6/9/2024.
 //
 
 import AppKit
@@ -11,44 +11,32 @@ import NSUI
 import SwiftTreeSitter
 import TreeSitterMarkdown
 import TreeSitterMarkdownInline
-import TreeSitterSwift
 
-public class MarkdownContainerView: NSView {
+public class MarkdownViewController: NSViewController {
   
-  let highlighter: TextViewHighlighter?
-  
+  var scrollView: MarkdownScrollView
   var textView: MarkdownTextView
-  let scrollView: MarkdownScrollView
   
-  init(frame: NSRect, configuration: MarkdownEditorConfiguration) {
+  let highlighter: TextViewHighlighter
+  
+  init(
+    configuration: MarkdownEditorConfiguration
+  ) {
+
+    self.scrollView = MarkdownScrollView(frame: .zero, configuration: configuration)
+    self.textView = self.scrollView.documentView as! MarkdownTextView
+    self.highlighter = try! Self.makeHighlighter(for: textView)
     
-    let textView = MarkdownTextView(frame: .zero, textContainer: nil, configuration: configuration)
-    self.textView = textView
-    
-    let scrollView = MarkdownScrollView(frame: .zero, configuration: configuration)
-    self.scrollView = scrollView
-    
-    do {
-      self.highlighter = try Self.makeHighlighter(for: textView)
-      super.init(frame: frame)
-      setupViews()
-    } catch {
-      
-      self.highlighter = nil
-      
-      super.init(frame: frame)
-      print("Issue with highlighter")
-    }
-    
+    super.init(nibName: nil, bundle: nil)
     
   }
-
   
   required init?(coder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
   
-  private static func makeHighlighter(for textView: MarkdownTextView) throws -> TextViewHighlighter {
+
+  private static func makeHighlighter(for textView: NSUITextView) throws -> TextViewHighlighter {
     let regularFont = NSUIFont.monospacedSystemFont(ofSize: 16, weight: .regular)
     let boldFont = NSUIFont.monospacedSystemFont(ofSize: 16, weight: .bold)
     let italicDescriptor = regularFont.fontDescriptor.nsuiWithSymbolicTraits(.traitItalic) ?? regularFont.fontDescriptor
@@ -73,33 +61,25 @@ public class MarkdownContainerView: NSView {
     }
     
     // this is doing both synchronous language initialization everything, but TreeSitterClient supports lazy loading for embedded languages
-    
-    let markdownConfig = try LanguageConfiguration(
+    let markdownConfig = try! LanguageConfiguration(
       tree_sitter_markdown(),
       name: "Markdown"
     )
     
-    let markdownInlineConfig = try LanguageConfiguration(
+    let markdownInlineConfig = try! LanguageConfiguration(
       tree_sitter_markdown_inline(),
       name: "MarkdownInline",
       bundleName: "TreeSitterMarkdown_TreeSitterMarkdownInline"
     )
-    
-    let swiftConfig = try LanguageConfiguration(
-      tree_sitter_swift(),
-      name: "Swift"
-    )
-    
 
+    
     let highlighterConfig = TextViewHighlighter.Configuration(
-      languageConfiguration: swiftConfig, // the root language
+      languageConfiguration: markdownConfig, // the root language
       attributeProvider: provider,
       languageProvider: { name in
         print("embedded language: ", name)
         
         switch name {
-          case "swift":
-            return swiftConfig
           case "markdown_inline":
             return markdownInlineConfig
           default:
@@ -112,32 +92,19 @@ public class MarkdownContainerView: NSView {
     return try TextViewHighlighter(textView: textView, configuration: highlighterConfig)
   }
   
-  private func setupViews() {
+  public override func loadView() {
+    
+    let max = CGFloat.greatestFiniteMagnitude
+    
+    textView.minSize = NSSize.zero
+    textView.maxSize = NSSize(width: max, height: max)
+    textView.isVerticallyResizable = true
+    textView.isHorizontallyResizable = true
+    
+    self.view = scrollView
+    
+    assert(self.textView.enclosingScrollView != nil, "I need the textView to have a scrollview.")
 
-    addSubview(scrollView)
-    
-    scrollView.hasVerticalScroller = true
-    scrollView.hasHorizontalScroller = false
-    scrollView.autohidesScrollers = true
-    
-    scrollView.documentView = textView
-    
-    scrollView.translatesAutoresizingMaskIntoConstraints = false
-
-    scrollView.leadingAnchor.constraint(equalTo: self.leadingAnchor).isActive = true
-    scrollView.trailingAnchor.constraint(equalTo: self.trailingAnchor).isActive = true
-    scrollView.topAnchor.constraint(equalTo: self.topAnchor).isActive = true
-    scrollView.bottomAnchor.constraint(equalTo: self.bottomAnchor).isActive = true
-    
-    scrollView.drawsBackground = false
-    
-    if let highlighter = self.highlighter {
-      highlighter.observeEnclosingScrollView()
-    } else {
-      print("There is no highlighter available")
-    }
-    
   }
   
-
 }

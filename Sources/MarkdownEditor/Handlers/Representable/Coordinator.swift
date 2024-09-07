@@ -43,18 +43,18 @@ public extension MarkdownEditor {
     /// targeted for the rendering surface.
     ///
     
-    public func textLayoutManager(
-      _ textLayoutManager: NSTextLayoutManager,
-      textLayoutFragmentFor location: NSTextLocation,
-      in textElement: NSTextElement
-    ) -> NSTextLayoutFragment {
-      
-      let tlm = textLayoutManager
-      
-      let defaultFragment = NSTextLayoutFragment(textElement: textElement, range: textElement.elementRange)
-      
-      return defaultFragment
-      
+//    public func textLayoutManager(
+//      _ textLayoutManager: NSTextLayoutManager,
+//      textLayoutFragmentFor location: NSTextLocation,
+//      in textElement: NSTextElement
+//    ) -> NSTextLayoutFragment {
+//      
+////      let tlm = textLayoutManager
+//      
+//      let defaultFragment = NSTextLayoutFragment(textElement: textElement, range: textElement.elementRange)
+//      
+//      return defaultFragment
+//      
 //      guard let tcm = tlm.textContentManager,
 //            let tcs = textView?.textContentStorage,
 //            let paragraph = textElement as? NSTextParagraph,
@@ -108,7 +108,7 @@ public extension MarkdownEditor {
 //      return defaultFragment
       
       
-    }
+//    }
     
     
     

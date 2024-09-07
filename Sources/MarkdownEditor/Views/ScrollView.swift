@@ -11,20 +11,20 @@ import SwiftUI
 
 public class MarkdownScrollView: NSScrollView {
   
-  
+  let configuration: MarkdownEditorConfiguration
   
   // MARK: - Initialization
   
   init(frame frameRect: NSRect, configuration: MarkdownEditorConfiguration) {
+    self.configuration = configuration
     super.init(frame: frameRect)
-    
-   
     
     setupScrollView()
   }
   
   required init?(coder: NSCoder) {
     assertionFailure("This init not supported")
+    self.configuration = MarkdownEditorConfiguration.init()
     super.init(coder: coder)
   }
   
@@ -55,6 +55,24 @@ public class MarkdownScrollView: NSScrollView {
   
   private func setupScrollView() {
     
+    let textView = MarkdownTextView(frame: .zero, textContainer: nil, configuration: configuration)
+    
+    self.documentView = textView
+    
+    self.hasVerticalScroller = true
+    self.hasHorizontalScroller = false
+    self.autohidesScrollers = true
+    self.drawsBackground = false
+    
+    self.autoresizingMask = [.width, .height]
+    
+//    scrollView.translatesAutoresizingMaskIntoConstraints = false
+//    
+//    scrollView.leadingAnchor.constraint(equalTo: self.leadingAnchor).isActive = true
+//    scrollView.trailingAnchor.constraint(equalTo: self.trailingAnchor).isActive = true
+//    scrollView.topAnchor.constraint(equalTo: self.topAnchor).isActive = true
+//    scrollView.bottomAnchor.constraint(equalTo: self.bottomAnchor).isActive = true
+//
     
     contentView.postsBoundsChangedNotifications = true
     

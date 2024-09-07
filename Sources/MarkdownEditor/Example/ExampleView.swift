@@ -41,7 +41,6 @@ struct ExampleView: View {
           .border(Color.blue.opacity(0.2))
       }
       .frame(maxWidth: .infinity, alignment: .top)
-      
     }
   
     .background(.black.opacity(0.5))
