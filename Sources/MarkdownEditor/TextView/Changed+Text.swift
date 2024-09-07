@@ -41,87 +41,41 @@ extension MarkdownTextView {
     //    print("`Should change text` \(Date.now)")
 
     
-    
-    
     return true
   } // END shouldChangeText
+  
   
   
   public override func didChangeText() {
     
     super.didChangeText()
     
-    
-    
+
     Task { @MainActor in
       let heightUpdate = self.updateEditorHeight()
       await self.infoHandler.update(heightUpdate)
     }
     
-//    exploreTextSegments()
-    
-    //    self.parseAndStyleMarkdownLite(trigger: .text)
-    //    self.styleElements(trigger: .text)
-    
-    //    print("`override func didChangeText()` — at \(Date.now)")
-    
-    //    onAppearAndTextChange()
-    
+    exploreTextSegments()
 
   }
 }
 
-//extension MarkdownTextView: NSTextContentStorageDelegate {
-//  func textContentStorage(_ textContentStorage: NSTextContentStorage, didInvalidate range: NSTextRange) {
-//    
-//    print("Does this ever get called?")
-//    DispatchQueue.main.async {
-//      self.updateEditorHeightIfNeeded()
-//    }
-//  }
-//}
-
 
 extension MarkdownTextView {
-//
-//  func updateEditorHeightIfNeeded() {
-//    let newFrame = updateEditorHeight()
-//    
-//    if abs(newFrame.height - frame.height) > 1 {
-//      self.frame.size.height = newFrame.height
-//      self.invalidateIntrinsicContentSize()
-//      
-//      // Update scroll view content size if necessary
-//      if let scrollView = self.enclosingScrollView {
-//        scrollView.documentView?.frame.size.height = newFrame.height
-//        scrollView.contentView.needsDisplay = true
-//      }
-//      
-//      self.superview?.needsLayout = true
-//      self.superview?.needsLayout = true
-//    }
-//  }
-//
 
-  
   func updateEditorHeight() -> EditorInfo.Frame {
     guard let tlm = self.textLayoutManager else { return .init() }
     
-    // Force layout update
     tlm.ensureLayout(for: tlm.documentRange)
-    
     let bounds = tlm.usageBoundsForTextContainer
-    
-    let extraHeight: CGFloat = 80
+    let extraHeightBuffer: CGFloat = 80
     
     let frame = EditorInfo.Frame(
       width: bounds.width,
-      height: bounds.height + extraHeight
+      height: bounds.height + extraHeightBuffer
     )
     
-//    print("Editor size — Width: \(frame.width), Height: \(frame.height)")
-    
-    // Mark view for layout and display update
     self.invalidateIntrinsicContentSize()
     self.needsLayout = true
     self.needsDisplay = true
@@ -129,38 +83,6 @@ extension MarkdownTextView {
     return frame
   }
 }
-
-//extension MarkdownTextView {
-//
-//
-//  func generateTextInfo() -> EditorInfo.Text {
-//
-//    guard let tlm = self.textLayoutManager,
-//          let viewportRange = tlm.textViewportLayoutController.viewportRange
-//    else { return .init() }
-//
-//    let documentRange = tlm.documentRange
-//
-//    var textElementCount: Int = 0
-//
-//    tlm.textContentManager?.enumerateTextElements(from: documentRange.location, using: { _ in
-//      textElementCount += 1
-//      return true
-//    })
-//
-//    let scratchPad: String = """
-//    Character count: \(self.string.count)
-//    TextElement count: \(textElementCount)
-//
-//    Markdown.Elements count: \(self.elements.count)
-//    Elements: \(self.condensedElementSummary)
-//    """
-//
-//    return EditorInfo.Text(
-//      scratchPad: scratchPad
-//    )
-//  }
-//}
 
 extension MarkdownTextView {
   var condensedElementSummary: String {

@@ -29,15 +29,13 @@ extension MarkdownTextView {
   
   func applyConfiguration() {
     
-    self.font = NSFont.systemFont(ofSize: self.configuration.fontSize)
-    self.defaultParagraphStyle = self.configuration.defaultParagraphStyle
     self.insertionPointColor = NSColor(self.configuration.insertionPointColour)
-    
+//    
     textContainer?.lineFragmentPadding = self.configuration.insets
     textContainerInset = NSSize(width: 0, height: self.configuration.insets)
-    
+//    
     typingAttributes = self.configuration.defaultTypingAttributes
-    defaultParagraphStyle = self.configuration.defaultParagraphStyle
+
     
   }
 
@@ -64,7 +62,6 @@ extension MarkdownTextView {
 
     wrapsTextToHorizontalBounds = true
 
-    
     self.applyConfiguration()
   }
 }

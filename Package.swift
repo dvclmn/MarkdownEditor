@@ -15,7 +15,7 @@ let package = Package(
   ],
   dependencies: [
     
-    .package(url: "https://github.com/ChimeHQ/Neon.git", branch: "main"),
+    .package(url: "https://github.com/ChimeHQ/Neon.git", from: "0.6.0"),
     .package(url: "https://github.com/ChimeHQ/Rearrange.git", from: "1.8.1"),
     .package(url: "https://github.com/tree-sitter-grammars/tree-sitter-markdown.git", branch: "split_parser"),
     .package(url: "https://github.com/krzyzanowskim/STTextKitPlus.git", from: "0.1.4"),

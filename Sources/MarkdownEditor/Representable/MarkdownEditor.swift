@@ -31,23 +31,26 @@ public struct MarkdownEditor: NSViewRepresentable {
     
     let viewController = MarkdownViewController(configuration: self.configuration)
     viewController.loadView()
-    viewController.textView.string = text
-    context.coordinator.textView = viewController.textView
+    
+    let textView = viewController.textView
+    
+    textView.string = text
+    context.coordinator.textView = textView
 
-    viewController.textView.delegate = context.coordinator
-    viewController.textView.textLayoutManager?.delegate = context.coordinator
+    textView.delegate = context.coordinator
+    textView.textLayoutManager?.delegate = context.coordinator
     
     
-    viewController.textView.onInfoUpdate = { info in
+    textView.onInfoUpdate = { info in
       DispatchQueue.main.async { self.info(info) }
     }
     
     return viewController.view as! MarkdownScrollView
   }
   
-  public func updateNSView(_ nsView: MarkdownScrollView, context: Context) {
+  public func updateNSView(_ scrollView: MarkdownScrollView, context: Context) {
     
-    let textView = nsView.documentView as! MarkdownTextView
+    let textView = scrollView.documentView as! MarkdownTextView
     
     context.coordinator.parent = self
     context.coordinator.textView = textView

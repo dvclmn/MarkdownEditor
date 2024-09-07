@@ -10,8 +10,6 @@ import AppKit
 import BaseHelpers
 import TextCore
 
-
-
 struct KeyboardShortcut: Equatable {
   var key: String
   var modifier: NSEvent.ModifierFlags?
@@ -24,8 +22,6 @@ struct KeyboardShortcut: Equatable {
     self.modifier = modifier
   }
 }
-
-
 
 class MarkdownSyntaxFinder {
   let text: String

@@ -24,7 +24,7 @@ public class MarkdownTextView: NSTextView {
   var editorInfo = EditorInfo()
   
   private var viewportLayoutController: NSTextViewportLayoutController?
-  var viewportDelegate: CustomViewportDelegate?
+  var viewportDelegate: MarkdownViewportDelegate?
 
   public var onInfoUpdate: MarkdownEditor.InfoUpdate = { _ in }
   
@@ -100,7 +100,7 @@ extension MarkdownTextView {
   func setupViewportLayoutController() {
     guard let textLayoutManager = self.textLayoutManager else { return }
     
-    self.viewportDelegate = CustomViewportDelegate()
+    self.viewportDelegate = MarkdownViewportDelegate()
     self.viewportDelegate?.textView = self
     
     self.viewportLayoutController = NSTextViewportLayoutController(textLayoutManager: textLayoutManager)

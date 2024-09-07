@@ -53,35 +53,32 @@ extension MarkdownEditorConfiguration {
     let renderingAttributes: Attributes = self.renderingAttributes.getAttributes() ?? [:]
     
     let font = NSFont.systemFont(ofSize: self.fontSize)
-    let fontAttributes: Attributes = [.font: font]
+    let paragraphStyle = defaultParagraphStyle
+    let fontAttributes: Attributes = [
+      .font: font,
+      .paragraphStyle: paragraphStyle
+    ]
     
-    let allAttributes: Attributes = renderingAttributes.merging(fontAttributes) { currentValue, newValue in
+    let allAttributes: Attributes = renderingAttributes.merging(fontAttributes) { _, _ in
       return true
     }
     
     return allAttributes
-    
   }
   
   var defaultParagraphStyle: NSParagraphStyle {
-    
     let paragraphStyle = NSMutableParagraphStyle()
     paragraphStyle.lineHeightMultiple = self.lineHeight
     
-
     return paragraphStyle
-    
   }
 }
 
 public extension AttributeContainer {
-  
   static var markdownRenderingDefaults: AttributeContainer {
-
     var container = AttributeContainer()
     container.foregroundColor = NSColor.textColor
 
     return container
   }
-
 }

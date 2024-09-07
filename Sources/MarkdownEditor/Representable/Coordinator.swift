@@ -26,10 +26,7 @@ public extension MarkdownEditor {
     var updatingNSView = false
     
     init(_ parent: MarkdownEditor) { self.parent = parent }
-    
 
-    
-    
     
     
     /// This method (`textLayoutManager`, defined on protocol `NSTextLayoutManagerDelegate`)
@@ -141,22 +138,6 @@ public extension MarkdownEditor {
     public func textViewWillChangeText() {
       
     }
-    
-    
-    
-    
-    
-    
+
   }
-}
-
-
-extension MarkdownEditor.Coordinator {
-  
-  
-  
-  //      // Update the selection to exclude the new wrapper characters
-  //      let newSelectionRange = NSRange(location: range.location + wrapper.count, length: range.length)
-  //      setSelectedRange(newSelectionRange)
-  
 }

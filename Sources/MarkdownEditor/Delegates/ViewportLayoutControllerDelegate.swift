@@ -1,5 +1,5 @@
 //
-//  CustomViewportDelegate.swift
+//  MarkdownViewportDelegate.swift
 //  MarkdownEditor
 //
 //  Created by Dave Coleman on 14/8/2024.
@@ -8,7 +8,7 @@
 import SwiftUI
 
 
-class CustomViewportDelegate: NSObject, @preconcurrency  NSTextViewportLayoutControllerDelegate {
+class MarkdownViewportDelegate: NSObject, @preconcurrency  NSTextViewportLayoutControllerDelegate {
   weak var textView: MarkdownTextView?
   
   var statusString: String = ""
