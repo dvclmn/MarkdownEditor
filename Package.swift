@@ -15,13 +15,13 @@ let package = Package(
   ],
   dependencies: [
     
-    .package(url: "https://github.com/ChimeHQ/Rearrange.git", from: "1.8.1"),
-    .package(url: "https://github.com/mattmassicotte/nsui.git", branch: "main"),
-    .package(url: "https://github.com/tree-sitter-grammars/tree-sitter-markdown.git", branch: "split_parser"),
     .package(url: "https://github.com/ChimeHQ/Neon.git", branch: "main"),
+    .package(url: "https://github.com/ChimeHQ/Rearrange.git", from: "1.8.1"),
+    .package(url: "https://github.com/tree-sitter-grammars/tree-sitter-markdown.git", branch: "split_parser"),
     .package(url: "https://github.com/krzyzanowskim/STTextKitPlus.git", from: "0.1.4"),
     .package(name: "TextCore", path: "../TextCore"),
     .package(name: "Helpers", path: "../SwiftCollection/Helpers"),
+    
     
   ],
   targets: [
@@ -32,9 +32,10 @@ let package = Package(
         "TextCore",
         "STTextKitPlus",
         "Rearrange",
+        "Neon",
+//        .product(name: "TreeSitterClient", package: "Neon"),
+//        .product(name: "RangeState", package: "Neon"),
         .product(name: "TreeSitterMarkdown", package: "tree-sitter-markdown"),
-        .product(name: "Neon", package: "Neon"),
-        .product(name: "NSUI", package: "nsui"),
       ]
       
     ),

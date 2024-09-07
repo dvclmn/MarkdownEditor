@@ -10,15 +10,6 @@
       }
     },
     {
-      "identity" : "nsui",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/mattmassicotte/nsui.git",
-      "state" : {
-        "branch" : "main",
-        "revision" : "8792b2f789bf03be1be9ecb4df43d2bfe0e5d361"
-      }
-    },
-    {
       "identity" : "rearrange",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/ChimeHQ/Rearrange.git",

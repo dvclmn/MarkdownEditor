@@ -8,7 +8,6 @@
 import SwiftUI
 
 
-
 public class MarkdownScrollView: NSScrollView {
   
   let configuration: MarkdownEditorConfiguration
