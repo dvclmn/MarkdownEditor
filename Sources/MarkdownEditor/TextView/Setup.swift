@@ -34,7 +34,7 @@ extension MarkdownTextView {
     textContainer?.lineFragmentPadding = self.configuration.insets
     textContainerInset = NSSize(width: 0, height: self.configuration.insets)
 //    
-    typingAttributes = self.configuration.defaultTypingAttributes
+//    typingAttributes = self.configuration.defaultTypingAttributes
 
     
   }
@@ -57,10 +57,10 @@ extension MarkdownTextView {
     textContainer?.widthTracksTextView = true
     textContainer?.heightTracksTextView = false
     
-    let containerSize = self.enclosingScrollView?.frame.size ?? .zero
-    textLayoutManager?.textContainer?.containerSize = containerSize
+//    let containerSize = self.enclosingScrollView?.frame.size ?? .zero
+//    textLayoutManager?.textContainer?.containerSize = containerSize
 
-    wrapsTextToHorizontalBounds = true
+//    wrapsTextToHorizontalBounds = true
 
     self.applyConfiguration()
   }

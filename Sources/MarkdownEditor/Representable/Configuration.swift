@@ -23,8 +23,8 @@ public struct MarkdownEditorConfiguration: Sendable, Equatable {
   public var insets: CGFloat
   
   public init(
-    fontSize: CGFloat = 15,
-    lineHeight: CGFloat = 1.3,
+    fontSize: CGFloat = 14,
+    lineHeight: CGFloat = 1.1,
     renderingAttributes: AttributeContainer = .markdownRenderingDefaults,
     
     insertionPointColour: Color = .blue,
@@ -77,7 +77,7 @@ extension MarkdownEditorConfiguration {
 public extension AttributeContainer {
   static var markdownRenderingDefaults: AttributeContainer {
     var container = AttributeContainer()
-    container.foregroundColor = NSColor.textColor
+    container.foregroundColor = NSColor.textColor.withAlphaComponent(0.9)
 
     return container
   }

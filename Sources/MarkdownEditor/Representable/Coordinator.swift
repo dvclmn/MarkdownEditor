@@ -7,8 +7,8 @@
 
 import SwiftUI
 import TextCore
-import Rearrange
-import STTextKitPlus
+//import Rearrange
+//import STTextKitPlus
 
 public extension MarkdownEditor {
   

@@ -7,9 +7,8 @@
 
 import SwiftUI
 import BaseHelpers
-import BaseStyles
 
-struct ExampleView: View {
+public struct ExampleView: View {
   
   @State private var text: String = TestStrings.Markdown.basicMarkdown
   
@@ -22,31 +21,25 @@ struct ExampleView: View {
   /// From SwiftUI —> AppKit
   /// Current method to set options for how the editor should look and feel
   ///
-  let config = MarkdownEditorConfiguration(
-    fontSize: 13,
-    lineHeight: 1.1,
-    renderingAttributes: .markdownRenderingDefaults,
-    insertionPointColour: .pink,
-    codeColour: .green,
-    hasLineNumbers: false,
-    isShowingFrames: false,
-    insets: 20
-  )
+//  let config = MarkdownEditorConfiguration(
+//    fontSize: 13,
+//    lineHeight: 1.1,
+//    renderingAttributes: .markdownRenderingDefaults,
+//    insertionPointColour: .pink,
+//    codeColour: .green,
+//    hasLineNumbers: false,
+//    isShowingFrames: false,
+//    insets: 20
+//  )
   
-  var body: some View {
+  public var body: some View {
     
     VStack(spacing: 0) {
       
-      MarkdownEditor(text: $text, configuration:config) { info in
+      MarkdownEditor(text: $text, configuration: .init()) { info in
         self.editorInfo = info
       }
-      .background(alignment: .topLeading) {
-        Rectangle()
-          .fill(.blue.opacity(0.05))
-          .frame(height: self.editorInfo?.frame.height, alignment: .topLeading)
-          .border(Color.blue.opacity(0.2))
-      }
-      .frame(maxWidth: .infinity, alignment: .top)
+     
     }
   
     .background(.black.opacity(0.5))

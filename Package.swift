@@ -2,6 +2,8 @@
 
 import PackageDescription
 
+let localPackagesRoot = "/Users/dvclmn/Apps/_ Swift Packages"
+
 let package = Package(
   name: "MarkdownEditor",
   platforms: [
@@ -16,11 +18,11 @@ let package = Package(
   dependencies: [
     
     .package(url: "https://github.com/ChimeHQ/Neon.git", branch: "main"),
-    .package(url: "https://github.com/ChimeHQ/Rearrange.git", from: "1.8.1"),
+//    .package(url: "https://github.com/ChimeHQ/Rearrange.git", branch: "main"),
+//    .package(url: "https://github.com/krzyzanowskim/STTextKitPlus.git", from: "0.1.4"),
     .package(url: "https://github.com/tree-sitter-grammars/tree-sitter-markdown.git", branch: "split_parser"),
-    .package(url: "https://github.com/krzyzanowskim/STTextKitPlus.git", from: "0.1.4"),
-    .package(name: "TextCore", path: "../TextCore"),
-    .package(name: "Helpers", path: "../SwiftCollection/Helpers"),
+    .package(name: "TextCore", path: "\(localPackagesRoot)/TextCore"),
+    .package(name: "Helpers", path: "\(localPackagesRoot)/SwiftCollection/Helpers"),
     
     
   ],
@@ -30,11 +32,9 @@ let package = Package(
       dependencies: [
         "Helpers",
         "TextCore",
-        "STTextKitPlus",
-        "Rearrange",
+//        "Rearrange",
+//        "STTextKitPlus",
         "Neon",
-//        .product(name: "TreeSitterClient", package: "Neon"),
-//        .product(name: "RangeState", package: "Neon"),
         .product(name: "TreeSitterMarkdown", package: "tree-sitter-markdown"),
       ]
       
