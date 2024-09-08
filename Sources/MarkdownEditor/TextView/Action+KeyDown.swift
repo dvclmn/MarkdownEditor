@@ -24,22 +24,26 @@ extension MarkdownTextView {
     
     let syntaxShortcuts: [KeyboardShortcut] = Markdown.Syntax.allCases.flatMap { $0.shortcuts }
     
-    /// Ensure the syntax exists for the pressed shortcut
-    guard let syntax = Markdown.Syntax.syntax(for: pressedShortcut) else {
+    
+    guard syntaxShortcuts.contains(pressedShortcut), let syntax = Markdown.Syntax.syntax(for: pressedShortcut) else {
       super.keyDown(with: event)
       return
     }
     
-    let requiresSelection: Bool = syntax.shortcuts.contains(where: { $0.doesRequireSelection })
-    let hasSelection: Bool = self.selectedRange().length > 0
-
-    if requiresSelection && hasSelection {
-      handleWrapping(for: syntax)
-    } else {
-      print("Shortcut requires selection but nothing is selected. Key pressed: \(event.keyCode)")
-      super.keyDown(with: event)
-    }
+    print("Syntax keyboard shortcut detected for \(syntax.name): \(pressedShortcut)")
     
+    let selectedRange: NSRange = self.selectedRange()
+    let somethingIsSelected: Bool = selectedRange.length > 0
+
+    if pressedShortcut.doesRequireSelection {
+      
+      if somethingIsSelected {
+        handleWrapping(for: syntax)
+      } else {
+        print("Shortcut \(pressedShortcut) requires selection but nothing is selected.")
+      }
+      
+    }
 
   } // END key down override
   

@@ -14,12 +14,12 @@ import Neon
 public class MarkdownViewController: NSViewController {
   
   var textView: MarkdownTextView
-  private let highlighter: TextViewHighlighter
+  @MainActor private let highlighter: TextViewHighlighter
   
   init(
     configuration: MarkdownEditorConfiguration
   ) {
-
+    
     self.textView = MarkdownTextView(frame: .zero, textContainer: nil, configuration: configuration)
     
     let scrollView = NSScrollView()
@@ -29,7 +29,7 @@ public class MarkdownViewController: NSViewController {
     
     do {
       self.highlighter = try Self.makeHighlighter(for: textView)
-//      print("Highlighter worked")
+      print("`TextViewHighlighter` is running.")
       super.init(nibName: nil, bundle: nil)
     } catch {
       fatalError("Error setting up the highlighter: \(error)")
@@ -41,34 +41,58 @@ public class MarkdownViewController: NSViewController {
     fatalError("init(coder:) has not been implemented")
   }
   
-  @MainActor private static func makeHighlighter(for textView: MarkdownTextView) throws -> TextViewHighlighter {
-
+  private static func makeHighlighter(for textView: MarkdownTextView) throws -> TextViewHighlighter {
+    
     textView.typingAttributes = textView.configuration.defaultTypingAttributes
     
     let markdownConfig = try LanguageConfiguration(
-      tree_sitter_markdown_inline(),
+      tree_sitter_markdown(),
       name: "Markdown"
     )
-
+    let markdownInlineConfig = try LanguageConfiguration(
+      tree_sitter_markdown_inline(),
+      name: "Markdown Inline"
+    )
+    
     let provider: TokenAttributeProvider = { token in
       
+      print("`TokenAttributeProvider` called. Token: \(token)")
+
       return switch token.name {
+         
+        case let keyword where keyword.hasPrefix("punctuation"): [.foregroundColor: NSColor.red]
           
-        case let keyword where keyword.hasPrefix("*"): [.foregroundColor: NSColor.red]
-        case "comment", "spell": [.foregroundColor: NSColor.green]
-          // Note: Default is not actually applied to unstyled/untokenized text.
+          //
+          //        case let keyword where keyword.hasPrefix("*"): [.foregroundColor: NSColor.red]
+          //        case "comment", "spell": [.foregroundColor: NSColor.green]
+          //          // Note: Default is not actually applied to unstyled/untokenized text.
         default: [.foregroundColor: NSColor.blue]
       }
     }
-
     
     let highlighterConfig = TextViewHighlighter.Configuration(
       languageConfiguration: markdownConfig,
       attributeProvider: provider,
+      languageProvider: { name in
+        
+        
+        
+        print("embedded language: ", name)
+        
+        switch name {
+          case "markdown_inline":
+            print("Let's fire up markdown inline")
+            return markdownInlineConfig
+          default:
+            return nil
+        }
+      },
       locationTransformer: { _ in nil }
     )
     
     return try TextViewHighlighter(textView: textView, configuration: highlighterConfig)
+
+    
   }
   
   public override func loadView() {
@@ -91,6 +115,6 @@ public class MarkdownViewController: NSViewController {
     highlighter.observeEnclosingScrollView()
     
   }
-
-
+  
+  
 }

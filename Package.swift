@@ -1,4 +1,4 @@
-// swift-tools-version:5.6
+// swift-tools-version:5.9
 
 import PackageDescription
 
@@ -36,6 +36,11 @@ let package = Package(
 //        "STTextKitPlus",
         "Neon",
         .product(name: "TreeSitterMarkdown", package: "tree-sitter-markdown"),
+      ],
+      swiftSettings: [
+        .enableExperimentalFeature("StrictConcurrency"),
+        .enableExperimentalFeature("StrictConcurrency"),
+        .enableUpcomingFeature("BareSlashRegexLiterals")
       ]
       
     ),
@@ -45,14 +50,3 @@ let package = Package(
     
   ]
 )
-
-for target in package.targets {
-  target.swiftSettings = target.swiftSettings ?? []
-  target.swiftSettings?.append(
-    .unsafeFlags([
-      "-Xfrontend", "-warn-concurrency",
-      "-Xfrontend", "-enable-actor-data-race-checks",
-      "-enable-bare-slash-regex",
-    ])
-  )
-}

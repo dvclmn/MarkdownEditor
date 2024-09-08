@@ -9,6 +9,7 @@
 import Foundation
 import SwiftUI
 import RegexBuilder
+import Shortcuts
 
 extension Markdown {
   
@@ -131,56 +132,56 @@ extension Markdown {
     }
     
     
-    var shortcuts: [KeyboardShortcut] {
+    var shortcuts: [Keyboard.Shortcut] {
       switch self {
         case .heading(let level):
           return [
-            KeyboardShortcut(
-              key: "\(level)",
-              modifier: .command
+            Keyboard.Shortcut(
+              .character(Character("\(level)")),
+              modifiers: [.command]
             )
           ]
           
         case .bold:
           return [
-            KeyboardShortcut(
-              key: "b",
-              modifier: .command
+            Keyboard.Shortcut(
+              .character("b"),
+              modifiers: [.command]
             )
           ]
         case .italic:
           return [
-            KeyboardShortcut(
-              key: "i",
-              modifier: .command
+            Keyboard.Shortcut(
+              .character("i"),
+              modifiers: [.command]
             )
           ]
         case .boldItalic:
           return [
-            KeyboardShortcut(
-              key: "b",
-              modifier: [.command, .shift]
+            Keyboard.Shortcut(
+              .character("b"),
+              modifiers: [.command, .shift]
             )
           ]
         case .inlineCode:
           return [
-            KeyboardShortcut(
-              key: "`",
-              doesRequireSelection: true
+            Keyboard.Shortcut(
+              .character("`"),
+              requiresTextSelection: true
             )
           ]
         case .highlight:
           return [
-            KeyboardShortcut(
-              key: "h",
-              modifier: .command
+            Keyboard.Shortcut(
+              .character("h"),
+              modifiers: [.command]
             )
           ]
         case .strikethrough:
           return [
-            KeyboardShortcut(
-              key: "s",
-              modifier: .command
+            Keyboard.Shortcut(
+              .character("s"),
+              modifiers: [.command]
             )
           ]
           
@@ -189,31 +190,21 @@ extension Markdown {
       }
     }
     
-    static func syntax(for shortcut: KeyboardShortcut) -> Self? {
-      let result = Self.allCases.first { $0.shortcut == shortcut }
-      print("Got a matching shortcut: \(String(describing: result))")
+    static func syntax(for shortcut: Keyboard.Shortcut) -> Self? {
+      
+      
+      
+      guard let result = Self.allCases.first(where: { $0.shortcuts.contains(shortcut) }) else {
+        print("No syntax associated with shortcut `\(shortcut)`")
+        return nil
+      }
+      print("Got a matching shortcut: \(result)")
       return result
     }
     
   }
   
   
-}
-
-struct KeyboardShortcut: Equatable {
-  var key: String
-  var modifier: NSEvent.ModifierFlags
-  var doesRequireSelection: Bool
-  
-  init(
-    key: String,
-    modifier: NSEvent.ModifierFlags = [],
-    doesRequireSelection: Bool = false
-  ) {
-    self.key = key
-    self.modifier = modifier
-    self.doesRequireSelection = doesRequireSelection
-  }
 }
 
 
