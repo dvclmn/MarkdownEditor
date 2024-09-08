@@ -6,6 +6,7 @@
 //
 
 import AppKit
+import Rearrange
 
 extension MarkdownTextView {
   
@@ -38,67 +39,71 @@ extension MarkdownTextView {
   }
   
   
-  func wrapSelection(in syntax: Markdown.Syntax) {
+   func wrapSelection(in syntax: Markdown.Syntax) {
     
     print("Let's wrap syntax, for \(syntax)")
     
-//    guard let tlm = self.textLayoutManager,
-//          let tcm = tlm.textContentManager,
-//          let selection = tlm.textSelections.first,
-//          let selectedRange = selection.textRanges.first,
-//          let selectedText = tcm.attributedString(in: selectedRange)?.string
-//    else {
-//      
-//      print("One of the above didn't happen")
-//      return
-//    }
-//    
-//    // TODO: I'm mid-way through this, pauding to continue looking at Neon
-//    guard let leading = syntax.leadingCharacter,
-//    let trailing = syntax.trailingCharacter
-//    else {
-//      print("")
-//      return
-//    }
-//    let selectedNSRange = NSRange(selectedRange, in: tcm)
-//    
-//    print("Selected text: \(selectedText)")
-//    
-////    let textElements: [NSTextElement] = tcm.textElements(for: selectedRange)
-//    
-//    
-//    let newText = leading + selectedText + trailing
-//    
-//    guard let newStartLocation = tcm.location(selectedRange.location, offsetBy: leading.count),
-//    let newEndLocation = tcm.location(selectedRange.endLocation, offsetBy: leading.count),
-//            let adjustedRange = NSTextRange(location: newStartLocation, end: newEndLocation)
-//    else { return }
-//    
-//    
-//    print("Here is the new text: \(newText)")
-//    
-//    tcm.performEditingTransaction {
-//      
-//      
-//      
-//      textStorage?.replaceCharacters(in: selectedNSRange, with: newText)
-//      
-//      // Register undo operation
-////      let undoManager = self.undoManager
-////      undoManager?.registerUndo(withTarget: self, handler: { (targetSelf) in
-////        targetSelf.textStorage?.replaceCharacters(in: newRange, with: selectedText)
-////        targetSelf.setSelectedRange(selectedRange)
-////      })
-////      undoManager?.setActionName("Wrap with \(syntax)")
-//
-//      setSelectedRange(NSRange(adjustedRange, in: tcm))
-//      
-//      
-//      
-//      needsDisplay = true
-//      tlm.ensureLayout(for: tlm.documentRange)
-//
-//    } // END perform edit
+    guard let tlm = self.textLayoutManager,
+          let tcm = tlm.textContentManager,
+          let selection = tlm.textSelections.first,
+          let selectedRange = selection.textRanges.first
+    else {
+      
+      print("One of the above didn't happen")
+      return
+    }
+    
+    let selectedNSRange = NSRange(selectedRange, provider: tcm)
+    
+    guard let leadingCharacter = syntax.leadingCharacter,
+          let trailingCharacter = syntax.trailingCharacter,
+          let leadingCount = syntax.leadingCharacterCount,
+          let trailingCount = syntax.trailingCharacterCount,
+          let selectedText = self.string.substring(with: selectedNSRange)
+    else {
+      print("Something failed above")
+      return
+    }
+    
+    let leading = String(repeating: leadingCharacter, count: leadingCount)
+    let trailing = String(repeating: trailingCharacter, count: trailingCount)
+    
+    print("Selected text: \(selectedText)")
+    
+    
+    let isWrapped = selectedText.hasPrefix(leading) && selectedText.hasSuffix(trailing)
+    let newText: String
+    let newRange: NSRange
+    
+    
+    if isWrapped {
+      // Unwrap
+      newText = String(selectedText.dropFirst(leadingCount).dropLast(trailingCount))
+      newRange = NSRange(location: selectedNSRange.location, length: newText.count)
+    } else {
+      // Wrap
+      newText = leading + selectedText + trailing
+      newRange = NSRange(location: selectedNSRange.location, length: newText.count)
+    }
+    
+    
+    tcm.performEditingTransaction {
+      textStorage?.replaceCharacters(in: selectedNSRange, with: newText)
+      
+      let undoManager = self.undoManager
+      undoManager?.registerUndo(withTarget: self) { targetSelf in
+        Task { @MainActor in
+          targetSelf.wrapSelection(in: syntax)
+        }
+      }
+      undoManager?.setActionName(isWrapped ? "Unwrap \(syntax)" : "Wrap with \(syntax)")
+      
+      setSelectedRange(newRange)
+      
+      needsDisplay = true
+      tlm.ensureLayout(for: tlm.documentRange)
+
+    } // END perform edit
   }
   
 }
