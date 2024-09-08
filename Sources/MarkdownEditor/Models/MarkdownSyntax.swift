@@ -143,7 +143,7 @@ extension Markdown {
         case .boldItalic:
           return KeyboardShortcut(key: "b", modifier: [.command, .shift])
         case .inlineCode:
-          return KeyboardShortcut(key: "`", modifier: nil)
+          return KeyboardShortcut(key: "`")
         case .highlight:
           return KeyboardShortcut(key: "h", modifier: .command)
         case .strikethrough:
@@ -160,20 +160,35 @@ extension Markdown {
       return result
     }
     
-    var isWrappable: Bool {
-      switch self {
-        case .inlineCode, .bold, .italic, .highlight, .strikethrough:
-          true
-        default:
-          false
-      }
-    }
+    /// Removed for now, as I think having a kb shortcut or not, can serve this purpose
+//    var isWrappable: Bool {
+//      switch self {
+//        case .inlineCode, .bold, .italic, .highlight, .strikethrough:
+//          true
+//        default:
+//          false
+//      }
+//    }
     
     
   }
   
   
 }
+
+struct KeyboardShortcut: Equatable {
+  var key: String
+  var modifier: NSEvent.ModifierFlags
+  
+  init(
+    key: String,
+    modifier: NSEvent.ModifierFlags = []
+  ) {
+    self.key = key
+    self.modifier = modifier
+  }
+}
+
 
 extension Markdown.Syntax {
   
