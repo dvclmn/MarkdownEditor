@@ -46,7 +46,7 @@ public class MarkdownViewController: NSViewController {
     textView.typingAttributes = textView.configuration.defaultTypingAttributes
     
     let markdownConfig = try LanguageConfiguration(
-      tree_sitter_markdown(),
+      tree_sitter_markdown_inline(),
       name: "Markdown"
     )
 

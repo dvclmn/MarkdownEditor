@@ -75,7 +75,7 @@ extension Markdown {
           
         case .bold, .italic, .boldItalic:
           return "*"
-
+          
         case .inlineCode:
           return "`"
         case .highlight:
@@ -131,26 +131,61 @@ extension Markdown {
     }
     
     
-    var shortcut: KeyboardShortcut? {
+    var shortcuts: [KeyboardShortcut] {
       switch self {
         case .heading(let level):
-          return KeyboardShortcut(key: "\(level)", modifier: .command)
+          return [
+            KeyboardShortcut(
+              key: "\(level)",
+              modifier: .command
+            )
+          ]
           
         case .bold:
-          return KeyboardShortcut(key: "b", modifier: .command)
+          return [
+            KeyboardShortcut(
+              key: "b",
+              modifier: .command
+            )
+          ]
         case .italic:
-          return KeyboardShortcut(key: "i", modifier: .command)
+          return [
+            KeyboardShortcut(
+              key: "i",
+              modifier: .command
+            )
+          ]
         case .boldItalic:
-          return KeyboardShortcut(key: "b", modifier: [.command, .shift])
+          return [
+            KeyboardShortcut(
+              key: "b",
+              modifier: [.command, .shift]
+            )
+          ]
         case .inlineCode:
-          return KeyboardShortcut(key: "`")
+          return [
+            KeyboardShortcut(
+              key: "`",
+              doesRequireSelection: true
+            )
+          ]
         case .highlight:
-          return KeyboardShortcut(key: "h", modifier: .command)
+          return [
+            KeyboardShortcut(
+              key: "h",
+              modifier: .command
+            )
+          ]
         case .strikethrough:
-          return KeyboardShortcut(key: "s", modifier: .command)
+          return [
+            KeyboardShortcut(
+              key: "s",
+              modifier: .command
+            )
+          ]
           
         default:
-          return nil
+          return []
       }
     }
     
@@ -160,17 +195,6 @@ extension Markdown {
       return result
     }
     
-    /// Removed for now, as I think having a kb shortcut or not, can serve this purpose
-//    var isWrappable: Bool {
-//      switch self {
-//        case .inlineCode, .bold, .italic, .highlight, .strikethrough:
-//          true
-//        default:
-//          false
-//      }
-//    }
-    
-    
   }
   
   
@@ -179,13 +203,16 @@ extension Markdown {
 struct KeyboardShortcut: Equatable {
   var key: String
   var modifier: NSEvent.ModifierFlags
+  var doesRequireSelection: Bool
   
   init(
     key: String,
-    modifier: NSEvent.ModifierFlags = []
+    modifier: NSEvent.ModifierFlags = [],
+    doesRequireSelection: Bool = false
   ) {
     self.key = key
     self.modifier = modifier
+    self.doesRequireSelection = doesRequireSelection
   }
 }
 

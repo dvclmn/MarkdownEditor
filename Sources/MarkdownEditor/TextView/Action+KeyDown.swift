@@ -22,66 +22,25 @@ extension MarkdownTextView {
     let modifierFlags = event.modifierFlags.intersection(.deviceIndependentFlagsMask)
     let pressedShortcut = KeyboardShortcut(key: pressedKey, modifier: modifierFlags)
     
-    /// Compact map returns an array with all `nil` items removed, leaving only items that have a value
-    let syntaxShortcuts = Markdown.Syntax.allCases.compactMap { $0.shortcut }
+    let syntaxShortcuts: [KeyboardShortcut] = Markdown.Syntax.allCases.flatMap { $0.shortcuts }
     
-    if syntaxShortcuts.contains(pressedShortcut) {
-      
-      
-      
-//      handleShortcut(pressedShortcut)
+    /// Ensure the syntax exists for the pressed shortcut
+    guard let syntax = Markdown.Syntax.syntax(for: pressedShortcut) else {
+      super.keyDown(with: event)
       return
+    }
+    
+    let requiresSelection: Bool = syntax.shortcuts.contains(where: { $0.doesRequireSelection })
+    let hasSelection: Bool = self.selectedRange().length > 0
+
+    if requiresSelection && hasSelection {
+      handleWrapping(for: syntax)
+    } else {
+      print("Shortcut requires selection but nothing is selected. Key pressed: \(event.keyCode)")
+      super.keyDown(with: event)
     }
     
 
-    
-    
-    
-    /// Now anything below this guard statement will only run if *something*
-    /// is selected. This is useful for shortcuts where the user would expect to
-    /// be able to type a key (backtick, asterisk), when they're not styling text.
-    ///
-    /// If nothing is selected, then the pressed key will work as normal.
-    ///
-    guard self.selectedRange().length > 0 else {
-      print("Nothing currently selected. Key pressed: \(event.keyCode)")
-      super.keyDown(with: event)
-      return
-    }
-    
-    guard let characters = event.charactersIgnoringModifiers else {
-      print("Key pressed was not part of `event.charactersIgnoringModifiers`. Key: \(event.keyCode)")
-      super.keyDown(with: event)
-      return
-    }
-    
-//    let wrappableList = Markdown.Syntax.allCases.filter {$0.isWrappable}
-    
-    
-    
-    if let syntax = wrappableList.first(where: { $0.shortcut?.key == characters.first }) {
-      
-      print(syntax.name)
-      
-    } else {
-      print("Key pressed didn't match any of the wrappable syntax characters. Key pressed was: \(event.keyCode)")
-      super.keyDown(with: event)
-    }
-    
-    //
-    //
-    //
-    //
-    //
-    //    for wrappable in wrappableList {
-    //      if let leading = wrappable.leadingCharacter, characters == String(leading) {
-    //        self.handleWrapping(for: wrappable)
-    //      } else {
-    //        super.keyDown(with: event)
-    //      }
-    //    }
-    //
-    
   } // END key down override
   
   enum WrapAction {
@@ -91,7 +50,7 @@ extension MarkdownTextView {
   
   
   func handleWrapping(_ action: WrapAction = .wrap, for syntax: Markdown.Syntax) {
-    
+
     /// 1. Check for characters, and character counts (e.g. 2x asterisks for bold `**`)
     /// 2. Wrapping:
     ///   - Create new string from syntax characters and selected content
