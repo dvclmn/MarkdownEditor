@@ -192,18 +192,14 @@ extension Markdown {
       }
     }
     
-    
-    static func syntax(for shortcut: Keyboard.Shortcut) -> Self? {
-      guard let result = Self.allCases.first(where: { syntax in
-        syntax.shortcuts.contains { $0 == shortcut }
-      }) else {
-        print("No syntax associated with shortcut `\(shortcut)`")
-        return nil
+    static func findMatchingSyntax(for shortcut: Keyboard.Shortcut) -> Markdown.Syntax? {
+      for syntax in Markdown.Syntax.allCases {
+        if syntax.shortcuts.contains(shortcut) {
+          return syntax
+        }
       }
-      print("Got a matching shortcut: \(result)")
-      return result
+      return nil
     }
-    
     
     
     

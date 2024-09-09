@@ -38,7 +38,7 @@ extension MarkdownTextView {
     
     print("Pressed shortcut: \(shortcut)")
     
-    guard let matchingSyntax = findMatchingSyntax(for: shortcut) else {
+    guard let matchingSyntax = Markdown.Syntax.findMatchingSyntax(for: shortcut) else {
       print("Shortcut didn't match any syntax shortcuts, handing the event back to the system.")
       defaultAction()
       return
@@ -53,14 +53,6 @@ extension MarkdownTextView {
   }
   
   
-  private func findMatchingSyntax(for shortcut: Keyboard.Shortcut) -> Markdown.Syntax? {
-    for syntax in Markdown.Syntax.allCases {
-      if syntax.shortcuts.contains(shortcut) {
-        return syntax
-      }
-    }
-    return nil
-  }
   
   private func meetsSelectionRequirement(for shortcut: Keyboard.Shortcut) -> Bool {
     
