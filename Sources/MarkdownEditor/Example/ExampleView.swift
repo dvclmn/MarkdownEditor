@@ -7,6 +7,7 @@
 
 import SwiftUI
 import BaseHelpers
+import BaseStyles
 
 public struct ExampleView: View {
   
@@ -17,6 +18,9 @@ public struct ExampleView: View {
   /// the height of the editor.
   ///
   @State private var editorInfo: EditorInfo? = nil
+  
+  @State private var performAction: MarkdownAction = { _ in }
+  @State private var markdownAction: Markdown.SyntaxAction? = nil
   
   /// From SwiftUI —> AppKit
   /// Current method to set options for how the editor should look and feel
@@ -36,10 +40,29 @@ public struct ExampleView: View {
     
     VStack(spacing: 0) {
       
-      MarkdownEditor(text: $text, configuration: .init()) { info in
+      MarkdownEditor(
+        text: $text,
+        configuration: .init(),
+        action: performAction
+      ) { info in
         self.editorInfo = info
       }
      
+    }
+    .overlay(alignment: .bottom) {
+      HStack {
+        Button {
+          let action = Markdown.SyntaxAction(syntax: .bold)
+          self.performAction(action)
+          
+        } label: {
+          Label("Bold", systemImage: Icons.text.icon)
+        }
+      }
+      .padding(.horizontal, 12)
+      .frame(height: 40)
+      .frame(maxWidth: .infinity, alignment: .leading)
+      .background(.black)
     }
   
     .background(.black.opacity(0.5))

@@ -41,6 +41,18 @@ public class MarkdownViewController: NSViewController {
     fatalError("init(coder:) has not been implemented")
   }
   
+  func performAction(_ action: Markdown.SyntaxAction) {
+    
+    DispatchQueue.main.async {
+      print("Recieved an action: \(action)")
+      self.actionHandler?(action)
+    }
+//    if let action = action {
+//    } else {
+//      print("No action recieved")
+//    }
+  }
+  
   private static func makeHighlighter(for textView: MarkdownTextView) throws -> TextViewHighlighter {
     
     textView.typingAttributes = textView.configuration.defaultTypingAttributes

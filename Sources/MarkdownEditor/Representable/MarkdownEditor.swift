@@ -13,20 +13,22 @@ public struct MarkdownEditor: NSViewControllerRepresentable {
   
   public typealias NSViewControllerType = MarkdownViewController
   
-  
   public typealias InfoUpdate = (_ info: EditorInfo) -> Void
   
   @Binding var text: String
   var configuration: MarkdownEditorConfiguration
+  var action: MarkdownAction?
   var info: InfoUpdate
   
   public init(
     text: Binding<String>,
     configuration: MarkdownEditorConfiguration,
+    action: MarkdownAction? = nil,
     info: @escaping InfoUpdate = { _ in }
   ) {
     self._text = text
     self.configuration = configuration
+    self.action = action
     self.info = info
   }
   
@@ -45,8 +47,16 @@ public struct MarkdownEditor: NSViewControllerRepresentable {
     
     
     textView.onInfoUpdate = { info in
-      DispatchQueue.main.async { self.info(info) }
+      DispatchQueue.main.async {
+        self.info(info)
+      }
     }
+//    viewController.actionHandler = { action in
+//      DispatchQueue.main.async {
+//        print("Received the action from SwiftUI, passing it to AppKit")
+//      }
+//    }
+
     
     return viewController
   }
@@ -65,6 +75,11 @@ public struct MarkdownEditor: NSViewControllerRepresentable {
     }
     
     if textView.configuration != self.configuration {
+      textView.configuration = self.configuration
+      textView.applyConfiguration()
+    }
+    
+    if self.action != nsView.actionHandler {
       textView.configuration = self.configuration
       textView.applyConfiguration()
     }
