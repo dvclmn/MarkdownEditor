@@ -11,9 +11,9 @@ import SwiftUI
 import RegexBuilder
 import Shortcuts
 
-extension Markdown {
+public extension Markdown {
   
-  public enum Syntax: Identifiable, Equatable, Hashable, Sendable {
+  enum Syntax: Identifiable, Equatable, Hashable, Sendable {
     
     case heading(level: Int)
     
@@ -134,7 +134,7 @@ extension Markdown {
     }
     
     
-    var shortcuts: [Keyboard.Shortcut] {
+    public var shortcuts: [Keyboard.Shortcut] {
       switch self {
         case .heading(let level):
           return [

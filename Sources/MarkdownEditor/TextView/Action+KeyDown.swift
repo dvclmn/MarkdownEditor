@@ -83,6 +83,12 @@ extension MarkdownTextView {
     ///   - Create new string from syntax characters and selected content
     ///   - Adjust range to compensate for new glyphs, keeping original text selected
     
+    
+    
+    /// 1. Make sure the text selection makes sense?
+    /// 2. Add the right characters (and number of them) around the selection
+    /// 3. Ensure the selection is adjusted
+    
     guard let leadingCharacter = syntax.leadingCharacter,
           let trailingCharacter = syntax.trailingCharacter,
           let leadingCount = syntax.leadingCharacterCount,
@@ -92,28 +98,22 @@ extension MarkdownTextView {
       return
     }
     
-    let leading = String(repeating: leadingCharacter, count: leadingCount)
-    let trailing = String(repeating: trailingCharacter, count: trailingCount)
+    let leadingString = String(repeating: leadingCharacter, count: leadingCount)
+    let trailingString = String(repeating: trailingCharacter, count: trailingCount)
+    let selectedRange = self.selectedRange()
+    let selectedText = self.attributedSubstring(forProposedRange: selectedRange, actualRange: nil)?.string ?? ""
     
-    print("Let's wrap \(syntax.name), with \(leading) and \(trailing)")
+    print("""
+    Let's wrap selection '\(selectedText)', with \(syntax.name) syntax:  '\(leadingString)' and '\(trailingString)'
+    """)
     
     guard let tlm = self.textLayoutManager,
-          let tcm = tlm.textContentManager,
-          let selection = tlm.textSelections.first,
-          let selectedRange = selection.textRanges.first
+          let tcm = tlm.textContentManager
     else {
       print("One of the above didn't happen")
       return
     }
-    
-    let selectedNSRange = NSRange(selectedRange, provider: tcm)
-    guard let selectedText = self.string.substring(with: selectedNSRange) else {
-      print("Issue getting selected text")
-      return
-    }
-    
-    print("Selected text to wrap: \(selectedText)")
-    
+
     let newSelection: NSRange
     let newText: String
     
@@ -125,9 +125,11 @@ extension MarkdownTextView {
         /// Using the original `selectedRange` as a fallback here, probably
         /// something more elegant that could be done.
         ///
-        newSelection = selectedNSRange.shifted(by: leadingCount) ?? selectedNSRange
+        /// > Important: The order in which the text and the selection is set matters.
+        /// > Set the text, and then set the selection adjustments accordingly.
         
-        newText = leading + selectedText + trailing
+        newText = leadingString + selectedText + trailingString
+        newSelection = selectedRange.shifted(by: leadingCount) ?? selectedRange
         
         
       case .unwrap:
@@ -135,8 +137,8 @@ extension MarkdownTextView {
         /// We want to expand our selection by the correct number of characters,
         /// and then replace it, just like a wrap(?)
         
-        let newLocation: Int = selectedNSRange.location - leadingCount
-        let newLength: Int = selectedNSRange.length + (leadingCount + trailingCount)
+//        let newLocation: Int = selectedNSRange.location - leadingCount
+//        let newLength: Int = selectedNSRange.length + (leadingCount + trailingCount)
         
         newText = String(selectedText)
         
@@ -146,7 +148,8 @@ extension MarkdownTextView {
         /// something more elegant that could be done.
         ///
         
-        newSelection = NSRange(location: newLocation, length: newLength)
+        newSelection = selectedRange
+//        newSelection = NSRange(location: newLocation, length: newLength)
         
     }
     

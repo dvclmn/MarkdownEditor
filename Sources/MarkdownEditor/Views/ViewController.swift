@@ -66,7 +66,7 @@ public class MarkdownViewController: NSViewController {
     
     let provider: TokenAttributeProvider = { token in
       
-      print("`TokenAttributeProvider` called. Token: \(token)")
+//      print("`TokenAttributeProvider` called. Token: \(token)")
 
       return switch token.name {
          
@@ -91,7 +91,7 @@ public class MarkdownViewController: NSViewController {
         
         switch name {
           case "markdown_inline":
-            print("Let's fire up markdown inline")
+//            print("Let's fire up markdown inline")
             return markdownInlineConfig
           default:
             return nil
