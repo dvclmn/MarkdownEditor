@@ -29,7 +29,7 @@ public class MarkdownViewController: NSViewController {
     
     do {
       self.highlighter = try Self.makeHighlighter(for: textView)
-      print("`TextViewHighlighter` is running.")
+//      print("`TextViewHighlighter` is running.")
       super.init(nibName: nil, bundle: nil)
     } catch {
       fatalError("Error setting up the highlighter: \(error)")

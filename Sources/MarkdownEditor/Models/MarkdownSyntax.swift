@@ -93,7 +93,9 @@ extension Markdown {
       switch self {
         case .heading:
           return "\n"
+          
         case .bold, .italic, .boldItalic, .inlineCode, .highlight, .strikethrough:
+          /// These are 'symmetrical' syntaxes, so their leading and trailing characters will be the same
           return self.leadingCharacter
           
         default:
@@ -190,17 +192,21 @@ extension Markdown {
       }
     }
     
+    
     static func syntax(for shortcut: Keyboard.Shortcut) -> Self? {
-      
-      
-      
-      guard let result = Self.allCases.first(where: { $0.shortcuts.contains(shortcut) }) else {
+      guard let result = Self.allCases.first(where: { syntax in
+        syntax.shortcuts.contains { $0 == shortcut }
+      }) else {
         print("No syntax associated with shortcut `\(shortcut)`")
         return nil
       }
       print("Got a matching shortcut: \(result)")
       return result
     }
+    
+    
+    
+    
     
   }
   

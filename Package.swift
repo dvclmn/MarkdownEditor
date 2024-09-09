@@ -39,7 +39,6 @@ let package = Package(
       ],
       swiftSettings: [
         .enableExperimentalFeature("StrictConcurrency"),
-        .enableExperimentalFeature("StrictConcurrency"),
         .enableUpcomingFeature("BareSlashRegexLiterals")
       ]
       
