@@ -35,7 +35,11 @@ extension MarkdownTextView {
   }
   
   func handleShortcut(_ shortcut: Keyboard.Shortcut, defaultAction: () -> Void) {
+    
+    print("Pressed shortcut: \(shortcut)")
+    
     guard let matchingSyntax = findMatchingSyntax(for: shortcut) else {
+      print("Shortcut didn't match any syntax shortcuts, handing the event back to the system.")
       defaultAction()
       return
     }
@@ -76,56 +80,7 @@ extension MarkdownTextView {
     return true
   }
   
-  
-  func handleShortcut(_ shortcut: Keyboard.Shortcut, defaultAction: @escaping () -> Void) {
-    
-    /// We have multiple syntax types, and each syntax may have more than one valid shortcut.
-    /// Let's loop through each, to determine if the pressed shortcut is a match.
-    ///
-    for syntax in Markdown.Syntax.allCases {
-      for syntaxShortcut in syntax.shortcuts {
-        if syntaxShortcut == shortcut {
-          
-          /// Now that a matching shortcut is found (`if syntaxShortcut == shortcut`),
-          /// we handle the shortcut's action, and use `return` to exit the function, no further
-          /// loop iterations required.
-          ///
-          /// Some shortcuts require a range of text to be selected, while some
-          /// will use the word containing the insertion point as the target text.
-          ///
-          /// Let's check this now, and if the shortcut's requirement is not met,
-          /// we exit the function and allow the key press through without
-          /// taking any action.
-          ///
-          let selectedRange: NSRange = self.selectedRange()
-          let somethingIsSelected: Bool = selectedRange.length > 0
-          
-          if shortcut.requiresTextSelection {
-            if somethingIsSelected {
-              print("The shortcut `\(shortcut)` requires a selection, and there is something selected: \(selectedRange)")
-              // Perform the action related to the shortcut
-              
-            } else {
-              print("The shortcut `\(shortcut)` requires a selection, but nothing is selected.")
-              // Optionally, return or handle the case where no selection exists
-              return
-            }
-          } else {
-            // Handle shortcuts that do not require a text selection
-            print("The shortcut `\(shortcut)` does not require a selection.")
-            
-          }
-          
-          //          handleWrapping(for: syntax, shortcut: shortcut)
-          return
-        }
-      }
-    }
-    /// No match found
-    defaultAction()
-  } // END handle shortcut
-  
-  
+ 
   func handleWrapping(
     _ action: WrapAction = .wrap,
     for syntax: Markdown.Syntax,
@@ -173,8 +128,6 @@ extension MarkdownTextView {
     
     switch action {
       case .wrap:
-        
-        
         
         /// Adjusts the selection to compensate for the new syntax characters.
         ///
