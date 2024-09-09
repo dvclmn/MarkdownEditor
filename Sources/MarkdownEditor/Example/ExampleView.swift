@@ -19,7 +19,6 @@ public struct ExampleView: View {
   ///
   @State private var editorInfo: EditorInfo? = nil
   
-  @State private var performAction: MarkdownAction = { _ in }
   @State private var markdownAction: Markdown.SyntaxAction? = nil
   
   /// From SwiftUI —> AppKit
@@ -36,14 +35,16 @@ public struct ExampleView: View {
 //    insets: 20
 //  )
   
+  let syntaxButtons: [Markdown.Syntax] = [.bold, .italic, .inlineCode]
+  
   public var body: some View {
     
     VStack(spacing: 0) {
       
       MarkdownEditor(
         text: $text,
-        configuration: .init(),
-        action: performAction
+        action: $markdownAction,
+        configuration: .init()
       ) { info in
         self.editorInfo = info
       }
@@ -51,13 +52,20 @@ public struct ExampleView: View {
     }
     .overlay(alignment: .bottom) {
       HStack {
-        Button {
-          let action = Markdown.SyntaxAction(syntax: .bold)
-          self.performAction(action)
+        
+        ForEach(syntaxButtons) { syntax in
+          Button {
+            self.markdownAction = Markdown.SyntaxAction(syntax: syntax)
+          } label: {
+            Label(syntax.name, systemImage: syntax.shortcuts.first?.label?.icon ?? "bold")
+              .labelStyle(.iconOnly)
+              .fontWeight(.medium)
+              .fontDesign(.rounded)
+              .frame(width: 14)
+          }
           
-        } label: {
-          Label("Bold", systemImage: Icons.text.icon)
         }
+        
       }
       .padding(.horizontal, 12)
       .frame(height: 40)
@@ -83,6 +91,10 @@ public struct ExampleView: View {
     //      }
     //    }
   }
+}
+
+extension ExampleView {
+
 }
 
 

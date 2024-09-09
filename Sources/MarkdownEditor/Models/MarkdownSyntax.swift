@@ -148,14 +148,16 @@ extension Markdown {
           return [
             Keyboard.Shortcut(
               .character("b"),
-              modifiers: [.command]
+              modifiers: [.command],
+              label: Keyboard.Shortcut.Label(title: self.name, icon: "bold")
             )
           ]
         case .italic:
           return [
             Keyboard.Shortcut(
               .character("i"),
-              modifiers: [.command]
+              modifiers: [.command],
+              label: Keyboard.Shortcut.Label(title: self.name, icon: "italic")
             )
           ]
         case .boldItalic:
@@ -169,6 +171,7 @@ extension Markdown {
           return [
             Keyboard.Shortcut(
               .character("`"),
+              label: Keyboard.Shortcut.Label(title: self.name, icon: "chevron.left.forwardslash.chevron.right"),
               requiresTextSelection: true
             )
           ]
@@ -191,6 +194,7 @@ extension Markdown {
           return []
       }
     }
+
     
     static func findMatchingSyntax(for shortcut: Keyboard.Shortcut) -> Markdown.Syntax? {
       for syntax in Markdown.Syntax.allCases {

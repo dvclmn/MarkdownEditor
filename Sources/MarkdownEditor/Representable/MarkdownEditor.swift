@@ -16,25 +16,28 @@ public struct MarkdownEditor: NSViewControllerRepresentable {
   public typealias InfoUpdate = (_ info: EditorInfo) -> Void
   
   @Binding var text: String
+  @Binding var action: Markdown.SyntaxAction?
   var configuration: MarkdownEditorConfiguration
-  var action: MarkdownAction?
   var info: InfoUpdate
   
   public init(
     text: Binding<String>,
+    action: Binding<Markdown.SyntaxAction?>,
     configuration: MarkdownEditorConfiguration,
-    action: MarkdownAction? = nil,
     info: @escaping InfoUpdate = { _ in }
   ) {
     self._text = text
+    self._action = action
     self.configuration = configuration
-    self.action = action
     self.info = info
   }
   
   public func makeNSViewController(context: Context) -> MarkdownViewController {
     
-    let viewController = MarkdownViewController(configuration: self.configuration)
+    let viewController = MarkdownViewController(
+      action: self.action,
+      configuration: self.configuration
+    )
     viewController.loadView()
     
     let textView = viewController.textView
@@ -45,17 +48,11 @@ public struct MarkdownEditor: NSViewControllerRepresentable {
     textView.delegate = context.coordinator
     textView.textLayoutManager?.delegate = context.coordinator
     
-    
     textView.onInfoUpdate = { info in
       DispatchQueue.main.async {
         self.info(info)
       }
     }
-//    viewController.actionHandler = { action in
-//      DispatchQueue.main.async {
-//        print("Received the action from SwiftUI, passing it to AppKit")
-//      }
-//    }
 
     
     return viewController
@@ -79,11 +76,11 @@ public struct MarkdownEditor: NSViewControllerRepresentable {
       textView.applyConfiguration()
     }
     
-    if self.action != nsView.actionHandler {
-      textView.configuration = self.configuration
-      textView.applyConfiguration()
-    }
+    if textView.action != self.action {
+      textView.action = self.action
 
+    }
+    
     textView.needsLayout = true
     textView.needsDisplay = true
     

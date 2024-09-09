@@ -45,7 +45,7 @@ extension MarkdownTextView {
     }
     
     if meetsSelectionRequirement(for: shortcut) {
-      handleWrapping(for: matchingSyntax, shortcut: shortcut)
+      handleWrapping(for: matchingSyntax)
     } else {
       defaultAction()
       return
@@ -75,8 +75,7 @@ extension MarkdownTextView {
  
   func handleWrapping(
     _ action: WrapAction = .wrap,
-    for syntax: Markdown.Syntax,
-    shortcut: Keyboard.Shortcut
+    for syntax: Markdown.Syntax
   ) {
     
     /// 1. Check for characters, and character counts (e.g. 2x asterisks for bold `**`)

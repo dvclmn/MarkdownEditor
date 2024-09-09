@@ -14,7 +14,12 @@ import Shortcuts
 @MainActor @Suite("Wrapping tests")
 struct WrappingTests {
   
-  let textView = MarkdownTextView(frame: .zero, textContainer: nil, configuration: .init())
+  let textView = MarkdownTextView(
+    frame: .zero,
+    textContainer: nil,
+    action: Markdown.SyntaxAction(syntax: .bold),
+    configuration: .init()
+  )
   
   let exampleString = """
     # Header
@@ -34,7 +39,7 @@ struct WrappingTests {
     textView.setSelectedRange(NSRange(location: 0, length: 5))
     
     for shortcut in syntax.shortcuts {
-      textView.handleWrapping(.wrap, for: syntax, shortcut: shortcut)
+      textView.handleWrapping(.wrap, for: syntax)
     }
     
     #expect(textView.string == "**Hello**, world!")

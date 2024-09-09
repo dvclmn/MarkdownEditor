@@ -16,11 +16,21 @@ public class MarkdownViewController: NSViewController {
   var textView: MarkdownTextView
   @MainActor private let highlighter: TextViewHighlighter
   
+  var action: Markdown.SyntaxAction?
+  
   init(
+    action: Markdown.SyntaxAction?,
     configuration: MarkdownEditorConfiguration
   ) {
     
-    self.textView = MarkdownTextView(frame: .zero, textContainer: nil, configuration: configuration)
+    self.textView = MarkdownTextView(
+      frame: .zero,
+      textContainer: nil,
+      action: action,
+      configuration: configuration
+    )
+    
+    self.action = action
     
     let scrollView = NSScrollView()
     
@@ -39,18 +49,6 @@ public class MarkdownViewController: NSViewController {
   
   required init?(coder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
-  }
-  
-  func performAction(_ action: Markdown.SyntaxAction) {
-    
-    DispatchQueue.main.async {
-      print("Recieved an action: \(action)")
-      self.actionHandler?(action)
-    }
-//    if let action = action {
-//    } else {
-//      print("No action recieved")
-//    }
   }
   
   private static func makeHighlighter(for textView: MarkdownTextView) throws -> TextViewHighlighter {
