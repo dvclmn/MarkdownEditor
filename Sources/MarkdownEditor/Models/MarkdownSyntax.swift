@@ -171,8 +171,7 @@ public extension Markdown {
           return [
             Keyboard.Shortcut(
               .character("`"),
-              label: Keyboard.Shortcut.Label(title: self.name, icon: "chevron.left.forwardslash.chevron.right"),
-              requiresTextSelection: true
+              label: Keyboard.Shortcut.Label(title: self.name, icon: "chevron.left.forwardslash.chevron.right")
             )
           ]
         case .highlight:

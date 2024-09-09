@@ -28,6 +28,7 @@ public class MarkdownTextView: NSTextView {
       if let syntaxAction = self.action {
 //        print("Let's do something with \(syntaxAction.syntax.name)")
         self.handleWrapping(for: syntaxAction.syntax)
+        self.handleShortcut(<#T##shortcut: Keyboard.Shortcut##Keyboard.Shortcut#>, defaultAction: <#T##() -> Void#>)
       }
     }
   }

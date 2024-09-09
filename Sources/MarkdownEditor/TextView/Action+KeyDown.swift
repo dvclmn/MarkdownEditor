@@ -22,7 +22,6 @@ extension MarkdownTextView {
     let modifierFlags = event.modifierFlags.intersection(.deviceIndependentFlagsMask)
     let pressedShortcut = Keyboard.Shortcut(.character(Character(pressedKey)), modifierFlags: modifierFlags)
     
-    
     handleShortcut(pressedShortcut) {
       super.keyDown(with: event)
     }
@@ -44,38 +43,52 @@ extension MarkdownTextView {
       return
     }
     
-    if meetsSelectionRequirement(for: shortcut) {
-      handleWrapping(for: matchingSyntax)
-    } else {
-      defaultAction()
-      return
-    }
-  }
-  
-  
-  
-  private func meetsSelectionRequirement(for shortcut: Keyboard.Shortcut) -> Bool {
+    let somethingIsSelected: Bool = selectedRange().length > 0
     
-    let somethingIsSelected = selectedRange().length > 0
+    /// The thoery here is that if the shortcut has no modifier, there is a possibility
+    /// for conflict between whether the user wants to type that character, or have it
+    /// perform it's shortcut role. The presence of a selection OR a modifier, should
+    /// be enough to resolve this ambiguity.
+    ///
+    let requiresTextSelection: Bool = shortcut.modifiers.isEmpty
     
-    if shortcut.requiresTextSelection && !somethingIsSelected {
-      print("The shortcut `\(shortcut)` requires a selection, but nothing is selected.")
-      return false
-    }
-    
-    if shortcut.requiresTextSelection {
-      print("The shortcut `\(shortcut)` requires a selection, and there is something selected: \(selectedRange())")
+    if requiresTextSelection {
+      
+      if somethingIsSelected {
+        print("The shortcut `\(shortcut)` requires a selection, and there is something selected: \(selectedRange())")
+        handleWrapping(for: matchingSyntax, requiresSelection: true)
+        print()
+        
+      } else {
+        print("The shortcut `\(shortcut)` requires a selection, but nothing is selected.")
+        defaultAction()
+      }
+      
     } else {
       print("The shortcut `\(shortcut)` does not require a selection.")
+      handleWrapping(for: matchingSyntax, requiresSelection: false)
     }
-    
-    return true
+
   }
   
- 
+  /// Let's leave zero-length selection support for some other time. 
+//  func obtainWordRange() -> NSRange? {
+//    
+//    let selectedRange = self.selectedRange()
+//    
+//    guard selectedRange.length == 0 else {
+//      print("No need to obtain word range, already have non-zero selection: \(selectedRange)")
+//      return nil
+//    }
+//    
+//    let selectedRange =
+//    
+//  }
+
   func handleWrapping(
     _ action: WrapAction = .wrap,
-    for syntax: Markdown.Syntax
+    for syntax: Markdown.Syntax,
+    requiresSelection: Bool = false
   ) {
     
     /// 1. Check for characters, and character counts (e.g. 2x asterisks for bold `**`)
