@@ -66,8 +66,10 @@ extension MarkdownTextView {
     // If the intersection is empty or invalid, return nil
     return nil
   }
-
-
+  
+  
+  
+  
   
   func handleWrapping(
     _ action: WrapAction = .wrap,
@@ -98,6 +100,7 @@ extension MarkdownTextView {
       return
     }
     
+    
     let leadingString = String(repeating: leadingCharacter, count: leadingCount)
     let trailingString = String(repeating: trailingCharacter, count: trailingCount)
     
@@ -107,7 +110,7 @@ extension MarkdownTextView {
     }
     
     print("""
-    Let's wrap selection '\(selectedText)', with \(syntax.name) syntax:  '\(leadingString)' and '\(trailingString)'
+    Let's \(action) selection '\(selectedText)', with \(syntax.name) syntax:  '\(leadingString)' and '\(trailingString)'
     """)
     
     guard let tlm = self.textLayoutManager,
@@ -117,70 +120,121 @@ extension MarkdownTextView {
       return
     }
     
-    let newSelection: NSRange
+    let selectionToReplace: NSRange
+    let selectionAdjustment: NSRange
     let newText: String
     
+
     switch action {
       case .wrap:
-        
-        /// Adjusts the selection to compensate for the new syntax characters.
-        ///
-        /// Using the original `selectedRange` as a fallback here, probably
-        /// something more elegant that could be done.
-        ///
-        /// > Important: The order in which the text and the selection is set matters.
-        /// > Set the text, and then set the selection adjustments accordingly.
-        
+        selectionToReplace = selectedRange
+        let newLocation: Int = (selectedRange.location + leadingCount)
+        selectionAdjustment = NSRange(location: newLocation, length: selectedRange.length)
         newText = leadingString + selectedText + trailingString
-        newSelection = selectedRange.shifted(by: leadingCount) ?? selectedRange
-        
         
       case .unwrap:
         
-        /// We want to expand our selection by the correct number of characters,
-        /// and then replace it, just like a wrap(?)
         
-        //        let newLocation: Int = selectedNSRange.location - leadingCount
-        //        let newLength: Int = selectedNSRange.length + (leadingCount + trailingCount)
+        let newLocation: Int = (selectedRange.location - leadingCount)
+        let newLength: Int = selectedRange.length + (leadingCount + trailingCount)
+        selectionToReplace = NSRange(location: newLocation, length: newLength)
         
-        newText = String(selectedText)
+        selectionAdjustment = NSRange(location: selectedRange.location - leadingCount, length: selectedRange.length)
+        //        selectionAdjustment = NSRange(location: selectedRange.location, length: selectedRange.length)
         
-        /// Adjusts the selection to compensate for the new syntax characters.
-        ///
-        /// Using the original `selectedRange` as a fallback here, probably
-        /// something more elegant that could be done.
-        ///
-        
-        newSelection = selectedRange
-        //        newSelection = NSRange(location: newLocation, length: newLength)
-        
+        newText = selectedText
+
     }
     
-    
-    
+    let undoManager = self.undoManager
     
     tcm.performEditingTransaction {
       
-      self.textStorage?.replaceCharacters(in: newSelection, with: newText)
+      // Store the current state for undo
+      let oldText = (self.textStorage?.attributedSubstring(from: selectionToReplace).string)!
+      let oldRange = selectionToReplace
       
-      self.setSelectedRange(newSelection)
+
+      /// Previously I had made the mistake of writing `...cters(in: newSelection`,
+      /// whereas it needs to be `selectedRange`. The new selection should only
+      /// take effect *after* the replacement has been made.
+      ///
       
-      let undoManager = self.undoManager
+      self.textStorage?.replaceCharacters(in: selectionToReplace, with: newText)
+      self.setSelectedRange(selectionAdjustment)
+      
+      
+      // Register undo action
       undoManager?.registerUndo(withTarget: self) { targetSelf in
         
         Task { @MainActor in
-          
-          //          targetSelf.handleWrapping(.unwrap, for: syntax)
-          //          targetSelf.setSelectedRange(selectedNSRange)
-          
+          targetSelf.undoWrapping(oldText: oldText, oldRange: oldRange, newText: newText, newRange: selectionToReplace, syntax: syntax)
         }
       }
-      undoManager?.setActionName("Wrap with \(syntax.name)")
+      
+      undoManager?.setActionName(action == .wrap ? "Wrap with \(syntax.name)" : "Unwrap \(syntax.name)")
+
       
       needsDisplay = true
       tlm.ensureLayout(for: tlm.documentRange)
       
     } // END perform edit
   }
+  
+  
+  func undoWrapping(oldText: String, oldRange: NSRange, newText: String, newRange: NSRange, syntax: Markdown.Syntax) {
+    guard let tlm = self.textLayoutManager,
+          let tcm = tlm.textContentManager
+    else {
+      print("Failed to get text layout manager or content manager")
+      return
+    }
+    
+    tcm.performEditingTransaction {
+      // Revert to the old state
+      self.textStorage?.replaceCharacters(in: newRange, with: oldText)
+      self.setSelectedRange(oldRange)
+      
+      // Register redo action
+      undoManager?.registerUndo(withTarget: self) { targetSelf in
+        
+        Task { @MainActor in
+          targetSelf.redoWrapping(oldText: newText, oldRange: newRange, newText: oldText, newRange: oldRange, syntax: syntax)
+        }
+      }
+      
+      needsDisplay = true
+      tlm.ensureLayout(for: tlm.documentRange)
+    }
+  }
+  
+  
+  func redoWrapping(oldText: String, oldRange: NSRange, newText: String, newRange: NSRange, syntax: Markdown.Syntax) {
+    guard let tlm = self.textLayoutManager,
+          let tcm = tlm.textContentManager
+    else {
+      print("Failed to get text layout manager or content manager")
+      return
+    }
+    
+    tcm.performEditingTransaction {
+      // Apply the wrapped/unwrapped state
+      self.textStorage?.replaceCharacters(in: newRange, with: oldText)
+      self.setSelectedRange(oldRange)
+      
+      // Register undo action
+      undoManager?.registerUndo(withTarget: self) { targetSelf in
+        Task { @MainActor in
+          targetSelf.undoWrapping(oldText: newText, oldRange: newRange, newText: oldText, newRange: oldRange, syntax: syntax)
+        }
+      }
+      
+      needsDisplay = true
+      tlm.ensureLayout(for: tlm.documentRange)
+    }
+  }
+  
+  
+  
   
 }

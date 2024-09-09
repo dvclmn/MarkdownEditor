@@ -17,6 +17,8 @@ public class MarkdownTextView: NSTextView {
   
   var scrollDebouncer = Debouncer(interval: 0.2)
   
+  let undoRedoManager = UndoRedoManager()
+  
   let infoHandler = EditorInfoHandler()
   
   var configuration: MarkdownEditorConfiguration
