@@ -18,3 +18,13 @@ public extension Markdown {
   }
 }
 
+
+extension Optional where Wrapped == Markdown.SyntaxAction {
+  var summary: String {
+    if let syntaxAction = self {
+      return syntaxAction.syntax.name
+    } else {
+      return "nil"
+    }
+  }
+}

@@ -16,21 +16,19 @@ public class MarkdownViewController: NSViewController {
   var textView: MarkdownTextView
   @MainActor private let highlighter: TextViewHighlighter
   
-  var action: Markdown.SyntaxAction?
+  
   
   init(
-    action: Markdown.SyntaxAction?,
+    
     configuration: MarkdownEditorConfiguration
   ) {
     
     self.textView = MarkdownTextView(
       frame: .zero,
       textContainer: nil,
-      action: action,
+
       configuration: configuration
     )
-    
-    self.action = action
     
     let scrollView = NSScrollView()
     

@@ -9,6 +9,40 @@ import SwiftUI
 import OSLog
 import BaseHelpers
 
+
+
+public class EventEmitter<Event> {
+  private var eventHandlers: [(Event) -> Void] = []
+  
+  public init() {}
+  
+  public func on(_ handler: @escaping (Event) -> Void) {
+    eventHandlers.append(handler)
+  }
+  
+  public func emit(_ event: Event) {
+    print("Let's emit event: \(event)")
+    eventHandlers.forEach { $0(event) }
+  }
+}
+
+
+public enum SyntaxEvent {
+  case wrap(Markdown.Syntax)
+}
+
+
+// Extend the EventEmitter to work with AppKitEvent
+//public extension EventEmitter where Event == SyntaxEvent {
+//  mutating func syntaxDidChange(_ syntax: Markdown.Syntax) {
+//    emit(.wrap(syntax))
+//  }
+//}
+
+
+
+
+
 public struct MarkdownEditor: NSViewControllerRepresentable {
   
   public typealias NSViewControllerType = MarkdownViewController
@@ -16,18 +50,20 @@ public struct MarkdownEditor: NSViewControllerRepresentable {
   public typealias InfoUpdate = (_ info: EditorInfo) -> Void
   
   @Binding var text: String
-  @Binding var action: Markdown.SyntaxAction?
+  
+  var eventEmitter: EventEmitter<SyntaxEvent>
+  
   var configuration: MarkdownEditorConfiguration
   var info: InfoUpdate
   
   public init(
     text: Binding<String>,
-    action: Binding<Markdown.SyntaxAction?>,
+    eventEmitter: EventEmitter<SyntaxEvent>,
     configuration: MarkdownEditorConfiguration,
     info: @escaping InfoUpdate = { _ in }
   ) {
     self._text = text
-    self._action = action
+    self.eventEmitter = eventEmitter
     self.configuration = configuration
     self.info = info
   }
@@ -35,7 +71,7 @@ public struct MarkdownEditor: NSViewControllerRepresentable {
   public func makeNSViewController(context: Context) -> MarkdownViewController {
     
     let viewController = MarkdownViewController(
-      action: self.action,
+      
       configuration: self.configuration
     )
     viewController.loadView()
@@ -44,7 +80,7 @@ public struct MarkdownEditor: NSViewControllerRepresentable {
     
     textView.string = text
     context.coordinator.textView = textView
-
+    
     textView.delegate = context.coordinator
     textView.textLayoutManager?.delegate = context.coordinator
     
@@ -53,7 +89,14 @@ public struct MarkdownEditor: NSViewControllerRepresentable {
         self.info(info)
       }
     }
-
+    
+    self.eventEmitter.on { event in
+      switch event {
+        case .wrap(let syntax):
+          textView.handleWrapping(for: syntax)
+      }
+    }
+    
     
     return viewController
   }
@@ -76,15 +119,13 @@ public struct MarkdownEditor: NSViewControllerRepresentable {
       textView.applyConfiguration()
     }
     
-    if textView.action != self.action {
-      textView.action = self.action
-
-    }
-    
+   
     textView.needsLayout = true
     textView.needsDisplay = true
     
     context.coordinator.updatingNSView = false
   }
 }
+
+
 

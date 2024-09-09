@@ -17,7 +17,7 @@ struct WrappingTests {
   let textView = MarkdownTextView(
     frame: .zero,
     textContainer: nil,
-    action: Markdown.SyntaxAction(syntax: .bold),
+//    action: Markdown.SyntaxAction(syntax: .bold),
     configuration: .init()
   )
   

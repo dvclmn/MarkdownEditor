@@ -9,7 +9,9 @@ import SwiftUI
 import BaseHelpers
 import BaseStyles
 
+
 public struct ExampleView: View {
+  
   
   @State private var text: String = TestStrings.Markdown.basicMarkdown
   
@@ -19,7 +21,9 @@ public struct ExampleView: View {
   ///
   @State private var editorInfo: EditorInfo? = nil
   
-  @State private var markdownAction: Markdown.SyntaxAction? = nil
+  @State private var emitter: EventEmitter<SyntaxEvent> = .init()
+  
+//  @State private var markdownAction: Markdown.SyntaxAction? = nil
   
   /// From SwiftUI —> AppKit
   /// Current method to set options for how the editor should look and feel
@@ -43,7 +47,7 @@ public struct ExampleView: View {
       
       MarkdownEditor(
         text: $text,
-        action: $markdownAction,
+        eventEmitter: self.emitter,
         configuration: .init()
       ) { info in
         self.editorInfo = info
@@ -55,7 +59,7 @@ public struct ExampleView: View {
         
         ForEach(syntaxButtons) { syntax in
           Button {
-            self.markdownAction = Markdown.SyntaxAction(syntax: syntax)
+            self.emitter.emit(.wrap(syntax))
           } label: {
             Label(syntax.name, systemImage: syntax.shortcuts.first?.label?.icon ?? "bold")
               .labelStyle(.iconOnly)

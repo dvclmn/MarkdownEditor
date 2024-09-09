@@ -27,8 +27,7 @@ public extension MarkdownEditor {
     
     init(_ parent: MarkdownEditor) { self.parent = parent }
 
-    
-    
+
     /// This method (`textLayoutManager`, defined on protocol `NSTextLayoutManagerDelegate`)
     /// is called by the system when it needs to create a layout fragment for a specific portion of text.
     /// It gives you an opportunity to provide a custom NSTextLayoutFragment subclass for different parts of your text.
