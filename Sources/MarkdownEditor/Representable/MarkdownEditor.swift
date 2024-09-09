@@ -12,6 +12,7 @@ import BaseHelpers
 
 
 public class EventEmitter<Event> {
+  
   private var eventHandlers: [(Event) -> Void] = []
   
   public init() {}
@@ -26,20 +27,9 @@ public class EventEmitter<Event> {
   }
 }
 
-
 public enum SyntaxEvent {
   case wrap(Markdown.Syntax)
 }
-
-
-// Extend the EventEmitter to work with AppKitEvent
-//public extension EventEmitter where Event == SyntaxEvent {
-//  mutating func syntaxDidChange(_ syntax: Markdown.Syntax) {
-//    emit(.wrap(syntax))
-//  }
-//}
-
-
 
 
 

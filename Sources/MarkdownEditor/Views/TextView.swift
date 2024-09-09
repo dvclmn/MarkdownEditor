@@ -26,6 +26,8 @@ public class MarkdownTextView: NSTextView {
   private var viewportLayoutController: NSTextViewportLayoutController?
   var viewportDelegate: MarkdownViewportDelegate?
   
+  var lastSelectedText: String = ""
+  
   public var onInfoUpdate: MarkdownEditor.InfoUpdate = { _ in }
   
   public init(
