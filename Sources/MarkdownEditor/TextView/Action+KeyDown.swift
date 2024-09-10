@@ -146,61 +146,87 @@ extension MarkdownTextView {
 
     }
     
-    let undoManager = self.undoManager
     
     tcm.performEditingTransaction {
-      
       // Store the current state for undo
-      let oldText = (self.textStorage?.attributedSubstring(from: selectionToReplace).string)!
-      let oldRange = selectionToReplace
+      let oldText = (self.textStorage?.attributedSubstring(from: selectionToReplace).string) ?? ""
       
-
-      /// Previously I had made the mistake of writing `...cters(in: newSelection`,
-      /// whereas it needs to be `selectedRange`. The new selection should only
-      /// take effect *after* the replacement has been made.
-      ///
-      
+      // Perform the edit
       self.textStorage?.replaceCharacters(in: selectionToReplace, with: newText)
       self.setSelectedRange(selectionAdjustment)
       
+      // Record the action in our UndoRedoManager
+      undoRedoManager.recordAction(oldText: oldText,
+                                   oldRange: selectionToReplace,
+                                   newText: newText,
+                                   newRange: selectionAdjustment,
+                                   syntax: syntax)
       
-      // Register undo action
-      undoManager?.registerUndo(withTarget: self) { targetSelf in
-        
-        Task { @MainActor in
-          targetSelf.undoWrapping(oldText: oldText, oldRange: oldRange, newText: newText, newRange: selectionToReplace, syntax: syntax)
-        }
+      // Set up the undo manager
+      self.undoManager?.registerUndo(withTarget: self) { targetSelf in
+        targetSelf.undoWrapping()
       }
       
-      undoManager?.setActionName(action == .wrap ? "Wrap with \(syntax.name)" : "Unwrap \(syntax.name)")
-
+      self.undoManager?.setActionName(action == .wrap ? "Wrap with \(syntax.name)" : "Unwrap \(syntax.name)")
       
       needsDisplay = true
       tlm.ensureLayout(for: tlm.documentRange)
-      
     } // END perform edit
+    
+    
+    
+    
+//    tcm.performEditingTransaction {
+//      
+//      // Store the current state for undo
+//      let oldText = (self.textStorage?.attributedSubstring(from: selectionToReplace).string)!
+//      let oldRange = selectionToReplace
+//      
+//
+//      /// Previously I had made the mistake of writing `...cters(in: newSelection`,
+//      /// whereas it needs to be `selectedRange`. The new selection should only
+//      /// take effect *after* the replacement has been made.
+//      ///
+//      
+//      self.textStorage?.replaceCharacters(in: selectionToReplace, with: newText)
+//      self.setSelectedRange(selectionAdjustment)
+//      
+//      
+//      // Register undo action
+//      undoManager?.registerUndo(withTarget: self) { targetSelf in
+//        
+//        Task { @MainActor in
+//          targetSelf.undoWrapping(oldText: oldText, oldRange: oldRange, newText: newText, newRange: selectionToReplace, syntax: syntax)
+//        }
+//      }
+//      
+//      undoManager?.setActionName(action == .wrap ? "Wrap with \(syntax.name)" : "Unwrap \(syntax.name)")
+//
+//      
+//      needsDisplay = true
+//      tlm.ensureLayout(for: tlm.documentRange)
+//      
+//    } // END perform edit
   }
   
   
-  func undoWrapping(oldText: String, oldRange: NSRange, newText: String, newRange: NSRange, syntax: Markdown.Syntax) {
-    guard let tlm = self.textLayoutManager,
+  func undoWrapping() {
+    guard let action = undoRedoManager.undo(),
+          let tlm = self.textLayoutManager,
           let tcm = tlm.textContentManager
     else {
-      print("Failed to get text layout manager or content manager")
+      print("Failed to get undo action or text managers")
       return
     }
     
     tcm.performEditingTransaction {
       // Revert to the old state
-      self.textStorage?.replaceCharacters(in: newRange, with: oldText)
-      self.setSelectedRange(oldRange)
+      self.textStorage?.replaceCharacters(in: action.newRange, with: action.oldText)
+      self.setSelectedRange(action.oldRange)
       
-      // Register redo action
-      undoManager?.registerUndo(withTarget: self) { targetSelf in
-        
-        Task { @MainActor in
-          targetSelf.redoWrapping(oldText: newText, oldRange: newRange, newText: oldText, newRange: oldRange, syntax: syntax)
-        }
+      // Set up redo
+      self.undoManager?.registerUndo(withTarget: self) { targetSelf in
+        targetSelf.redoWrapping()
       }
       
       needsDisplay = true
@@ -208,32 +234,29 @@ extension MarkdownTextView {
     }
   }
   
-  
-  func redoWrapping(oldText: String, oldRange: NSRange, newText: String, newRange: NSRange, syntax: Markdown.Syntax) {
-    guard let tlm = self.textLayoutManager,
+  func redoWrapping() {
+    guard let action = undoRedoManager.redo(),
+          let tlm = self.textLayoutManager,
           let tcm = tlm.textContentManager
     else {
-      print("Failed to get text layout manager or content manager")
+      print("Failed to get redo action or text managers")
       return
     }
     
     tcm.performEditingTransaction {
       // Apply the wrapped/unwrapped state
-      self.textStorage?.replaceCharacters(in: newRange, with: oldText)
-      self.setSelectedRange(oldRange)
+      self.textStorage?.replaceCharacters(in: action.oldRange, with: action.newText)
+      self.setSelectedRange(action.newRange)
       
-      // Register undo action
-      undoManager?.registerUndo(withTarget: self) { targetSelf in
-        Task { @MainActor in
-          targetSelf.undoWrapping(oldText: newText, oldRange: newRange, newText: oldText, newRange: oldRange, syntax: syntax)
-        }
+      // Set up undo
+      self.undoManager?.registerUndo(withTarget: self) { targetSelf in
+        targetSelf.undoWrapping()
       }
       
       needsDisplay = true
       tlm.ensureLayout(for: tlm.documentRange)
     }
   }
-  
   
   
   
