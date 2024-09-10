@@ -7,6 +7,8 @@
 
 import AppKit
 
+/// https://stackoverflow.com/a/66281546
+///
 extension NSTextView {
   var selectedText: String {
     var text = ""

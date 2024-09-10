@@ -14,10 +14,9 @@ extension MarkdownTextView {
     
     super.setSelectedRanges(ranges, affinity: affinity, stillSelecting: stillSelecting)
 
-    if !stillSelecting {
-      printNewSelection()
-    }
-
+//    if !stillSelecting {
+//      printNewSelection()
+//    }
   }
 
   func printNewSelection() {

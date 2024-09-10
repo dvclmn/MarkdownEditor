@@ -31,7 +31,7 @@ extension MarkdownTextView {
       
       handleWrapping(for: matchingSyntax)
     } else {
-      print("Shortcut didn't match any syntax shortcuts, handing the event back to the system.")
+//      print("Shortcut didn't match any syntax shortcuts, handing the event back to the system.")
       super.keyDown(with: event)
     }
     

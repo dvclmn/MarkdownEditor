@@ -23,21 +23,21 @@ public struct ExampleView: View {
   
   @State private var emitter: EventEmitter<SyntaxEvent> = .init()
   
-//  @State private var markdownAction: Markdown.SyntaxAction? = nil
+  //  @State private var markdownAction: Markdown.SyntaxAction? = nil
   
   /// From SwiftUI —> AppKit
   /// Current method to set options for how the editor should look and feel
   ///
-//  let config = MarkdownEditorConfiguration(
-//    fontSize: 13,
-//    lineHeight: 1.1,
-//    renderingAttributes: .markdownRenderingDefaults,
-//    insertionPointColour: .pink,
-//    codeColour: .green,
-//    hasLineNumbers: false,
-//    isShowingFrames: false,
-//    insets: 20
-//  )
+  //  let config = MarkdownEditorConfiguration(
+  //    fontSize: 13,
+  //    lineHeight: 1.1,
+  //    renderingAttributes: .markdownRenderingDefaults,
+  //    insertionPointColour: .pink,
+  //    codeColour: .green,
+  //    hasLineNumbers: false,
+  //    isShowingFrames: false,
+  //    insets: 20
+  //  )
   
   let syntaxButtons: [Markdown.Syntax] = [.bold, .italic, .inlineCode]
   
@@ -52,34 +52,33 @@ public struct ExampleView: View {
       ) { info in
         self.editorInfo = info
       }
-     
     }
-    .overlay(alignment: .bottom) {
-      HStack {
-        
-        ForEach(syntaxButtons) { syntax in
-          Button {
-            self.emitter.emit(.wrap(syntax))
-          } label: {
-            Label(syntax.name, systemImage: syntax.shortcuts.first?.label?.icon ?? "bold")
-              .labelStyle(.iconOnly)
-              .fontWeight(.medium)
-              .fontDesign(.rounded)
-              .frame(width: 14)
-          }
-          
-        }
-        
-      }
-      .padding(.horizontal, 12)
-      .frame(height: 40)
-      .frame(maxWidth: .infinity, alignment: .leading)
-      .background(.black)
-    }
-  
-    .background(.black.opacity(0.5))
-    .background(.purple.opacity(0.1))
+    //    .overlay(alignment: .bottom) {
+    //      HStack {
+    //
+    //        ForEach(syntaxButtons) { syntax in
+    //          Button {
+    //            self.emitter.emit(.wrap(syntax))
+    //          } label: {
+    //            Label(syntax.name, systemImage: syntax.shortcuts.first?.label?.icon ?? "bold")
+    //              .labelStyle(.iconOnly)
+    //              .fontWeight(.medium)
+    //              .fontDesign(.rounded)
+    //              .frame(width: 14)
+    //          }
+    //
+    //        }
+    //
+    //      }
+    //      .padding(.horizontal, 12)
+    //      .frame(height: 40)
+    //      .frame(maxWidth: .infinity, alignment: .leading)
+    ////      .background(.regularMaterial)
+    //    }
+    //
     .frame(width: 440, height: 600)
+    .background(.black.opacity(0.8))
+    .background(.purple.opacity(0.1))
     
     /// Interestingly, the below 'simulates' text being added to the NSTextView, but NOT
     /// in the same as a user actually focusing the view and typing into it. There appears
@@ -98,7 +97,7 @@ public struct ExampleView: View {
 }
 
 extension ExampleView {
-
+  
 }
 
 
