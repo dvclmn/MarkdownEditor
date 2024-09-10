@@ -25,8 +25,7 @@ extension MarkdownTextView {
     /// I don't need to see anything below a character count of 2
     ///
     guard self.selectedRange().length > 2,
-    let selectedText = self.getSelectedText(),
-        lastSelectedText != selectedText
+    lastSelectedText != self.selectedText
     else { return }
     
     let result: String = """
