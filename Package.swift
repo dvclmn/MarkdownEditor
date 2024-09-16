@@ -1,4 +1,4 @@
-// swift-tools-version:5.9
+// swift-tools-version:5.10
 
 import PackageDescription
 
@@ -21,7 +21,7 @@ let package = Package(
     .package(url: "https://github.com/ChimeHQ/Rearrange.git", from: "1.8.1"),
 //    .package(url: "https://github.com/krzyzanowskim/STTextKitPlus.git", from: "0.1.4"),
     .package(url: "https://github.com/tree-sitter-grammars/tree-sitter-markdown.git", branch: "split_parser"),
-    .package(name: "TextCore", path: "\(localPackagesRoot)/TextCore"),
+    .package(url: "https://github.com/dvclmn/TextCore.git", branch: "main"),
     .package(name: "Helpers", path: "\(localPackagesRoot)/SwiftCollection/Helpers"),
     
     
