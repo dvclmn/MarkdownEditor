@@ -1,4 +1,5 @@
 {
+  "originHash" : "f48e2f2cef3eaa547c3276d27f57ce29cbdc63a488034536a36479e3087a3cc1",
   "pins" : [
     {
       "identity" : "neon",
@@ -7,6 +8,15 @@
       "state" : {
         "branch" : "main",
         "revision" : "e3b042119a64ad030b6a449dceb3dd521bdf3721"
+      }
+    },
+    {
+      "identity" : "nsui",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/mattmassicotte/nsui",
+      "state" : {
+        "revision" : "8792b2f789bf03be1be9ecb4df43d2bfe0e5d361",
+        "version" : "1.3.0"
       }
     },
     {
@@ -19,20 +29,20 @@
       }
     },
     {
-      "identity" : "sttextkitplus",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/krzyzanowskim/STTextKitPlus.git",
-      "state" : {
-        "revision" : "60e1e790c4a77ffd10176849719eb3c52bbfb2c3",
-        "version" : "0.1.5"
-      }
-    },
-    {
       "identity" : "swifttreesitter",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/ChimeHQ/SwiftTreeSitter",
       "state" : {
         "revision" : "b01904a3737649c1d8520106bbb285724fe5b0bb"
+      }
+    },
+    {
+      "identity" : "textcore",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/dvclmn/TextCore.git",
+      "state" : {
+        "branch" : "main",
+        "revision" : "1e61456a5db92d479ad7675ce24946df8d2e9ff8"
       }
     },
     {
@@ -45,5 +55,5 @@
       }
     }
   ],
-  "version" : 2
+  "version" : 3
 }

@@ -9,19 +9,22 @@ import SwiftUI
 import BaseHelpers
 
 
-
 public class MarkdownTextView: NSTextView {
   
   var elements: [Markdown.Element] = []
   var parsingTask: Task<Void, Never>?
   
   var scrollDebouncer = Debouncer(interval: 0.2)
+  var parseDebouncer = Debouncer(interval: 0.05)
   
   let infoHandler = EditorInfoHandler()
   
   var configuration: MarkdownEditorConfiguration
   
   var editorInfo = EditorInfo()
+  
+  var currentParagraph = ParagraphInfo()
+
   
   private var viewportLayoutController: NSTextViewportLayoutController?
   var viewportDelegate: MarkdownViewportDelegate?

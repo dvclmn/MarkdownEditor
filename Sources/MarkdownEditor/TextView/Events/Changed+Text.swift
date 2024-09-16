@@ -57,6 +57,8 @@ extension MarkdownTextView {
     }
     
     exploreTextSegments()
+    
+//    basicInlineMarkdown()
 
   }
 }

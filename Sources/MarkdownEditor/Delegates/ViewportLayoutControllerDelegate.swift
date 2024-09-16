@@ -7,7 +7,6 @@
 
 import SwiftUI
 
-
 class MarkdownViewportDelegate: NSObject, @preconcurrency  NSTextViewportLayoutControllerDelegate {
   weak var textView: MarkdownTextView?
   

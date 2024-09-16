@@ -25,14 +25,11 @@ extension AttributeContainer {
   
 }
 
-extension MarkdownViewController {
-  func setUpScrollView() {
-    scrollView.hasVerticalScroller = true
-    scrollView.drawsBackground = false
-    scrollView.documentView = textView
-    scrollView.additionalSafeAreaInsets.bottom = 40
-  }
-}
+//extension MarkdownViewController {
+//  func setUpScrollView() {
+//    
+//  }
+//}
 
 extension MarkdownTextView {
 
@@ -68,8 +65,21 @@ extension MarkdownTextView {
     //
     textContainer?.lineFragmentPadding = self.configuration.insets
     textContainerInset = NSSize(width: 0, height: self.configuration.insets)
+    
+    self.font = NSFont.systemFont(ofSize: self.configuration.fontSize)
+    
     //
-        typingAttributes = self.configuration.defaultTypingAttributes
+//        typingAttributes = self.configuration.defaultTypingAttributes
+    
+//    let defaultAttributes: Attributes = [.foregroundColor: NSColor.textColor.withAlphaComponent(0.9)]
+    
+//    let defaults = self.configuration.defaultTypingAttributes
+    
+//    let nsString = self.string as NSString
+    
+    self.defaultParagraphStyle = self.configuration.defaultParagraphStyle
+    
+//    self.textStorage?.setAttributes(defaults, range: NSRange(location: 0, length: nsString.length))
     
     
   }

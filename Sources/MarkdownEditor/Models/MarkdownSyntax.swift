@@ -207,6 +207,7 @@ public extension Markdown {
     
     
     
+    
   }
   
   
@@ -259,9 +260,9 @@ extension Markdown.Syntax {
     return [
       .bold,
       .italic,
-      .boldItalic,
-      .strikethrough,
-      .highlight,
+//      .boldItalic,
+//      .strikethrough,
+//      .highlight,
       .inlineCode,
     ]
   }

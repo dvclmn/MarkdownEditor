@@ -16,7 +16,9 @@ import TreeSitterClient
 public class MarkdownViewController: NSViewController {
   
   var textView: MarkdownTextView
-  var scrollView: NSScrollView
+//  var scrollView: NSScrollView
+  
+  private let highlighter: TextViewHighlighter
   
   init(
     configuration: MarkdownEditorConfiguration
@@ -28,15 +30,23 @@ public class MarkdownViewController: NSViewController {
       configuration: configuration
     )
     
-    self.scrollView = NSScrollView()
+    let scrollView = NSScrollView()
     
-//    do {
-//      self.highlighter = try Self.makeHighlighter(for: textView)
+    scrollView.hasVerticalScroller = true
+    scrollView.drawsBackground = false
+    scrollView.documentView = textView
+    scrollView.additionalSafeAreaInsets.bottom = 40
+    
+    scrollView.documentView = textView
+    
+//          super.init(nibName: nil, bundle: nil)
+    do {
+      self.highlighter = try Self.makeHighlighter(for: textView)
 //      print("`TextViewHighlighter` is running.")
       super.init(nibName: nil, bundle: nil)
-//    } catch {
-//      fatalError("Error setting up the highlighter: \(error)")
-//    }
+    } catch {
+      fatalError("Error setting up the highlighter: \(error)")
+    }
     
   }
   
@@ -46,65 +56,18 @@ public class MarkdownViewController: NSViewController {
   
   public override func loadView() {
 
-    do {
-      try self.neonSetup()
-    } catch {
-      print("Error with Neon: \(error)")
-    }
+//    do {
+//      try self.neonSetup()
+//    } catch {
+//      print("Error with Neon: \(error)")
+//    }
     
-    setUpScrollView()
+    
     self.view = textView.scrollView
-    assert(self.textView.enclosingScrollView != nil, "I need the textView to have a scrollview.")
+    
+    highlighter.observeEnclosingScrollView()
     
   }
   
-  func neonSetup() throws {
-    
-    let languageConfig = try LanguageConfiguration(
-      tree_sitter_markdown(),
-      name: "Markdown"
-    )
-    
-    let clientConfig = TreeSitterClient.Configuration(
-      languageProvider: { identifier in
-        print("Nested languages? \(identifier)")
-        return languageConfig
-      },
-      contentProvider: { [textView] length in
-        
-        print("contentProvider `length`: \(length.description)")
-        
-        return .init(string: textView.string)
-      },
-      lengthProvider: { [textView] in
-        textView.string.utf16.count
-        
-      },
-      invalidationHandler: { set in
-        print("Invalidations: \(set)")
-      },
-      locationTransformer: { location in
-
-        return nil
-      }
-    )
-    
-    let client = try TreeSitterClient(
-      rootLanguageConfig: languageConfig,
-      configuration: clientConfig
-    )
-    
-    let source = textView.string
-    
-    let provider = source.predicateTextProvider
-    
-    Task { @MainActor in
-      
-      let highlights = try await client.highlights(in: textView.visibleTextRange, provider: provider)
-
-      print("Highlights: ", highlights)
-    }
-
-  }
   
 }

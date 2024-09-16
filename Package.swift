@@ -2,8 +2,6 @@
 
 import PackageDescription
 
-let localPackagesRoot = "/Users/dvclmn/Apps/_ Swift Packages"
-
 let package = Package(
   name: "MarkdownEditor",
   platforms: [
@@ -22,7 +20,8 @@ let package = Package(
 //    .package(url: "https://github.com/krzyzanowskim/STTextKitPlus.git", from: "0.1.4"),
     .package(url: "https://github.com/tree-sitter-grammars/tree-sitter-markdown.git", branch: "split_parser"),
     .package(url: "https://github.com/dvclmn/TextCore.git", branch: "main"),
-    .package(name: "Helpers", path: "\(localPackagesRoot)/SwiftCollection/Helpers"),
+    .package(url: "https://github.com/dvclmn/Collection.git", branch: "main"),
+    .package(url: "https://github.com/dvclmn/BoxMaker", branch: "main")
     
     
   ],
@@ -30,7 +29,8 @@ let package = Package(
     .target(
       name: "MarkdownEditor",
       dependencies: [
-        "Helpers",
+        .product(name: "BoxMaker", package: "BoxMaker"),
+        .product(name: "BaseHelpers", package: "Collection"),
         "TextCore",
         "Rearrange",
 //        "STTextKitPlus",
@@ -45,7 +45,12 @@ let package = Package(
     ),
     .testTarget(
       name: "MarkdownEditorTests",
-      dependencies: ["MarkdownEditor", "Helpers", "TextCore"]),
+      dependencies: [
+        "MarkdownEditor",
+        .product(name: "BaseHelpers", package: "Collection"),
+        "TextCore"
+      ]
+    ),
     
   ]
 )
