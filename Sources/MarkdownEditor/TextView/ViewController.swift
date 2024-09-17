@@ -7,11 +7,11 @@
 
 import AppKit
 
-import Neon
-import TreeSitterMarkdown
-import TreeSitterMarkdownInline
-import SwiftTreeSitter
-import TreeSitterClient
+//import Neon
+//import TreeSitterMarkdown
+//import TreeSitterMarkdownInline
+//import SwiftTreeSitter
+//import TreeSitterClient
 
 public class MarkdownViewController: NSViewController {
   

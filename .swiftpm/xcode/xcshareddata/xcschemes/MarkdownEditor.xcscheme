@@ -43,37 +43,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "BoxMaker"
-               BuildableName = "BoxMaker"
-               BlueprintName = "BoxMaker"
-               ReferencedContainer = "container:../../BoxMaker/BoxMaker">
-            </BuildableReference>
-         </BuildActionEntry>
-         <BuildActionEntry
-            buildForTesting = "YES"
-            buildForRunning = "YES"
-            buildForProfiling = "YES"
-            buildForArchiving = "YES"
-            buildForAnalyzing = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
                BlueprintIdentifier = "BaseHelpers"
                BuildableName = "BaseHelpers"
                BlueprintName = "BaseHelpers"
-               ReferencedContainer = "container:../../Collection/Collection">
-            </BuildableReference>
-         </BuildActionEntry>
-         <BuildActionEntry
-            buildForTesting = "YES"
-            buildForRunning = "YES"
-            buildForProfiling = "YES"
-            buildForArchiving = "YES"
-            buildForAnalyzing = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "Macros"
-               BuildableName = "Macros"
-               BlueprintName = "Macros"
                ReferencedContainer = "container:../../Collection/Collection">
             </BuildableReference>
          </BuildActionEntry>
@@ -103,6 +75,20 @@
                BuildableName = "TextCore"
                BlueprintName = "TextCore"
                ReferencedContainer = "container:../../TextCore">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "Wrecktangle"
+               BuildableName = "Wrecktangle"
+               BlueprintName = "Wrecktangle"
+               ReferencedContainer = "container:../../Wrecktangle/Wrecktangle">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>

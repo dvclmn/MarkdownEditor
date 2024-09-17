@@ -8,6 +8,7 @@
 import SwiftUI
 import TextCore
 //import Rearrange
+import BaseHelpers
 //import STTextKitPlus
 
 extension MarkdownTextView {
@@ -55,10 +56,15 @@ extension MarkdownTextView {
           let text = self.string
           let nsString = self.string as NSString
           
-          let fullRange = NSRange(location: 0, length: nsString.length)
+          let documentNSRange = NSRange(location: 0, length: nsString.length)
           
-          self.textStorage?.removeAttribute(.foregroundColor, range: fullRange)
-          self.textStorage?.addAttributes(AttributeSet.white.attributes, range: fullRange)
+          let paragraphNSRange = self.currentParagraph.range
+          
+          self.textStorage?.removeAttribute(.foregroundColor, range: paragraphNSRange)
+          self.textStorage?.removeAttribute(.backgroundColor, range: paragraphNSRange)
+          
+          self.textStorage?.addAttributes(AttributeSet.white.attributes, range: paragraphNSRange)
+          
           
           
           
@@ -87,7 +93,25 @@ extension MarkdownTextView {
             
             for match in matches {
               
-              let nsRange = NSRange(match.range, in: text)
+//              let nsRange = NSRange(match.range, in: text)
+
+              let syntaxRange: NSRange = .init(match.range, in: text)
+//              let syntaxRange: NSRange =
+              
+              let leadingCount = match.output.leading.count
+              let trailingCount = match.output.trailing.count
+              
+              let contentRange: NSRange = .init(location: syntaxRange.location + leadingCount, length: syntaxRange.length - (leadingCount + trailingCount))
+              
+              
+//              let leadingRange: NSRange = nsString.range(of: String(match.output.leading))
+//              let trailingRange: NSRange = nsString.range(of: String(match.output.trailing))
+              
+              self.textStorage?.addAttributes(syntax.syntaxAttributes(with: self.configuration).attributes, range: syntaxRange)
+              self.textStorage?.addAttributes(syntax.contentAttributes(with: self.configuration).attributes, range: contentRange)
+//              self.textStorage?.addAttributes(syntax.syntaxRenderingAttributes, range: syntaxRange)
+//              self.textStorage?.addAttributes(AttributeSet.highlighter.attributes, range: trailingRange)
+              
               
   //            print("""
   //              Syntax: \(syntax.name)
@@ -108,7 +132,7 @@ extension MarkdownTextView {
               
 //              tlm.setRenderingAttributes(syntax.contentRenderingAttributes, for: nsTextRange)
               
-              self.textStorage?.addAttributes(syntax.contentRenderingAttributes, range: nsRange)
+              
               
               
             } // END matches

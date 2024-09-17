@@ -12,34 +12,31 @@ import TextCore
 
 public struct MarkdownEditorConfiguration: Sendable, Equatable {
   
-  public var fontSize: CGFloat
+  public var theme: MarkdownTheme
   public var lineHeight: CGFloat
   public var renderingAttributes: AttributeContainer
   
-  public var insertionPointColour: Color
-  public var codeColour: Color
+  
+  
   public var hasLineNumbers: Bool
   public var isShowingFrames: Bool
   public var insets: CGFloat
   
   public init(
-    fontSize: CGFloat = 14,
+    theme: MarkdownTheme = .default,
     lineHeight: CGFloat = 1.1,
     renderingAttributes: AttributeContainer = .markdownRenderingDefaults,
     
-    insertionPointColour: Color = .blue,
-    codeColour: Color = .primary.opacity(0.7),
+    
     hasLineNumbers: Bool = false,
     
     isShowingFrames: Bool = false,
     insets: CGFloat = 20
   ) {
-    self.fontSize = fontSize
+    self.theme = theme
     self.lineHeight = lineHeight
     self.renderingAttributes = renderingAttributes
-    
-    self.insertionPointColour = insertionPointColour
-    self.codeColour = codeColour
+
     self.hasLineNumbers = hasLineNumbers
     self.isShowingFrames = isShowingFrames
     self.insets = insets
@@ -52,7 +49,7 @@ extension MarkdownEditorConfiguration {
     
     let renderingAttributes: Attributes = self.renderingAttributes.getAttributes() ?? [:]
     
-    let font = NSFont.systemFont(ofSize: self.fontSize)
+    let font = NSFont.systemFont(ofSize: self.theme.fontSize)
     let paragraphStyle = defaultParagraphStyle
     let fontAttributes: Attributes = [
       .font: font,

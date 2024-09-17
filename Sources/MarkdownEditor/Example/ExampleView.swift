@@ -74,7 +74,7 @@ public struct ExampleView: View {
     ////      .background(.regularMaterial)
     //    }
     //
-    .frame(width: 440, height: 600)
+    .frame(width: 320, height: 600)
     .background(.black.opacity(0.6))
     .background(.purple.opacity(0.1))
     

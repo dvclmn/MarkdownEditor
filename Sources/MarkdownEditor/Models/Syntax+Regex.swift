@@ -114,8 +114,7 @@ extension Markdown.Syntax {
         /// and ends with three backticks at the start of a line
         /// Note: (?m) enables multiline mode, [\s\S] matches any character including newlines
       case .codeBlock:
-        return nil
-        //        /(?<leading>(?m)^```)(?<content>[\s\S]*?)(?<trailing>^```)/
+        return /(?<leading>```)(?<content>.*?)(?<trailing>```)/.dotMatchesNewlines()
         
         /// Matches a quote block: A '>' followed by a space at the start of a line, then any characters until the end of the line
       case .quoteBlock:

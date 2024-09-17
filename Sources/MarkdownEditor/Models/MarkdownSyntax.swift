@@ -264,6 +264,7 @@ extension Markdown.Syntax {
 //      .strikethrough,
 //      .highlight,
       .inlineCode,
+      .codeBlock
     ]
   }
 }

@@ -9,7 +9,7 @@ import AppKit
 
 class CodeBlockBackground: NSTextLayoutFragment {
   
-  private let paragraphStyle: NSParagraphStyle
+//  private let paragraphStyle: NSParagraphStyle
   
   static var fragmentCount: Int = 0
   private let fragmentIndex: Int
@@ -22,12 +22,12 @@ class CodeBlockBackground: NSTextLayoutFragment {
   init(
     textElement: NSTextElement,
     range rangeInElement: NSTextRange?,
-    paragraphStyle: NSParagraphStyle,
-    isActive: Bool
+//    paragraphStyle: NSParagraphStyle,
+    isActive: Bool = false
   ) {
     CodeBlockBackground.fragmentCount += 1
     self.fragmentIndex = CodeBlockBackground.fragmentCount
-    self.paragraphStyle = paragraphStyle
+//    self.paragraphStyle = paragraphStyle
     self.isActive = isActive
     super.init(textElement: textElement, range: rangeInElement)
   }

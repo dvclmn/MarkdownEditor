@@ -46,18 +46,26 @@ public extension MarkdownEditor {
     ) -> NSTextLayoutFragment {
       
       let tlm = textLayoutManager
+      let range = textElement.elementRange
       
       let defaultFragment = NSTextLayoutFragment(textElement: textElement, range: textElement.elementRange)
-//      
-//      return defaultFragment
       
-      guard let tcm = tlm.textContentManager,
-            let tcs = textView?.textContentStorage,
-            let paragraph = textElement as? NSTextParagraph,
-            //            let fullAttrString = tcs.textStorage?.attributedSubstring(from: NSRange(tlm.documentRange, in: tcm)),
-            let textRange = textElement.elementRange
-              
-      else { return defaultFragment }
+//      let codeFragment = CodeBlockBackground(
+//        textElement: textElement,
+//        range: range
+//      )
+
+      return defaultFragment
+//      return codeFragment
+      
+      
+//      guard let tcm = tlm.textContentManager,
+//            let tcs = textView?.textContentStorage,
+//            let paragraph = textElement as? NSTextParagraph,
+//            //            let fullAttrString = tcs.textStorage?.attributedSubstring(from: NSRange(tlm.documentRange, in: tcm)),
+//            let textRange = textElement.elementRange
+//              
+//      else { return defaultFragment }
       
       //      let text = fullAttrString.string
       
@@ -71,7 +79,7 @@ public extension MarkdownEditor {
 //      tlm.removeRenderingAttribute(.foregroundColor, for: textRange)
       
       
-      return defaultFragment
+//      return defaultFragment
       
       
     }

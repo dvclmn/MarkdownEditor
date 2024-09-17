@@ -55,12 +55,12 @@ extension MarkdownTextView {
   
   func applyConfiguration() {
     
-    self.insertionPointColor = NSColor(self.configuration.insertionPointColour)
+    self.insertionPointColor = NSColor(self.configuration.theme.insertionPointColour)
     //
     textContainer?.lineFragmentPadding = self.configuration.insets
     textContainerInset = NSSize(width: 0, height: self.configuration.insets)
     
-    self.font = NSFont.systemFont(ofSize: self.configuration.fontSize)
+    self.font = NSFont.systemFont(ofSize: self.configuration.theme.fontSize)
     
     //
 //        typingAttributes = self.configuration.defaultTypingAttributes

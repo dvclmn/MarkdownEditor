@@ -7,7 +7,6 @@
 
 import SwiftUI
 import RegexBuilder
-import BoxMaker
 
 extension Regex<Substring>: @unchecked @retroactive Sendable {}
 extension NSTextRange: @unchecked @retroactive Sendable {}
@@ -25,36 +24,12 @@ public struct Markdown {
 }
 
 enum BlockSyntax {
-  case heading
+  case heading(level: Int)
   case list
   case code
   case quote
   case none
 }
 
-struct ParagraphInfo {
-  var string: String
-  var range: NSRange
-  var type: BlockSyntax
-  
-  init(
-    string: String = "",
-    range: NSRange = .zero,
-    type: BlockSyntax = .none
-  ) {
-    self.string = string
-    self.range = range
-    self.type = type
-  }
-}
-
-extension ParagraphInfo: CustomStringConvertible {
-  var description: String {
-    
-    
-    
-    return "ParagraphInfo: \(string)"
-  }
-}
 
 
