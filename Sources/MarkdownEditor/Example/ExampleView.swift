@@ -75,7 +75,7 @@ public struct ExampleView: View {
     //    }
     //
     .frame(width: 440, height: 600)
-    .background(.black.opacity(0.8))
+    .background(.black.opacity(0.6))
     .background(.purple.opacity(0.1))
     
     /// Interestingly, the below 'simulates' text being added to the NSTextView, but NOT

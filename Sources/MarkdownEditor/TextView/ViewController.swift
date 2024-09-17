@@ -18,7 +18,7 @@ public class MarkdownViewController: NSViewController {
   var textView: MarkdownTextView
 //  var scrollView: NSScrollView
   
-  private let highlighter: TextViewHighlighter
+//  private let highlighter: TextViewHighlighter
   
   init(
     configuration: MarkdownEditorConfiguration
@@ -39,14 +39,14 @@ public class MarkdownViewController: NSViewController {
     
     scrollView.documentView = textView
     
-//          super.init(nibName: nil, bundle: nil)
-    do {
-      self.highlighter = try Self.makeHighlighter(for: textView)
+          super.init(nibName: nil, bundle: nil)
+//    do {
+//      self.highlighter = try Self.makeHighlighter(for: textView)
 //      print("`TextViewHighlighter` is running.")
-      super.init(nibName: nil, bundle: nil)
-    } catch {
-      fatalError("Error setting up the highlighter: \(error)")
-    }
+//      super.init(nibName: nil, bundle: nil)
+//    } catch {
+//      fatalError("Error setting up the highlighter: \(error)")
+//    }
     
   }
   
@@ -65,7 +65,7 @@ public class MarkdownViewController: NSViewController {
     
     self.view = textView.scrollView
     
-    highlighter.observeEnclosingScrollView()
+//    highlighter.observeEnclosingScrollView()
     
   }
   

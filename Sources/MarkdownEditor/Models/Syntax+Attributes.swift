@@ -9,7 +9,6 @@ import AppKit
 import Foundation
 import BaseHelpers
 import TextCore
-import BaseStyles
 
 
 public extension Markdown.Syntax {
@@ -60,7 +59,7 @@ public extension Markdown.Syntax {
             
           case .inlineCode:
             return [
-              .foregroundColor: NSColor.blue
+              .foregroundColor: NSColor.systemGreen
             ]
           case .codeBlock:
             return [

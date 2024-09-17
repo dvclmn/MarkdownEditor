@@ -48,7 +48,7 @@ extension MarkdownTextView {
     
     let result = ParagraphInfo(string: text, range: range, type: syntax)
     
-    print("Current paragraph info: \(result)")
+//    print("Current paragraph info: \(result)")
     
     self.currentParagraph = result
     

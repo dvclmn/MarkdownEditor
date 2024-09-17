@@ -29,14 +29,18 @@ extension MarkdownTextView {
       await self.infoHandler.update(heightUpdate)
     }
     
-    //    exploreTextSegments()
+//        exploreTextSegments()
     
-//    basicInlineMarkdown()
+    basicInlineMarkdown()
     
     
   }
   
-  
+  /// Just realised; for inline Markdown elements, I *should* be safe to only perform
+  /// the 'erase-and-re-apply styles' process on a paragraph-by-paragraph basis.
+  ///
+  /// Because inline elements shouldn't be extending past that anyway.
+  ///
   func basicInlineMarkdown() {
     
     Task {
@@ -55,6 +59,7 @@ extension MarkdownTextView {
           
           self.textStorage?.removeAttribute(.foregroundColor, range: fullRange)
           self.textStorage?.addAttributes(AttributeSet.white.attributes, range: fullRange)
+          
           
           
 //          self.textStorage?.setAttributes(defaultAttributes, range: fullRange)
@@ -124,38 +129,38 @@ extension MarkdownTextView {
   
   
   
-  func exploreTextSegments() {
+//  func exploreTextSegments() {
+//    
+//    guard let tlm = self.textLayoutManager,
+//          let tcm = tlm.textContentManager
+//    else { return }
+//    
     
-    guard let tlm = self.textLayoutManager,
-          let tcm = tlm.textContentManager
-    else { return }
-    
-    
-    tcm.performEditingTransaction {
+//    tcm.performEditingTransaction {
       
-      tlm.enumerateTextLayoutFragments(from: tlm.documentRange.location) { fragment in
+//      tlm.enumerateTextLayoutFragments(from: tlm.documentRange.location) { fragment in
+//        
+//        guard let paragraph = fragment.textElement as? NSTextParagraph else { return false }
+//        
+//        let string = paragraph.attributedString.string
+//        
+//        guard let paragraphRange = paragraph.elementRange
+//        else {
+//          print("Returned false: \(string)")
+//          return false
+//        }
+//        
+//        let nsRange = NSRange(paragraphRange, provider: tcm)
+//        
         
-        guard let paragraph = fragment.textElement as? NSTextParagraph else { return false }
-        
-        let string = paragraph.attributedString.string
-        
-        guard let paragraphRange = paragraph.elementRange
-        else {
-          print("Returned false: \(string)")
-          return false
-        }
-        
-        let nsRange = NSRange(paragraphRange, provider: tcm)
         
         
-        
-        
-        return true
+//        return true
         //
-      } // END enumerate fragments
-      //
-    } // END perform edit
-  }
+//      } // END enumerate fragments
+//      
+//    } // END perform edit
+//  }
   
   
   func setupScrollObservation() {
