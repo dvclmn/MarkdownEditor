@@ -105,6 +105,14 @@ public class MarkdownTextView: NSTextView {
     return result
   }
   
+  public override func setFrameSize(_ newSize: NSSize) {
+    super.setFrameSize(newSize)
+    if !configuration.isScrollable {
+      textContainer?.containerSize = NSSize(width: newSize.width, height: CGFloat.greatestFiniteMagnitude)
+    }
+  }
+
+  
   
 }
 

@@ -29,38 +29,38 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
+               BlueprintIdentifier = "Wrecktangle"
+               BuildableName = "Wrecktangle"
+               BlueprintName = "Wrecktangle"
+               ReferencedContainer = "container:../Wrecktangle">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "F621FF942C4C32EE0074D5C1"
+               BuildableName = "Banksia.app"
+               BlueprintName = "Banksia"
+               ReferencedContainer = "container:../../Banksia/Banksia.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
                BlueprintIdentifier = "BaseStyles"
                BuildableName = "BaseStyles"
                BlueprintName = "BaseStyles"
-               ReferencedContainer = "container:../../Collection/Collection">
-            </BuildableReference>
-         </BuildActionEntry>
-         <BuildActionEntry
-            buildForTesting = "YES"
-            buildForRunning = "YES"
-            buildForProfiling = "YES"
-            buildForArchiving = "YES"
-            buildForAnalyzing = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "BaseHelpers"
-               BuildableName = "BaseHelpers"
-               BlueprintName = "BaseHelpers"
-               ReferencedContainer = "container:../../Collection/Collection">
-            </BuildableReference>
-         </BuildActionEntry>
-         <BuildActionEntry
-            buildForTesting = "YES"
-            buildForRunning = "YES"
-            buildForProfiling = "YES"
-            buildForArchiving = "YES"
-            buildForAnalyzing = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "Utilities"
-               BuildableName = "Utilities"
-               BlueprintName = "Utilities"
-               ReferencedContainer = "container:../../Collection/Collection">
+               ReferencedContainer = "container:../Collection">
             </BuildableReference>
          </BuildActionEntry>
          <BuildActionEntry
@@ -74,7 +74,7 @@
                BlueprintIdentifier = "TextCore"
                BuildableName = "TextCore"
                BlueprintName = "TextCore"
-               ReferencedContainer = "container:../../TextCore">
+               ReferencedContainer = "container:../TextCore">
             </BuildableReference>
          </BuildActionEntry>
          <BuildActionEntry
@@ -85,10 +85,10 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "Wrecktangle"
-               BuildableName = "Wrecktangle"
-               BlueprintName = "Wrecktangle"
-               ReferencedContainer = "container:../../Wrecktangle/Wrecktangle">
+               BlueprintIdentifier = "BaseHelpers"
+               BuildableName = "BaseHelpers"
+               BlueprintName = "BaseHelpers"
+               ReferencedContainer = "container:../Collection">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>

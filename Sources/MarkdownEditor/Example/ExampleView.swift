@@ -7,6 +7,7 @@
 
 import SwiftUI
 import BaseHelpers
+//import Resizable
 
 public struct ExampleView: View {
   
@@ -20,7 +21,7 @@ public struct ExampleView: View {
   @State private var editorInfo: EditorInfo? = nil
   
   @State private var emitter: EventEmitter<SyntaxEvent> = .init()
-  
+  @State private var isManualMode: Bool = false
   //  @State private var markdownAction: Markdown.SyntaxAction? = nil
   
   /// From SwiftUI —> AppKit
@@ -74,7 +75,13 @@ public struct ExampleView: View {
     ////      .background(.regularMaterial)
     //    }
     //
-    .frame(width: 320, height: 600)
+    
+//    .resizable(
+//      isManualMode: $isManualMode,
+//      edge: .trailing,
+//      lengthMin: 100,
+//      lengthMax: 600
+//    )
     .background(.black.opacity(0.6))
     .background(.purple.opacity(0.1))
     
@@ -101,5 +108,5 @@ extension ExampleView {
 
 #Preview {
   ExampleView()
-  
+    .frame(width: 600, height: 600)
 }

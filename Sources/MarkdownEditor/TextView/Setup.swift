@@ -50,6 +50,11 @@ extension MarkdownTextView {
     
     textContainer?.widthTracksTextView = true
     textContainer?.heightTracksTextView = false
+    
+    if !configuration.isScrollable {
+      textContainer?.containerSize = NSSize(width: bounds.width, height: CGFloat.greatestFiniteMagnitude)
+    }
+
 
     self.applyConfiguration()
   }
