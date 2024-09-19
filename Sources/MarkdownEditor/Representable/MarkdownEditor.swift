@@ -41,19 +41,19 @@ public struct MarkdownEditor: NSViewControllerRepresentable {
   
   @Binding var text: String
   
-  var eventEmitter: EventEmitter<SyntaxEvent>
+//  var eventEmitter: EventEmitter<SyntaxEvent>
   
   var configuration: MarkdownEditorConfiguration
   var info: InfoUpdate
   
   public init(
     text: Binding<String>,
-    eventEmitter: EventEmitter<SyntaxEvent>,
+//    eventEmitter: EventEmitter<SyntaxEvent>,
     configuration: MarkdownEditorConfiguration,
     info: @escaping InfoUpdate = { _ in }
   ) {
     self._text = text
-    self.eventEmitter = eventEmitter
+//    self.eventEmitter = eventEmitter
     self.configuration = configuration
     self.info = info
   }
@@ -80,12 +80,12 @@ public struct MarkdownEditor: NSViewControllerRepresentable {
       }
     }
     
-    self.eventEmitter.on { event in
-      switch event {
-        case .wrap(let syntax):
-          textView.handleWrapping(for: syntax)
-      }
-    }
+//    self.eventEmitter.on { event in
+//      switch event {
+//        case .wrap(let syntax):
+//          textView.handleWrapping(for: syntax)
+//      }
+//    }
     
     
     return viewController

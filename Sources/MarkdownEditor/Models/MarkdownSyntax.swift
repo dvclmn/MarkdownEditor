@@ -9,7 +9,7 @@
 import Foundation
 import SwiftUI
 import RegexBuilder
-import Shortcuts
+//import Shortcuts
 
 public extension Markdown {
   
@@ -134,76 +134,76 @@ public extension Markdown {
     }
     
     
-    public var shortcuts: [Keyboard.Shortcut] {
-      switch self {
-        case .heading(let level):
-          return [
-            Keyboard.Shortcut(
-              .character(Character("\(level)")),
-              modifiers: [.command]
-            )
-          ]
-          
-        case .bold:
-          return [
-            Keyboard.Shortcut(
-              .character("b"),
-              modifiers: [.command],
-              label: Keyboard.Shortcut.Label(title: self.name, icon: "bold")
-            )
-          ]
-        case .italic:
-          return [
-            Keyboard.Shortcut(
-              .character("i"),
-              modifiers: [.command],
-              label: Keyboard.Shortcut.Label(title: self.name, icon: "italic")
-            )
-          ]
-        case .boldItalic:
-          return [
-            Keyboard.Shortcut(
-              .character("b"),
-              modifiers: [.command, .shift]
-            )
-          ]
-        case .inlineCode:
-          return [
-            Keyboard.Shortcut(
-              .character("`"),
-              label: Keyboard.Shortcut.Label(title: self.name, icon: "chevron.left.forwardslash.chevron.right")
-            )
-          ]
-        case .highlight:
-          return [
-            Keyboard.Shortcut(
-              .character("h"),
-              modifiers: [.command]
-            )
-          ]
-        case .strikethrough:
-          return [
-            Keyboard.Shortcut(
-              .character("s"),
-              modifiers: [.command]
-            )
-          ]
-          
-        default:
-          return []
-      }
-    }
+//    public var shortcuts: [Keyboard.Shortcut] {
+//      switch self {
+//        case .heading(let level):
+//          return [
+//            Keyboard.Shortcut(
+//              .character(Character("\(level)")),
+//              modifiers: [.command]
+//            )
+//          ]
+//          
+//        case .bold:
+//          return [
+//            Keyboard.Shortcut(
+//              .character("b"),
+//              modifiers: [.command],
+//              label: Keyboard.Shortcut.Label(title: self.name, icon: "bold")
+//            )
+//          ]
+//        case .italic:
+//          return [
+//            Keyboard.Shortcut(
+//              .character("i"),
+//              modifiers: [.command],
+//              label: Keyboard.Shortcut.Label(title: self.name, icon: "italic")
+//            )
+//          ]
+//        case .boldItalic:
+//          return [
+//            Keyboard.Shortcut(
+//              .character("b"),
+//              modifiers: [.command, .shift]
+//            )
+//          ]
+//        case .inlineCode:
+//          return [
+//            Keyboard.Shortcut(
+//              .character("`"),
+//              label: Keyboard.Shortcut.Label(title: self.name, icon: "chevron.left.forwardslash.chevron.right")
+//            )
+//          ]
+//        case .highlight:
+//          return [
+//            Keyboard.Shortcut(
+//              .character("h"),
+//              modifiers: [.command]
+//            )
+//          ]
+//        case .strikethrough:
+//          return [
+//            Keyboard.Shortcut(
+//              .character("s"),
+//              modifiers: [.command]
+//            )
+//          ]
+//          
+//        default:
+//          return []
+//      }
+//    }
 
     
-    static func findMatchingSyntax(for shortcut: Keyboard.Shortcut) -> Markdown.Syntax? {
-      for syntax in Markdown.Syntax.allCases {
-        if syntax.shortcuts.contains(shortcut) {
-          return syntax
-        }
-      }
-      return nil
-    }
-    
+//    static func findMatchingSyntax(for shortcut: Keyboard.Shortcut) -> Markdown.Syntax? {
+//      for syntax in Markdown.Syntax.allCases {
+//        if syntax.shortcuts.contains(shortcut) {
+//          return syntax
+//        }
+//      }
+//      return nil
+//    }
+//    
     
     
     

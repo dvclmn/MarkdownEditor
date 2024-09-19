@@ -29,7 +29,9 @@ extension MarkdownTextView {
 
   func textViewSetup() {
     
-    isEditable = true
+    isEditable = self.configuration.isEditable
+    
+    isSelectable = true
     drawsBackground = false
     allowsUndo = true
     isRichText = false

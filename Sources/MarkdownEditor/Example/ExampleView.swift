@@ -45,8 +45,8 @@ public struct ExampleView: View {
       
       MarkdownEditor(
         text: $text,
-        eventEmitter: self.emitter,
-        configuration: .init()
+//        eventEmitter: self.emitter,
+        configuration: .init(isScrollable: false)
       ) { info in
         self.editorInfo = info
       }

@@ -168,7 +168,7 @@ public extension Markdown.Syntax {
       case .codeBlock:
         font = theme.codeFont
         foregroundColour = .systemBrown
-        backgroundColour = theme.codeBackgroundColour.nsColour
+        backgroundColour = .clear
         
       case .quoteBlock:
         font = theme.defaultFont

@@ -16,7 +16,6 @@ import AppKit
 public class MarkdownViewController: NSViewController {
   
   var textView: MarkdownTextView
-//  var scrollView: NSScrollView
   
 //  private let highlighter: TextViewHighlighter
   
@@ -30,14 +29,21 @@ public class MarkdownViewController: NSViewController {
       configuration: configuration
     )
     
-    let scrollView = NSScrollView()
+    if configuration.isScrollable {
+      
+      let scrollView = NSScrollView()
+      
+      scrollView.hasVerticalScroller = true
+      scrollView.drawsBackground = false
+      scrollView.documentView = textView
+      scrollView.additionalSafeAreaInsets.bottom = 40
+      
+      scrollView.documentView = textView
+      
+    } else {
+      print("No scrolling needed, did not set up NSScrollView.")
+    }
     
-    scrollView.hasVerticalScroller = true
-    scrollView.drawsBackground = false
-    scrollView.documentView = textView
-    scrollView.additionalSafeAreaInsets.bottom = 40
-    
-    scrollView.documentView = textView
     
           super.init(nibName: nil, bundle: nil)
 //    do {
@@ -62,8 +68,11 @@ public class MarkdownViewController: NSViewController {
 //      print("Error with Neon: \(error)")
 //    }
     
-    
-    self.view = textView.scrollView
+    if let scrollview = textView.scrollView {
+      self.view = scrollview
+    } else {
+      self.view = textView
+    }
     
 //    highlighter.observeEnclosingScrollView()
     

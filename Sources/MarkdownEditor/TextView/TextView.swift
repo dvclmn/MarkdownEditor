@@ -14,7 +14,7 @@ public class MarkdownTextView: NSTextView {
   var elements: [Markdown.Element] = []
   var parsingTask: Task<Void, Never>?
   
-  var scrollDebouncer = Debouncer(interval: 0.2)
+//  var scrollDebouncer = Debouncer(interval: 0.2)
   var parseDebouncer = Debouncer(interval: 0.05)
   
   let infoHandler = EditorInfoHandler()
@@ -90,7 +90,13 @@ public class MarkdownTextView: NSTextView {
     NotificationCenter.default.removeObserver(self)
   }
   
-  var scrollView: NSScrollView {
+  var scrollView: NSScrollView? {
+    
+    guard configuration.isScrollable else {
+      print("Text view isn't scrollable, returning nil")
+      return nil
+    }
+    
     guard let result = enclosingScrollView,
           result.documentView == self
     else {

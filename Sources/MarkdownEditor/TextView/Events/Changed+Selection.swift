@@ -63,7 +63,7 @@ extension MarkdownTextView {
     
     let box = Box(header: "Paragraph Info", content: result.description)
     
-    print(box)
+//    print(box)
     
     self.currentParagraph = result
     

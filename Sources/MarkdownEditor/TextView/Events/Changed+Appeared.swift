@@ -16,7 +16,9 @@ extension MarkdownTextView {
   public override func viewDidMoveToSuperview() {
     super.viewDidMoveToSuperview()
     
-    setupScrollObservation()
+//    if configuration.isScrollable {
+//      setupScrollObservation()
+//    }
   }
   
   public override func viewDidMoveToWindow() {
@@ -48,8 +50,11 @@ extension MarkdownTextView {
       DispatchQueue.main.async {
         
         guard let tlm = self.textLayoutManager,
-              let tcm = tlm.textContentManager
-        else { return }
+              let tcm = tlm.textContentManager,
+              let ts = self.textStorage
+        else {
+          fatalError("Something went wrong with the text layout manager")
+        }
         
         tcm.performEditingTransaction {
           
@@ -60,11 +65,10 @@ extension MarkdownTextView {
           
           let paragraphNSRange = self.currentParagraph.range
           
-          self.textStorage?.removeAttribute(.foregroundColor, range: paragraphNSRange)
-          self.textStorage?.removeAttribute(.backgroundColor, range: paragraphNSRange)
+          ts.removeAttribute(.foregroundColor, range: paragraphNSRange)
+          ts.removeAttribute(.backgroundColor, range: paragraphNSRange)
           
-          self.textStorage?.addAttributes(AttributeSet.white.attributes, range: paragraphNSRange)
-          
+          ts.addAttributes(AttributeSet.white.attributes, range: paragraphNSRange)
           
           
           
@@ -107,10 +111,44 @@ extension MarkdownTextView {
 //              let leadingRange: NSRange = nsString.range(of: String(match.output.leading))
 //              let trailingRange: NSRange = nsString.range(of: String(match.output.trailing))
               
-              self.textStorage?.addAttributes(syntax.syntaxAttributes(with: self.configuration).attributes, range: syntaxRange)
-              self.textStorage?.addAttributes(syntax.contentAttributes(with: self.configuration).attributes, range: contentRange)
-//              self.textStorage?.addAttributes(syntax.syntaxRenderingAttributes, range: syntaxRange)
+              
+              let attachment = NSTextAttachment()
+              let cell = BoxDrawingAttachmentCell()
+              attachment.attachmentCell = cell
+              
+              let attachmentAttribute: AttributeSet = [
+                .attachment: attachment
+              ]
+              
+              let attributedString = NSAttributedString(string: "Hello", attributes: attachmentAttribute.attributes)
+              
+//              ts.addAttributes(attachmentAttribute.attributes, range: contentRange)
+              
+              // Expand the attachment to cover the entire range
+//              let fullRange = NSRange(location: range.location, length: 1)
+//              textStorage.addAttribute(.expansion, value: NSNumber(value: Float(range.length)), range: fullRange)
+//
+//              let attr = self.attributedSubstring(forProposedRange: contentRange, actualRange: nil)
+              
+//              print("""
+//              Attributed: \(attr)
+//              """)
+              
+              ts.addAttributes(syntax.syntaxAttributes(with: self.configuration).attributes, range: syntaxRange)
+              ts.addAttributes(syntax.contentAttributes(with: self.configuration).attributes, range: contentRange)
+              
 //              self.textStorage?.addAttributes(AttributeSet.highlighter.attributes, range: trailingRange)
+              
+//              if syntax == .codeBlock {
+                
+//                let blockStart: Int = self.string.distance(from: self.string.startIndex, to: match.range.lowerBound)
+//
+                
+//                print(blockStart)
+                
+                
+                
+//              }
               
               
   //            print("""
@@ -150,9 +188,6 @@ extension MarkdownTextView {
   } // END basicInlineMarkdown
   
   
-  
-  
-  
 //  func exploreTextSegments() {
 //    
 //    guard let tlm = self.textLayoutManager,
@@ -187,16 +222,36 @@ extension MarkdownTextView {
 //  }
   
   
-  func setupScrollObservation() {
-    
-    NotificationCenter.default.addObserver(
-      self,
-      selector: #selector(handleScrollViewDidScroll),
-      name: NSView.boundsDidChangeNotification,
-      object: enclosingScrollView?.contentView
-    )
-    
+//  func setupScrollObservation() {
+//    
+//    NotificationCenter.default.addObserver(
+//      self,
+//      selector: #selector(handleScrollViewDidScroll),
+//      name: NSView.boundsDidChangeNotification,
+//      object: enclosingScrollView?.contentView
+//    )
+//    
+//  }
+  
+  
+}
+
+
+
+class BoxDrawingAttachmentCell: NSTextAttachmentCell {
+  var cornerRadius: CGFloat = 5.0
+  var borderColor: NSColor = .orange
+  var backgroundColor: NSColor = .lightGray.withAlphaComponent(0.9)
+  
+  override func draw(withFrame cellFrame: NSRect, in controlView: NSView?) {
+    let path = NSBezierPath(roundedRect: cellFrame, xRadius: cornerRadius, yRadius: cornerRadius)
+    backgroundColor.setFill()
+    path.fill()
+    borderColor.setStroke()
+    path.stroke()
   }
   
-  
+  override func cellSize() -> NSSize {
+    return NSSize(width: 100, height: 100) // The cell itself doesn't have a size
+  }
 }
