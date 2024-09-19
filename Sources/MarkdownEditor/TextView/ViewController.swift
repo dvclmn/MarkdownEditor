@@ -17,7 +17,7 @@ public class MarkdownViewController: NSViewController {
   
   var textView: MarkdownTextView
   
-//  private let highlighter: TextViewHighlighter
+  //  private let highlighter: TextViewHighlighter
   
   init(
     configuration: MarkdownEditorConfiguration
@@ -29,30 +29,23 @@ public class MarkdownViewController: NSViewController {
       configuration: configuration
     )
     
-    if configuration.isScrollable {
-      
-      let scrollView = NSScrollView()
-      
-      scrollView.hasVerticalScroller = true
-      scrollView.drawsBackground = false
-      scrollView.documentView = textView
-      scrollView.additionalSafeAreaInsets.bottom = 40
-      
-      scrollView.documentView = textView
-      
-    } else {
-      print("No scrolling needed, did not set up NSScrollView.")
-    }
     
     
-          super.init(nibName: nil, bundle: nil)
-//    do {
-//      self.highlighter = try Self.makeHighlighter(for: textView)
-//      print("`TextViewHighlighter` is running.")
-//      super.init(nibName: nil, bundle: nil)
-//    } catch {
-//      fatalError("Error setting up the highlighter: \(error)")
-//    }
+    let scrollView = NSScrollView()
+    
+    scrollView.hasVerticalScroller = configuration.isEditable
+    scrollView.drawsBackground = false
+    scrollView.documentView = textView
+    scrollView.additionalSafeAreaInsets.bottom = 40
+    
+    super.init(nibName: nil, bundle: nil)
+    //    do {
+    //      self.highlighter = try Self.makeHighlighter(for: textView)
+    //      print("`TextViewHighlighter` is running.")
+    //      super.init(nibName: nil, bundle: nil)
+    //    } catch {
+    //      fatalError("Error setting up the highlighter: \(error)")
+    //    }
     
   }
   
@@ -61,20 +54,18 @@ public class MarkdownViewController: NSViewController {
   }
   
   public override func loadView() {
-
-//    do {
-//      try self.neonSetup()
-//    } catch {
-//      print("Error with Neon: \(error)")
-//    }
     
-    if let scrollview = textView.scrollView {
-      self.view = scrollview
-    } else {
-      self.view = textView
-    }
+    //    do {
+    //      try self.neonSetup()
+    //    } catch {
+    //      print("Error with Neon: \(error)")
+    //    }
     
-//    highlighter.observeEnclosingScrollView()
+    
+      self.view = textView.scrollView
+  
+    
+    //    highlighter.observeEnclosingScrollView()
     
   }
   

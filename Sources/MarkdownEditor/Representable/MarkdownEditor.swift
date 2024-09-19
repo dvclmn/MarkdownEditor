@@ -49,7 +49,7 @@ public struct MarkdownEditor: NSViewControllerRepresentable {
   public init(
     text: Binding<String>,
 //    eventEmitter: EventEmitter<SyntaxEvent>,
-    configuration: MarkdownEditorConfiguration,
+    configuration: MarkdownEditorConfiguration = .init(),
     info: @escaping InfoUpdate = { _ in }
   ) {
     self._text = text

@@ -90,12 +90,12 @@ public class MarkdownTextView: NSTextView {
     NotificationCenter.default.removeObserver(self)
   }
   
-  var scrollView: NSScrollView? {
+  var scrollView: NSScrollView {
     
-    guard configuration.isScrollable else {
-      print("Text view isn't scrollable, returning nil")
-      return nil
-    }
+//    guard configuration.isScrollable else {
+//      print("Text view isn't scrollable, returning nil")
+//      return nil
+//    }
     
     guard let result = enclosingScrollView,
           result.documentView == self
@@ -107,9 +107,9 @@ public class MarkdownTextView: NSTextView {
   
   public override func setFrameSize(_ newSize: NSSize) {
     super.setFrameSize(newSize)
-    if !configuration.isScrollable {
-      textContainer?.containerSize = NSSize(width: newSize.width, height: CGFloat.greatestFiniteMagnitude)
-    }
+    textContainer?.containerSize = NSSize(width: newSize.width, height: CGFloat.greatestFiniteMagnitude)
+//    if !configuration.isScrollable {
+//    }
   }
 
   

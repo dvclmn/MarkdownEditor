@@ -45,9 +45,8 @@ public struct ExampleView: View {
     VStack(spacing: 0) {
       
       MarkdownEditor(
-        text: $text,
+        text: $text
 //        eventEmitter: self.emitter,
-        configuration: .init(isScrollable: false)
       ) { info in
         self.editorInfo = info
       }
