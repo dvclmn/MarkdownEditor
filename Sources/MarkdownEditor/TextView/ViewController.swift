@@ -29,13 +29,6 @@ public class MarkdownViewController: NSViewController {
       configuration: configuration
     )
     
-    let scrollView = NSScrollView()
-    
-    scrollView.hasVerticalScroller = configuration.isEditable
-    scrollView.drawsBackground = false
-    scrollView.documentView = textView
-    scrollView.additionalSafeAreaInsets.bottom = 40
-    
 //    super.init(nibName: nil, bundle: nil)
     do {
       self.highlighter = try Self.makeHighlighter(for: textView)
@@ -59,7 +52,17 @@ public class MarkdownViewController: NSViewController {
 //      print("Error with Neon: \(error)")
 //    }
     
-    self.view = textView.scrollView
+    let scrollView = NSScrollView()
+    
+//    scrollView.hasVerticalScroller = configuration.isEditable
+    scrollView.drawsBackground = false
+    scrollView.documentView = textView
+    scrollView.additionalSafeAreaInsets.bottom = 40
+    
+    textView.isVerticallyResizable = true
+    textView.isHorizontallyResizable = true
+    
+    self.view = textView
     
     highlighter.observeEnclosingScrollView()
     

@@ -10,7 +10,7 @@ import AppKit
 
 import Neon
 import TreeSitterMarkdown
-import TreeSitterMarkdownInline
+//import TreeSitterMarkdownInline
 import SwiftTreeSitter
 import TreeSitterClient
 
