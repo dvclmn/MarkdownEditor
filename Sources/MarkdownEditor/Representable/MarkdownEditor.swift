@@ -31,12 +31,9 @@ public enum SyntaxEvent {
   case wrap(Markdown.Syntax)
 }
 
-
-
 public struct MarkdownEditor: NSViewControllerRepresentable {
   
   public typealias NSViewControllerType = MarkdownViewController
-  
   public typealias InfoUpdate = (_ info: EditorInfo) -> Void
   
   @Binding var text: String

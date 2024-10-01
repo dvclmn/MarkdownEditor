@@ -7,17 +7,17 @@
 
 import AppKit
 
-//import Neon
-//import TreeSitterMarkdown
-//import TreeSitterMarkdownInline
-//import SwiftTreeSitter
-//import TreeSitterClient
+import Neon
+import TreeSitterMarkdown
+import TreeSitterMarkdownInline
+import SwiftTreeSitter
+import TreeSitterClient
 
 public class MarkdownViewController: NSViewController {
   
   var textView: MarkdownTextView
   
-  //  private let highlighter: TextViewHighlighter
+  private let highlighter: TextViewHighlighter
   
   init(
     configuration: MarkdownEditorConfiguration
@@ -29,8 +29,6 @@ public class MarkdownViewController: NSViewController {
       configuration: configuration
     )
     
-    
-    
     let scrollView = NSScrollView()
     
     scrollView.hasVerticalScroller = configuration.isEditable
@@ -38,14 +36,14 @@ public class MarkdownViewController: NSViewController {
     scrollView.documentView = textView
     scrollView.additionalSafeAreaInsets.bottom = 40
     
-    super.init(nibName: nil, bundle: nil)
-    //    do {
-    //      self.highlighter = try Self.makeHighlighter(for: textView)
-    //      print("`TextViewHighlighter` is running.")
-    //      super.init(nibName: nil, bundle: nil)
-    //    } catch {
-    //      fatalError("Error setting up the highlighter: \(error)")
-    //    }
+//    super.init(nibName: nil, bundle: nil)
+    do {
+      self.highlighter = try Self.makeHighlighter(for: textView)
+      print("`TextViewHighlighter` is running.")
+      super.init(nibName: nil, bundle: nil)
+    } catch {
+      fatalError("Error setting up the highlighter: \(error)")
+    }
     
   }
   
@@ -55,17 +53,15 @@ public class MarkdownViewController: NSViewController {
   
   public override func loadView() {
     
-    //    do {
-    //      try self.neonSetup()
-    //    } catch {
-    //      print("Error with Neon: \(error)")
-    //    }
+//    do {
+//      try self.neonSetup()
+//    } catch {
+//      print("Error with Neon: \(error)")
+//    }
     
+    self.view = textView.scrollView
     
-      self.view = textView.scrollView
-  
-    
-    //    highlighter.observeEnclosingScrollView()
+    highlighter.observeEnclosingScrollView()
     
   }
   

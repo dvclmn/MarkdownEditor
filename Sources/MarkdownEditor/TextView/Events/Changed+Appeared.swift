@@ -66,7 +66,7 @@ extension MarkdownTextView {
         
       tcm.performEditingTransaction {
         
-        let nsString = self.string as NSString
+//        let nsString = self.string as NSString
         
   //        let documentNSRange = NSRange(location: 0, length: nsString.length)
         

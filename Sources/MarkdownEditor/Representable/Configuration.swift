@@ -28,7 +28,6 @@ public struct MarkdownEditorConfiguration: Sendable, Equatable {
     lineHeight: CGFloat = 1.1,
     renderingAttributes: AttributeContainer = .markdownRenderingDefaults,
     
-    
     hasLineNumbers: Bool = false,
     
     isShowingFrames: Bool = false,

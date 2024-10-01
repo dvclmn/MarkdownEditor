@@ -8,9 +8,9 @@
 import SwiftUI
 import RegexBuilder
 
-extension Regex<Substring>: @unchecked @retroactive Sendable {}
-extension NSTextRange: @unchecked @retroactive Sendable {}
-extension NSParagraphStyle: @unchecked @retroactive Sendable {}
+//extension Regex<Substring>: @unchecked @retroactive Sendable {}
+//extension NSTextRange: @unchecked @retroactive Sendable {}
+//extension NSParagraphStyle: @unchecked @retroactive Sendable {}
 
 public struct Markdown {
 
