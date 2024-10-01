@@ -45,8 +45,8 @@ public extension MarkdownEditor {
       in textElement: NSTextElement
     ) -> NSTextLayoutFragment {
       
-      let tlm = textLayoutManager
-      let range = textElement.elementRange
+//      let tlm = textLayoutManager
+//      let range = textElement.elementRange
       
       let defaultFragment = NSTextLayoutFragment(textElement: textElement, range: textElement.elementRange)
       

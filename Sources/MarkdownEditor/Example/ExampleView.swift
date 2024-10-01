@@ -17,7 +17,6 @@ public struct ExampleView: View {
   /// From AppKit —> SwiftUI
   /// This currently only returns a frame (`CGSize`), to provide SwiftUI with
   /// the height of the editor.
-  ///
   @State private var editorInfo: EditorInfo? = nil
   
   @State private var emitter: EventEmitter<SyntaxEvent> = .init()

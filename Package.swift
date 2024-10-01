@@ -36,12 +36,7 @@ let package = Package(
 //        "STTextKitPlus",
 //        "Neon",
 //        .product(name: "TreeSitterMarkdown", package: "tree-sitter-markdown"),
-      ],
-      swiftSettings: [
-        .enableExperimentalFeature("StrictConcurrency"),
-        .enableUpcomingFeature("BareSlashRegexLiterals")
       ]
-      
     ),
     .testTarget(
       name: "MarkdownEditorTests",
@@ -54,3 +49,18 @@ let package = Package(
     
   ]
 )
+
+
+let swiftSettings: [SwiftSetting] = [
+  .enableExperimentalFeature("StrictConcurrency"),
+  .enableUpcomingFeature("DisableOutwardActorInference"),
+  .enableUpcomingFeature("InferSendableFromCaptures"),
+  .enableUpcomingFeature("BareSlashRegexLiterals"),
+]
+
+for target in package.targets {
+  var settings = target.swiftSettings ?? []
+  settings.append(contentsOf: swiftSettings)
+  target.swiftSettings = settings
+}
+

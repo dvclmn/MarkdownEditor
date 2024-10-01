@@ -60,7 +60,7 @@ extension MarkdownTextView {
         
         let text = self.string
         guard !text.isEmpty else {
-          print("Text is empty, nothing to process")
+//          print("Text is empty, nothing to process")
           return
         }
         
@@ -68,7 +68,7 @@ extension MarkdownTextView {
         
         let nsString = self.string as NSString
         
-        let documentNSRange = NSRange(location: 0, length: nsString.length)
+  //        let documentNSRange = NSRange(location: 0, length: nsString.length)
         
         let paragraphNSRange = self.currentParagraph.range
         
@@ -123,11 +123,11 @@ extension MarkdownTextView {
             let cell = BoxDrawingAttachmentCell()
             attachment.attachmentCell = cell
             
-            let attachmentAttribute: AttributeSet = [
-              .attachment: attachment
-            ]
+//            let attachmentAttribute: AttributeSet = [
+//              .attachment: attachment
+//            ]
             
-            let attributedString = NSAttributedString(string: "Hello", attributes: attachmentAttribute.attributes)
+//            let attributedString = NSAttributedString(string: "Hello", attributes: attachmentAttribute.attributes)
             
             //              ts.addAttributes(attachmentAttribute.attributes, range: contentRange)
             

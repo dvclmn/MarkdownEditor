@@ -7,12 +7,13 @@
 
 import AppKit
 
+
 class CodeBlockBackground: NSTextLayoutFragment {
   
 //  private let paragraphStyle: NSParagraphStyle
   
-  static var fragmentCount: Int = 0
-  private let fragmentIndex: Int
+//  static let fragmentCount: Int = 0
+//  private let fragmentIndex: Int
   
   let backgroundColor: NSColor = .lightGray.withAlphaComponent(0.2)
   let cornerRadius: CGFloat = 5
@@ -25,8 +26,8 @@ class CodeBlockBackground: NSTextLayoutFragment {
 //    paragraphStyle: NSParagraphStyle,
     isActive: Bool = false
   ) {
-    CodeBlockBackground.fragmentCount += 1
-    self.fragmentIndex = CodeBlockBackground.fragmentCount
+//    CodeBlockBackground.fragmentCount += 1
+//    self.fragmentIndex = CodeBlockBackground.fragmentCount
 //    self.paragraphStyle = paragraphStyle
     self.isActive = isActive
     super.init(textElement: textElement, range: rangeInElement)
@@ -48,14 +49,14 @@ class CodeBlockBackground: NSTextLayoutFragment {
     path.fill()
     
     // Draw the fragment index
-    let indexString = "\(fragmentIndex)"
-    let attributes: [NSAttributedString.Key: Any] = [
-      .font: NSFont.systemFont(ofSize: 10),
-      .foregroundColor: NSColor.darkGray
-    ]
-    let size = indexString.size(withAttributes: attributes)
-    let indexPoint = CGPoint(x: rect.maxX - size.width - 5, y: rect.minY + 5)
-    indexString.draw(at: indexPoint, withAttributes: attributes)
+//    let indexString = "\(fragmentIndex)"
+//    let attributes: [NSAttributedString.Key: Any] = [
+//      .font: NSFont.systemFont(ofSize: 10),
+//      .foregroundColor: NSColor.darkGray
+//    ]
+//    let size = indexString.size(withAttributes: attributes)
+//    let indexPoint = CGPoint(x: rect.maxX - size.width - 5, y: rect.minY + 5)
+//    indexString.draw(at: indexPoint, withAttributes: attributes)
     
     context.strokePath()
     context.restoreGState()

@@ -110,6 +110,17 @@
                ReferencedContainer = "container:">
             </BuildableReference>
          </TestableReference>
+         <TestableReference
+            skipped = "NO"
+            parallelizable = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "F65651A82C9D46D20024563F"
+               BuildableName = "BanksiaTests.xctest"
+               BlueprintName = "BanksiaTests"
+               ReferencedContainer = "container:../../Banksia/Banksia.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
    </TestAction>
    <LaunchAction

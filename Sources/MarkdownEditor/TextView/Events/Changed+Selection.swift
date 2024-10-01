@@ -34,7 +34,7 @@ extension MarkdownTextView {
     let nsString = self.string as NSString
     let range = nsString.paragraphRange(for: selectedRange)
     guard let text = self.attributedSubstring(forProposedRange: range, actualRange: nil)?.string else {
-      print("Couldn't get that text")
+//      print("Couldn't get that text")
       return
     }
     
@@ -61,7 +61,7 @@ extension MarkdownTextView {
     let result = ParagraphInfo(string: text, range: range, type: syntax)
     
     
-    let box = Box(header: "Paragraph Info", content: result.description)
+//    let box = Box(header: "Paragraph Info", content: result.description)
     
 //    print(box)
     
