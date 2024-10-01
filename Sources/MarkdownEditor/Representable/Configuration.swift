@@ -17,7 +17,6 @@ public struct MarkdownEditorConfiguration: Sendable, Equatable {
   public var lineHeight: CGFloat
   public var renderingAttributes: AttributeContainer
   
-  
   public var hasLineNumbers: Bool
   public var isShowingFrames: Bool
   public var insets: CGFloat

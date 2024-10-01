@@ -58,7 +58,6 @@ public struct MarkdownEditor: NSViewControllerRepresentable {
   public func makeNSViewController(context: Context) -> MarkdownViewController {
     
     let viewController = MarkdownViewController(
-      
       configuration: self.configuration
     )
     viewController.loadView()

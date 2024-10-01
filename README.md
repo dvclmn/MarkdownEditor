@@ -1,1 +1,1 @@
-# Markdown-Editor
+# MarkdownEditor

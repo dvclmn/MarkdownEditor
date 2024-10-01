@@ -18,8 +18,7 @@ public struct Markdown {
     var syntax: Markdown.Syntax
     var range: NSTextRange
   }
-  
-  
+
   
 }
 

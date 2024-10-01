@@ -51,14 +51,14 @@ extension MarkdownTextView {
     super.didChangeText()
     
 
-    Task { @MainActor in
-      let heightUpdate = self.updateEditorHeight()
-      await self.infoHandler.update(heightUpdate)
-    }
+//    Task { @MainActor in
+//      let heightUpdate = self.updateEditorHeight()
+//      await self.infoHandler.update(heightUpdate)
+//    }
     
 //    exploreTextSegments()
     
-    basicInlineMarkdown()
+//    basicInlineMarkdown()
 
   }
 }
