@@ -16,7 +16,7 @@ public struct MarkdownEditorConfiguration: Sendable, Equatable {
   public var theme: MarkdownTheme
   public var lineHeight: CGFloat
   public var renderingAttributes: AttributeContainer
-  
+  public var bottomSafeArea: CGFloat
   public var hasLineNumbers: Bool
   public var isShowingFrames: Bool
   public var insets: CGFloat
@@ -26,7 +26,7 @@ public struct MarkdownEditorConfiguration: Sendable, Equatable {
     theme: MarkdownTheme = .default,
     lineHeight: CGFloat = 1.1,
     renderingAttributes: AttributeContainer = .markdownRenderingDefaults,
-    
+    bottomSafeArea: CGFloat = .zero,
     hasLineNumbers: Bool = false,
     
     isShowingFrames: Bool = false,
@@ -36,7 +36,7 @@ public struct MarkdownEditorConfiguration: Sendable, Equatable {
     self.theme = theme
     self.lineHeight = lineHeight
     self.renderingAttributes = renderingAttributes
-
+    self.bottomSafeArea = bottomSafeArea
     self.hasLineNumbers = hasLineNumbers
     self.isShowingFrames = isShowingFrames
     self.insets = insets

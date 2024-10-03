@@ -1,14 +1,167 @@
 {
+  "originHash" : "b4e0715aa9b62be47950e9e8ce4775b93d517da9bccef7b1a24785b9814e414a",
   "pins" : [
     {
-      "identity" : "sttextkitplus",
+      "identity" : "collection",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/krzyzanowskim/STTextKitPlus.git",
+      "location" : "https://github.com/dvclmn/Collection.git",
       "state" : {
-        "revision" : "60e1e790c4a77ffd10176849719eb3c52bbfb2c3",
-        "version" : "0.1.5"
+        "branch" : "main",
+        "revision" : "1489b5fc0107dec127a892e1a9335ef50ded1ace"
+      }
+    },
+    {
+      "identity" : "combine-schedulers",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/pointfreeco/combine-schedulers",
+      "state" : {
+        "revision" : "9fa31f4403da54855f1e2aeaeff478f4f0e40b13",
+        "version" : "1.0.2"
+      }
+    },
+    {
+      "identity" : "keychain-swift",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/evgenyneu/keychain-swift.git",
+      "state" : {
+        "revision" : "5e1b02b6a9dac2a759a1d5dbc175c86bd192a608",
+        "version" : "24.0.0"
+      }
+    },
+    {
+      "identity" : "neon",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/ChimeHQ/Neon.git",
+      "state" : {
+        "branch" : "main",
+        "revision" : "8d01febc54d0bedba1136ef3bc833ddd7c843528"
+      }
+    },
+    {
+      "identity" : "nsui",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/mattmassicotte/nsui",
+      "state" : {
+        "revision" : "8792b2f789bf03be1be9ecb4df43d2bfe0e5d361",
+        "version" : "1.3.0"
+      }
+    },
+    {
+      "identity" : "rearrange",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/ChimeHQ/Rearrange",
+      "state" : {
+        "revision" : "5ff7f3363f7a08f77e0d761e38e6add31c2136e1",
+        "version" : "1.8.1"
+      }
+    },
+    {
+      "identity" : "scrollkit",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/danielsaidi/ScrollKit.git",
+      "state" : {
+        "revision" : "b3142033da3769046770e38d459203756db879b5",
+        "version" : "0.5.1"
+      }
+    },
+    {
+      "identity" : "smoothgradient",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/raymondjavaxx/SmoothGradient.git",
+      "state" : {
+        "revision" : "61bf248fad31c7921c9985b418e6e9297cd7b861",
+        "version" : "1.0.0"
+      }
+    },
+    {
+      "identity" : "swift-clocks",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/pointfreeco/swift-clocks",
+      "state" : {
+        "revision" : "b9b24b69e2adda099a1fa381cda1eeec272d5b53",
+        "version" : "1.0.5"
+      }
+    },
+    {
+      "identity" : "swift-concurrency-extras",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/pointfreeco/swift-concurrency-extras",
+      "state" : {
+        "revision" : "6054df64b55186f08b6d0fd87152081b8ad8d613",
+        "version" : "1.2.0"
+      }
+    },
+    {
+      "identity" : "swift-dependencies",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/pointfreeco/swift-dependencies.git",
+      "state" : {
+        "revision" : "0fc0255e780bf742abeef29dec80924f5f0ae7b9",
+        "version" : "1.4.1"
+      }
+    },
+    {
+      "identity" : "swift-memberwise-init-macro",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/gohanlon/swift-memberwise-init-macro.git",
+      "state" : {
+        "revision" : "21ca6d8c8f9e4ce27e92f82da294e0d91953b8b6",
+        "version" : "0.5.1"
+      }
+    },
+    {
+      "identity" : "swift-syntax",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/swiftlang/swift-syntax",
+      "state" : {
+        "revision" : "0687f71944021d616d34d922343dcef086855920",
+        "version" : "600.0.1"
+      }
+    },
+    {
+      "identity" : "swifttreesitter",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/ChimeHQ/SwiftTreeSitter",
+      "state" : {
+        "revision" : "d0938d3607abcc5669bdf1d7d3b0485a8740fc65"
+      }
+    },
+    {
+      "identity" : "textcore",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/dvclmn/TextCore.git",
+      "state" : {
+        "branch" : "main",
+        "revision" : "1e61456a5db92d479ad7675ce24946df8d2e9ff8"
+      }
+    },
+    {
+      "identity" : "tree-sitter",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/tree-sitter/tree-sitter",
+      "state" : {
+        "revision" : "d97db6d63507eb62c536bcb2c4ac7d70c8ec665e",
+        "version" : "0.23.2"
+      }
+    },
+    {
+      "identity" : "tree-sitter-markdown",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/tree-sitter-grammars/tree-sitter-markdown.git",
+      "state" : {
+        "branch" : "split_parser",
+        "revision" : "b7eba93e6a3e588e259e831416ac11abdaa8616a"
+      }
+    },
+    {
+      "identity" : "xctest-dynamic-overlay",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/pointfreeco/xctest-dynamic-overlay",
+      "state" : {
+        "revision" : "770f990d3e4eececb57ac04a6076e22f8c97daeb",
+        "version" : "1.4.2"
       }
     }
   ],
-  "version" : 2
+  "version" : 3
 }

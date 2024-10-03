@@ -7,46 +7,46 @@
 
 import AppKit
 import Rearrange
-//import Shortcuts
+import Shortcuts
 
 extension MarkdownTextView {
   
-//  typealias DefaultKeyEvent = () -> Void
-//  
-//  public override func keyDown(with event: NSEvent) {
-//    
-//    guard let pressedKey = event.charactersIgnoringModifiers, pressedKey.count == 1 else {
-//      print("Key `\(event.keyCode)` not needed for this operation.")
-//      return super.keyDown(with: event)
-//    }
-//    
-//    let modifierFlags = event.modifierFlags.intersection(.deviceIndependentFlagsMask)
-//    let pressedShortcut = Keyboard.Shortcut(.character(Character(pressedKey)), modifierFlags: modifierFlags)
-//    
-//    if let matchingSyntax = Markdown.Syntax.findMatchingSyntax(for: pressedShortcut) {
-//      
-//      let hasSelection: Bool = self.selectedRange().length > 0
-//      guard hasSelection else {
-//        print("Zero-length selection not yet supported for keyboard shortcuts.")
-//        return super.keyDown(with: event)
-//      }
-//      
-//      handleWrapping(for: matchingSyntax)
-//    } else if pressedKey == "\n" || event.keyCode == 36 {
-//      
-//      handleNewListItem {
-//        super.keyDown(with: event)
-//      }
-//      
-////      print("Pressed return")
-//    
-//  } else {
-////      print("Shortcut didn't match any syntax shortcuts, handing the event back to the system.")
-//      super.keyDown(with: event)
-//    }
-//    
-//  } // END key down override
-//  
+  typealias DefaultKeyEvent = () -> Void
+  
+  public override func keyDown(with event: NSEvent) {
+    
+    guard let pressedKey = event.charactersIgnoringModifiers, pressedKey.count == 1 else {
+      print("Key `\(event.keyCode)` not needed for this operation.")
+      return super.keyDown(with: event)
+    }
+    
+    let modifierFlags = event.modifierFlags.intersection(.deviceIndependentFlagsMask)
+    let pressedShortcut = Keyboard.Shortcut(.character(Character(pressedKey)), modifierFlags: modifierFlags)
+    
+    if let matchingSyntax = Markdown.Syntax.findMatchingSyntax(for: pressedShortcut) {
+      
+      let hasSelection: Bool = self.selectedRange().length > 0
+      guard hasSelection else {
+        print("Zero-length selection not yet supported for keyboard shortcuts.")
+        return super.keyDown(with: event)
+      }
+      
+      handleWrapping(for: matchingSyntax)
+    } else if pressedKey == "\n" || event.keyCode == 36 {
+      
+      handleNewListItem {
+        super.keyDown(with: event)
+      }
+      
+//      print("Pressed return")
+    
+  } else {
+//      print("Shortcut didn't match any syntax shortcuts, handing the event back to the system.")
+      super.keyDown(with: event)
+    }
+    
+  } // END key down override
+  
   
 //  func currentLineContents() -> String? {
 //    guard let textStorage = textStorage else { return nil }
@@ -69,73 +69,73 @@ extension MarkdownTextView {
   
   
   
-//  func handleNewListItem(
-//    defaultKey: DefaultKeyEvent
-//  ) {
-//    
-//    guard let tlm = self.textLayoutManager,
-//          let tcm = tlm.textContentManager
-//    else {
-//      print("One of the above didn't happen")
-//      return
-//    }
-//    
-//    let nsString = self.string as NSString
-//    let paragraphRange = nsString.paragraphRange(for: self.selectedRange())
-//    guard let paragraphText = self.attributedSubstring(forProposedRange: paragraphRange, actualRange: nil)?.string else {
-//      defaultKey()
-//      return
-//    }
-//    
-////    print("Paragraph: \(paragraphText)")
-//    
-////    let paragraphStartPattern: Regex<(Substring, listContent: Substring)> = /^ -(?<listContent>.*?)/
-//    let newListItemPattern = "- "
-//    let trimmedParagraph = paragraphText.trimmingCharacters(in: .whitespacesAndNewlines)
-//    
-//    
-//    
-//    if trimmedParagraph.hasPrefix(newListItemPattern) {
-//      // We're in a list item
-//      if trimmedParagraph == newListItemPattern {
-//        
-//        print(paragraphRange)
-//        
-//        // The list item is empty, so break out of the list
-////        replaceCharacters(in: , with: "\n")
-////        moveSelectedRange(by: 1) // Move cursor to the new line
+  func handleNewListItem(
+    defaultKey: DefaultKeyEvent
+  ) {
+    
+    guard let tlm = self.textLayoutManager,
+          let tcm = tlm.textContentManager
+    else {
+      print("One of the above didn't happen")
+      return
+    }
+    
+    let nsString = self.string as NSString
+    let paragraphRange = nsString.paragraphRange(for: self.selectedRange())
+    guard let paragraphText = self.attributedSubstring(forProposedRange: paragraphRange, actualRange: nil)?.string else {
+      defaultKey()
+      return
+    }
+    
+//    print("Paragraph: \(paragraphText)")
+    
+//    let paragraphStartPattern: Regex<(Substring, listContent: Substring)> = /^ -(?<listContent>.*?)/
+    let newListItemPattern = "- "
+    let trimmedParagraph = paragraphText.trimmingCharacters(in: .whitespacesAndNewlines)
+    
+    
+    
+    if trimmedParagraph.hasPrefix(newListItemPattern) {
+      // We're in a list item
+      if trimmedParagraph == newListItemPattern {
+        
+        print(paragraphRange)
+        
+        // The list item is empty, so break out of the list
+//        replaceCharacters(in: , with: "\n")
+//        moveSelectedRange(by: 1) // Move cursor to the new line
+      } else {
+        // Continue the list
+//        print("Trimmed paragraph: `\(trimmedParagraph)` was not equal to `\(newListItemPattern)`")
+        let cursorPosition = selectedRange().location
+        let textToInsert = "\n- "
+        insertText(textToInsert, replacementRange: NSRange(location: cursorPosition, length: 0))
+        
+//        moveSelectedRange(by: textToInsert.count) // Move cursor to end of inserted text
+      }
+    } else {
+      // Not in a list item, perform default behavior
+      defaultKey()
+    }
+    
+    
+//    if paragraphText.hasPrefix(newListItemPattern) {
+//      
+//      if paragraphText == newListItemPattern {
+//
+//        replaceCharacters(in: paragraphRange, with: "\n")
+////        insertText("\n", replacementRange: self.selectedRange())
 //      } else {
-//        // Continue the list
-////        print("Trimmed paragraph: `\(trimmedParagraph)` was not equal to `\(newListItemPattern)`")
-//        let cursorPosition = selectedRange().location
-//        let textToInsert = "\n- "
-//        insertText(textToInsert, replacementRange: NSRange(location: cursorPosition, length: 0))
-//        
-////        moveSelectedRange(by: textToInsert.count) // Move cursor to end of inserted text
+//        insertText("\n- ", replacementRange: self.selectedRange())
 //      }
+//      
 //    } else {
-//      // Not in a list item, perform default behavior
 //      defaultKey()
 //    }
-//    
-//    
-////    if paragraphText.hasPrefix(newListItemPattern) {
-////      
-////      if paragraphText == newListItemPattern {
-////
-////        replaceCharacters(in: paragraphRange, with: "\n")
-//////        insertText("\n", replacementRange: self.selectedRange())
-////      } else {
-////        insertText("\n- ", replacementRange: self.selectedRange())
-////      }
-////      
-////    } else {
-////      defaultKey()
-////    }
-//    
-//  }
-//  
-//  
+    
+  }
+  
+  
   
   enum WrapAction {
     case wrap

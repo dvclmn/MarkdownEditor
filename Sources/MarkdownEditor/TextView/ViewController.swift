@@ -17,7 +17,9 @@ public class MarkdownViewController: NSViewController {
   
   var textView: MarkdownTextView
   
-  private let highlighter: TextViewHighlighter
+  private let highlighter: TextViewHighlighter?
+
+  let isNeonEnabled: Bool = false
   
   init(
     configuration: MarkdownEditorConfiguration
@@ -34,15 +36,21 @@ public class MarkdownViewController: NSViewController {
     scrollView.hasVerticalScroller = configuration.isEditable
     scrollView.drawsBackground = false
     scrollView.documentView = textView
-    scrollView.additionalSafeAreaInsets.bottom = 40
+    scrollView.additionalSafeAreaInsets.bottom = configuration.bottomSafeArea
     
-//    super.init(nibName: nil, bundle: nil)
-    do {
-      self.highlighter = try Self.makeHighlighter(for: textView)
-      print("`TextViewHighlighter` is running.")
+    if isNeonEnabled {
+      do {
+        self.highlighter = try Self.makeHighlighter(for: textView)
+        print("`TextViewHighlighter` is running.")
+        super.init(nibName: nil, bundle: nil)
+      } catch {
+        fatalError("Error setting up the highlighter: \(error)")
+      }
+    } else {
+      
+      self.highlighter = nil
+      
       super.init(nibName: nil, bundle: nil)
-    } catch {
-      fatalError("Error setting up the highlighter: \(error)")
     }
     
   }
@@ -66,7 +74,9 @@ public class MarkdownViewController: NSViewController {
     
     self.view = textView.scrollView
     
-    highlighter.observeEnclosingScrollView()
+    if let highlighter = highlighter {
+      highlighter.observeEnclosingScrollView()
+    }
     
   }
   

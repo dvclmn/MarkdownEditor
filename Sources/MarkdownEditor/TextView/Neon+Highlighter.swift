@@ -10,7 +10,7 @@ import AppKit
 
 import Neon
 import TreeSitterMarkdown
-//import TreeSitterMarkdownInline
+import TreeSitterMarkdownInline
 import SwiftTreeSitter
 import TreeSitterClient
 
@@ -25,11 +25,11 @@ extension MarkdownViewController {
       tree_sitter_markdown(),
       name: "Markdown"
     )
-//    let markdownInlineConfig = try LanguageConfiguration(
-//      tree_sitter_markdown_inline(),
-//      name: "Markdown Inline",
-//      bundleName: "TreeSitterMarkdown_TreeSitterMarkdownInline"
-//    )
+    let markdownInlineConfig = try LanguageConfiguration(
+      tree_sitter_markdown_inline(),
+      name: "Markdown Inline",
+      bundleName: "TreeSitterMarkdown_TreeSitterMarkdownInline"
+    )
     
     let provider: TokenAttributeProvider = { token in
       
@@ -58,19 +58,19 @@ extension MarkdownViewController {
     let highlighterConfig = TextViewHighlighter.Configuration(
       languageConfiguration: markdownConfig,
       attributeProvider: provider,
-//      languageProvider: { name in
-//        
-////        print("Embedded language: ", name)
-//        
-//        switch name {
-////          case "markdown_inline": // tried both this and "Markdown Inline"
-////          case "Markdown Inline":
-////            print("Let's fire up markdown inline")
-////            return markdownInlineConfig
-//          default:
-//            return nil
-//        }
-//      },
+      languageProvider: { name in
+        
+//        print("Embedded language: ", name)
+        
+        switch name {
+          case "markdown_inline": // tried both this and "Markdown Inline"
+//          case "Markdown Inline":
+//            print("Let's fire up markdown inline")
+            return markdownInlineConfig
+          default:
+            return nil
+        }
+      },
       locationTransformer: { _ in nil }
     )
     

@@ -6,7 +6,7 @@
 //
 
 import SwiftUI
-import Wrecktangle
+//import Wrecktangle
 
 extension MarkdownTextView {
   
