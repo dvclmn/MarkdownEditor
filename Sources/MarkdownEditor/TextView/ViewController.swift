@@ -18,7 +18,9 @@ public class MarkdownViewController: NSViewController {
   var textView: MarkdownTextView
   
   private let highlighter: TextViewHighlighter?
-
+  
+  /// I've been switching Neon on and off a lot, so this is here to save me
+  /// constantly toggling blocks of code everywhere.
   let isNeonEnabled: Bool = false
   
   init(
@@ -31,12 +33,16 @@ public class MarkdownViewController: NSViewController {
       configuration: configuration
     )
     
-    let scrollView = NSScrollView()
-    
-    scrollView.hasVerticalScroller = configuration.isEditable
-    scrollView.drawsBackground = false
-    scrollView.documentView = textView
-    scrollView.additionalSafeAreaInsets.bottom = configuration.bottomSafeArea
+    if configuration.isScrollable {
+      let scrollView = NSScrollView()
+      
+      scrollView.hasVerticalScroller = true
+      scrollView.drawsBackground = false
+      scrollView.documentView = textView
+      scrollView.additionalSafeAreaInsets.bottom = configuration.bottomSafeArea
+    } else {
+      print("No scroll view set up, text view is not editable, and scrolling is handled in SwiftUI.")
+    }
     
     if isNeonEnabled {
       do {
@@ -61,18 +67,18 @@ public class MarkdownViewController: NSViewController {
   
   public override func loadView() {
     
-//    do {
-//      try self.neonSetup()
-//    } catch {
-//      print("Error with Neon: \(error)")
-//    }
+    //    do {
+    //      try self.neonSetup()
+    //    } catch {
+    //      print("Error with Neon: \(error)")
+    //    }
     
-   
-    
-    textView.isVerticallyResizable = true
-    textView.isHorizontallyResizable = true
-    
-    self.view = textView.scrollView
+
+    if let scrollView = textView.scrollView {
+      self.view = scrollView
+    } else {
+      self.view = textView
+    }
     
     if let highlighter = highlighter {
       highlighter.observeEnclosingScrollView()

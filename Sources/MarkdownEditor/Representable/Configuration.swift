@@ -13,6 +13,7 @@ import TextCore
 public struct MarkdownEditorConfiguration: Sendable, Equatable {
   
   public var isEditable: Bool
+  public var isScrollable: Bool
   public var theme: MarkdownTheme
   public var lineHeight: CGFloat
   public var renderingAttributes: AttributeContainer
@@ -23,6 +24,7 @@ public struct MarkdownEditorConfiguration: Sendable, Equatable {
   
   public init(
     isEditable: Bool = true,
+    isScrollable: Bool = false,
     theme: MarkdownTheme = .default,
     lineHeight: CGFloat = 1.1,
     renderingAttributes: AttributeContainer = .markdownRenderingDefaults,
@@ -33,6 +35,7 @@ public struct MarkdownEditorConfiguration: Sendable, Equatable {
     insets: CGFloat = 20
   ) {
     self.isEditable = isEditable
+    self.isScrollable = isScrollable
     self.theme = theme
     self.lineHeight = lineHeight
     self.renderingAttributes = renderingAttributes

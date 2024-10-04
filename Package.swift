@@ -15,12 +15,12 @@ let package = Package(
   ],
   dependencies: [
     
-    .package(url: "https://github.com/ChimeHQ/Neon", branch: "main"),
-    .package(url: "https://github.com/ChimeHQ/Rearrange", from: "1.8.1"),
+    .package(url: "https://github.com/ChimeHQ/Neon.git", branch: "main"),
+    .package(url: "https://github.com/ChimeHQ/Rearrange.git", from: "1.8.1"),
 //    .package(url: "https://github.com/krzyzanowskim/STTextKitPlus.git", from: "0.1.4"),
-    .package(url: "https://github.com/tree-sitter-grammars/tree-sitter-markdown", branch: "split_parser"),
-    .package(url: "https://github.com/dvclmn/TextCore", branch: "main"),
-    .package(url: "https://github.com/dvclmn/Collection", branch: "main"),
+    .package(url: "https://github.com/tree-sitter-grammars/tree-sitter-markdown.git", branch: "split_parser"),
+    .package(url: "https://github.com/dvclmn/TextCore.git", branch: "main"),
+    .package(url: "https://github.com/dvclmn/Collection.git", branch: "main"),
 //    .package(url: "https://github.com/dvclmn/Wrecktangle.git", branch: "main")
     
     

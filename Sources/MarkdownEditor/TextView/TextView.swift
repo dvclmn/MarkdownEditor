@@ -11,10 +11,13 @@ import BaseHelpers
 
 public class MarkdownTextView: NSTextView {
   
+  var scrollView: NSScrollView?
+  
   var elements: [Markdown.Element] = []
   var parsingTask: Task<Void, Never>?
   
-//  var scrollDebouncer = Debouncer(interval: 0.2)
+  var maxWidth: CGFloat = .infinity
+  
   var parseDebouncer = Debouncer(interval: 0.05)
   
   let infoHandler = EditorInfoHandler()
@@ -25,7 +28,6 @@ public class MarkdownTextView: NSTextView {
   
   var currentParagraph = ParagraphInfo()
 
-  
   private var viewportLayoutController: NSTextViewportLayoutController?
   var viewportDelegate: MarkdownViewportDelegate?
   
@@ -41,7 +43,6 @@ public class MarkdownTextView: NSTextView {
     
   ) {
     self.configuration = configuration
-    
     
     /// First, we provide TextKit with a frame
     ///
@@ -90,20 +91,42 @@ public class MarkdownTextView: NSTextView {
     NotificationCenter.default.removeObserver(self)
   }
   
-  var scrollView: NSScrollView {
-    
-//    guard configuration.isScrollable else {
-//      print("Text view isn't scrollable, returning nil")
-//      return nil
+//  public override var intrinsicContentSize: NSSize {
+//    
+//    guard let tlm = textLayoutManager else { return super.intrinsicContentSize }
+//    
+//    tlm.ensureLayout(for: tlm.documentRange)
+//    
+////    tlm.textContainer?.layoutManager?.usedRect(for: self.textContainer)
+//    
+//
+//
+////    layoutManager.ensureLayout(for: self.textContainer!)
+//    return layoutManager.usedRect(for: self.textContainer!).size
+//  }
+  
+  
+//  public override func setFrameSize(_ newSize: NSSize) {
+//    let width = min(newSize.width, maxWidth)
+//    super.setFrameSize(NSSize(width: width, height: newSize.height))
+//    self.textContainer?.size = NSSize(width: width, height: CGFloat.greatestFiniteMagnitude)
+//    self.invalidateIntrinsicContentSize()
+//  }
+  
+//  var scrollView: NSScrollView {
+//    
+////    guard configuration.isScrollable else {
+////      print("Text view isn't scrollable, returning nil")
+////      return nil
+////    }
+//    
+//    guard let result = self.enclosingScrollView,
+//          result.documentView == self
+//    else {
+//      fatalError("The text view needs a scroll view.")
 //    }
-    
-    guard let result = enclosingScrollView,
-          result.documentView == self
-    else {
-      fatalError("The text view needs a scroll view.")
-    }
-    return result
-  }
+//    return result
+//  }
   
 //  public override func setFrameSize(_ newSize: NSSize) {
 //    super.setFrameSize(newSize)
@@ -134,8 +157,11 @@ extension MarkdownTextView {
     super.draw(rect)
     
     if configuration.isShowingFrames {
+      
+      let colour: NSColor = configuration.isEditable ? .red : .purple
+      
       let border:NSBezierPath = NSBezierPath(rect: bounds)
-      let borderColor = NSColor.red.withAlphaComponent(0.08)
+      let borderColor = colour.withAlphaComponent(0.08)
       borderColor.set()
       border.lineWidth = 1.0
       border.fill()

@@ -8,53 +8,57 @@
 import SwiftUI
 import TextCore
 
-extension AttributeContainer {
-  
-  func getAttributes<S: AttributeScope>(for scope: KeyPath<AttributeScopes, S.Type>) -> [NSAttributedString.Key: Any]? {
-    do {
-      return try Dictionary(self, including: scope)
-    } catch {
-      return nil
-    }
-  }
-
-  /// Overload, to allow `\.appKit` as default
-  func getAttributes() -> [NSAttributedString.Key: Any]? {
-    return getAttributes(for: \.appKit)
-  }
-  
-}
-
 extension MarkdownTextView {
 
   func textViewSetup() {
     
     isEditable = self.configuration.isEditable
     
+    if self.configuration.isScrollable {
+      
+      /// *Scrolling* version
+      isVerticallyResizable = true
+      isHorizontallyResizable = true
+      
+      autoresizingMask = [.width, .height]
+      
+      textContainer?.widthTracksTextView = true
+      textContainer?.heightTracksTextView = false
+      
+    } else {
+      
+      /// *NON-scrolling* version
+      
+      /// Setting `isVerticallyResizable` to false seems to make a huge difference,
+      /// and SwiftUI just seems to take care of the height stuff. KEEP THIS FALSE for
+      /// (seemingly) predictable, normal, horizontal text reflow.
+      isVerticallyResizable = false
+      isHorizontallyResizable = false
+      
+      autoresizingMask = [.width, .height]
+      
+      textContainer?.widthTracksTextView = true
+      textContainer?.heightTracksTextView = false
+      
+    }
+    
     isSelectable = true
     drawsBackground = false
     allowsUndo = true
     isRichText = false
-    
-    let max = CGFloat.greatestFiniteMagnitude
-    
-    minSize = NSSize.zero
-    maxSize = NSSize(width: max, height: max)
-    
-    isVerticallyResizable = true
-    isHorizontallyResizable = true
-    
     smartInsertDeleteEnabled = false
     
-    autoresizingMask = [.width, .height]
+//    let max = CGFloat.greatestFiniteMagnitude
     
-    textContainer?.widthTracksTextView = true
-    textContainer?.heightTracksTextView = false
+//    minSize = NSSize.zero
+//    maxSize = NSSize(width: max, height: max)
     
-    textContainer?.containerSize = NSSize(width: bounds.width, height: CGFloat.greatestFiniteMagnitude)
-//    if !configuration.isScrollable {
-//    }
+    
+    
+    
 
+    
+//    textContainer?.containerSize = NSSize(width: bounds.width, height: max)
 
     self.applyConfiguration()
   }

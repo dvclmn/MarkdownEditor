@@ -66,16 +66,23 @@ extension MarkdownTextView {
         
       tcm.performEditingTransaction {
         
-//        let nsString = self.string as NSString
-        
-  //        let documentNSRange = NSRange(location: 0, length: nsString.length)
+        let nsString = self.string as NSString
+        let documentNSRange = NSRange(location: 0, length: nsString.length)
         
         let paragraphNSRange = self.currentParagraph.range
         
-        ts.removeAttribute(.foregroundColor, range: paragraphNSRange)
-        ts.removeAttribute(.backgroundColor, range: paragraphNSRange)
         
-        ts.addAttributes(AttributeSet.white.attributes, range: paragraphNSRange)
+        
+        
+        if paragraphNSRange.length <= documentNSRange.length {
+          ts.removeAttribute(.foregroundColor, range: paragraphNSRange)
+          ts.removeAttribute(.backgroundColor, range: paragraphNSRange)
+          
+          ts.addAttributes(AttributeSet.white.attributes, range: paragraphNSRange)
+        } else {
+          fatalError("Things went out of bounds, for some reason?")
+        }
+        
         
         
         
