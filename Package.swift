@@ -21,7 +21,7 @@ let package = Package(
     .package(url: "https://github.com/tree-sitter-grammars/tree-sitter-markdown.git", branch: "split_parser"),
     .package(url: "https://github.com/dvclmn/TextCore.git", branch: "main"),
     .package(url: "https://github.com/dvclmn/Collection.git", branch: "main"),
-//    .package(url: "https://github.com/dvclmn/Wrecktangle.git", branch: "main")
+    .package(url: "https://github.com/dvclmn/Wrecktangle.git", branch: "main")
     
     
   ],
@@ -29,7 +29,7 @@ let package = Package(
     .target(
       name: "MarkdownEditor",
       dependencies: [
-//        "Wrecktangle",
+        "Wrecktangle",
         .product(name: "BaseHelpers", package: "Collection"),
         "TextCore",
         "Rearrange",

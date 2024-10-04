@@ -58,6 +58,8 @@ extension MarkdownTextView {
     
 //    exploreTextSegments()
     
+    updateParagraphInfo(firstSelected: nil)
+    
     basicInlineMarkdown()
 
   }

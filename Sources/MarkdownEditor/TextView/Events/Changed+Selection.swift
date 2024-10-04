@@ -10,63 +10,23 @@ import SwiftUI
 
 extension MarkdownTextView {
   
-//  public override func setSelectedRange(_ charRange: NSRange) {
-//    
-//    super.setSelectedRange(charRange)
-//    
-//    updateParagraphInfo(selectedRange: charRange)
-//    
-//  }
+  //  public override func setSelectedRange(_ charRange: NSRange) {
+  //
+  //    super.setSelectedRange(charRange)
+  //
+  //    updateParagraphInfo(selectedRange: charRange)
+  //
+  //  }
   
-    public override func setSelectedRanges(_ ranges: [NSValue], affinity: NSSelectionAffinity, stillSelecting: Bool) {
-  
-      super.setSelectedRanges(ranges, affinity: affinity, stillSelecting: stillSelecting)
-  
-      updateParagraphInfo(selectedRange: ranges.first!.rangeValue)
-      
-  //    if !stillSelecting {
-  //      printNewSelection()
-  //    }
-    }
-  
-  func updateParagraphInfo(selectedRange: NSRange) {
+  public override func setSelectedRanges(_ ranges: [NSValue], affinity: NSSelectionAffinity, stillSelecting: Bool) {
     
-    let nsString = self.string as NSString
-    let range = nsString.paragraphRange(for: selectedRange)
-    guard let text = self.attributedSubstring(forProposedRange: range, actualRange: nil)?.string else {
-//      print("Couldn't get that text")
-      return
-    }
+    super.setSelectedRanges(ranges, affinity: affinity, stillSelecting: stillSelecting)
     
-    var syntax: BlockSyntax
-    
+    updateParagraphInfo(firstSelected: ranges.first?.rangeValue)
 
-    if text.hasPrefix("#") {
-      
-      let headingLevel = text.prefix(while: { $0 == "#" }).count
-      
-      if headingLevel <= 6 && (text.count == headingLevel || text[text.index(text.startIndex, offsetBy: headingLevel)] == " ") {
-        syntax = BlockSyntax.heading(level: headingLevel)
-      } else {
-        syntax = BlockSyntax.heading(level: 1)
-      }
-      
-    } else if text.hasPrefix("- ") {
-      syntax = .list
-    } else {
-      // TODO: Implement more cases
-      syntax = .none
-    }
-    
-    let result = ParagraphInfo(string: text, range: range, type: syntax)
-    
-    
-//    let box = Box(header: "Paragraph Info", content: result.description)
-    
-//    print(box)
-    
-    self.currentParagraph = result
-    
+    //    if !stillSelecting {
+    //      printNewSelection()
+    //    }
   }
   
   func printNewSelection() {
