@@ -19,6 +19,7 @@ public class MarkdownTextView: NSTextView {
   var maxWidth: CGFloat = .infinity
   
   var parseDebouncer = Debouncer(interval: 0.05)
+  var adjustWidthDebouncer = Debouncer(interval: 0.2)
   
   let infoHandler = EditorInfoHandler()
   
@@ -27,7 +28,7 @@ public class MarkdownTextView: NSTextView {
   var editorInfo = EditorInfo()
   
   var currentParagraph = ParagraphInfo()
-
+  
   private var viewportLayoutController: NSTextViewportLayoutController?
   var viewportDelegate: MarkdownViewportDelegate?
   
@@ -83,60 +84,39 @@ public class MarkdownTextView: NSTextView {
   }
   
   public override var layoutManager: NSLayoutManager? {
-    assertionFailure("TextKit 1 is not supported")
+    print("Using TextKit 1")
+//    assertionFailure("TextKit 1 is not supported")
     return nil
   }
   
   deinit {
     NotificationCenter.default.removeObserver(self)
   }
-  
-//  public override var intrinsicContentSize: NSSize {
-//    
-//    guard let tlm = textLayoutManager else { return super.intrinsicContentSize }
-//    
-//    tlm.ensureLayout(for: tlm.documentRange)
-//    
-////    tlm.textContainer?.layoutManager?.usedRect(for: self.textContainer)
-//    
-//
-//
-////    layoutManager.ensureLayout(for: self.textContainer!)
-//    return layoutManager.usedRect(for: self.textContainer!).size
-//  }
-  
-  
-//  public override func setFrameSize(_ newSize: NSSize) {
-//    let width = min(newSize.width, maxWidth)
-//    super.setFrameSize(NSSize(width: width, height: newSize.height))
-//    self.textContainer?.size = NSSize(width: width, height: CGFloat.greatestFiniteMagnitude)
-//    self.invalidateIntrinsicContentSize()
-//  }
-  
-//  var scrollView: NSScrollView {
-//    
-////    guard configuration.isScrollable else {
-////      print("Text view isn't scrollable, returning nil")
-////      return nil
-////    }
-//    
-//    guard let result = self.enclosingScrollView,
-//          result.documentView == self
-//    else {
-//      fatalError("The text view needs a scroll view.")
-//    }
-//    return result
-//  }
-  
-//  public override func setFrameSize(_ newSize: NSSize) {
-//    super.setFrameSize(newSize)
-//    textContainer?.containerSize = NSSize(width: newSize.width, height: CGFloat.greatestFiniteMagnitude)
-////    if !configuration.isScrollable {
-////    }
-//  }
 
+  private var oldWidth: CGFloat = 0
   
-  
+  public override var frame: NSRect {
+    
+    didSet {
+      print("Frame size change: \(frame)")
+      
+      if frame.width != oldWidth {
+        print("Frame width was different from old width (\(oldWidth)).")
+        Task {
+          await adjustWidthDebouncer.processTask {
+            
+            Task { @MainActor in
+              let heightUpdate = self.updateEditorHeight()
+              await self.infoHandler.update(heightUpdate)
+            }
+            
+          }
+        }
+
+        oldWidth = frame.width
+      }
+    }
+  }
 }
 
 extension MarkdownTextView {

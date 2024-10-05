@@ -30,12 +30,15 @@ let package = Package(
       name: "MarkdownEditor",
       dependencies: [
         "Wrecktangle",
-        .product(name: "BaseHelpers", package: "Collection"),
         "TextCore",
         "Rearrange",
 //        "STTextKitPlus",
+        
         "Neon",
         .product(name: "TreeSitterMarkdown", package: "tree-sitter-markdown"),
+        .product(name: "BaseHelpers", package: "Collection"),
+        .product(name: "BaseStyles", package: "Collection"),
+        .product(name: "Utilities", package: "Collection"),
       ]
     ),
     .testTarget(

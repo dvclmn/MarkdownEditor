@@ -7,12 +7,13 @@
 
 import SwiftUI
 import BaseHelpers
+import Scrolling
 //import Resizable
 
 public struct ExampleView: View {
   
   
-  @State private var text: String = TestStrings.Markdown.basicMarkdown
+  @State private var text: String = TestStrings.Markdown.shortMarkdownBasics
   
   /// From AppKit —> SwiftUI
   /// This currently only returns a frame (`CGSize`), to provide SwiftUI with
@@ -44,12 +45,16 @@ public struct ExampleView: View {
     VStack(spacing: 0) {
       
       MarkdownEditor(
-        text: $text
+        text: $text,
+        configuration: MarkdownEditorConfiguration(isShowingFrames: true)
 //        eventEmitter: self.emitter,
       ) { info in
         self.editorInfo = info
       }
+      .frame(height: self.editorInfo?.frame.height)
+      
     }
+    .scrollWithOffset()
     //    .overlay(alignment: .bottom) {
     //      HStack {
     //

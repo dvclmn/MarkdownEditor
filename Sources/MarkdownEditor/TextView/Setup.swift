@@ -69,6 +69,7 @@ extension MarkdownTextView {
     self.insertionPointColor = NSColor(self.configuration.theme.insertionPointColour)
     //
     textContainer?.lineFragmentPadding = self.configuration.insets
+//    textContainerInset = NSSize(width: 0, height: 0)
     textContainerInset = NSSize(width: 0, height: self.configuration.insets)
     
     self.font = NSFont.systemFont(ofSize: self.configuration.theme.fontSize)

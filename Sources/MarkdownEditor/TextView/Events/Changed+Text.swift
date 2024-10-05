@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import BaseStyles
 
 
 extension MarkdownTextView {
@@ -73,7 +74,7 @@ extension MarkdownTextView {
     
     tlm.ensureLayout(for: tlm.documentRange)
     let bounds = tlm.usageBoundsForTextContainer
-    let extraHeightBuffer: CGFloat = 80
+    let extraHeightBuffer: CGFloat = configuration.isScrollable ? 0 : configuration.bottomSafeArea
     
     let frame = EditorInfo.Frame(
       width: bounds.width,

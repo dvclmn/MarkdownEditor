@@ -80,6 +80,8 @@ public class MarkdownViewController: NSViewController {
       self.view = textView
     }
     
+    let _ = textView.layoutManager
+    
     if let highlighter = highlighter {
       highlighter.observeEnclosingScrollView()
     }
