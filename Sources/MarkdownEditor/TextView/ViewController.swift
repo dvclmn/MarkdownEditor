@@ -19,10 +19,6 @@ public class MarkdownViewController: NSViewController {
   
   private let highlighter: TextViewHighlighter?
   
-  /// I've been switching Neon on and off a lot, so this is here to save me
-  /// constantly toggling blocks of code everywhere.
-  let isNeonEnabled: Bool = false
-  
   init(
     configuration: MarkdownEditorConfiguration
   ) {
@@ -44,7 +40,7 @@ public class MarkdownViewController: NSViewController {
       print("No scroll view set up, text view is not editable, and scrolling is handled in SwiftUI.")
     }
     
-    if isNeonEnabled {
+    if configuration.isNeonEnabled {
       do {
         self.highlighter = try Self.makeHighlighter(for: textView)
         print("`TextViewHighlighter` is running.")

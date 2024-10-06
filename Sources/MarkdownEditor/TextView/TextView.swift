@@ -95,31 +95,52 @@ public class MarkdownTextView: NSTextView {
 
   private var oldWidth: CGFloat = 0
   
+  var horizontalInsets: CGFloat {
+    
+    let width = self.frame.width
+    let maxWidth: CGFloat = configuration.maxReadingWidth
+    
+    if width > maxWidth + (configuration.insets * 2) {
+      return (width - maxWidth) / 2
+    } else {
+      return configuration.insets
+    }
+    
+  }
+  
   public override var frame: NSRect {
     
     didSet {
-      print("Frame size change: \(frame)")
-      
-      if frame.width != oldWidth {
-        print("Frame width was different from old width (\(oldWidth)).")
-        Task {
-          await adjustWidthDebouncer.processTask {
-            
-            Task { @MainActor in
-              let heightUpdate = self.updateEditorHeight()
-              await self.infoHandler.update(heightUpdate)
-            }
-            
-          }
-        }
-
-        oldWidth = frame.width
-      }
+      onFrameChange()
     }
-  }
+  } // END frame override
 }
 
 extension MarkdownTextView {
+  
+  func onFrameChange() {
+    
+    print("Frame size change: \(frame)")
+    
+    if frame.width != oldWidth {
+      print("Frame width was different from old width (\(oldWidth)).")
+      
+      self.textContainer?.lineFragmentPadding = self.horizontalInsets
+      
+      Task {
+        await adjustWidthDebouncer.processTask {
+          
+          Task { @MainActor in
+            let heightUpdate = self.updateEditorHeight()
+            await self.infoHandler.update(heightUpdate)
+          }
+          
+        }
+      }
+      
+      oldWidth = frame.width
+    }
+  }
   
   
   func setupViewportLayoutController() {
@@ -148,3 +169,96 @@ extension MarkdownTextView {
     }
   }
 }
+
+
+//
+//
+//extension MarkdownTextView {
+//  
+//  func drawRoundedRect(
+//    around range: NSRange,
+//    cornerRadius: CGFloat = 5.0,
+//    lineWidth: CGFloat = 2.0,
+//    color: NSColor = .red
+//  ) {
+////    guard let layoutManager = self.layoutManager,
+////          let textContainer = self.textContainer else {
+////      return
+////    }
+////    
+//
+//    guard let tlm = textLayoutManager else { return }
+//    
+////    tlm.
+//    
+////    let rectArray = layoutManager.rectArray(forCharacterRange: range,
+////                                            withinSelectedCharacterRange: range,
+////                                            in: textContainer,
+////                                            rectCount: &rectCount)
+//    
+//    // Create a path for the rounded rectangle
+//    let path = NSBezierPath()
+//    
+////    for i in 0..<rectCount {
+////      var rect = rectArray[i]
+////      
+////      // Convert rect to view coordinates
+////      rect = self.convert(rect, from: nil)
+////      
+////      // Adjust rect to account for line width
+////      rect = rect.insetBy(dx: -lineWidth / 2, dy: -lineWidth / 2)
+////      
+////      if i == 0 {
+////        path.move(to: NSPoint(x: rect.minX, y: rect.minY + cornerRadius))
+////      }
+////      
+////      // Draw rounded corners for top-left and top-right of first rectangle,
+////      // and bottom-left and bottom-right of last rectangle
+////      if i == 0 {
+////        path.line(to: NSPoint(x: rect.minX, y: rect.maxY - cornerRadius))
+////        path.appendArc(withCenter: NSPoint(x: rect.minX + cornerRadius, y: rect.maxY - cornerRadius),
+////                       radius: cornerRadius,
+////                       startAngle: 180,
+////                       endAngle: 90,
+////                       clockwise: true)
+////        
+////        path.line(to: NSPoint(x: rect.maxX - cornerRadius, y: rect.maxY))
+////        path.appendArc(withCenter: NSPoint(x: rect.maxX - cornerRadius, y: rect.maxY - cornerRadius),
+////                       radius: cornerRadius,
+////                       startAngle: 90,
+////                       endAngle: 0,
+////                       clockwise: true)
+////      } else if i == rectCount - 1 {
+////        path.line(to: NSPoint(x: rect.maxX, y: rect.minY + cornerRadius))
+////        path.appendArc(withCenter: NSPoint(x: rect.maxX - cornerRadius, y: rect.minY + cornerRadius),
+////                       radius: cornerRadius,
+////                       startAngle: 0,
+////                       endAngle: -90,
+////                       clockwise: true)
+////        
+////        path.line(to: NSPoint(x: rect.minX + cornerRadius, y: rect.minY))
+////        path.appendArc(withCenter: NSPoint(x: rect.minX + cornerRadius, y: rect.minY + cornerRadius),
+////                       radius: cornerRadius,
+////                       startAngle: -90,
+////                       endAngle: 180,
+////                       clockwise: true)
+////      } else {
+////        path.line(to: NSPoint(x: rect.maxX, y: rect.maxY))
+////        path.line(to: NSPoint(x: rect.maxX, y: rect.minY))
+////      }
+////      
+////      if i < rectCount - 1 {
+////        path.line(to: NSPoint(x: rect.minX, y: rect.minY))
+////      }
+////    }
+//    
+//    path.close()
+//    
+//    // Set the drawing attributes
+//    color.setStroke()
+//    path.lineWidth = lineWidth
+//    
+//    // Draw the path
+//    path.stroke()
+//  }
+//}

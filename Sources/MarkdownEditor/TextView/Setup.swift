@@ -48,17 +48,6 @@ extension MarkdownTextView {
     isRichText = false
     smartInsertDeleteEnabled = false
     
-//    let max = CGFloat.greatestFiniteMagnitude
-    
-//    minSize = NSSize.zero
-//    maxSize = NSSize(width: max, height: max)
-    
-    
-    
-    
-
-    
-//    textContainer?.containerSize = NSSize(width: bounds.width, height: max)
 
     self.applyConfiguration()
   }
@@ -68,8 +57,9 @@ extension MarkdownTextView {
     
     self.insertionPointColor = NSColor(self.configuration.theme.insertionPointColour)
     //
-    textContainer?.lineFragmentPadding = self.configuration.insets
-//    textContainerInset = NSSize(width: 0, height: 0)
+    textContainer?.lineFragmentPadding = configuration.insets
+//    textContainer?.lineFragmentPadding = self.horizontalInsets
+
     textContainerInset = NSSize(width: 0, height: self.configuration.insets)
     
     self.font = NSFont.systemFont(ofSize: self.configuration.theme.fontSize)

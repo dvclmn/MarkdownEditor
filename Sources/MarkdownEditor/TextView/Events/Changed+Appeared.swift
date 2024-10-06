@@ -34,6 +34,7 @@ extension MarkdownTextView {
     
     //        exploreTextSegments()
     
+    
     basicInlineMarkdown()
     
     
@@ -45,6 +46,8 @@ extension MarkdownTextView {
   /// Because inline elements shouldn't be extending past that anyway.
   ///
   func basicInlineMarkdown() {
+    
+    guard !configuration.isNeonEnabled else { return }
     
     DispatchQueue.main.async { [weak self] in
       

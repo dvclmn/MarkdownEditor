@@ -20,7 +20,13 @@ public struct MarkdownEditorConfiguration: Sendable, Equatable {
   public var bottomSafeArea: CGFloat
   public var hasLineNumbers: Bool
   public var isShowingFrames: Bool
+  public var maxReadingWidth: CGFloat
+  
+  /// I've been switching Neon on and off a lot, so this is here to save me
+  /// constantly toggling blocks of code everywhere.
   public var insets: CGFloat
+  
+  var isNeonEnabled: Bool
   
   public init(
     isEditable: Bool = true,
@@ -32,7 +38,9 @@ public struct MarkdownEditorConfiguration: Sendable, Equatable {
     hasLineNumbers: Bool = false,
     
     isShowingFrames: Bool = false,
-    insets: CGFloat = 20
+    insets: CGFloat = 20,
+    isNeonEnabled: Bool = false,
+    maxReadingWidth: CGFloat = 580
   ) {
     self.isEditable = isEditable
     self.isScrollable = isScrollable
@@ -43,6 +51,8 @@ public struct MarkdownEditorConfiguration: Sendable, Equatable {
     self.hasLineNumbers = hasLineNumbers
     self.isShowingFrames = isShowingFrames
     self.insets = insets
+    self.isNeonEnabled = isNeonEnabled
+    self.maxReadingWidth = maxReadingWidth
   }
 }
 
