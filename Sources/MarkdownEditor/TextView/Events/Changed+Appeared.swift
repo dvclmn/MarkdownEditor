@@ -132,13 +132,33 @@ extension MarkdownTextView {
             let contentRange: NSRange = .init(location: syntaxRange.location + leadingCount, length: syntaxRange.length - (leadingCount + trailingCount))
             
             
+            if syntax == .codeBlock {
+              
+//              self.drawRoundedRect(around: contentRange)
+//              self.highlightTextRange(contentRange)
+              self.addRoundedRectHighlight(around: contentRange)
+              
+            }
+            
+            
             //              let leadingRange: NSRange = nsString.range(of: String(match.output.leading))
             //              let trailingRange: NSRange = nsString.range(of: String(match.output.trailing))
             
             
-            let attachment = NSTextAttachment()
-            let cell = BoxDrawingAttachmentCell()
-            attachment.attachmentCell = cell
+
+            
+//            guard let attrString = self.attributedSubstring(forProposedRange: safeParagraphRange, actualRange: nil) else {
+//              print("Couldn't get that text")
+//              return
+//            }
+            
+            
+            
+            
+            
+//            let attachment = NSTextAttachment()
+//            let cell = BoxDrawingAttachmentCell()
+//            attachment.attachmentCell = cell
             
 //            let attachmentAttribute: AttributeSet = [
 //              .attachment: attachment
