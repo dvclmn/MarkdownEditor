@@ -136,7 +136,9 @@ extension MarkdownTextView {
               
 //              self.drawRoundedRect(around: contentRange)
 //              self.highlightTextRange(contentRange)
-              self.addRoundedRectHighlight(around: contentRange)
+//              self.addRoundedRectHighlight(around: contentRange)
+              
+              
               
             }
             
