@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+
 class MarkdownViewportDelegate: NSObject, @preconcurrency  NSTextViewportLayoutControllerDelegate {
   weak var textView: MarkdownTextView?
   
@@ -46,3 +47,19 @@ class MarkdownViewportDelegate: NSObject, @preconcurrency  NSTextViewportLayoutC
   }
 
 }
+
+//extension MarkdownTextView {
+//  func setupViewportLayoutController() {
+//    guard let textLayoutManager = self.textLayoutManager else {
+//      print("Couldn't set up the tlm")
+//      return
+//    }
+//    
+//    self.viewportDelegate = MarkdownViewportDelegate()
+//    self.viewportDelegate?.textView = self
+//    
+//    self.viewportLayoutController = NSTextViewportLayoutController(textLayoutManager: textLayoutManager)
+//    self.viewportLayoutController?.delegate = viewportDelegate
+//  }
+//  
+//}

@@ -17,10 +17,12 @@ public extension MarkdownEditor {
     Coordinator(self)
   }
   
-  final class Coordinator: NSObject, NSTextViewDelegate, NSTextStorageDelegate {
+  final class Coordinator: NSObject, NSTextViewDelegate, @preconcurrency NSTextStorageDelegate {
     
     var parent: MarkdownEditor
     weak var textView: MarkdownTextView?
+    
+    var lastLineCount: Int = 0
     
     var selectedRanges: [NSValue] = []
     var selections: [NSTextSelection] = []
@@ -29,7 +31,7 @@ public extension MarkdownEditor {
     init(_ parent: MarkdownEditor) { self.parent = parent }
 
     
-    public func textStorage(
+    @MainActor public func textStorage(
       _ textStorage: NSTextStorage,
       didProcessEditing editedMask: NSTextStorageEditActions,
       range editedRange: NSRange,
@@ -40,9 +42,23 @@ public extension MarkdownEditor {
         return
       }
       
-      Task { @MainActor in
-        textView.parseAndRedraw()
-      }
+//      Task { @MainActor in
+
+        let currentLines = currentLineCount()
+        
+        // Check if the number of lines has changed
+        if currentLines != lastLineCount {
+          lastLineCount = currentLines
+          
+          // Trigger expensive operations
+          textView.parseAndRedraw()
+        } else {
+          // Optional: Handle minimal updates if necessary
+          // For example, updating line-specific highlights
+        }
+      
+        
+//      }
     }
     
     public func textDidChange(_ notification: Notification) {
@@ -76,6 +92,28 @@ public extension MarkdownEditor {
 //    }
     
     
+    
+    
+    /// Counts the number of lines in the text view.
+    @MainActor
+    func currentLineCount() -> Int {
+      
+      guard let layoutManager = self.textView?.layoutManager,
+            let textContainer = self.textView?.textContainer else {
+        return 0
+      }
+      
+      let glyphRange = layoutManager.glyphRange(for: textContainer)
+      var lineCount = 0
+      
+      layoutManager.enumerateLineFragments(forGlyphRange: glyphRange) { (_, _, _, _, _) in
+        lineCount += 1
+      }
+      
+      print("Current line count is: \(lineCount)")
+      
+      return lineCount
+    }
     
   }
 }

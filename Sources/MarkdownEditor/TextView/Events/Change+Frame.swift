@@ -64,6 +64,8 @@ extension MarkdownTextView {
     //      return .init()
     //    }
     
+    
+    
     guard let lm = self.layoutManager else {
       print("Couldn't get the lm")
       

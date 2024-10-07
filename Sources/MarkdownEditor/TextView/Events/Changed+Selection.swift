@@ -22,7 +22,7 @@ extension MarkdownTextView {
     
     super.setSelectedRanges(ranges, affinity: affinity, stillSelecting: stillSelecting)
     
-    print("Text view frame: `\(self.frame)`")
+//    print("Text view frame: `\(self.frame)`")
 //    updateParagraphInfo(firstSelected: ranges.first?.rangeValue)
 
     //    if !stillSelecting {

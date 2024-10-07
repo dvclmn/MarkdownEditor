@@ -31,7 +31,8 @@ extension MarkdownTextView {
       await parseDebouncer.processTask {
         
         Task { @MainActor in
-          self.basicInlineMarkdown()
+//          self.basicInlineMarkdown()
+          self.parseCodeBlocks()
           self.needsDisplay = true
         }
       }
@@ -69,6 +70,9 @@ extension MarkdownTextView {
 
   func parseCodeBlocks() {
     guard let textStorage = self.textStorage else { return }
+    
+    print("Parsing code blocks")
+    print("Current number of elements: \(elements.count)")
 
     let text = textStorage.string
     
@@ -93,6 +97,8 @@ extension MarkdownTextView {
     
     // Replace the old elements with new ones
     self.elements = newElements
+    
+    print("New state of `elements`: \(elements)")
   }
   
   

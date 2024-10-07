@@ -27,12 +27,17 @@ extension MarkdownTextView {
     
 //    setupViewportLayoutController()
     
-
+    
+    parseAndRedraw()
     
     //        exploreTextSegments()
     
     
 //    basicInlineMarkdown()
+    
+  }
+  
+  func lineCount() {
     
   }
  
