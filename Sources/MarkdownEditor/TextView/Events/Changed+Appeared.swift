@@ -34,7 +34,6 @@ extension MarkdownTextView {
     
     basicInlineMarkdown()
     
-    
   }
   
   /// Just realised; for inline Markdown elements, I *should* be safe to only perform
@@ -65,11 +64,7 @@ extension MarkdownTextView {
         }
         
       ts.beginEditing()
-      
-//      tcm.performEditingTransaction {
-        
-        
-        
+
         let documentLength = (self.string as NSString).length
         let paragraphRange = self.currentParagraph.range
         
@@ -84,33 +79,10 @@ extension MarkdownTextView {
           ts.removeAttribute(.foregroundColor, range: safeParagraphRange)
           ts.removeAttribute(.backgroundColor, range: safeParagraphRange)
           ts.addAttributes(AttributeSet.white.attributes, range: safeParagraphRange)
-          
-//          textStorage?.removeAttribute(.foregroundColor, range: safeParagraphRange)
-//          textStorage?.removeAttribute(.backgroundColor, range: safeParagraphRange)
-//          textStorage?.addAttributes(AttributeSet.white.attributes, range: safeParagraphRange)
+
         } else {
           print("Invalid paragraph range")
         }
-        
-        
-        
-        
-        //          self.textStorage?.setAttributes(defaultAttributes, range: fullRange)
-        
-        //          tlm.removeRenderingAttribute(.foregroundColor, for: tlm.documentRange)
-        //          tlm.removeRenderingAttribute(.backgroundColor, for: tlm.documentRange)
-        
-        //        guard let pattern = Markdown.Syntax.inlineCode.regex else { return }
-        
-        //            let nsString = self.string as NSString
-        //            let fullRange = NSRange(location: 0, length: nsString.length)
-        
-        
-        //            let attributedString = NSMutableAttributedString(string: text)
-        
-        //            text.enumerateSubstrings(in: text.startIndex..<text.endIndex, options: .) {
-        //              (substring, substringRange, _, _) in
-        
         
         for syntax in Markdown.Syntax.testCases {
           

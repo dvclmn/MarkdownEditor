@@ -6,12 +6,6 @@
 //
 
 import AppKit
-//
-//extension MarkdownTextView {
-//  public override func viewDidChangeFrame() {
-//    
-//  }
-//}
 
 extension MarkdownTextView {
   
@@ -81,23 +75,11 @@ extension MarkdownTextView {
       fatalError("Couldn't get the text container.")
     }
     
-    
-    
-    //    lm.ensureLayout(for: container)
-    //    guard let bounds = container.textView?.bounds else {
-    //      fatalError("Couldn't get bounds?")
-    //    }
-    //    tlm.ensureLayout(for: tlm.documentRange)
-    //    let bounds = tlm.usageBoundsForTextContainer
-    
-    //    let bounds = self.frame
-    
     let extraHeightBuffer: CGFloat = configuration.isScrollable ? 0 : configuration.bottomSafeArea
     
     let newHeight = lm.usedRect(for: container).size.height + extraHeightBuffer
     
     if newHeight != frame.height {
-      
       
       let editorFrame = EditorInfo.Frame(
         width: frame.width,
