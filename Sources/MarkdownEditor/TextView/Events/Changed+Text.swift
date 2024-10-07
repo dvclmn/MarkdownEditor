@@ -54,6 +54,9 @@ extension MarkdownTextView {
 
     updateFrameDebounced()
     
+    parseAndRedraw()
+    
+    
 //    updateParagraphInfo(firstSelected: nil)
     
 //    basicInlineMarkdown()

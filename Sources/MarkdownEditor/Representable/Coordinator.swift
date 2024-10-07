@@ -17,7 +17,7 @@ public extension MarkdownEditor {
     Coordinator(self)
   }
   
-  final class Coordinator: NSObject, NSTextViewDelegate, @preconcurrency NSTextStorageDelegate {
+  final class Coordinator: NSObject, NSTextViewDelegate, NSTextStorageDelegate {
     
     var parent: MarkdownEditor
     weak var textView: MarkdownTextView?
@@ -30,19 +30,21 @@ public extension MarkdownEditor {
     
     init(_ parent: MarkdownEditor) { self.parent = parent }
 
-    
-    @MainActor public func textStorage(
-      _ textStorage: NSTextStorage,
-      didProcessEditing editedMask: NSTextStorageEditActions,
-      range editedRange: NSRange,
-      changeInLength delta: Int
-    ) {
-      guard let textView = textView else {
-        print("Issue getting the text view, within the `NSTextStorageDelegate`")
-        return
-      }
+//    
+//    @MainActor public func textStorage(
+//      _ textStorage: NSTextStorage,
+//      didProcessEditing editedMask: NSTextStorageEditActions,
+//      range editedRange: NSRange,
+//      changeInLength delta: Int
+//    ) {
+//      guard let textView = textView else {
+//        print("Issue getting the text view, within the `NSTextStorageDelegate`")
+//        return
+//      }
       
-      textView.parseAndRedraw()
+      
+      
+//      textView.parseAndRedraw()
       
 //      Task { @MainActor in
 
@@ -61,7 +63,7 @@ public extension MarkdownEditor {
       
         
 //      }
-    }
+//    }
     
     public func textDidChange(_ notification: Notification) {
       

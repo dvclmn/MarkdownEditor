@@ -27,21 +27,184 @@ extension MarkdownTextView {
   
   
   func parseAndRedraw() {
-
-    Task {
-      await parseDebouncer.processTask {
-        
-        Task { @MainActor in
-          self.parseCodeBlocks()
-          self.needsDisplay = true
-        }
-      }
+    
+    Task { @MainActor in
+      self.parseCodeBlocks()
+      self.needsDisplay = true
     }
     
-    self.basicInlineMarkdown()
+    
+//    Task {
+//      await parseDebouncer.processTask {
+//        
+//        Task { @MainActor in
+//          self.parseCodeBlocks()
+//          self.needsDisplay = true
+//        }
+//      }
+//    }
   }
   
   
+
+  
+  
+  func parseCodeBlocks() {
+    
+    guard let textStorage = self.textStorage else { return }
+    
+//    print("Parsing code blocks")
+    //    print("Current number of elements: \(elements.count)")
+    
+    let text = textStorage.string
+    
+    // Temporary set to collect new elements
+    //    var newElements = Set<Markdown.Element>()
+    
+    // Find matches using regex
+    //    let matches = codeBlockRegex.matches(in: text, options: [], range: fullRange)
+    
+    guard let pattern = Markdown.Syntax.codeBlock.regex else {
+      print("There was an issue with the regex for code blocks")
+      return
+    }
+    
+    textStorage.beginEditing()
+    
+    let matches = text.matches(of: pattern)
+    
+//    DispatchQueue.main.async { [weak self] in
+      
+    for match in matches {
+      
+      //    isUpdatingText = true
+      
+      
+        
+        
+        
+        //        for element in elements {
+        //        let highlightr = Highlightr()
+        
+        guard let highlightr = highlightr else {
+          print("Highlightr error")
+          return
+        }
+        
+        highlightr.setTheme(to: "paraiso-dark")
+        
+        
+        
+        
+        guard let highlightedCode: NSAttributedString = highlightr.highlight(text, as: "swift") else {
+          print("Couldn't get an attrString for this block of code")
+          return
+        }
+        
+//        textStorage.setAttributes(highlightedCode, range: getRange(for: .content, in: match))
+      
+      textStorage.replaceCharacters(in: getRange(for: .total, in: match), with: highlightedCode)
+        
+//        
+//        for attribute in highlightedCode {
+//          attribute.
+//        }
+        
+//        textStorage.addAttributes(<#T##attrs: [NSAttributedString.Key : Any]##[NSAttributedString.Key : Any]#>, range: <#T##NSRange#>)
+        
+        //        ts.setAttributedString(highlightedCode)
+        
+        
+        
+        
+        
+        //        let code = "let a = 1"
+        
+        
+        
+        //        } // END elements loop
+        
+        
+        //      for syntax in Markdown.Syntax.testCases {
+        //
+        //
+        //
+        //      } // END loop syntaxes
+        
+        
+      
+      
+      //    isUpdatingText = false
+      
+      //      let element = Markdown.Element(syntax: .codeBlock, range: getRange(for: .total, in: match))
+      //      newElements.insert(element)
+    } // END matches
+    
+//    } // END dispatch
+    textStorage.endEditing()
+    
+    // Replace the old elements with new ones
+    //    self.elements = newElements
+    
+    //    print("New state of `elements`: \(elements)")
+  }
+  
+  
+  //  func basicInlineMarkdown() {
+  //
+  //    guard !configuration.isNeonEnabled
+  ////            !isUpdatingText
+  //    else { return }
+  //
+  //    guard let ts = self.textStorage,
+  //          !text.isEmpty
+  //    else {
+  //      print("Text layout manager setup failed")
+  //      return
+  //    }
+  //
+  //
+  //  } // END basicInlineMarkdown
+  //
+  
+} // END extension MD text view
+
+
+
+
+/// Some backup code
+///
+
+//      let documentLength = (self.string as NSString).length
+//      let paragraphRange = self.currentParagraph.range
+//
+//      // Ensure the paragraph range is within the document bounds
+//      let safeParagraphRange = NSRange(
+//        location: min(paragraphRange.location, documentLength),
+//        length: min(paragraphRange.length, documentLength - paragraphRange.location)
+//      )
+//
+//      if safeParagraphRange.length > 0 {
+//
+//        ts.removeAttribute(.foregroundColor, range: safeParagraphRange)
+//        ts.removeAttribute(.backgroundColor, range: safeParagraphRange)
+//        ts.addAttributes(AttributeSet.white.attributes, range: safeParagraphRange)
+//
+//      } else {
+//        print("Invalid paragraph range")
+//      }
+
+//      for element in self.elements {
+//        <#body#>
+//      }
+//
+//      ts.addAttributes(syntax.syntaxAttributes(with: self.configuration).attributes, range: syntaxRange)
+//      ts.addAttributes(syntax.contentAttributes(with: self.configuration).attributes, range: contentRange)
+
+
+
+
+extension MarkdownTextView {
   func getRange(for type: SyntaxRangeType, in match: MarkdownRegexMatch) -> NSRange {
     
     let totalRange = NSRange(match.range, in: self.string)
@@ -68,136 +231,4 @@ extension MarkdownTextView {
         
     }
   }
-  
-  
-  func parseCodeBlocks() {
-    guard let textStorage = self.textStorage else { return }
-    
-    print("Parsing code blocks")
-    print("Current number of elements: \(elements.count)")
-    
-    let text = textStorage.string
-    
-    // Temporary set to collect new elements
-    var newElements = Set<Markdown.Element>()
-    
-    // Find matches using regex
-    //    let matches = codeBlockRegex.matches(in: text, options: [], range: fullRange)
-    
-    guard let pattern = Markdown.Syntax.codeBlock.regex else {
-      print("There was an issue with the regex for code blocks")
-      return
-    }
-    
-    let matches = text.matches(of: pattern)
-    
-    for match in matches {
-      
-      let element = Markdown.Element(syntax: .codeBlock, range: getRange(for: .total, in: match))
-      newElements.insert(element)
-    }
-    
-    // Replace the old elements with new ones
-    self.elements = newElements
-    
-    //    print("New state of `elements`: \(elements)")
-  }
-  
-  
-  func basicInlineMarkdown() {
-    
-    guard !configuration.isNeonEnabled, !isUpdatingText else { return }
-    
-    guard let ts = self.textStorage,
-          !text.isEmpty
-    else {
-      print("Text layout manager setup failed")
-      return
-    }
-    
-    
-    isUpdatingText = true
-    
-    ts.beginEditing()
-    
-    DispatchQueue.main.async { [weak self] in
-      
-      guard let self = self else { return }
-      
-      for element in elements {
-//        let highlightr = Highlightr()
-        
-        guard let highlightr = highlightr else {
-          print("Highlightr error")
-          return
-        }
-        
-        highlightr.setTheme(to: "paraiso-dark")
-        
-//        element.range
-        guard let text = self.attributedSubstring(forProposedRange: element.range, actualRange: nil)?.string else {
-          print("Couldn't get the text for this one")
-          continue
-        }
-        
-        guard let highlightedCode: NSAttributedString = highlightr.highlight(text, as: "swift") else {
-          
-          print("Couldn't get an attrString for this block of code")
-          continue
-        }
-        
-        ts.setAttributedString(highlightedCode)
-        
-        
-        
-        
-//        let code = "let a = 1"
-        
-        
-        
-      }
-      
-      //      let documentLength = (self.string as NSString).length
-      //      let paragraphRange = self.currentParagraph.range
-      //
-      //      // Ensure the paragraph range is within the document bounds
-      //      let safeParagraphRange = NSRange(
-      //        location: min(paragraphRange.location, documentLength),
-      //        length: min(paragraphRange.length, documentLength - paragraphRange.location)
-      //      )
-      //
-      //      if safeParagraphRange.length > 0 {
-      //
-      //        ts.removeAttribute(.foregroundColor, range: safeParagraphRange)
-      //        ts.removeAttribute(.backgroundColor, range: safeParagraphRange)
-      //        ts.addAttributes(AttributeSet.white.attributes, range: safeParagraphRange)
-      //
-      //      } else {
-      //        print("Invalid paragraph range")
-      //      }
-      
-      //      for element in self.elements {
-      //        <#body#>
-      //      }
-      //
-      //      ts.addAttributes(syntax.syntaxAttributes(with: self.configuration).attributes, range: syntaxRange)
-      //      ts.addAttributes(syntax.contentAttributes(with: self.configuration).attributes, range: contentRange)
-      
-      
-      //      for syntax in Markdown.Syntax.testCases {
-      //
-      //
-      //
-      //      } // END loop syntaxes
-      
-      
-    } // END dispatch
-    
-    ts.endEditing()
-    
-    isUpdatingText = false
-    
-  } // END basicInlineMarkdown
-  
-  
 }
