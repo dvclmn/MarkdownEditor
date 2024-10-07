@@ -36,7 +36,6 @@ extension MarkdownTextView {
         
         Task { @MainActor in
           self.parseCodeBlocks()
-          self.highlightElements()
           self.needsDisplay = true
         }
       }
@@ -45,23 +44,7 @@ extension MarkdownTextView {
     
   } // END parse and redraw
   
-  
-  func highlightElements() {
-    
-    guard let textStorage = self.textStorage else {
-      print("textStorage issue yeah")
-      return
-    }
-    
-    textStorage.beginEditing()
-    let currentSelection = selectedRange
-    for element in self.elements {
-      applyCodeHighlighting(to: element)
-    }
-    setSelectedRange(currentSelection)
-    textStorage.endEditing()
-  }
-  
+
   
   func parseCodeBlocks() {
     
@@ -86,15 +69,24 @@ extension MarkdownTextView {
     
     textStorage.beginEditing()
     
+    let currentSelection = selectedRange
+    
     let matches = documentText.matches(of: pattern)
     
-    
+//    highlightr.setTheme(to: "xcode-dark")
     
     for match in matches {
       
       let elementRange = getRange(for: .total, in: match)
       let elementString = getString(for: .content, in: match)
-      
+
+      guard let highlightedCode: NSAttributedString = highlightr.highlight(elementString, as: "swift") else {
+          print("Couldn't get the Highlighted string")
+          return
+        }
+        
+      textStorage.replaceCharacters(in: elementRange, with: highlightedCode)
+
       let element = Markdown.Element(
         string: elementString,
         syntax: .codeBlock,
@@ -106,6 +98,7 @@ extension MarkdownTextView {
 
     } // END matches
     
+    setSelectedRange(currentSelection)
     
     textStorage.endEditing()
     
@@ -115,18 +108,7 @@ extension MarkdownTextView {
   } // END parse code blocks
   
   
-  
-  func applyCodeHighlighting(to element: Markdown.Element) {
-    
-    guard let textStorage = self.textStorage else { return }
 
-    guard let highlightedCode: NSAttributedString = highlightr.highlight(element.string, as: "swift") else {
-      print("Couldn't get the Highlighted string")
-      return
-    }
-    
-    textStorage.replaceCharacters(in: element.range, with: highlightedCode)
-  }
   
   
 } // END extension MD text view
@@ -210,6 +192,7 @@ extension MarkdownTextView {
   }
   
   func getRange(for type: SyntaxRangeType, in match: MarkdownRegexMatch) -> NSRange {
+    
     
     let totalRange = NSRange(match.range, in: self.string)
     
