@@ -6,7 +6,6 @@
 //
 
 import AppKit
-import Rearrange
 import Shortcuts
 
 extension MarkdownTextView {
@@ -72,13 +71,6 @@ extension MarkdownTextView {
   func handleNewListItem(
     defaultKey: DefaultKeyEvent
   ) {
-    
-    guard let tlm = self.textLayoutManager,
-          let tcm = tlm.textContentManager
-    else {
-      print("One of the above didn't happen")
-      return
-    }
     
     let nsString = self.string as NSString
     let paragraphRange = nsString.paragraphRange(for: self.selectedRange())

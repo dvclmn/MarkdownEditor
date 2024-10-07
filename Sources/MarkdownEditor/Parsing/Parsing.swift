@@ -28,6 +28,8 @@ extension MarkdownTextView {
   
   func parseAndRedraw() {
     
+    let currentSelection = selectedRange
+    
     Task {
       await parseDebouncer.processTask {
         
@@ -37,6 +39,8 @@ extension MarkdownTextView {
         }
       }
     }
+    
+    setSelectedRange(currentSelection)
   } // END parse and redraw
   
   
@@ -61,15 +65,13 @@ extension MarkdownTextView {
       return
     }
     
-    let currentSelection = selectedRange
+    
     
     let matches = documentText.matches(of: pattern)
     
     //    DispatchQueue.main.async { [weak self] in
     
     for match in matches {
-      
-      
       
       let elementRange = getRange(for: .total, in: match)
       let elementString = getString(for: .content, in: match)
@@ -86,7 +88,7 @@ extension MarkdownTextView {
     } // END matches
     
     // Restore the text selection
-    setSelectedRange(currentSelection)
+    
     
     //    } // END dispatch
     textStorage.endEditing()
@@ -150,7 +152,7 @@ extension MarkdownTextView {
 
 extension MarkdownTextView {
   
-  func applyAttributedString(_ attrString: NSAttributedString) {
+//  func applyAttributedString(_ attrString: NSAttributedString) {
     
     //          // Apply attributes instead of replacing the text
     //          highlightedCode.enumerateAttributes(in: getRange(for: .total, in: match), options: []) { attrs, range, _ in
@@ -173,7 +175,7 @@ extension MarkdownTextView {
     //            ts.setAttributedString(highlightedCode)
     
     
-  }
+//  }
   
   
   

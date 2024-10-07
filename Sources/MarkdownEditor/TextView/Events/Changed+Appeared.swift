@@ -13,13 +13,13 @@ import BaseHelpers
 
 extension MarkdownTextView {
   
-  public override func viewDidMoveToSuperview() {
-    super.viewDidMoveToSuperview()
-    
-    //    if configuration.isScrollable {
-    //      setupScrollObservation()
-    //    }
-  }
+//  public override func viewDidMoveToSuperview() {
+//    super.viewDidMoveToSuperview()
+//    
+//    //    if configuration.isScrollable {
+//    //      setupScrollObservation()
+//    //    }
+//  }
   
   public override func viewDidMoveToWindow() {
     

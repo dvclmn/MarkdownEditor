@@ -25,7 +25,6 @@ extension Markdown.Syntax {
   
   var nsRegex: String? {
     
-    
     switch self {
       case .bold:
         "(?<leading>__|\\*\\*)(?<content>[^_|\\*]*?)(?<trailing>__|\\*\\*)"

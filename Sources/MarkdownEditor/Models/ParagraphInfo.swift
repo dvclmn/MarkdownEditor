@@ -6,6 +6,7 @@
 //
 
 import AppKit
+import Rearrange
 import Wrecktangle
 
 struct ParagraphInfo {

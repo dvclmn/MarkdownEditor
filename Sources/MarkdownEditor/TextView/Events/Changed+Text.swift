@@ -33,17 +33,17 @@ extension MarkdownTextView {
   /// In macOS 10.4 and later, if there are multiple selections, this method acts on the
   /// first selected subrange.
   ///
-  public override func shouldChangeText(
-    in affectedCharRange: NSRange,
-    replacementString: String?
-  ) -> Bool {
-    super.shouldChangeText(in: affectedCharRange, replacementString: replacementString)
-    
-    //    print("`Should change text` \(Date.now)")
-
-    
-    return true
-  } // END shouldChangeText
+//  public override func shouldChangeText(
+//    in affectedCharRange: NSRange,
+//    replacementString: String?
+//  ) -> Bool {
+//    super.shouldChangeText(in: affectedCharRange, replacementString: replacementString)
+//    
+//    //    print("`Should change text` \(Date.now)")
+//
+//    
+//    return true
+//  } // END shouldChangeText
   
   
   
@@ -52,7 +52,7 @@ extension MarkdownTextView {
     super.didChangeText()
     
 
-    updateFrameDebounced()
+//    updateFrameDebounced()
     
 //    parseAndRedraw()
     

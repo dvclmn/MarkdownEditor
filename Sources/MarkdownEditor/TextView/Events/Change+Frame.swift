@@ -14,7 +14,7 @@ extension MarkdownTextView {
     didSet {
       print("The text view's frame changed. Width: `\(frame.width)`, Height: `\(frame.height)`")
       
-      updateFrameDebounced()
+//      updateFrameDebounced()
       
       //        onFrameChange()
     }

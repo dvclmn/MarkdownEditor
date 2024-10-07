@@ -18,17 +18,17 @@ extension MarkdownTextView {
   //
   //  }
   
-  public override func setSelectedRanges(_ ranges: [NSValue], affinity: NSSelectionAffinity, stillSelecting: Bool) {
-    
-    super.setSelectedRanges(ranges, affinity: affinity, stillSelecting: stillSelecting)
-    
-//    print("Text view frame: `\(self.frame)`")
-//    updateParagraphInfo(firstSelected: ranges.first?.rangeValue)
-
-    //    if !stillSelecting {
-    //      printNewSelection()
-    //    }
-  }
+//  public override func setSelectedRanges(_ ranges: [NSValue], affinity: NSSelectionAffinity, stillSelecting: Bool) {
+//    
+//    super.setSelectedRanges(ranges, affinity: affinity, stillSelecting: stillSelecting)
+//    
+////    print("Text view frame: `\(self.frame)`")
+////    updateParagraphInfo(firstSelected: ranges.first?.rangeValue)
+//
+//    //    if !stillSelecting {
+//    //      printNewSelection()
+//    //    }
+//  }
   
   func printNewSelection() {
     
