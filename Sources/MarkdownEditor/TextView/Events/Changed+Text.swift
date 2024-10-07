@@ -52,7 +52,7 @@ extension MarkdownTextView {
     super.didChangeText()
     
 
-//    updateFrameDebounced()
+    updateFrameDebounced()
     
 //    parseAndRedraw()
     
