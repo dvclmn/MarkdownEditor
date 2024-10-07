@@ -7,11 +7,13 @@
 
 import SwiftUI
 import BaseHelpers
-
+import Highlightr
 
 public class MarkdownTextView: NSTextView {
   
   var configuration: MarkdownEditorConfiguration
+  let highlightr = Highlightr()
+  
   var scrollView: NSScrollView?
   
   var isUpdatingFrame: Bool = false

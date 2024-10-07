@@ -14,21 +14,21 @@ extension MarkdownTextView {
     super.draw(rect)
     
     
+    guard let layoutManager = self.layoutManager else {
+      fatalError("No layout manager")
+    }
     guard let textContainer = self.textContainer else {
-      fatalError()
+      fatalError("No text container")
     }
     
-    guard let layoutManager = self.layoutManager else {
-      fatalError()
-    }
     
     
     
     // Define your highlight properties
     let cornerRadius: CGFloat = 5.0
     let backgroundColour: NSColor = NSColor.black.withAlphaComponent(0.2)
-    let strokeColor: NSColor = NSColor.white.withAlphaComponent(0.05)
-    let strokeWidth: CGFloat = 0.0
+//    let strokeColor: NSColor = NSColor.white.withAlphaComponent(0.05)
+//    let strokeWidth: CGFloat = 0.0
     
     // Set the highlight color
    

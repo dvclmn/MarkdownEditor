@@ -27,16 +27,18 @@ extension MarkdownTextView {
   
   
   func parseAndRedraw() {
+
     Task {
       await parseDebouncer.processTask {
         
         Task { @MainActor in
-//          self.basicInlineMarkdown()
           self.parseCodeBlocks()
           self.needsDisplay = true
         }
       }
     }
+    
+    self.basicInlineMarkdown()
   }
   
   
@@ -63,24 +65,24 @@ extension MarkdownTextView {
       case .trailingSyntax:
         let trailingSyntaxRange = NSRange(location: (totalRange.lowerBound - trailingCount), length: trailingCount)
         return trailingSyntaxRange
-
+        
     }
   }
   
-
+  
   func parseCodeBlocks() {
     guard let textStorage = self.textStorage else { return }
     
     print("Parsing code blocks")
     print("Current number of elements: \(elements.count)")
-
+    
     let text = textStorage.string
     
     // Temporary set to collect new elements
     var newElements = Set<Markdown.Element>()
     
     // Find matches using regex
-//    let matches = codeBlockRegex.matches(in: text, options: [], range: fullRange)
+    //    let matches = codeBlockRegex.matches(in: text, options: [], range: fullRange)
     
     guard let pattern = Markdown.Syntax.codeBlock.regex else {
       print("There was an issue with the regex for code blocks")
@@ -98,7 +100,7 @@ extension MarkdownTextView {
     // Replace the old elements with new ones
     self.elements = newElements
     
-//    print("New state of `elements`: \(elements)")
+    //    print("New state of `elements`: \(elements)")
   }
   
   
@@ -122,39 +124,72 @@ extension MarkdownTextView {
       
       guard let self = self else { return }
       
-//      let documentLength = (self.string as NSString).length
-//      let paragraphRange = self.currentParagraph.range
-//      
-//      // Ensure the paragraph range is within the document bounds
-//      let safeParagraphRange = NSRange(
-//        location: min(paragraphRange.location, documentLength),
-//        length: min(paragraphRange.length, documentLength - paragraphRange.location)
-//      )
-//      
-//      if safeParagraphRange.length > 0 {
-//        
-//        ts.removeAttribute(.foregroundColor, range: safeParagraphRange)
-//        ts.removeAttribute(.backgroundColor, range: safeParagraphRange)
-//        ts.addAttributes(AttributeSet.white.attributes, range: safeParagraphRange)
-//        
-//      } else {
-//        print("Invalid paragraph range")
-//      }
+      for element in elements {
+//        let highlightr = Highlightr()
+        
+        guard let highlightr = highlightr else {
+          print("Highlightr error")
+          return
+        }
+        
+        highlightr.setTheme(to: "paraiso-dark")
+        
+//        element.range
+        guard let text = self.attributedSubstring(forProposedRange: element.range, actualRange: nil)?.string else {
+          print("Couldn't get the text for this one")
+          continue
+        }
+        
+        guard let highlightedCode: NSAttributedString = highlightr.highlight(text, as: "swift") else {
+          
+          print("Couldn't get an attrString for this block of code")
+          continue
+        }
+        
+        ts.setAttributedString(highlightedCode)
+        
+        
+        
+        
+//        let code = "let a = 1"
+        
+        
+        
+      }
       
-//      for element in self.elements {
-//        <#body#>
-//      }
-//      
-//      ts.addAttributes(syntax.syntaxAttributes(with: self.configuration).attributes, range: syntaxRange)
-//      ts.addAttributes(syntax.contentAttributes(with: self.configuration).attributes, range: contentRange)
+      //      let documentLength = (self.string as NSString).length
+      //      let paragraphRange = self.currentParagraph.range
+      //
+      //      // Ensure the paragraph range is within the document bounds
+      //      let safeParagraphRange = NSRange(
+      //        location: min(paragraphRange.location, documentLength),
+      //        length: min(paragraphRange.length, documentLength - paragraphRange.location)
+      //      )
+      //
+      //      if safeParagraphRange.length > 0 {
+      //
+      //        ts.removeAttribute(.foregroundColor, range: safeParagraphRange)
+      //        ts.removeAttribute(.backgroundColor, range: safeParagraphRange)
+      //        ts.addAttributes(AttributeSet.white.attributes, range: safeParagraphRange)
+      //
+      //      } else {
+      //        print("Invalid paragraph range")
+      //      }
+      
+      //      for element in self.elements {
+      //        <#body#>
+      //      }
+      //
+      //      ts.addAttributes(syntax.syntaxAttributes(with: self.configuration).attributes, range: syntaxRange)
+      //      ts.addAttributes(syntax.contentAttributes(with: self.configuration).attributes, range: contentRange)
       
       
-//      for syntax in Markdown.Syntax.testCases {
-//        
-//        
-//                
-//      } // END loop syntaxes
-
+      //      for syntax in Markdown.Syntax.testCases {
+      //
+      //
+      //
+      //      } // END loop syntaxes
+      
       
     } // END dispatch
     

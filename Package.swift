@@ -15,6 +15,7 @@ let package = Package(
   ],
   dependencies: [
     
+    .package(url: "https://github.com/raspu/Highlightr.git", from: "2.2.1"),
     .package(url: "https://github.com/ChimeHQ/Neon.git", branch: "main"),
     .package(url: "https://github.com/ChimeHQ/Rearrange.git", from: "1.8.1"),
 //    .package(url: "https://github.com/krzyzanowskim/STTextKitPlus.git", from: "0.1.4"),
@@ -22,7 +23,6 @@ let package = Package(
     .package(url: "https://github.com/dvclmn/TextCore.git", branch: "main"),
     .package(url: "https://github.com/dvclmn/Collection.git", branch: "main"),
     .package(url: "https://github.com/dvclmn/Wrecktangle.git", branch: "main")
-    
     
   ],
   targets: [
@@ -33,6 +33,7 @@ let package = Package(
         "TextCore",
         "Rearrange",
 //        "STTextKitPlus",
+        "Highlightr",
         
         "Neon",
         .product(name: "TreeSitterMarkdown", package: "tree-sitter-markdown"),
