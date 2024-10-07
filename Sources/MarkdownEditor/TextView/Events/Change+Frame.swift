@@ -30,6 +30,21 @@ extension MarkdownTextView {
     
   }
   
+  func updateFrameDebounced() {
+    
+    Task {
+      await adjustWidthDebouncer.processTask {
+        Task { @MainActor in
+          let heightUpdate = self.updateEditorHeight()
+          await self.infoHandler.update(heightUpdate)
+          
+          // Reset the guard flag after updates
+          self.isUpdatingFrame = false
+        }
+      } // END debounce process task
+    } // END outer task
+  }
+  
   
   func frameDidChange() {
     
@@ -45,24 +60,8 @@ extension MarkdownTextView {
     
     container.lineFragmentPadding = self.horizontalInsets
     
-    Task {
-      await adjustWidthDebouncer.processTask {
-        
-        Task { @MainActor in
-          let heightUpdate = self.updateEditorHeight()
-          await self.infoHandler.update(heightUpdate)
-          
-          // Reset the guard flag after updates
-          self.isUpdatingFrame = false
-        }
-        
-        //        print("I'm coming from inside a debounce task.")
-        
-      }
-    }
-    
-    
-    
+    updateFrameDebounced()
+     
   }
   
   func updateEditorHeight() -> EditorInfo.Frame {

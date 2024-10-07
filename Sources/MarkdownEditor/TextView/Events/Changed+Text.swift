@@ -52,12 +52,7 @@ extension MarkdownTextView {
     super.didChangeText()
     
 
-//    Task { @MainActor in
-//      let heightUpdate = self.updateEditorHeight()
-//      await self.infoHandler.update(heightUpdate)
-//    }
-    
-//    exploreTextSegments()
+    updateFrameDebounced()
     
     updateParagraphInfo(firstSelected: nil)
     

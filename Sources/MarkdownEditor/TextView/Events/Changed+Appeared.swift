@@ -27,10 +27,7 @@ extension MarkdownTextView {
     
 //    setupViewportLayoutController()
     
-//    Task { @MainActor in
-//      let heightUpdate = self.updateEditorHeight()
-//      await self.infoHandler.update(heightUpdate)
-//    }
+
     
     //        exploreTextSegments()
     
