@@ -98,9 +98,9 @@ public struct MarkdownEditor: NSViewControllerRepresentable {
     
     if textView.string != self.text {
       textView.string = self.text
-      if !self.configuration.isEditable {
-        textView.onFrameChange()
-      }
+//      if !self.configuration.isEditable {
+//        textView.frameDidChange()
+//      }
     }
     
     if textView.configuration != self.configuration {
@@ -108,7 +108,6 @@ public struct MarkdownEditor: NSViewControllerRepresentable {
       textView.applyConfiguration()
     }
     
-   
     textView.needsLayout = true
     textView.needsDisplay = true
     

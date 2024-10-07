@@ -23,11 +23,30 @@ public class MarkdownViewController: NSViewController {
     configuration: MarkdownEditorConfiguration
   ) {
     
-    self.textView = MarkdownTextView(
-      frame: .zero,
-      textContainer: nil,
-      configuration: configuration
-    )
+    if configuration.isTextKit2 {
+      self.textView = MarkdownTextView(
+        frame: .zero,
+        textContainer: nil,
+        configuration: configuration
+      )
+    } else {
+      
+      /// TextKit 1 setup
+      let container = NSTextContainer()
+      let textStorage = NSTextStorage()
+      let layoutManager = NSLayoutManager()
+      textStorage.addLayoutManager(layoutManager)
+      
+      layoutManager.addTextContainer(container)
+      
+      self.textView = MarkdownTextView(
+        frame: .zero,
+        textContainer: container,
+        configuration: configuration
+      )
+      
+    }
+    
     
     if configuration.isScrollable {
       let scrollView = NSScrollView()
@@ -62,21 +81,12 @@ public class MarkdownViewController: NSViewController {
   }
   
   public override func loadView() {
-    
-    //    do {
-    //      try self.neonSetup()
-    //    } catch {
-    //      print("Error with Neon: \(error)")
-    //    }
-    
 
     if let scrollView = textView.scrollView {
       self.view = scrollView
     } else {
       self.view = textView
     }
-    
-//    let _ = textView.layoutManager
     
     if let highlighter = highlighter {
       highlighter.observeEnclosingScrollView()

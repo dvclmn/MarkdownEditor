@@ -7,6 +7,7 @@
 
 import SwiftUI
 import TextCore
+
 //import Rearrange
 //import STTextKitPlus
 
@@ -38,6 +39,7 @@ public extension MarkdownEditor {
     /// Use this to provide an NSTextLayoutFragment specialized for an NSTextElement subclass
     /// targeted for the rendering surface.
     ///
+    
     
   
     public func textLayoutManager(
@@ -105,9 +107,9 @@ public extension MarkdownEditor {
       
     }
     
-    public func textViewWillChangeText() {
+//    public func textViewWillChangeText() {
       
-    }
+//    }
     
     
     

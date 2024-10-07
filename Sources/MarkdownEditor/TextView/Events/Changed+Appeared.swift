@@ -25,17 +25,17 @@ extension MarkdownTextView {
     
     super.viewDidMoveToWindow()
     
-    setupViewportLayoutController()
+//    setupViewportLayoutController()
     
-    Task { @MainActor in
-      let heightUpdate = self.updateEditorHeight()
-      await self.infoHandler.update(heightUpdate)
-    }
+//    Task { @MainActor in
+//      let heightUpdate = self.updateEditorHeight()
+//      await self.infoHandler.update(heightUpdate)
+//    }
     
     //        exploreTextSegments()
     
     
-//    basicInlineMarkdown()
+    basicInlineMarkdown()
     
     
   }
@@ -52,8 +52,8 @@ extension MarkdownTextView {
     DispatchQueue.main.async { [weak self] in
       
       guard let self = self,
-            let tlm = self.textLayoutManager,
-            let tcm = tlm.textContentManager,
+//            let tlm = self.textLayoutManager,
+//            let tcm = tlm.textContentManager,
             let ts = self.textStorage
       else {
         print("Text layout manager setup failed")
@@ -67,7 +67,9 @@ extension MarkdownTextView {
           return
         }
         
-      tcm.performEditingTransaction {
+      ts.beginEditing()
+      
+//      tcm.performEditingTransaction {
         
         
         
@@ -229,7 +231,9 @@ extension MarkdownTextView {
         
         
         
-      } // END perform edit
+//      } // END perform edit
+      
+      ts.endEditing()
       
     } // END dispatch
     

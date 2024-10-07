@@ -341,7 +341,10 @@ extension MarkdownTextView {
     cornerRadius: CGFloat = 3
   ) {
     
-    guard let textStorage = textStorage else { return }
+    guard let textStorage = textStorage else {
+      print("No text storage")
+      return
+    }
     
     let attachment = HighlightTextAttachment(color: color, cornerRadius: cornerRadius)
     let attachmentChar = NSAttributedString(attachment: attachment)

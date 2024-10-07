@@ -52,16 +52,16 @@ extension MarkdownTextView {
     super.didChangeText()
     
 
-    Task { @MainActor in
-      let heightUpdate = self.updateEditorHeight()
-      await self.infoHandler.update(heightUpdate)
-    }
+//    Task { @MainActor in
+//      let heightUpdate = self.updateEditorHeight()
+//      await self.infoHandler.update(heightUpdate)
+//    }
     
 //    exploreTextSegments()
     
     updateParagraphInfo(firstSelected: nil)
     
-//    basicInlineMarkdown()
+    basicInlineMarkdown()
 
   }
 }
@@ -69,24 +69,7 @@ extension MarkdownTextView {
 
 extension MarkdownTextView {
 
-  func updateEditorHeight() -> EditorInfo.Frame {
-    guard let tlm = self.textLayoutManager else { return .init() }
-    
-    tlm.ensureLayout(for: tlm.documentRange)
-    let bounds = tlm.usageBoundsForTextContainer
-    let extraHeightBuffer: CGFloat = configuration.isScrollable ? 0 : configuration.bottomSafeArea
-    
-    let frame = EditorInfo.Frame(
-      width: bounds.width,
-      height: bounds.height + extraHeightBuffer
-    )
-    
-    self.invalidateIntrinsicContentSize()
-    self.needsLayout = true
-    self.needsDisplay = true
-    
-    return frame
-  }
+
 }
 
 extension MarkdownTextView {

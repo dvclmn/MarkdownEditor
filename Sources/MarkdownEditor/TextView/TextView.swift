@@ -11,6 +11,9 @@ import BaseHelpers
 
 public class MarkdownTextView: NSTextView {
   
+  var lastFrame: NSRect = .zero
+  var isUpdatingFrame = false
+  
   var scrollView: NSScrollView?
   
   var elements: [Markdown.Element] = []
@@ -43,32 +46,41 @@ public class MarkdownTextView: NSTextView {
     configuration: MarkdownEditorConfiguration
     
   ) {
+    
     self.configuration = configuration
     
-    /// First, we provide TextKit with a frame
-    ///
-    let container = NSTextContainer()
-    
-    /// Then we need some content to display, which is handled by `NSTextContentManager`,
-    /// which uses `NSTextContentStorage` by default
-    ///
-    let textContentStorage = NSTextContentStorage()
-    
-    /// This content is then laid out by `NSTextLayoutManager`
-    ///
-    let textLayoutManager = NSTextLayoutManager()
-    
-    /// Finally we connect these parts together.
-    ///
-    /// > Important: Access to the text container is through the `textLayoutManager`.
-    /// > There is still a `textContainer` property directly on `NSTextView`, but as
-    /// > I understand it, that isn't the one we use.
-    ///
-    textLayoutManager.textContainer = container
-    textContentStorage.addTextLayoutManager(textLayoutManager)
-    textContentStorage.primaryTextLayoutManager = textLayoutManager
-    
+    if configuration.isTextKit2 {
+      
+      /// First, we provide TextKit with a frame
+      ///
+      let nsTextContainer = NSTextContainer()
+      
+      /// Then we need some content to display, which is handled by `NSTextContentManager`,
+      /// which uses `NSTextContentStorage` by default
+      ///
+      let textContentStorage = NSTextContentStorage()
+      
+      /// This content is then laid out by `NSTextLayoutManager`
+      ///
+      let textLayoutManager = NSTextLayoutManager()
+      
+      /// Finally we connect these parts together.
+      ///
+      /// > Important: Access to the text container is through the `textLayoutManager`.
+      /// > There is still a `textContainer` property directly on `NSTextView`, but as
+      /// > I understand it, that isn't the one we use.
+      ///
+      textLayoutManager.textContainer = nsTextContainer
+      textContentStorage.addTextLayoutManager(textLayoutManager)
+      textContentStorage.primaryTextLayoutManager = textLayoutManager
+      
+      super.init(frame: frameRect, textContainer: nsTextContainer)
+      
+    } else {
+          
     super.init(frame: frameRect, textContainer: container)
+      
+    }
     
     self.textViewSetup()
     
@@ -83,17 +95,15 @@ public class MarkdownTextView: NSTextView {
     fatalError("init(coder:) has not been implemented")
   }
   
-//  public override var layoutManager: NSLayoutManager? {
-//    print("Using TextKit 1")
-    //    assertionFailure("TextKit 1 is not supported")
-//    return nil
-//  }
+  //  public override var layoutManager: NSLayoutManager? {
+  //    print("Using TextKit 1")
+  //    assertionFailure("TextKit 1 is not supported")
+  //    return nil
+  //  }
   
   deinit {
     NotificationCenter.default.removeObserver(self)
   }
-  
-  private var oldWidth: CGFloat = 0
   
   var horizontalInsets: CGFloat {
     
@@ -108,43 +118,34 @@ public class MarkdownTextView: NSTextView {
     
   }
   
-  public override var frame: NSRect {
-    
-    didSet {
-      onFrameChange()
-    }
-  } // END frame override
+  
+  
+  //  public override var frame: NSRect {
+  //    didSet {
+  //      onFrameChange()
+  //    }
+  //  } // END frame override
 }
 
 extension MarkdownTextView {
   
-  func onFrameChange() {
-    
-    //    print("Frame size change: \(frame)")
-    
-    if frame.width != oldWidth {
-      //      print("Frame width was different from old width (\(oldWidth)).")
-      
-      self.textContainer?.lineFragmentPadding = self.horizontalInsets
-      
-      Task {
-        await adjustWidthDebouncer.processTask {
-          
-          Task { @MainActor in
-            let heightUpdate = self.updateEditorHeight()
-            await self.infoHandler.update(heightUpdate)
-          }
-          
-        }
-      }
-      
-      oldWidth = frame.width
-    }
-  }
+
   
+//  public override func setFrameSize(_ newSize: NSSize) {
+//    super.setFrameSize(newSize)
+
+//  }
+  
+  
+  
+  
+
   
   func setupViewportLayoutController() {
-    guard let textLayoutManager = self.textLayoutManager else { return }
+    guard let textLayoutManager = self.textLayoutManager else {
+      print("Couldn't set up the tlm")
+      return
+    }
     
     self.viewportDelegate = MarkdownViewportDelegate()
     self.viewportDelegate?.textView = self
@@ -154,16 +155,17 @@ extension MarkdownTextView {
   }
   
   
+  
   public override func draw(_ rect: NSRect) {
     super.draw(rect)
     
-//    let tempRange = NSRange(location: 20, length: 200)
-//    var cornerRadius: CGFloat = 5.0
-//    var highlightColor: NSColor = .yellow.withAlphaComponent(0.3)
+    //    let tempRange = NSRange(location: 20, length: 200)
+    //    var cornerRadius: CGFloat = 5.0
+    //    var highlightColor: NSColor = .yellow.withAlphaComponent(0.3)
     
     guard let textContainer = self.textContainer else {
-//      print("Couldn't get the text container")
-//      return
+      //      print("Couldn't get the text container")
+      //      return
       fatalError()
     }
     
@@ -172,57 +174,57 @@ extension MarkdownTextView {
       fatalError()
     }
     
-//    let glyphRange = layoutManager.glyphRange(forCharacterRange: tempRange, actualCharacterRange: nil)
-//    let boundingRect = layoutManager.boundingRect(forGlyphRange: glyphRange, in: textContainer)
+    //    let glyphRange = layoutManager.glyphRange(forCharacterRange: tempRange, actualCharacterRange: nil)
+    //    let boundingRect = layoutManager.boundingRect(forGlyphRange: glyphRange, in: textContainer)
     
-//    print("Bound rect for glyph range: \(boundingRect)")
+    //    print("Bound rect for glyph range: \(boundingRect)")
     
     // Adjust the rect to account for text container insets
-//    let adjustedRect = NSRect(
-//      x: boundingRect.minX + textContainerOrigin.x,
-//      y: boundingRect.minY + textContainerOrigin.y,
-//      width: boundingRect.width,
-//      height: boundingRect.height
-//    )
+    //    let adjustedRect = NSRect(
+    //      x: boundingRect.minX + textContainerOrigin.x,
+    //      y: boundingRect.minY + textContainerOrigin.y,
+    //      width: boundingRect.width,
+    //      height: boundingRect.height
+    //    )
     
-//    let path = NSBezierPath(roundedRect: adjustedRect, xRadius: cornerRadius, yRadius: cornerRadius)
-//    
-//    // Fill the rounded rectangle
-//    highlightColor.setFill()
-//    path.fill()
-//    
-//    let borderColor = NSColor.red.withAlphaComponent(0.08)
-//    borderColor.set()
-//    path.lineWidth = 2.0
-//    path.stroke()
+    //    let path = NSBezierPath(roundedRect: adjustedRect, xRadius: cornerRadius, yRadius: cornerRadius)
+    //
+    //    // Fill the rounded rectangle
+    //    highlightColor.setFill()
+    //    path.fill()
+    //
+    //    let borderColor = NSColor.red.withAlphaComponent(0.08)
+    //    borderColor.set()
+    //    path.lineWidth = 2.0
+    //    path.stroke()
     
     
-//
-//    
-//    guard let layoutManager = self.layoutManager, let textContainer = self.textContainer else { return }
-//
-//    
-//    let glyphRange = layoutManager.glyphRange(forCharacterRange: tempRange, actualCharacterRange: nil)
-//    let boundingRect = layoutManager.boundingRect(forGlyphRange: glyphRange, in: textContainer)
-//    
-//    // Draw your custom shape here
-//    let path = NSBezierPath(rect: boundingRect)
-//    NSColor.red.setStroke()
-//    path.stroke()
-//    
-//    
-//    
-//    
-//    if configuration.isShowingFrames {
-//      
-//      let colour: NSColor = configuration.isEditable ? .red : .purple
-//      
-//      let border:NSBezierPath = NSBezierPath(rect: bounds)
-//      let borderColor = colour.withAlphaComponent(0.08)
-//      borderColor.set()
-//      border.lineWidth = 1.0
-//      border.fill()
-//    }
+    //
+    //
+    //    guard let layoutManager = self.layoutManager, let textContainer = self.textContainer else { return }
+    //
+    //
+    //    let glyphRange = layoutManager.glyphRange(forCharacterRange: tempRange, actualCharacterRange: nil)
+    //    let boundingRect = layoutManager.boundingRect(forGlyphRange: glyphRange, in: textContainer)
+    //
+    //    // Draw your custom shape here
+    //    let path = NSBezierPath(rect: boundingRect)
+    //    NSColor.red.setStroke()
+    //    path.stroke()
+    //
+    //
+    //
+    //
+    if configuration.isShowingFrames {
+      
+      let colour: NSColor = configuration.isEditable ? .red : .purple
+      
+      let border:NSBezierPath = NSBezierPath(rect: bounds)
+      let borderColor = colour.withAlphaComponent(0.08)
+      borderColor.set()
+      border.lineWidth = 1.0
+      border.fill()
+    }
   }
 }
 

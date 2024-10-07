@@ -13,7 +13,10 @@ class MarkdownViewportDelegate: NSObject, @preconcurrency  NSTextViewportLayoutC
   var statusString: String = ""
   
   @MainActor func viewportBounds(for textViewportLayoutController: NSTextViewportLayoutController) -> CGRect {
-    guard let textView = textView else { return .zero }
+    guard let textView = textView else {
+      print("Couldn't get textView for viewportBounds")
+      return .zero
+    }
     return textView.visibleRect
   }
   

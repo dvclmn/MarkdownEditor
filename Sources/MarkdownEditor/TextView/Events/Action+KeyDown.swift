@@ -34,9 +34,9 @@ extension MarkdownTextView {
       handleWrapping(for: matchingSyntax)
     } else if pressedKey == "\n" || event.keyCode == 36 {
       
-      handleNewListItem {
+//      handleNewListItem {
         super.keyDown(with: event)
-      }
+//      }
       
 //      print("Pressed return")
     
