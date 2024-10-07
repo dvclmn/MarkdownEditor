@@ -81,8 +81,10 @@ public class MarkdownTextView: NSTextView {
     }
     
     self.textViewSetup()
+    self.applyConfiguration()
     
     self.infoHandler.onInfoUpdate = { [weak self] info in
+      print("How often is this called? \(Date.now.friendlyDateAndTime)")
       self?.onInfoUpdate(info)
     }
     
@@ -98,6 +100,8 @@ public class MarkdownTextView: NSTextView {
 //  }
   
   var horizontalInsets: CGFloat {
+    
+    print("Horizontal insets, Called @ \(Date.now.friendlyDateAndTime)")
     
     let width = self.frame.width
     let maxWidth: CGFloat = configuration.maxReadingWidth

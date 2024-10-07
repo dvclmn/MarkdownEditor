@@ -27,9 +27,16 @@ extension MarkdownTextView {
     
 //    setupViewportLayoutController()
     
-    highlightr.setTheme(to: "xcode.dark")
     
-    parseAndRedraw()
+//    let codeFontSize: CGFloat = 13
+
+//    highlightr.setTheme(to: "xcode-dark")
+//    
+//    highlightr.theme.codeFont = NSFont.monospacedSystemFont(ofSize: codeFontSize, weight: .medium)
+//    highlightr.theme.boldCodeFont = NSFont.monospacedSystemFont(ofSize: codeFontSize, weight: .bold)
+    
+    
+//    parseAndRedraw()
     
     //        exploreTextSegments()
     
@@ -38,9 +45,9 @@ extension MarkdownTextView {
     
   }
   
-  func lineCount() {
-    
-  }
+//  func lineCount() {
+//    
+//  }
  
   //  func exploreTextSegments() {
   //
@@ -88,24 +95,4 @@ extension MarkdownTextView {
   //  }
   
   
-}
-
-
-
-class BoxDrawingAttachmentCell: NSTextAttachmentCell {
-  var cornerRadius: CGFloat = 5.0
-  var borderColor: NSColor = .orange
-  var backgroundColor: NSColor = .lightGray.withAlphaComponent(0.9)
-  
-  override func draw(withFrame cellFrame: NSRect, in controlView: NSView?) {
-    let path = NSBezierPath(roundedRect: cellFrame, xRadius: cornerRadius, yRadius: cornerRadius)
-    backgroundColor.setFill()
-    path.fill()
-    borderColor.setStroke()
-    path.stroke()
-  }
-  
-  override func cellSize() -> NSSize {
-    return NSSize(width: 100, height: 100) // The cell itself doesn't have a size
-  }
 }

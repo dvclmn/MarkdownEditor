@@ -28,8 +28,6 @@ extension MarkdownTextView {
   
   func parseAndRedraw() {
     
-    
-    
     Task {
       await parseDebouncer.processTask {
         
@@ -39,7 +37,7 @@ extension MarkdownTextView {
         }
       }
     }
-  }
+  } // END parse and redraw
   
   
   
@@ -54,21 +52,16 @@ extension MarkdownTextView {
     
     let documentText = textStorage.string
     
-    
-    
     //     Temporary set to collect new elements
     var newElements = Set<Markdown.Element>()
-    
-    // Find matches using regex
-    //    let matches = codeBlockRegex.matches(in: text, options: [], range: fullRange)
+
     
     guard let pattern = Markdown.Syntax.codeBlock.regex else {
       print("There was an issue with the regex for code blocks")
       return
     }
-
-    let currentSelection = selectedRange
     
+    let currentSelection = selectedRange
     
     let matches = documentText.matches(of: pattern)
     
@@ -76,54 +69,20 @@ extension MarkdownTextView {
     
     for match in matches {
       
-      guard let codeString = getString(for: .total, in: match) else {
-        print("Couldn't get the attrString for this block of code")
-        return
-      }
       
-      guard let highlightedCode: NSAttributedString = highlightr.highlight(codeString, as: "swift") else {
-        print("Couldn't get the Highlighted string")
-        return
-      }
-      
-      textStorage.replaceCharacters(in: getRange(for: .total, in: match), with: highlightedCode)
       
       let elementRange = getRange(for: .total, in: match)
+      let elementString = getString(for: .content, in: match)
       
       let element = Markdown.Element(
+        string: elementString,
         syntax: .codeBlock,
         range: elementRange,
         rect: getRect(for: elementRange)
       )
       
       newElements.insert(element)
-      
-      
-      
-      
-      //        let code = "let a = 1"
-      
-      
-      
-      //        } // END elements loop
-      
-      
-      //      for syntax in Markdown.Syntax.testCases {
-      //
-      //
-      //
-      //      } // END loop syntaxes
-      
-      
-      
-      
-      //    isUpdatingText = false
-      
-      //      let element = Markdown.Element(syntax: .codeBlock, range: getRange(for: .total, in: match))
-      //      newElements.insert(element)
-      
-      
-      
+
     } // END matches
     
     // Restore the text selection
@@ -137,6 +96,19 @@ extension MarkdownTextView {
     
   } // END parse code blocks
   
+  
+  
+  func applyCodeHighlighting(to element: Markdown.Element) {
+    
+    guard let textStorage = self.textStorage else { return }
+
+    guard let highlightedCode: NSAttributedString = highlightr.highlight(element.string, as: "swift") else {
+      print("Couldn't get the Highlighted string")
+      return
+    }
+    
+    textStorage.replaceCharacters(in: element.range, with: highlightedCode)
+  }
   
   
 } // END extension MD text view
@@ -205,14 +177,14 @@ extension MarkdownTextView {
   
   
   
-  func getString(for type: SyntaxRangeType, in match: MarkdownRegexMatch) -> String? {
+  func getString(for type: SyntaxRangeType, in match: MarkdownRegexMatch) -> String {
     
     guard let string = textStorage?.string as? NSString else {
       print("Couldn't cast to ns string")
-      return nil
+      return "nil"
     }
     
-    let matchedText = string.substring(with: getRange(for: type, in: match))
+    let matchedText: String = string.substring(with: getRange(for: type, in: match))
     
     //    let matchedText = self.attributedSubstring(forProposedRange: getRange(for: .total, in: match), actualRange: nil)
     return matchedText

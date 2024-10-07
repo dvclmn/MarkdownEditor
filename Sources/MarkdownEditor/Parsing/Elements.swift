@@ -14,6 +14,7 @@ import TextCore
 public struct Markdown {
   
   struct Element: Hashable {
+    var string: String
     var syntax: Markdown.Syntax
     var range: NSRange
     var rect: NSRect

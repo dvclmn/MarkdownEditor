@@ -20,12 +20,12 @@ extension MarkdownTextView {
     }
   } // END frame override
   
-  public override func layout() {
-    super.layout()
-    
-    // Do things in here when layout changes
-    
-  }
+//  public override func layout() {
+//    super.layout()
+//    
+//    // Do things in here when layout changes
+//    
+//  }
   
   func updateFrameDebounced() {
     
@@ -34,12 +34,13 @@ extension MarkdownTextView {
       return
     }
     
+    isUpdatingFrame = true
+
     guard let container = textContainer else {
       print("Couldn't get text container")
       return
     }
     
-    isUpdatingFrame = true
     
     container.lineFragmentPadding = self.horizontalInsets
     
@@ -50,13 +51,12 @@ extension MarkdownTextView {
           let heightUpdate = self.updateEditorHeight()
           await self.infoHandler.update(heightUpdate)
           
-          // Reset the guard flag after updates
+          self.isUpdatingFrame = false
           
         }
       } // END debounce process task
     } // END outer task
     
-    self.isUpdatingFrame = false
     
   }
 
