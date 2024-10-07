@@ -32,7 +32,7 @@ extension MarkdownTextView {
     //        exploreTextSegments()
     
     
-    basicInlineMarkdown()
+//    basicInlineMarkdown()
     
   }
  

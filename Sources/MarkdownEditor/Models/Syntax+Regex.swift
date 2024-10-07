@@ -17,6 +17,9 @@ public typealias MarkdownRegex = Regex<(
 )>
 
 
+public typealias MarkdownRegexOutput = Regex<MarkdownRegex>.RegexOutput
+public typealias MarkdownRegexMatch = MarkdownRegexOutput.Match
+
 extension Markdown.Syntax {
 
   

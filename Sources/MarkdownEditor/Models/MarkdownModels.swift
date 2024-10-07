@@ -12,15 +12,6 @@ import RegexBuilder
 //extension NSTextRange: @unchecked @retroactive Sendable {}
 //extension NSParagraphStyle: @unchecked @retroactive Sendable {}
 
-public struct Markdown {
-
-  struct Element {
-    var syntax: Markdown.Syntax
-    var range: NSTextRange
-  }
-
-  
-}
 
 enum BlockSyntax {
   case heading(level: Int)

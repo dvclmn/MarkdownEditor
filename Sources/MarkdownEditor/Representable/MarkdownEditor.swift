@@ -68,7 +68,8 @@ public struct MarkdownEditor: NSViewControllerRepresentable {
     context.coordinator.textView = textView
     
     textView.delegate = context.coordinator
-    textView.textLayoutManager?.delegate = context.coordinator
+    textView.textStorage?.delegate = context.coordinator
+//    textView.textLayoutManager?.delegate = context.coordinator
     
     textView.onInfoUpdate = { info in
       DispatchQueue.main.async {

@@ -14,14 +14,19 @@ public class MarkdownTextView: NSTextView {
   var lastFrame: NSRect = .zero
   var isUpdatingFrame = false
   
+  var textIsEditing: Bool = false
+  
   var scrollView: NSScrollView?
   
-  var elements: [Markdown.Element] = []
+  var elements: Set<Markdown.Element> = []
+  
+//  var elements: [Markdown.Element] = []
   var parsingTask: Task<Void, Never>?
   
   var maxWidth: CGFloat = .infinity
   
-  var parseDebouncer = Debouncer(interval: 0.05)
+  var parseDebouncer = Debouncer()
+  
   var adjustWidthDebouncer = Debouncer(interval: 0.2)
   
   let infoHandler = EditorInfoHandler()
@@ -167,19 +172,60 @@ extension MarkdownTextView {
     guard let layoutManager = self.layoutManager else {
       fatalError()
     }
+//    
+//    let tempRange = NSRange(location: 20, length: 200)
+////    var cornerRadius: CGFloat = 5.0
+////    var highlightColor: NSColor = .yellow.withAlphaComponent(0.3)
+//    
+//    
+//    let glyphRange = layoutManager.glyphRange(forCharacterRange: tempRange, actualCharacterRange: nil)
+//    let boundingRect = layoutManager.boundingRect(forGlyphRange: glyphRange, in: textContainer)
+//    
+//    // Draw your custom shape here
+//    let path = NSBezierPath(rect: boundingRect)
+//    NSColor.red.setStroke()
+//    path.stroke()
+//    
+//    
+//    
+//    
     
-    let tempRange = NSRange(location: 20, length: 200)
-//    var cornerRadius: CGFloat = 5.0
-//    var highlightColor: NSColor = .yellow.withAlphaComponent(0.3)
     
     
-    let glyphRange = layoutManager.glyphRange(forCharacterRange: tempRange, actualCharacterRange: nil)
-    let boundingRect = layoutManager.boundingRect(forGlyphRange: glyphRange, in: textContainer)
+    // Define your highlight properties
+    let cornerRadius: CGFloat = 5.0
+    let highlightColor: NSColor = NSColor.yellow.withAlphaComponent(0.3)
+    let strokeColor: NSColor = NSColor.red
+    let strokeWidth: CGFloat = 1.0
     
-    // Draw your custom shape here
-    let path = NSBezierPath(rect: boundingRect)
-    NSColor.red.setStroke()
-    path.stroke()
+    // Set the highlight color
+    highlightColor.setFill()
+    
+    for element in elements {
+      // Get the glyph range for the character range
+      let glyphRange = layoutManager.glyphRange(forCharacterRange: element.range, actualCharacterRange: nil)
+      
+      // Enumerate over each line within the glyph range
+      layoutManager.enumerateLineFragments(forGlyphRange: glyphRange) { (rect, usedRect, textContainer, glyphRange, stop) in
+        
+        // Adjust the rect to the text view's coordinate system
+        let adjustedRect = layoutManager.boundingRect(forGlyphRange: glyphRange, in: textContainer)
+        
+        // Create a rounded rectangle path
+        let path = NSBezierPath(roundedRect: adjustedRect.insetBy(dx: -5, dy: 0), xRadius: cornerRadius, yRadius: cornerRadius)
+        
+        // Fill the path
+        path.fill()
+        
+        // Stroke the path
+        strokeColor.setStroke()
+        path.lineWidth = strokeWidth
+        path.stroke()
+      }
+    }
+    
+    
+    
     
     
     

@@ -17,7 +17,7 @@ public extension MarkdownEditor {
     Coordinator(self)
   }
   
-  final class Coordinator: NSObject, NSTextViewDelegate, NSTextContentStorageDelegate, NSTextLayoutManagerDelegate {
+  final class Coordinator: NSObject, NSTextViewDelegate, NSTextStorageDelegate {
     
     var parent: MarkdownEditor
     weak var textView: MarkdownTextView?
@@ -27,59 +27,23 @@ public extension MarkdownEditor {
     var updatingNSView = false
     
     init(_ parent: MarkdownEditor) { self.parent = parent }
-    
-    
-    /// This method (`textLayoutManager`, defined on protocol `NSTextLayoutManagerDelegate`)
-    /// is called by the system when it needs to create a layout fragment for a specific portion of text.
-    /// It gives you an opportunity to provide a custom NSTextLayoutFragment subclass for different parts of your text.
-    ///
-    /// The method the framework calls to give the delegate an opportunity to return a custom text layout fragment.
-    /// https://developer.apple.com/documentation/uikit/nstextlayoutmanagerdelegate/3810024-textlayoutmanager
-    ///
-    /// Use this to provide an NSTextLayoutFragment specialized for an NSTextElement subclass
-    /// targeted for the rendering surface.
-    ///
-    
-    
-  
-    public func textLayoutManager(
-      _ textLayoutManager: NSTextLayoutManager,
-      textLayoutFragmentFor location: NSTextLocation,
-      in textElement: NSTextElement
-    ) -> NSTextLayoutFragment {
-      
-      
-      
-//      let tlm = textLayoutManager
-      let range = textElement.elementRange
-      let defaultFragment = NSTextLayoutFragment(textElement: textElement, range: range)
-//
-//      guard let tcm = tlm.textContentManager,
-//            let textView = textView,
-//            let tcs = textView.textContentStorage,
-//            let paragraph = textElement as? NSTextParagraph,
-//            let fullAttrString = tcs.textStorage?.attributedSubstring(from: NSRange(tlm.documentRange, provider: tcm)),
-//            let textRange = textElement.elementRange
-//              
-//      else { return defaultFragment }
-//      
-//      let text = fullAttrString.string
-//      
-//      
-//      let codeFragment = CodeBlockBackground(
-//        textElement: textElement,
-//        range: range,
-//        viewWidth: textView.frame.width
-//      
-//
-//      )
-//      
-//      return codeFragment
-      return defaultFragment
 
+    
+    public func textStorage(
+      _ textStorage: NSTextStorage,
+      didProcessEditing editedMask: NSTextStorageEditActions,
+      range editedRange: NSRange,
+      changeInLength delta: Int
+    ) {
+      guard let textView = textView else {
+        print("Issue getting the text view, within the `NSTextStorageDelegate`")
+        return
+      }
+      
+      Task { @MainActor in
+        textView.parseAndRedraw()
+      }
     }
-    
-    
     
     public func textDidChange(_ notification: Notification) {
       
@@ -115,6 +79,3 @@ public extension MarkdownEditor {
     
   }
 }
-
-
-
