@@ -159,51 +159,20 @@ extension MarkdownTextView {
   public override func draw(_ rect: NSRect) {
     super.draw(rect)
     
-    let tempRange = NSRange(location: 20, length: 200)
-    var cornerRadius: CGFloat = 5.0
-    var highlightColor: NSColor = .yellow.withAlphaComponent(0.3)
     
     guard let textContainer = self.textContainer else {
-      //      print("Couldn't get the text container")
-      //      return
       fatalError()
     }
-    
     
     guard let layoutManager = self.layoutManager else {
       fatalError()
     }
     
-//    let glyphRange = layoutManager.glyphRange(forCharacterRange: tempRange, actualCharacterRange: nil)
-//    let boundingRect = layoutManager.boundingRect(forGlyphRange: glyphRange, in: textContainer)
-//    
-//    print("Bound rect for glyph range: \(boundingRect)")
-//    
-//    // Adjust the rect to account for text container insets
-//    let adjustedRect = NSRect(
-//      x: boundingRect.minX + textContainerOrigin.x,
-//      y: boundingRect.minY + textContainerOrigin.y,
-//      width: boundingRect.width,
-//      height: boundingRect.height
-//    )
-//    
-//    let path = NSBezierPath(roundedRect: adjustedRect, xRadius: cornerRadius, yRadius: cornerRadius)
-//    
-//    // Fill the rounded rectangle
-//    highlightColor.setFill()
-//    path.fill()
-//    
-//    let borderColor = NSColor.red.withAlphaComponent(0.08)
-//    borderColor.set()
-//    path.lineWidth = 2.0
-//    path.stroke()
-//    
-//    
-//    
-//    
-//    guard let layoutManager = self.layoutManager, let textContainer = self.textContainer else { return }
-//    
-//    
+    let tempRange = NSRange(location: 20, length: 200)
+//    var cornerRadius: CGFloat = 5.0
+//    var highlightColor: NSColor = .yellow.withAlphaComponent(0.3)
+    
+    
     let glyphRange = layoutManager.glyphRange(forCharacterRange: tempRange, actualCharacterRange: nil)
     let boundingRect = layoutManager.boundingRect(forGlyphRange: glyphRange, in: textContainer)
     
@@ -214,6 +183,7 @@ extension MarkdownTextView {
     
     
     
+
     
     if configuration.isShowingFrames {
       

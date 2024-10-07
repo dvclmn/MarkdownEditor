@@ -13,7 +13,6 @@ import TextCore
 
 extension MarkdownTextView {
   
-  
   func addMarkdownElement(_ element: Markdown.Element) {
     elements.append(element)
     needsDisplay = true
