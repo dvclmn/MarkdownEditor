@@ -34,29 +34,31 @@ extension MarkdownTextView {
     }
     
     
-//    Task {
-//      await parseDebouncer.processTask {
-//        
-//        Task { @MainActor in
-//          self.parseCodeBlocks()
-//          self.needsDisplay = true
-//        }
-//      }
-//    }
+    //    Task {
+    //      await parseDebouncer.processTask {
+    //
+    //        Task { @MainActor in
+    //          self.parseCodeBlocks()
+    //          self.needsDisplay = true
+    //        }
+    //      }
+    //    }
   }
   
   
-
+  
   
   
   func parseCodeBlocks() {
     
     guard let textStorage = self.textStorage else { return }
     
-//    print("Parsing code blocks")
+    //    print("Parsing code blocks")
     //    print("Current number of elements: \(elements.count)")
     
-    let text = textStorage.string
+    let documentText = textStorage.string
+    
+    
     
     // Temporary set to collect new elements
     //    var newElements = Set<Markdown.Element>()
@@ -68,86 +70,94 @@ extension MarkdownTextView {
       print("There was an issue with the regex for code blocks")
       return
     }
+    guard let highlightr = highlightr else {
+      print("Highlightr error")
+      return
+    }
+    highlightr.setTheme(to: "xcode-dark")
     
-    textStorage.beginEditing()
+    let currentSelection = selectedRange
     
-    let matches = text.matches(of: pattern)
     
-//    DispatchQueue.main.async { [weak self] in
-      
+    let matches = documentText.matches(of: pattern)
+    
+    //    DispatchQueue.main.async { [weak self] in
+    
     for match in matches {
       
-      //    isUpdatingText = true
+      guard let codeString = getString(for: .total, in: match) else {
+        print("Couldn't get the attrString for this block of code")
+        return
+      }
       
-      
-        
-        
-        
-        //        for element in elements {
-        //        let highlightr = Highlightr()
-        
-        guard let highlightr = highlightr else {
-          print("Highlightr error")
-          return
-        }
-        
-        highlightr.setTheme(to: "paraiso-dark")
-        
-        
-        
-        
-        guard let highlightedCode: NSAttributedString = highlightr.highlight(text, as: "swift") else {
-          print("Couldn't get an attrString for this block of code")
-          return
-        }
-        
-//        textStorage.setAttributes(highlightedCode, range: getRange(for: .content, in: match))
+      guard let highlightedCode: NSAttributedString = highlightr.highlight(codeString, as: "swift") else {
+        print("Couldn't get the Highlighted string")
+        return
+      }
       
       textStorage.replaceCharacters(in: getRange(for: .total, in: match), with: highlightedCode)
-        
-//        
-//        for attribute in highlightedCode {
-//          attribute.
-//        }
-        
-//        textStorage.addAttributes(<#T##attrs: [NSAttributedString.Key : Any]##[NSAttributedString.Key : Any]#>, range: <#T##NSRange#>)
-        
-        //        ts.setAttributedString(highlightedCode)
-        
-        
-        
-        
-        
-        //        let code = "let a = 1"
-        
-        
-        
-        //        } // END elements loop
-        
-        
-        //      for syntax in Markdown.Syntax.testCases {
-        //
-        //
-        //
-        //      } // END loop syntaxes
-        
-        
+      
+      
+//      // Apply attributes instead of replacing the text
+//      highlightedCode.enumerateAttributes(in: getRange(for: .total, in: match), options: []) { attrs, range, _ in
+//
+//        let effectiveRange = NSRange(location: codeRange.location + range.location, length: range.length)
+//
+//        textStorage.setAttributes(attrs, range: effectiveRange)
+//      }
+      
+      //        textStorage.setAttributes(highlightedCode, range: getRange(for: .content, in: match))
+      
+      
+      //
+      //        for attribute in highlightedCode {
+      //          attribute.
+      //        }
+      
+      //        textStorage.addAttributes(<#T##attrs: [NSAttributedString.Key : Any]##[NSAttributedString.Key : Any]#>, range: <#T##NSRange#>)
+      
+      //        ts.setAttributedString(highlightedCode)
+      
+      
+      
+      
+      
+      //        let code = "let a = 1"
+      
+      
+      
+      //        } // END elements loop
+      
+      
+      //      for syntax in Markdown.Syntax.testCases {
+      //
+      //
+      //
+      //      } // END loop syntaxes
+      
+      
       
       
       //    isUpdatingText = false
       
       //      let element = Markdown.Element(syntax: .codeBlock, range: getRange(for: .total, in: match))
       //      newElements.insert(element)
+      
+      
+      
     } // END matches
     
-//    } // END dispatch
+    // Restore the text selection
+    setSelectedRange(currentSelection)
+    
+    //    } // END dispatch
     textStorage.endEditing()
     
     // Replace the old elements with new ones
     //    self.elements = newElements
     
     //    print("New state of `elements`: \(elements)")
-  }
+  } // END parse code blocks
   
   
   //  func basicInlineMarkdown() {
@@ -205,6 +215,22 @@ extension MarkdownTextView {
 
 
 extension MarkdownTextView {
+  
+  
+  func getString(for type: SyntaxRangeType, in match: MarkdownRegexMatch) -> String? {
+    
+    guard let string = textStorage?.string as? NSString else {
+      print("Couldn't cast to ns string")
+      return nil
+    }
+    
+    let matchedText = string.substring(with: getRange(for: type, in: match))
+    
+//    let matchedText = self.attributedSubstring(forProposedRange: getRange(for: .total, in: match), actualRange: nil)
+    return matchedText
+      
+  }
+  
   func getRange(for type: SyntaxRangeType, in match: MarkdownRegexMatch) -> NSRange {
     
     let totalRange = NSRange(match.range, in: self.string)
