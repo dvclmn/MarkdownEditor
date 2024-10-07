@@ -29,7 +29,7 @@ extension ParagraphInfo: CustomStringConvertible {
   var description: String {
     
     let output: String = """
-     \(Date.now.friendlyDateAndTime.string)
+     \(Date.now.friendlyDateAndTime)
     Type: \(type)
     Range: \(range.info)
     String: \(string.trimmingCharacters(in: .whitespacesAndNewlines).preview(40))...

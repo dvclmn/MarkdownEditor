@@ -18,6 +18,9 @@ public class MarkdownTextView: NSTextView {
   
   var isUpdatingFrame: Bool = false
   var isUpdatingText: Bool = false
+
+  var lastSentHeight: CGFloat = 0
+  var lastSelectedText: String = ""
   
   var elements: Set<Markdown.Element> = []
 
@@ -25,14 +28,13 @@ public class MarkdownTextView: NSTextView {
   /// Debouncers
   ///
   var parseDebouncer = Debouncer(interval: 0.5)
-  var adjustWidthDebouncer = Debouncer(interval: 0.2)
+  var frameDebouncer = Debouncer(interval: 0.2)
   
   let infoHandler = EditorInfoHandler()
+  public var onInfoUpdate: MarkdownEditor.InfoUpdate = { _ in }
   
 
-  var lastSelectedText: String = ""
   
-  public var onInfoUpdate: MarkdownEditor.InfoUpdate = { _ in }
   
   public init(
     frame frameRect: NSRect,
