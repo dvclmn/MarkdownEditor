@@ -83,16 +83,16 @@ public class MarkdownTextView: NSTextView {
     fatalError("init(coder:) has not been implemented")
   }
   
-  public override var layoutManager: NSLayoutManager? {
-    print("Using TextKit 1")
-//    assertionFailure("TextKit 1 is not supported")
-    return nil
-  }
+//  public override var layoutManager: NSLayoutManager? {
+//    print("Using TextKit 1")
+    //    assertionFailure("TextKit 1 is not supported")
+//    return nil
+//  }
   
   deinit {
     NotificationCenter.default.removeObserver(self)
   }
-
+  
   private var oldWidth: CGFloat = 0
   
   var horizontalInsets: CGFloat {
@@ -120,10 +120,10 @@ extension MarkdownTextView {
   
   func onFrameChange() {
     
-//    print("Frame size change: \(frame)")
+    //    print("Frame size change: \(frame)")
     
     if frame.width != oldWidth {
-//      print("Frame width was different from old width (\(oldWidth)).")
+      //      print("Frame width was different from old width (\(oldWidth)).")
       
       self.textContainer?.lineFragmentPadding = self.horizontalInsets
       
@@ -157,16 +157,73 @@ extension MarkdownTextView {
   public override func draw(_ rect: NSRect) {
     super.draw(rect)
     
-    if configuration.isShowingFrames {
-      
-      let colour: NSColor = configuration.isEditable ? .red : .purple
-      
-      let border:NSBezierPath = NSBezierPath(rect: bounds)
-      let borderColor = colour.withAlphaComponent(0.08)
-      borderColor.set()
-      border.lineWidth = 1.0
-      border.fill()
+//    let tempRange = NSRange(location: 20, length: 200)
+//    var cornerRadius: CGFloat = 5.0
+//    var highlightColor: NSColor = .yellow.withAlphaComponent(0.3)
+    
+    guard let textContainer = self.textContainer else {
+//      print("Couldn't get the text container")
+//      return
+      fatalError()
     }
+    
+    
+    guard let layoutManager = self.layoutManager else {
+      fatalError()
+    }
+    
+//    let glyphRange = layoutManager.glyphRange(forCharacterRange: tempRange, actualCharacterRange: nil)
+//    let boundingRect = layoutManager.boundingRect(forGlyphRange: glyphRange, in: textContainer)
+    
+//    print("Bound rect for glyph range: \(boundingRect)")
+    
+    // Adjust the rect to account for text container insets
+//    let adjustedRect = NSRect(
+//      x: boundingRect.minX + textContainerOrigin.x,
+//      y: boundingRect.minY + textContainerOrigin.y,
+//      width: boundingRect.width,
+//      height: boundingRect.height
+//    )
+    
+//    let path = NSBezierPath(roundedRect: adjustedRect, xRadius: cornerRadius, yRadius: cornerRadius)
+//    
+//    // Fill the rounded rectangle
+//    highlightColor.setFill()
+//    path.fill()
+//    
+//    let borderColor = NSColor.red.withAlphaComponent(0.08)
+//    borderColor.set()
+//    path.lineWidth = 2.0
+//    path.stroke()
+    
+    
+//
+//    
+//    guard let layoutManager = self.layoutManager, let textContainer = self.textContainer else { return }
+//
+//    
+//    let glyphRange = layoutManager.glyphRange(forCharacterRange: tempRange, actualCharacterRange: nil)
+//    let boundingRect = layoutManager.boundingRect(forGlyphRange: glyphRange, in: textContainer)
+//    
+//    // Draw your custom shape here
+//    let path = NSBezierPath(rect: boundingRect)
+//    NSColor.red.setStroke()
+//    path.stroke()
+//    
+//    
+//    
+//    
+//    if configuration.isShowingFrames {
+//      
+//      let colour: NSColor = configuration.isEditable ? .red : .purple
+//      
+//      let border:NSBezierPath = NSBezierPath(rect: bounds)
+//      let borderColor = colour.withAlphaComponent(0.08)
+//      borderColor.set()
+//      border.lineWidth = 1.0
+//      border.fill()
+//    }
   }
 }
+
 

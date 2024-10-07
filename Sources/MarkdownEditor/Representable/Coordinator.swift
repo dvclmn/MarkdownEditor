@@ -48,49 +48,33 @@ public extension MarkdownEditor {
       
       
       
-      let tlm = textLayoutManager
+//      let tlm = textLayoutManager
       let range = textElement.elementRange
-      let defaultFragment = NSTextLayoutFragment(textElement: textElement, range: textElement.elementRange)
-      
-      guard let tcm = tlm.textContentManager,
-            let textView = textView,
-            let tcs = textView.textContentStorage,
-            let paragraph = textElement as? NSTextParagraph,
-            let fullAttrString = tcs.textStorage?.attributedSubstring(from: NSRange(tlm.documentRange, provider: tcm)),
-            let textRange = textElement.elementRange
-              
-      else { return defaultFragment }
-      
-      let text = fullAttrString.string
-      
-      
-      let codeFragment = CodeBlockBackground(
-        textElement: textElement,
-        range: range,
-        viewWidth: textView.frame.width
-        //              isStartOfCodeBlock: isStartOfCodeBlock,
-        //              isEndOfCodeBlock: isEndOfCodeBlock
-      )
-      
-      return codeFragment
-      
-      
-      
-      
-      
-      
-      
-      //      let finder = MarkdownSyntaxFinder(text: paragraph.attributedString.string, provider: tcm)
-      //      let boldRanges = finder.findSyntaxRanges(for: .inlineCode, in: textRange)
-      
-      
-      
-      //      tlm.removeRenderingAttribute(.foregroundColor, for: textRange)
-      
-      
-      //      return defaultFragment
-      
-      
+      let defaultFragment = NSTextLayoutFragment(textElement: textElement, range: range)
+//
+//      guard let tcm = tlm.textContentManager,
+//            let textView = textView,
+//            let tcs = textView.textContentStorage,
+//            let paragraph = textElement as? NSTextParagraph,
+//            let fullAttrString = tcs.textStorage?.attributedSubstring(from: NSRange(tlm.documentRange, provider: tcm)),
+//            let textRange = textElement.elementRange
+//              
+//      else { return defaultFragment }
+//      
+//      let text = fullAttrString.string
+//      
+//      
+//      let codeFragment = CodeBlockBackground(
+//        textElement: textElement,
+//        range: range,
+//        viewWidth: textView.frame.width
+//      
+//
+//      )
+//      
+//      return codeFragment
+      return defaultFragment
+
     }
     
     

@@ -61,7 +61,7 @@ extension MarkdownTextView {
     
     updateParagraphInfo(firstSelected: nil)
     
-    basicInlineMarkdown()
+//    basicInlineMarkdown()
 
   }
 }

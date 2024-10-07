@@ -35,7 +35,7 @@ extension MarkdownTextView {
     //        exploreTextSegments()
     
     
-    basicInlineMarkdown()
+//    basicInlineMarkdown()
     
     
   }
@@ -137,6 +137,9 @@ extension MarkdownTextView {
 //              self.drawRoundedRect(around: contentRange)
 //              self.highlightTextRange(contentRange)
 //              self.addRoundedRectHighlight(around: contentRange)
+              
+//              self.layoutManager?.drawBackground(forGlyphRange: contentRange, at: self.textContainerOrigin)
+              
               
               
               

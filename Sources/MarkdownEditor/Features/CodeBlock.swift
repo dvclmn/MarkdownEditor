@@ -31,22 +31,32 @@ class CodeBlockBackground: NSTextLayoutFragment {
   }
   
   override func draw(at point: CGPoint, in context: CGContext) {
+    
     context.saveGState()
     
-
     let colour = isActive ? NSColor.blue.withAlphaComponent(0.4) : backgroundColor
     
-    let path = NSBezierPath(
-      roundedRect: NSRect(
-        origin: renderingSurfaceBounds.origin,
-        size: CGSize(
-          width: 100,
-//          width: viewWidth,
-          height: renderingSurfaceBounds.height)
-      ),
-      xRadius: cornerRadius,
-      yRadius: cornerRadius
-    )
+    let path = NSBezierPath()
+    
+//    let path = NSBezierPath(
+//      roundedRect: NSRect(
+//        origin: renderingSurfaceBounds.origin,
+//        size: CGSize(
+//          width: 100,
+////          width: viewWidth,
+//          height: renderingSurfaceBounds.height)
+//      ),
+//      xRadius: cornerRadius,
+//      yRadius: cornerRadius
+//    )
+//    
+    path.move(to: point)
+    
+    path.line(to: point.shiftRight(20))
+    
+    path.curve(to: point.shift(dx: 40, dy: 80), controlPoint: point.shiftRight(viewWidth))
+    
+    path.close()
 
     colour.setFill()
     path.fill()

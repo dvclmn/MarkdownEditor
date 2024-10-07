@@ -88,8 +88,8 @@ extension MarkdownTextView {
     let result = ParagraphInfo(string: text, range: safeParagraphRange, type: syntax)
     
     
-    let box = Box(header: "Paragraph Info", content: result.description + "Paragraph count: \(self)")
-    print(box)
+//    let box = Box(header: "Paragraph Info", content: result.description + "Paragraph count: \(self)")
+//    print(box)
     
     self.currentParagraph = result
     
