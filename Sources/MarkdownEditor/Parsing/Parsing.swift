@@ -98,13 +98,13 @@ extension MarkdownTextView {
     // Replace the old elements with new ones
     self.elements = newElements
     
-    print("New state of `elements`: \(elements)")
+//    print("New state of `elements`: \(elements)")
   }
   
   
   func basicInlineMarkdown() {
     
-    guard !configuration.isNeonEnabled, !textIsEditing else { return }
+    guard !configuration.isNeonEnabled, !isUpdatingText else { return }
     
     guard let ts = self.textStorage,
           !text.isEmpty
@@ -114,7 +114,7 @@ extension MarkdownTextView {
     }
     
     
-    textIsEditing = true
+    isUpdatingText = true
     
     ts.beginEditing()
     
@@ -160,7 +160,7 @@ extension MarkdownTextView {
     
     ts.endEditing()
     
-    textIsEditing = false
+    isUpdatingText = false
     
   } // END basicInlineMarkdown
   

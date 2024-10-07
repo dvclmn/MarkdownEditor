@@ -22,7 +22,7 @@ public extension MarkdownEditor {
     var parent: MarkdownEditor
     weak var textView: MarkdownTextView?
     
-    var lastLineCount: Int = 0
+//    var lastLineCount: Int = 0
     
     var selectedRanges: [NSValue] = []
     var selections: [NSTextSelection] = []
@@ -42,20 +42,22 @@ public extension MarkdownEditor {
         return
       }
       
+      textView.parseAndRedraw()
+      
 //      Task { @MainActor in
 
-        let currentLines = currentLineCount()
+//        let currentLines = currentLineCount()
         
         // Check if the number of lines has changed
-        if currentLines != lastLineCount {
-          lastLineCount = currentLines
+//        if currentLines != lastLineCount {
+//          lastLineCount = currentLines
           
           // Trigger expensive operations
-          textView.parseAndRedraw()
-        } else {
+          
+//        } else {
           // Optional: Handle minimal updates if necessary
           // For example, updating line-specific highlights
-        }
+//        }
       
         
 //      }
@@ -95,25 +97,25 @@ public extension MarkdownEditor {
     
     
     /// Counts the number of lines in the text view.
-    @MainActor
-    func currentLineCount() -> Int {
-      
-      guard let layoutManager = self.textView?.layoutManager,
-            let textContainer = self.textView?.textContainer else {
-        return 0
-      }
-      
-      let glyphRange = layoutManager.glyphRange(for: textContainer)
-      var lineCount = 0
-      
-      layoutManager.enumerateLineFragments(forGlyphRange: glyphRange) { (_, _, _, _, _) in
-        lineCount += 1
-      }
-      
-      print("Current line count is: \(lineCount)")
-      
-      return lineCount
-    }
-    
+//    @MainActor
+//    func currentLineCount() -> Int {
+//      
+//      guard let layoutManager = self.textView?.layoutManager,
+//            let textContainer = self.textView?.textContainer else {
+//        return 0
+//      }
+//      
+//      let glyphRange = layoutManager.glyphRange(for: textContainer)
+//      var lineCount = 0
+//      
+//      layoutManager.enumerateLineFragments(forGlyphRange: glyphRange) { (_, _, _, _, _) in
+//        lineCount += 1
+//      }
+//      
+//      print("Current line count is: \(lineCount)")
+//      
+//      return lineCount
+//    }
+//    
   }
 }

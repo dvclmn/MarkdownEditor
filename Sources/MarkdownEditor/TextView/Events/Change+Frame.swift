@@ -9,54 +9,57 @@ import AppKit
 
 extension MarkdownTextView {
   
+  
+  public override var frame: NSRect {
+    didSet {
+      print("The text view's frame changed. Width: `\(frame.width)`, Height: `\(frame.height)`")
+      
+      updateFrameDebounced()
+      
+      //        onFrameChange()
+    }
+  } // END frame override
+  
   public override func layout() {
     super.layout()
     
-    // Prevent processing if already updating frame
-    if isUpdatingFrame { return }
-
-    
-    // Check if the frame has changed
-    if self.frame != lastFrame {
-      lastFrame = self.frame
-      frameDidChange()
-    }
+    // Do things in here when layout changes
     
   }
   
   func updateFrameDebounced() {
     
-    Task {
-      await adjustWidthDebouncer.processTask {
-        Task { @MainActor in
-          let heightUpdate = self.updateEditorHeight()
-          await self.infoHandler.update(heightUpdate)
-          
-          // Reset the guard flag after updates
-          self.isUpdatingFrame = false
-        }
-      } // END debounce process task
-    } // END outer task
-  }
-  
-  
-  func frameDidChange() {
-    
-    print("Frame size changed. Width: `\(self.frame.size.width)`, Height: `\(self.frame.size.height)`")
+    guard !isUpdatingFrame else {
+      print("Let's let the previous frame adjustment happen, before starting another.")
+      return
+    }
     
     guard let container = textContainer else {
       print("Couldn't get text container")
       return
     }
     
-    // Set the guard flag before making changes
     isUpdatingFrame = true
     
     container.lineFragmentPadding = self.horizontalInsets
     
-    updateFrameDebounced()
-     
+    Task {
+      await adjustWidthDebouncer.processTask {
+        Task { @MainActor in
+          
+          let heightUpdate = self.updateEditorHeight()
+          await self.infoHandler.update(heightUpdate)
+          
+          // Reset the guard flag after updates
+          
+        }
+      } // END debounce process task
+    } // END outer task
+    
+    self.isUpdatingFrame = false
+    
   }
+
   
   func updateEditorHeight() -> EditorInfo.Frame {
     //    guard let tlm = self.textLayoutManager else {
@@ -104,7 +107,7 @@ extension MarkdownTextView {
       )
     }
   }
-
+  
 }
 
 

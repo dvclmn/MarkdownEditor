@@ -11,35 +11,23 @@ import BaseHelpers
 
 public class MarkdownTextView: NSTextView {
   
-  var lastFrame: NSRect = .zero
-  var isUpdatingFrame = false
-  
-  var textIsEditing: Bool = false
-  
+  var configuration: MarkdownEditorConfiguration
   var scrollView: NSScrollView?
   
+  var isUpdatingFrame: Bool = false
+  var isUpdatingText: Bool = false
+  
   var elements: Set<Markdown.Element> = []
-  
-  //  var elements: [Markdown.Element] = []
-  var parsingTask: Task<Void, Never>?
-  
-  var maxWidth: CGFloat = .infinity
-  
+
+
+  /// Debouncers
+  ///
   var parseDebouncer = Debouncer(interval: 0.05)
-  
   var adjustWidthDebouncer = Debouncer(interval: 0.2)
   
   let infoHandler = EditorInfoHandler()
   
-  var configuration: MarkdownEditorConfiguration
-  
-//  var editorInfo = EditorInfo()
-  
-//  var currentParagraph = ParagraphInfo()
-  
-  //  var viewportLayoutController: NSTextViewportLayoutController?
-  //  var viewportDelegate: MarkdownViewportDelegate?
-  
+
   var lastSelectedText: String = ""
   
   public var onInfoUpdate: MarkdownEditor.InfoUpdate = { _ in }
@@ -118,13 +106,7 @@ public class MarkdownTextView: NSTextView {
   }
   
   
-  
-  public override var frame: NSRect {
-    didSet {
-      print("The text view's frame changed. Width: `\(frame.width)`, Height: `\(frame.height)`")
-      //        onFrameChange()
-    }
-  } // END frame override
+
 }
 
 extension MarkdownTextView {
