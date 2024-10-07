@@ -28,28 +28,47 @@ extension MarkdownTextView {
   
   func parseAndRedraw() {
     
-    let currentSelection = selectedRange
-    
+    /// There would be a way to make it work, but currently I think that
+    /// as soon as I style something, I think I'm then taking it away, by resetting
+    /// all the elements in the Set. Need to improve this.
     Task {
       await parseDebouncer.processTask {
         
         Task { @MainActor in
           self.parseCodeBlocks()
+          self.highlightElements()
           self.needsDisplay = true
         }
       }
     }
     
-    setSelectedRange(currentSelection)
+    
   } // END parse and redraw
   
   
-  
+  func highlightElements() {
+    
+    guard let textStorage = self.textStorage else {
+      print("textStorage issue yeah")
+      return
+    }
+    
+    textStorage.beginEditing()
+    let currentSelection = selectedRange
+    for element in self.elements {
+      applyCodeHighlighting(to: element)
+    }
+    setSelectedRange(currentSelection)
+    textStorage.endEditing()
+  }
   
   
   func parseCodeBlocks() {
     
-    guard let textStorage = self.textStorage else { return }
+    guard let textStorage = self.textStorage else {
+      print("Issue getting the text storage")
+      return
+    }
     
     print("Parsing code blocks")
     print("Current number of elements: \(elements.count)")
@@ -65,11 +84,11 @@ extension MarkdownTextView {
       return
     }
     
-    
+    textStorage.beginEditing()
     
     let matches = documentText.matches(of: pattern)
     
-    //    DispatchQueue.main.async { [weak self] in
+    
     
     for match in matches {
       
@@ -87,10 +106,7 @@ extension MarkdownTextView {
 
     } // END matches
     
-    // Restore the text selection
     
-    
-    //    } // END dispatch
     textStorage.endEditing()
     
     // Replace the old elements with new ones

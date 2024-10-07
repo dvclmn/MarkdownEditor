@@ -12,18 +12,17 @@ extension MarkdownTextView {
   public override func draw(_ rect: NSRect) {
     super.draw(rect)
     
-    // Define your highlight properties
-//    let cornerRadius: CGFloat = 5.0
-//    let backgroundColour: NSColor = NSColor.black.withAlphaComponent(0.2)
-//    
-//    for element in elements {
-//      
-//      let path = NSBezierPath(roundedRect: element.rect, xRadius: cornerRadius, yRadius: cornerRadius)
-//      
-//      backgroundColour.setFill()
-//      path.fill()
-//      
-//    }
+    let cornerRadius: CGFloat = 5.0
+    let backgroundColour: NSColor = NSColor.black.withAlphaComponent(0.2)
+    
+    for element in elements {
+      
+      let path = NSBezierPath(roundedRect: element.rect, xRadius: cornerRadius, yRadius: cornerRadius)
+      
+      backgroundColour.setFill()
+      path.fill()
+      
+    }
 //    
 //    if configuration.isShowingFrames {
 //      

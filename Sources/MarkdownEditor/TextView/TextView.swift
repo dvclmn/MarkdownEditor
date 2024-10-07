@@ -31,6 +31,7 @@ public class MarkdownTextView: NSTextView {
   var frameDebouncer = Debouncer(interval: 0.2)
   
   let infoHandler = EditorInfoHandler()
+  
   public var onInfoUpdate: MarkdownEditor.InfoUpdate = { _ in }
   
 
@@ -47,7 +48,6 @@ public class MarkdownTextView: NSTextView {
     
     self.configuration = configuration
     self.highlightr = highlightr
-    
     
     if configuration.isTextKit2 {
       
@@ -83,7 +83,7 @@ public class MarkdownTextView: NSTextView {
     }
     
     self.textViewSetup()
-    self.applyConfiguration()
+    
     
     self.infoHandler.onInfoUpdate = { [weak self] info in
       print("How often is this called? \(Date.now.friendlyDateAndTime)")
@@ -119,10 +119,3 @@ public class MarkdownTextView: NSTextView {
   
 
 }
-
-extension MarkdownTextView {
-  
-  
-}
-
-

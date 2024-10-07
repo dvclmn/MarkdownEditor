@@ -49,6 +49,8 @@ extension MarkdownTextView {
     allowsUndo = true
     isRichText = false
     smartInsertDeleteEnabled = false
+   
+    self.applyConfiguration()
     
   }
   

@@ -24,7 +24,7 @@ public extension MarkdownEditor {
     
 //    var lastLineCount: Int = 0
     
-//    var selectedRanges: [NSValue] = []
+    var selectedRanges: [NSValue] = []
 //    var selections: [NSTextSelection] = []
     var updatingNSView = false
     
@@ -73,7 +73,7 @@ public extension MarkdownEditor {
       else { return }
       
       self.parent.text = textView.string
-//      self.selectedRanges = textView.selectedRanges
+      self.selectedRanges = textView.selectedRanges
       
       /// I have learned, and need to remember, that this `Coordinator` is
       /// a delegate, for my ``MarkdownTextView``. Which means I can take
@@ -82,14 +82,14 @@ public extension MarkdownEditor {
       
     }
     
-//    public func textViewDidChangeSelection(_ notification: Notification) {
-//      guard let textView = notification.object as? MarkdownTextView,
-//            !updatingNSView
-//      else { return }
+    public func textViewDidChangeSelection(_ notification: Notification) {
+      guard let textView = notification.object as? MarkdownTextView,
+            !updatingNSView
+      else { return }
       
-//      self.selectedRanges = textView.selectedRanges
+      self.selectedRanges = textView.selectedRanges
       
-//    }
+    }
     
 //    public func textViewWillChangeText() {
       
