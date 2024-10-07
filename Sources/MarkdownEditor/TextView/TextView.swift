@@ -12,7 +12,7 @@ import Highlightr
 public class MarkdownTextView: NSTextView {
   
   var configuration: MarkdownEditorConfiguration
-  let highlightr = Highlightr()
+  let highlightr: Highlightr
   
   var scrollView: NSScrollView?
   
@@ -24,7 +24,7 @@ public class MarkdownTextView: NSTextView {
 
   /// Debouncers
   ///
-  var parseDebouncer = Debouncer(interval: 0.05)
+  var parseDebouncer = Debouncer(interval: 0.5)
   var adjustWidthDebouncer = Debouncer(interval: 0.2)
   
   let infoHandler = EditorInfoHandler()
@@ -38,11 +38,14 @@ public class MarkdownTextView: NSTextView {
     frame frameRect: NSRect,
     textContainer container: NSTextContainer?,
     
-    configuration: MarkdownEditorConfiguration
+    configuration: MarkdownEditorConfiguration,
+    highlightr: Highlightr
     
   ) {
     
     self.configuration = configuration
+    self.highlightr = highlightr
+    
     
     if configuration.isTextKit2 {
       

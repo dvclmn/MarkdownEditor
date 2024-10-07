@@ -27,6 +27,7 @@ extension MarkdownTextView {
     
 //    setupViewportLayoutController()
     
+    highlightr.setTheme(to: "xcode.dark")
     
     parseAndRedraw()
     

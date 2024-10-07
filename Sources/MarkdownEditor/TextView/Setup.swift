@@ -7,12 +7,22 @@
 
 import SwiftUI
 import TextCore
+import Highlightr
 
 extension MarkdownTextView {
 
   func textViewSetup() {
     
     isEditable = self.configuration.isEditable
+    
+    /// Highlightr
+    
+    let codeFontSize: CGFloat = 14
+    
+    highlightr.theme.codeFont = NSFont.monospacedSystemFont(ofSize: codeFontSize, weight: .medium)
+    highlightr.theme.boldCodeFont = NSFont.monospacedSystemFont(ofSize: codeFontSize, weight: .bold)
+    
+    
     
     if self.configuration.isScrollable {
       
