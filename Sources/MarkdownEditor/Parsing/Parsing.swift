@@ -39,8 +39,8 @@ extension MarkdownTextView {
         /// I learned that `Task { @MainActor in` is `async`,
         /// whereas `await MainActor.run {` is synchronous.
         ///
-        await MainActor.run {
-//        Task { @MainActor in
+//        await MainActor.run {
+        Task { @MainActor in
           self.parseCodeBlocks()
           self.needsDisplay = true
         }
@@ -55,13 +55,12 @@ extension MarkdownTextView {
   func parseCodeBlocks() {
     
     guard let layoutManager = self.layoutManager else {
-      print("Issue getting the layout manager")
-      return
+      fatalError("Issue getting the layout manager")
+      
     }
     
     guard let textStorage = self.textStorage else {
-      print("Issue getting the text storage")
-      return
+      fatalError("Issue getting the text storage")
     }
     
     print("Parsing code blocks")
@@ -69,10 +68,10 @@ extension MarkdownTextView {
     
 //    let documentText = textStorage.string
     
-    guard let documentNSString = self.string as NSString? else {
-      print("Error getting NSString")
-      return
-    }
+//    guard let documentNSString = self.string as NSString? else {
+//      print("Error getting NSString")
+//      return
+//    }
     
     
     
@@ -80,6 +79,8 @@ extension MarkdownTextView {
     //     Temporary set to collect new elements
 //    var newElements = Set<Markdown.Element>()
     
+    var matchesString: String = "let's "
+    var resultCount: Int = 0
     
     guard let pattern = Markdown.Syntax.codeBlock.regex else {
       print("There was an issue with the regex for code blocks")
@@ -88,57 +89,82 @@ extension MarkdownTextView {
 
     textStorage.beginEditing()
     
-    let matches = self.string.matches(of: pattern)
     
-    //    highlightr.setTheme(to: "xcode-dark")
-    
-    for match in matches {
+    pattern.enumerateMatches(in: self.string, range: NSRange(location: 0, length: self.string.count)) { result, flags, stop in
       
-      let totalString: String = getString(for: .total, in: match)
-      let totalNSString = totalString as NSString
+      print("Let's enumerate")
       
-      let attrString = attributedString()
-//      let lmAttrString = layoutManager.attributedString()
-      
-      let totalRange = documentNSString.range(of: totalString)
-      let documentRange = documentNSString.range(of: self.string)
-      
-      let codeBlockPreview: String = "\n---\n\(totalString.preview(18))\n---\n"
-      
-      guard let highlightedCode: NSAttributedString = highlightr.highlight(totalString, as: nil) else {
-                print("Couldn't get the Highlighted string")
-                return
-              }
-      
-      
-      var foregroundAttributes: String = ""
-      
-      highlightedCode.enumerateAttribute(.foregroundColor, in: documentRange) { attribute, range, stop in
-        if let attribute = attribute as? NSColor {
-          foregroundAttributes += attribute.accessibilityName
-        }
+      if let result = result {
+        
+        resultCount += 1
+        
+        let newInfo: String = "Regex results (\(resultCount) in total)\n"
+        + result.description
+        + "\n"
+        + result.range.info
+        + "\n"
+        
+        matchesString += newInfo
+      } else {
+        matchesString += "No result"
       }
-      
-      let debugString = """
-      Text preview: \(codeBlockPreview)
-      
-      `String` Full document char. count: \(self.string.count)
-      `NSString` Full document range: \(documentNSString.length)
-      Full document range: \(documentRange.info)
-      
-      `String` Total match char. count: \(totalString.count)
-      `NSString` Total match char. count: \(totalNSString.length)
-      Total match NSRange: \(totalRange.info)
-      
-      Foreground attributes: \\(foregroundAttributes)
-      
-      Attr string length: \(attrString.length)
-      LM's attr string length: \\(lmAttrString.length)
-      
-      """
-      
-      print(Box(header: "Debugging Code Blocks", content: debugString))
- 
+      print(Box(header: "Enumeration results", content: matchesString))
+    }
+    
+    
+    
+    
+//    let matches = self.string.matches(of: pattern)
+//    
+//    //    highlightr.setTheme(to: "xcode-dark")
+//    
+//    for match in matches {
+//      
+//      let totalString: String = getString(for: .total, in: match)
+//      let totalNSString = totalString as NSString
+//      
+//      let attrString = attributedString()
+////      let lmAttrString = layoutManager.attributedString()
+//      
+//      let totalRange = documentNSString.range(of: totalString)
+//      let documentRange = documentNSString.range(of: self.string)
+//      
+//      let codeBlockPreview: String = "\n---\n\(totalString.preview(18))\n---\n"
+//      
+//      guard let highlightedCode: NSAttributedString = highlightr.highlight(totalString, as: nil) else {
+//                print("Couldn't get the Highlighted string")
+//                return
+//              }
+//      
+//      
+//      var foregroundAttributes: String = ""
+//      
+//      highlightedCode.enumerateAttribute(.foregroundColor, in: documentRange) { attribute, range, stop in
+//        if let attribute = attribute as? NSColor {
+//          foregroundAttributes += attribute.accessibilityName
+//        }
+//      }
+//      
+//      let debugString = """
+//      Text preview: \(codeBlockPreview)
+//      
+//      `String` Full document char. count: \(self.string.count)
+//      `NSString` Full document range: \(documentNSString.length)
+//      Full document range: \(documentRange.info)
+//      
+//      `String` Total match char. count: \(totalString.count)
+//      `NSString` Total match char. count: \(totalNSString.length)
+//      Total match NSRange: \(totalRange.info)
+//      
+//      Foreground attributes: \\(foregroundAttributes)
+//      
+//      Attr string length: \(attrString.length)
+//      LM's attr string length: \\(lmAttrString.length)
+//      
+//      """
+//      
+//      print(Box(header: "Debugging Code Blocks", content: debugString))
+// 
 
 //      
 ////      let attrString: NSAttributedString = attributedString()
@@ -166,7 +192,7 @@ extension MarkdownTextView {
 //      newElements.insert(element)
 //      
   
-    } // END matches
+//    } // END matches
     
     
     
