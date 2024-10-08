@@ -16,7 +16,6 @@ public typealias MarkdownRegex = Regex<(
   trailing: Substring
 )>
 
-
 public typealias MarkdownRegexOutput = Regex<MarkdownRegex>.RegexOutput
 public typealias MarkdownRegexMatch = MarkdownRegexOutput.Match
 

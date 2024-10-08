@@ -9,6 +9,7 @@ import Foundation
 import AppKit
 import BaseHelpers
 import TextCore
+import Rearrange
 
 enum SyntaxRangeType {
   case total
@@ -77,7 +78,10 @@ extension MarkdownTextView {
     
     for match in matches {
       
-      let elementRange = getRange(for: .total, in: match)
+      guard let elementRange = getRange(for: .total, in: match) else {
+        print("Bad oh blim")
+        return
+      }
       let elementString = getString(for: .content, in: match)
 
       guard let highlightedCode: NSAttributedString = highlightr.highlight(elementString, as: "swift") else {
@@ -184,38 +188,72 @@ extension MarkdownTextView {
       return "nil"
     }
     
-    let matchedText: String = string.substring(with: getRange(for: type, in: match))
+    guard let range = getRange(for: type, in: match) else {
+      return "nil"
+    }
+    
+    let matchedText: String = string.substring(with: range)
     
     //    let matchedText = self.attributedSubstring(forProposedRange: getRange(for: .total, in: match), actualRange: nil)
     return matchedText
     
   }
   
-  func getRange(for type: SyntaxRangeType, in match: MarkdownRegexMatch) -> NSRange {
-    
-    
-    let totalRange = NSRange(match.range, in: self.string)
+  func getRange(for type: SyntaxRangeType, in match: MarkdownRegexMatch) -> NSRange? {
+
+    let totalRange = NSRange.range(<#T##self: _NSRange##_NSRange#>)
     
     let leadingCount = match.output.leading.count
     let trailingCount = match.output.trailing.count
     
+    match.ra
+    
+    let totalLength = totalRange.upperBound - totalRange.lowerBound
+    
+    guard leadingCount + trailingCount <= totalLength else {
+      print("Invalid counts: leadingCount (\(leadingCount)) + trailingCount (\(trailingCount)) exceed totalRange.length (\(totalLength)).")
+      return nil
+    }
+    
     switch type {
-        
       case .total:
         return totalRange
         
       case .content:
-        let contentRange = NSRange(location: totalRange.location + leadingCount, length: totalRange.length - (leadingCount + trailingCount))
-        return contentRange
+        let contentLocation = totalRange.location + leadingCount
+        let contentLength = totalRange.length - (leadingCount + trailingCount)
+        
+        // Validate contentRange
+        if contentLocation + contentLength > self.string.utf16.count || contentLength < 0 {
+          print("Invalid contentRange: location \(contentLocation), length \(contentLength).")
+          return nil
+        }
+        
+        return NSRange(location: contentLocation, length: contentLength)
         
       case .leadingSyntax:
-        let leadingSyntaxRange = NSRange(location: totalRange.location, length: leadingCount)
-        return leadingSyntaxRange
+        let leadingLocation = totalRange.location
+        let leadingLength = leadingCount
+        
+        // Validate leadingSyntaxRange
+        if leadingLocation + leadingLength > self.string.utf16.count || leadingLength < 0 {
+          print("Invalid leadingSyntaxRange: location \(leadingLocation), length \(leadingLength).")
+          return nil
+        }
+        
+        return NSRange(location: leadingLocation, length: leadingLength)
         
       case .trailingSyntax:
-        let trailingSyntaxRange = NSRange(location: (totalRange.lowerBound - trailingCount), length: trailingCount)
-        return trailingSyntaxRange
+        let trailingLength = trailingCount
+        let trailingLocation = totalRange.location + totalRange.length - trailingLength
         
+        // Validate trailingSyntaxRange
+        if trailingLocation + trailingLength > self.string.utf16.count || trailingLocation < 0 || trailingLength < 0 {
+          print("Invalid trailingSyntaxRange: location \(trailingLocation), length \(trailingLength).")
+          return nil
+        }
+        
+        return NSRange(location: trailingLocation, length: trailingLength)
     }
   }
 }
