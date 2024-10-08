@@ -258,12 +258,12 @@ extension Markdown.Syntax {
   
   static public var testCases: [Markdown.Syntax] {
     return [
-      .bold,
-      .italic,
+//      .bold,
+//      .italic,
 //      .boldItalic,
 //      .strikethrough,
 //      .highlight,
-      .inlineCode,
+//      .inlineCode,
       .codeBlock
     ]
   }

@@ -10,26 +10,26 @@ import Highlightr
 
 extension MarkdownTextView {
   
-  func styleMarkdownDebounced() {
-    
-    Task {
-      await stylingDebouncer.processTask {
-        
-        Task { @MainActor in
-          
-          let currentSelection = self.selectedRange
-          
-          self.styleElement()
-          
-//          self.needsDisplay = true
-
-          self.setSelectedRange(currentSelection)
-          
-        }
-      }
-    }
-  } // END style debounced
-  
+//  func styleMarkdownDebounced() {
+//    
+//    Task {
+//      await stylingDebouncer.processTask {
+//        
+//        Task { @MainActor in
+//          
+//          let currentSelection = self.selectedRange
+//          
+//          self.styleElement()
+//          
+////          self.needsDisplay = true
+//
+//          self.setSelectedRange(currentSelection)
+//          
+//        }
+//      }
+//    }
+//  } // END style debounced
+//  
   
   func styleElement() {
     

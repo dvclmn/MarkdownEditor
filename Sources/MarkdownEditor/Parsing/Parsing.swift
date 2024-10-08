@@ -30,16 +30,23 @@ extension MarkdownTextView {
   
   func parseMarkdownDebounced() {
     
-    guard !isUpdatingFrame || !isUpdatingText else {
-      print("Let's let the operation happen (frame, text), before starting another.")
-      return
-    }
+//    DispatchQueue.main.async {
+//      for syntax in Markdown.Syntax.testCases {
+//        self.parseSyntax(syntax)
+//      }
+//    }
+//    
     
-    self.isUpdatingText = true
-    
-    /// There would be a way to make it work, but currently I think that
-    /// as soon as I style something, I think I'm then taking it away, by resetting
-    /// all the elements in the Set. Need to improve this.
+//    guard !isUpdatingFrame || !isUpdatingText else {
+//      print("Let's let the operation happen (frame, text), before starting another.")
+//      return
+//    }
+//    
+//    self.isUpdatingText = true
+//    
+//    /// There would be a way to make it work, but currently I think that
+//    /// as soon as I style something, I think I'm then taking it away, by resetting
+//    /// all the elements in the Set. Need to improve this.
     Task {
       await parsingDebouncer.processTask {
         
@@ -48,32 +55,39 @@ extension MarkdownTextView {
         ///
         //        await MainActor.run {
         Task { @MainActor in
+          for syntax in Markdown.Syntax.testCases {
+            self.parseSyntax(syntax)
+          }
           
-          self.parseCodeBlocks()
 
           self.isUpdatingText = false
         }
       }
     }
     
-    
+//    
     
   } // END parse and redraw
   
  
-  func parseCodeBlocks() {
+  func parseSyntax(_ syntax: Markdown.Syntax) {
     
     //    guard let layoutManager = self.layoutManager else {
     //      fatalError("Issue getting the layout manager")
     //    }
     
+    guard let pattern = syntax.regex else {
+      print("No regex defined for \(syntax.name)")
+      return
+    }
+    
+    
+    var generalInfo: String = "General info\n\n"
+    
     guard let textStorage = self.textStorage else {
       fatalError("Issue getting the text storage")
     }
-    
-    print("Parsing code blocks")
-    print("Current number of elements: \(elements.count)")
-    
+
     //    let documentText = textStorage.string
     
     //    guard let documentNSString = self.string as NSString? else {
@@ -82,40 +96,61 @@ extension MarkdownTextView {
     //    }
     
     //     Temporary set to collect new elements
+    
+    let string = self.string
+    
+    generalInfo += string.preview()
+    
+    guard let nsString = string as NSString? else {
+      print("NSString issue")
+      return
+    }
+    
     textStorage.beginEditing()
 
     var newElements = Set<Markdown.Element>()
     
-    var matchesString: String = ""
+    var matchesString: String = "Enumeration results:\n"
     var resultCount: Int = 0
     
-    guard let pattern = Markdown.Syntax.codeBlock.regex else {
-      print("There was an issue with the regex for code blocks")
-      return
-    }
     
     
-    pattern.enumerateMatches(in: self.string, range: NSRange(location: 0, length: self.string.count)) { result, flags, stop in
+    pattern.enumerateMatches(in: string, range: NSRange(location: 0, length: nsString.length)) { result, flags, stop in
       
       if let result = result {
         
+        let elementString: String = textStorage.attributedSubstring(from: result.range).string
+        let elementRange: NSRange = result.range
+
         resultCount += 1
         
-        let newInfo: String = "Regex results (\(resultCount) in total)\n"
-        + "\(result.resultType)"
-        + "\n"
+        let newInfo: String = "Regex result \(resultCount):\n"
+        /// We won't print the `NSTextCheckingResult.CheckingType`, as it's always regularExpression
+//        + "\(result.resultType)"
+//        + "\n"
+        + elementString.preview()
         + result.range.info
         + "\n"
         
         matchesString += newInfo
         
         
+        guard let highlightedCode: NSAttributedString = highlightr.highlight(elementString, as: nil) else {
+          print("Couldn't get the Highlighted string")
+          return
+        }
+        
+        
+        
+        textStorage.replaceCharacters(in: elementRange, with: highlightedCode)
+        
         
         let element = Markdown.Element(
-          string: textStorage.attributedSubstring(from: result.range).string,
+          string: elementString,
           syntax: .codeBlock,
-          range: result.range,
-          rect: getRect(for: result.range)
+          range: elementRange,
+          rect: .zero
+//          rect: getRect(for: result.range)
         )
         
         newElements.insert(element)
@@ -126,179 +161,19 @@ extension MarkdownTextView {
       }
     } // END enumerate matches
     
-    print(matchesString)
-//    print(Box(header: "Enumeration results", content: matchesString))
+    generalInfo += "Total \(syntax.name)s found: \(resultCount)\n\n"
     
+    generalInfo += matchesString
+    
+//    print(matchesString)
+    print(Box(header: "Parsing markdown", content: generalInfo))
     
     self.elements = newElements
     
     textStorage.endEditing()
     
   } // END parse code blocks
-    
-    //    let matches = self.string.matches(of: pattern)
-    //
-    //    //    highlightr.setTheme(to: "xcode-dark")
-    //
-    //    for match in matches {
-    //
-    //      let totalString: String = getString(for: .total, in: match)
-    //      let totalNSString = totalString as NSString
-    //
-    //      let attrString = attributedString()
-    ////      let lmAttrString = layoutManager.attributedString()
-    //
-    //      let totalRange = documentNSString.range(of: totalString)
-    //      let documentRange = documentNSString.range(of: self.string)
-    //
-    //      let codeBlockPreview: String = "\n---\n\(totalString.preview(18))\n---\n"
-    //
-    //      guard let highlightedCode: NSAttributedString = highlightr.highlight(totalString, as: nil) else {
-    //                print("Couldn't get the Highlighted string")
-    //                return
-    //              }
-    //
-    //
-    //      var foregroundAttributes: String = ""
-    //
-    //      highlightedCode.enumerateAttribute(.foregroundColor, in: documentRange) { attribute, range, stop in
-    //        if let attribute = attribute as? NSColor {
-    //          foregroundAttributes += attribute.accessibilityName
-    //        }
-    //      }
-    //
-    //      let debugString = """
-    //      Text preview: \(codeBlockPreview)
-    //
-    //      `String` Full document char. count: \(self.string.count)
-    //      `NSString` Full document range: \(documentNSString.length)
-    //      Full document range: \(documentRange.info)
-    //
-    //      `String` Total match char. count: \(totalString.count)
-    //      `NSString` Total match char. count: \(totalNSString.length)
-    //      Total match NSRange: \(totalRange.info)
-    //
-    //      Foreground attributes: \\(foregroundAttributes)
-    //
-    //      Attr string length: \(attrString.length)
-    //      LM's attr string length: \\(lmAttrString.length)
-    //
-    //      """
-    //
-    //      print(Box(header: "Debugging Code Blocks", content: debugString))
-    //
-    
-    //
-    ////      let attrString: NSAttributedString = attributedString()
-    //
-    //      if let codeColours = highlightedCode.attribute(.foregroundColor, at: totalRange.location, effectiveRange: nil) {
-    //        textStorage.addAttributes([.foregroundColor: codeColours], range: totalRange)
-    //      }
-    
-    
-    
-    
-    
-    //      let attributeInfo: String = highlightedCode.debugDescription
-    //      print(Box(header: "Attribute info", content: attributeInfo))
-    
-    
-
-  
-  
-  
-  
+ 
   
 } // END extension MD text view
 
-
-
-
-/// Some backup code
-///
-
-//      let documentLength = (self.string as NSString).length
-//      let paragraphRange = self.currentParagraph.range
-//
-//      // Ensure the paragraph range is within the document bounds
-//      let safeParagraphRange = NSRange(
-//        location: min(paragraphRange.location, documentLength),
-//        length: min(paragraphRange.length, documentLength - paragraphRange.location)
-//      )
-//
-//      if safeParagraphRange.length > 0 {
-//
-//        ts.removeAttribute(.foregroundColor, range: safeParagraphRange)
-//        ts.removeAttribute(.backgroundColor, range: safeParagraphRange)
-//        ts.addAttributes(AttributeSet.white.attributes, range: safeParagraphRange)
-//
-//      } else {
-//        print("Invalid paragraph range")
-//      }
-
-//      for element in self.elements {
-//        <#body#>
-//      }
-//
-//      ts.addAttributes(syntax.syntaxAttributes(with: self.configuration).attributes, range: syntaxRange)
-//      ts.addAttributes(syntax.contentAttributes(with: self.configuration).attributes, range: contentRange)
-
-
-
-
-extension MarkdownTextView {
-  
-  //  func applyAttributedString(_ attrString: NSAttributedString) {
-  
-  //          // Apply attributes instead of replacing the text
-  //          highlightedCode.enumerateAttributes(in: getRange(for: .total, in: match), options: []) { attrs, range, _ in
-  //
-  //            let effectiveRange = NSRange(location: codeRange.location + range.location, length: range.length)
-  //
-  //            textStorage.setAttributes(attrs, range: effectiveRange)
-  //          }
-  //
-  //            textStorage.setAttributes(highlightedCode, range: getRange(for: .content, in: match))
-  //
-  //
-  //
-  //            for attribute in highlightedCode {
-  //              attribute.
-  //            }
-  //
-  //            textStorage.addAttributes(T##attrs: [NSAttributedString.Key : Any]##[NSAttributedString.Key : Any], range: T##NSRange)
-  //
-  //            ts.setAttributedString(highlightedCode)
-  
-  
-  //  }
-  
-  
-  
-  func getString(for type: SyntaxRangeType, in match: MarkdownRegexMatch) -> String {
-    
-    let substring: Substring
-    
-    switch type {
-      case .total:
-        substring = match.output.0
-        
-      case .content:
-        substring = match.output.content
-        
-      case .leadingSyntax:
-        substring = match.output.leading
-        
-      case .trailingSyntax:
-        substring = match.output.trailing
-    }
-    
-    //    let outputString = "This is the result of `getString`:\n\(substring)"
-    //    print(Box(content: outputString))
-    return String(substring)
-    
-    
-  }
-  
-  
-}

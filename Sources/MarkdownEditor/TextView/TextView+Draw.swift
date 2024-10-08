@@ -9,29 +9,31 @@ import AppKit
 
 extension MarkdownTextView {
   
-  public override func draw(_ rect: NSRect) {
-    super.draw(rect)
-    
-    
-    
-    // MARK: - Code block backgrounds
-    let cornerRadius: CGFloat = 5.0
-    let backgroundColour: NSColor = NSColor.black.withAlphaComponent(0.2)
-    
-    for element in elements {
-      
-      let path = NSBezierPath(roundedRect: element.rect, xRadius: cornerRadius, yRadius: cornerRadius)
-      
-      backgroundColour.setFill()
-      path.fill()
-      
-    }
-    
-    debugFrames()
-    
-    // MARK: - Showing Frames
-    
-  } // END draw override
+//  public override func draw(_ rect: NSRect) {
+//    super.draw(rect)
+//    
+//    
+//    
+//    // MARK: - Code block backgrounds
+//    let cornerRadius: CGFloat = 5.0
+//    let backgroundColour: NSColor = NSColor.black.withAlphaComponent(0.2)
+//    
+//    for element in elements where element.syntax == .codeBlock {
+//      
+//      let path = NSBezierPath(roundedRect: element.rect, xRadius: cornerRadius, yRadius: cornerRadius)
+//      
+//      backgroundColour.setFill()
+//      path.fill()
+//      
+//    }
+//    
+//    debugFrames()
+//    
+//    // MARK: - Showing Frames
+//    
+//  } // END draw override
+  
+  
   
   func getRect(
     for range: NSRange
@@ -43,7 +45,14 @@ extension MarkdownTextView {
       fatalError("Couldn't get 'em")
     }
     
-    
+    /// IMPORTANT:
+    ///
+    /// This innocent little `boundingRect` function was (i'm pretty sure) causing a long-lasting
+    /// error/crash, `_fillLayoutHoleForCharacterRange` (etc) and
+    /// `attempted layout while textStorage is`...
+    /// So I'll have to make sure I only call this when it's safe (or use something different).
+    /// https://lists.apple.com/archives/cocoa-dev/2011/Aug/msg01126.html
+    ///
     let boundingRect = layoutManager.boundingRect(
       forGlyphRange: range,
       in: textContainer

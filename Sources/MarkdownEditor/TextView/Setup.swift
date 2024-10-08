@@ -13,6 +13,8 @@ extension MarkdownTextView {
 
   func textViewSetup() {
     
+    print("How often does text view setup get called?")
+    
     isEditable = self.configuration.isEditable
 
 //    highlightr.setTheme(to: "xcode-dark")
@@ -57,6 +59,8 @@ extension MarkdownTextView {
   
   
   func applyConfiguration() {
+    
+    print("How often does the apply config get called?")
     
     self.insertionPointColor = NSColor(self.configuration.theme.insertionPointColour)
     //

@@ -29,7 +29,7 @@ public class MarkdownTextView: NSTextView {
   ///
   var frameDebouncer = Debouncer(interval: 0.3)
   var parsingDebouncer = Debouncer(interval: 0.3)
-  var stylingDebouncer = Debouncer(interval: 0.3)
+//  var stylingDebouncer = Debouncer(interval: 0.3)
   
   let infoHandler = EditorInfoHandler()
   

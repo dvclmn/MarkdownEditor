@@ -47,7 +47,7 @@ extension MarkdownTextView {
   func updateFrameDebounced() {
     
     guard !isUpdatingFrame else {
-      print("Let's let the previous frame adjustment happen, before starting another.")
+//      print("Let's let the previous frame adjustment happen, before starting another.")
       return
     }
     
