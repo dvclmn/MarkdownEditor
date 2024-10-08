@@ -22,31 +22,31 @@ public typealias MarkdownRegexMatch = MarkdownRegexOutput.Match
 extension Markdown.Syntax {
 
   
-  var nsRegex: String? {
-    
-    switch self {
-      case .bold:
-        "(?<leading>__|\\*\\*)(?<content>[^_|\\*]*?)(?<trailing>__|\\*\\*)"
-      case .italic:
-        "(?<leading>_|\\*)(?<content>[^_|\\*]*?)(?<trailing>_|\\*)"
-      case .boldItalic:
-        "(?<leading>___|\\*\\*\\*)(?<content>[^_|\\*]*?)(?<trailing>___|\\*\\*\\*)"
-      case .strikethrough:
-        "(?<leading>~~)(?<content>[^~]*?)(?<trailing>~~)"
-      case .highlight:
-        "(?<leading>==)(?<content>[^=]*?)(?<trailing>==)"
-      case .inlineCode:
-        "(?<leading>`)(?<content>(?:[^`\\n])+?)(?<trailing>`)"
-      case .quoteBlock:
-        "(?<leading>^>)(?<content>[^>\\n]+)(?<trailing>)"
-      case .link:
-        "(?<leading>\\[)(?<content>[^\\]]+)(?<trailing>\\]\\([^\\)]+\\))"
-      case .image:
-        "(?<leading>!\\[)(?<content>[^\\]]+)(?<trailing>\\]\\([^\\)]+\\))"
-      case .list, .heading, .horizontalRule, .codeBlock:
-        nil
-    }
-  }
+//  var nsRegex: String? {
+//    
+//    switch self {
+//      case .bold:
+//        "(?<leading>__|\\*\\*)(?<content>[^_|\\*]*?)(?<trailing>__|\\*\\*)"
+//      case .italic:
+//        "(?<leading>_|\\*)(?<content>[^_|\\*]*?)(?<trailing>_|\\*)"
+//      case .boldItalic:
+//        "(?<leading>___|\\*\\*\\*)(?<content>[^_|\\*]*?)(?<trailing>___|\\*\\*\\*)"
+//      case .strikethrough:
+//        "(?<leading>~~)(?<content>[^~]*?)(?<trailing>~~)"
+//      case .highlight:
+//        "(?<leading>==)(?<content>[^=]*?)(?<trailing>==)"
+//      case .inlineCode:
+//        "(?<leading>`)(?<content>(?:[^`\\n])+?)(?<trailing>`)"
+//      case .quoteBlock:
+//        "(?<leading>^>)(?<content>[^>\\n]+)(?<trailing>)"
+//      case .link:
+//        "(?<leading>\\[)(?<content>[^\\]]+)(?<trailing>\\]\\([^\\)]+\\))"
+//      case .image:
+//        "(?<leading>!\\[)(?<content>[^\\]]+)(?<trailing>\\]\\([^\\)]+\\))"
+//      case .list, .heading, .horizontalRule, .codeBlock:
+//        nil
+//    }
+//  }
   
   
   public var regex: MarkdownRegex? {
@@ -115,7 +115,8 @@ extension Markdown.Syntax {
         /// and ends with three backticks at the start of a line
         /// Note: (?m) enables multiline mode, [\s\S] matches any character including newlines
       case .codeBlock:
-        return /(?<leading>```)(?<content>.*?)(?<trailing>```)/.dotMatchesNewlines()
+//        return /(?<leading>```)(?<content>.*?)(?<trailing>```)/.dotMatchesNewlines()
+        return /(?<leading>```[a-zA-Z]*)\n(?<content>.*?)(?<trailing>```)/.dotMatchesNewlines()
         
         /// Matches a quote block: A '>' followed by a space at the start of a line, then any characters until the end of the line
       case .quoteBlock:

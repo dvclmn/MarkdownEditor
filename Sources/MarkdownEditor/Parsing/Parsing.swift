@@ -10,6 +10,7 @@ import AppKit
 import BaseHelpers
 import TextCore
 import Rearrange
+import Wrecktangle
 
 enum SyntaxRangeType {
   case total
@@ -35,7 +36,11 @@ extension MarkdownTextView {
     Task {
       await parseDebouncer.processTask {
         
-        Task { @MainActor in
+        /// I learned that `Task { @MainActor in` is `async`,
+        /// whereas `await MainActor.run {` is synchronous.
+        ///
+        await MainActor.run {
+//        Task { @MainActor in
           self.parseCodeBlocks()
           self.needsDisplay = true
         }
@@ -49,6 +54,11 @@ extension MarkdownTextView {
   
   func parseCodeBlocks() {
     
+    guard let layoutManager = self.layoutManager else {
+      print("Issue getting the layout manager")
+      return
+    }
+    
     guard let textStorage = self.textStorage else {
       print("Issue getting the text storage")
       return
@@ -57,61 +67,113 @@ extension MarkdownTextView {
     print("Parsing code blocks")
     print("Current number of elements: \(elements.count)")
     
-    let documentText = textStorage.string
+//    let documentText = textStorage.string
     
-    guard let documentNSString = textStorage.string as NSString? else {
+    guard let documentNSString = self.string as NSString? else {
       print("Error getting NSString")
       return
     }
     
+    
+    
     let currentSelection = selectedRange
     //     Temporary set to collect new elements
-    var newElements = Set<Markdown.Element>()
+//    var newElements = Set<Markdown.Element>()
     
     
     guard let pattern = Markdown.Syntax.codeBlock.regex else {
       print("There was an issue with the regex for code blocks")
       return
     }
-    
+
     textStorage.beginEditing()
     
-    
-    let matches = documentText.matches(of: pattern)
+    let matches = self.string.matches(of: pattern)
     
     //    highlightr.setTheme(to: "xcode-dark")
     
     for match in matches {
       
-      //      let elementRange = getRange(for: .total, in: match)
-      //      let elementString = getString(for: .total, in: match)
+      let totalString: String = getString(for: .total, in: match)
+      let totalNSString = totalString as NSString
       
-      let totalString = getString(for: .total, in: match)
-      let totalRange: NSRange = documentNSString.range(of: totalString)
+      let attrString = attributedString()
+//      let lmAttrString = layoutManager.attributedString()
       
-      guard let highlightedCode: NSAttributedString = highlightr.highlight(totalString, as: "swift") else {
-        print("Couldn't get the Highlighted string")
-        return
+      let totalRange = documentNSString.range(of: totalString)
+      let documentRange = documentNSString.range(of: self.string)
+      
+      let codeBlockPreview: String = "\n---\n\(totalString.preview(18))\n---\n"
+      
+      guard let highlightedCode: NSAttributedString = highlightr.highlight(totalString, as: nil) else {
+                print("Couldn't get the Highlighted string")
+                return
+              }
+      
+      
+      var foregroundAttributes: String = ""
+      
+      highlightedCode.enumerateAttribute(.foregroundColor, in: documentRange) { attribute, range, stop in
+        if let attribute = attribute as? NSColor {
+          foregroundAttributes += attribute.accessibilityName
+        }
       }
       
-      //      textStorage.replaceCharacters(in: totalRange, with: highlightedCode)
+      let debugString = """
+      Text preview: \(codeBlockPreview)
       
-      let element = Markdown.Element(
-        string: totalString,
-        syntax: .codeBlock,
-        range: totalRange,
-        rect: getRect(for: totalRange)
-      )
+      `String` Full document char. count: \(self.string.count)
+      `NSString` Full document range: \(documentNSString.length)
+      Full document range: \(documentRange.info)
       
-      newElements.insert(element)
+      `String` Total match char. count: \(totalString.count)
+      `NSString` Total match char. count: \(totalNSString.length)
+      Total match NSRange: \(totalRange.info)
       
+      Foreground attributes: \\(foregroundAttributes)
+      
+      Attr string length: \(attrString.length)
+      LM's attr string length: \\(lmAttrString.length)
+      
+      """
+      
+      print(Box(header: "Debugging Code Blocks", content: debugString))
+ 
+
+//      
+////      let attrString: NSAttributedString = attributedString()
+//      
+//      if let codeColours = highlightedCode.attribute(.foregroundColor, at: totalRange.location, effectiveRange: nil) {
+//        textStorage.addAttributes([.foregroundColor: codeColours], range: totalRange)
+//      }
+      
+      
+      
+     
+      
+//      let attributeInfo: String = highlightedCode.debugDescription
+//      print(Box(header: "Attribute info", content: attributeInfo))
+      
+      
+      
+//      let element = Markdown.Element(
+//        string: totalString,
+//        syntax: .codeBlock,
+//        range: totalRange,
+//        rect: getRect(for: totalRange)
+//      )
+//      
+//      newElements.insert(element)
+//      
+  
     } // END matches
     
     
-    textStorage.endEditing()
     
-    // Replace the old elements with new ones
-    self.elements = newElements
+//    // Replace the old elements with new ones
+//    self.elements = newElements
+//    
+    textStorage.endEditing()
     
     setSelectedRange(currentSelection)
     
@@ -203,9 +265,10 @@ extension MarkdownTextView {
         
       case .trailingSyntax:
         substring = match.output.trailing
-        
     }
     
+//    let outputString = "This is the result of `getString`:\n\(substring)"
+//    print(Box(content: outputString))
     return String(substring)
     
     

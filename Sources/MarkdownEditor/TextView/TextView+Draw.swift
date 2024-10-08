@@ -61,8 +61,7 @@ extension MarkdownTextView {
     
     if configuration.isShowingFrames {
       
-      guard let layoutManager = self.layoutManager,
-            let textContainer = self.textContainer
+      guard let layoutManager = self.layoutManager
       else {
         fatalError("Couldn't get 'em")
       }

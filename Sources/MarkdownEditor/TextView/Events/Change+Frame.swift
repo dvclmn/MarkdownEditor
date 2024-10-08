@@ -9,28 +9,37 @@ import AppKit
 
 extension MarkdownTextView {
   
-  
-  //  public override var frame: NSRect {
-  //    didSet {
-  //      print("The text view's frame changed. Width: `\(frame.width)`, Height: `\(frame.height)`")
-  //
-  //
-  //
-  //    }
-  //  } // END frame override
-  
-  /// IMPORTANT
+  /// IMPORTANT:
   ///
-  /// It's finally occured to me; watching changes to the frame or layout etc here *absolutely*
-  /// causes loops and leaks etc, because I am sending this information back to SwiftUI,
-  /// which is applying the information to it's `.frame()`, which in turn *affects the frame here*
+  /// Trying to use a `layout` override, as a way to trigger parsing/styling/frame
+  /// changes, is a BAD idea, and results in such messages as
+  /// `attempted layout while textStorage is editing. It is not valid to cause the layoutManager to do layout while the textStorage is editing` etc
   ///
-  public override func layout() {
-    super.layout()
-    
-    updateFrameDebounced()
-    // Do things in here when layout changes
-    
+  //  public override func layout() {
+  //    super.layout()
+  
+    public override var frame: NSRect {
+      didSet {
+        //      print("The text view's frame changed. Width: `\(frame.width)`, Height: `\(frame.height)`")
+        //
+        //
+        //
+        //    }
+        //  } // END frame override
+        
+        /// IMPORTANT
+        ///
+        /// It's finally occured to me; watching changes to the frame or layout etc here *absolutely*
+        /// causes loops and leaks etc, because I am sending this information back to SwiftUI,
+        /// which is applying the information to it's `.frame()`, which in turn *affects the frame here*
+        ///
+        //  public override func layout() {
+        //    super.layout()
+        
+        updateFrameDebounced()
+        parseAndRedraw()
+        // Do things in here when layout changes
+      }
   }
   
   
@@ -45,7 +54,7 @@ extension MarkdownTextView {
     
     // Check if the height has actually changed
     guard newFrame.height != lastSentHeight else {
-      print("Height unchanged. No update needed.")
+//      print("Height unchanged. No update needed.")
       return
     }
     

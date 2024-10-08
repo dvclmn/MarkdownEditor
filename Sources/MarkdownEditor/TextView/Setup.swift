@@ -15,6 +15,7 @@ extension MarkdownTextView {
     
     isEditable = self.configuration.isEditable
 
+    highlightr.setTheme(to: "xcode-dark")
     
     if self.configuration.isScrollable {
       

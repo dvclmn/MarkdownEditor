@@ -86,7 +86,7 @@ public class MarkdownTextView: NSTextView {
     
     
     self.infoHandler.onInfoUpdate = { [weak self] info in
-      print("How often is this called? \(Date.now.friendlyDateAndTime)")
+//      print("How often is this called? \(Date.now.friendlyDateAndTime)")
       self?.onInfoUpdate(info)
     }
     
