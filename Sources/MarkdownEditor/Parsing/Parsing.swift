@@ -64,6 +64,7 @@ extension MarkdownTextView {
       return
     }
     
+    let currentSelection = selectedRange
     //     Temporary set to collect new elements
     var newElements = Set<Markdown.Element>()
 
@@ -75,7 +76,6 @@ extension MarkdownTextView {
     
     textStorage.beginEditing()
     
-    let currentSelection = selectedRange
     
     let matches = documentText.matches(of: pattern)
     
@@ -107,12 +107,13 @@ extension MarkdownTextView {
 
     } // END matches
     
-    setSelectedRange(currentSelection)
     
     textStorage.endEditing()
     
     // Replace the old elements with new ones
     self.elements = newElements
+    
+    setSelectedRange(currentSelection)
     
   } // END parse code blocks
   
@@ -206,58 +207,9 @@ extension MarkdownTextView {
     }
     
     return String(substring)
-    
-//    guard let string = textStorage?.string as? NSString else {
-//      print("Couldn't cast to ns string")
-//      return "nil"
-//    }
-//    
-//    let range = getRange(for: type, in: match)
-//    
-//    let matchedText: String = string.substring(with: range)
-//    
-//    //    let matchedText = self.attributedSubstring(forProposedRange: getRange(for: .total, in: match), actualRange: nil)
-//    return matchedText
+
     
   }
   
-//  func getRange(for type: SyntaxRangeType, in match: MarkdownRegexMatch) -> NSRange {
-//    
-//    let fullText: String = String(match.output.0)
-//    
-////    let fullNSString = fullText as NSString
-//    
-//    let fullRange = fullText.lower
-//    
-////    let fullRange = fullNSString.range(of: fullText)
-//    
-////    print("String length: \(self.string.count)")
-////    print("Match content: \()")
-//    
-//
-////    let totalRange = NSRange(match.range, in: self.string)
-//    
-//    let leadingCount = match.output.leading.count
-//    let trailingCount = match.output.trailing.count
-//    
-//    switch type {
-//        
-//      case .total:
-//        return fullRange
-//        
-//      case .content:
-//        let contentRange = NSRange
-////        let contentRange = NSRange(location: totalRange.location + leadingCount, length: totalRange.length - (leadingCount + trailingCount))
-//        return contentRange
-//        
-//      case .leadingSyntax:
-//        let leadingSyntaxRange = NSRange(location: totalRange.location, length: leadingCount)
-//        return leadingSyntaxRange
-//        
-//      case .trailingSyntax:
-//        let trailingSyntaxRange = NSRange(location: (totalRange.upperBound - trailingCount), length: trailingCount)
-//        return trailingSyntaxRange
-//        
-//    }
-//  }
+
 }

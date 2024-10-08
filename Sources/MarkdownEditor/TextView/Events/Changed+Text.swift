@@ -11,6 +11,22 @@ import BaseStyles
 
 extension MarkdownTextView {
   
+  
+  
+  public override func didChangeText() {
+    
+    super.didChangeText()
+    
+    
+    updateFrameDebounced()
+    
+    parseAndRedraw()
+    
+    
+    //    updateParagraphInfo(firstSelected: nil)
+    
+  }
+  
   /// Initiates a series of delegate messages (and general notifications) to determine
   /// whether modifications can be made to the characters and attributes of the receiver’s text.
   ///
@@ -45,56 +61,6 @@ extension MarkdownTextView {
 //    return true
 //  } // END shouldChangeText
   
-  
-  
-  public override func didChangeText() {
-    
-    super.didChangeText()
-    
-
-    updateFrameDebounced()
-    
-    parseAndRedraw()
-    
-    
-//    updateParagraphInfo(firstSelected: nil)
-    
-//    basicInlineMarkdown()
-
-  }
-}
-
-
-extension MarkdownTextView {
-
 
 }
 
-extension MarkdownTextView {
-  var condensedElementSummary: String {
-    let elementCounts = Dictionary(grouping: elements, by: { $0.syntax })
-      .mapValues { $0.count }
-    /// The below sorts by frequency within the source text
-    //      .sorted { $0.value > $1.value }
-    
-    /// This sorts alphabetically
-      .sorted { $0.key.name < $1.key.name }
-    
-    let summaries = elementCounts.map { syntax, count in
-      count > 1 ? "\(syntax.name) (x\(count))" : syntax.name
-    }
-    
-    return summaries.joined(separator: ", ")
-  }
-  
-  func printElementSummary() {
-    var textElementCount = 0
-    textLayoutManager?.textContentManager?.enumerateTextElements(from: textLayoutManager?.documentRange.location, using: { _ in
-      textElementCount += 1
-      return true
-    })
-    
-    print("Total elements: \(textElementCount)")
-    print("Elements: \(condensedElementSummary)")
-  }
-}

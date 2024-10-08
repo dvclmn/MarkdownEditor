@@ -35,6 +35,7 @@ extension MarkdownTextView {
   
   
   func updateFrameDebounced() {
+    
     guard !isUpdatingFrame else {
       print("Let's let the previous frame adjustment happen, before starting another.")
       return
@@ -55,11 +56,16 @@ extension MarkdownTextView {
         Task { @MainActor in
           await self.infoHandler.update(newFrame)
           self.lastSentHeight = newFrame.height
+          
+          
+          
           self.isUpdatingFrame = false
         }
       }
     }
-  }
+    
+    
+  } // END update frame debounced
   
   
   

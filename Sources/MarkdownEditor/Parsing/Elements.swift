@@ -22,29 +22,3 @@ public struct Markdown {
   
 }
 
-
-
-extension MarkdownTextView {
-  
-  func getRect(
-    for range: NSRange
-  ) -> NSRect {
-    
-    guard let layoutManager = self.layoutManager,
-          let textContainer = self.textContainer
-    else {
-      fatalError("Couldn't get 'em")
-    }
-    
-    let boundingRect = layoutManager.boundingRect(
-      forGlyphRange: range,
-      in: textContainer
-    )
-
-    let textContainerOrigin = self.textContainerOrigin
-    let adjustedRect = boundingRect.offsetBy(dx: textContainerOrigin.x, dy: textContainerOrigin.y)
-    
-    return adjustedRect
-  }
-
-}
