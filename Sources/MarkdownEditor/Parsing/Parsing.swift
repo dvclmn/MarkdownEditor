@@ -59,6 +59,11 @@ extension MarkdownTextView {
     
     let documentText = textStorage.string
     
+    guard let documentNSString = textStorage.string as NSString? else {
+      print("Error getting NSString")
+      return
+    }
+    
     //     Temporary set to collect new elements
     var newElements = Set<Markdown.Element>()
 
@@ -78,24 +83,24 @@ extension MarkdownTextView {
     
     for match in matches {
       
-      guard let elementRange = getRange(for: .total, in: match) else {
-        print("Bad oh blim")
-        return
-      }
-      let elementString = getString(for: .content, in: match)
+//      let elementRange = getRange(for: .total, in: match)
+//      let elementString = getString(for: .total, in: match)
+      
+      let totalString = getString(for: .total, in: match)
+      let totalRange: NSRange = documentNSString.range(of: totalString)
 
-      guard let highlightedCode: NSAttributedString = highlightr.highlight(elementString, as: "swift") else {
+      guard let highlightedCode: NSAttributedString = highlightr.highlight(totalString, as: "swift") else {
           print("Couldn't get the Highlighted string")
           return
         }
         
-      textStorage.replaceCharacters(in: elementRange, with: highlightedCode)
+      textStorage.replaceCharacters(in: totalRange, with: highlightedCode)
 
       let element = Markdown.Element(
-        string: elementString,
+        string: totalString,
         syntax: .codeBlock,
-        range: elementRange,
-        rect: getRect(for: elementRange)
+        range: totalRange,
+        rect: getRect(for: totalRange)
       )
       
       newElements.insert(element)
@@ -183,77 +188,76 @@ extension MarkdownTextView {
   
   func getString(for type: SyntaxRangeType, in match: MarkdownRegexMatch) -> String {
     
-    guard let string = textStorage?.string as? NSString else {
-      print("Couldn't cast to ns string")
-      return "nil"
-    }
-    
-    guard let range = getRange(for: type, in: match) else {
-      return "nil"
-    }
-    
-    let matchedText: String = string.substring(with: range)
-    
-    //    let matchedText = self.attributedSubstring(forProposedRange: getRange(for: .total, in: match), actualRange: nil)
-    return matchedText
-    
-  }
-  
-  func getRange(for type: SyntaxRangeType, in match: MarkdownRegexMatch) -> NSRange? {
-
-    let totalRange = NSRange.range(<#T##self: _NSRange##_NSRange#>)
-    
-    let leadingCount = match.output.leading.count
-    let trailingCount = match.output.trailing.count
-    
-    match.ra
-    
-    let totalLength = totalRange.upperBound - totalRange.lowerBound
-    
-    guard leadingCount + trailingCount <= totalLength else {
-      print("Invalid counts: leadingCount (\(leadingCount)) + trailingCount (\(trailingCount)) exceed totalRange.length (\(totalLength)).")
-      return nil
-    }
+    let substring: Substring
     
     switch type {
       case .total:
-        return totalRange
-        
+        substring = match.output.0
+
       case .content:
-        let contentLocation = totalRange.location + leadingCount
-        let contentLength = totalRange.length - (leadingCount + trailingCount)
-        
-        // Validate contentRange
-        if contentLocation + contentLength > self.string.utf16.count || contentLength < 0 {
-          print("Invalid contentRange: location \(contentLocation), length \(contentLength).")
-          return nil
-        }
-        
-        return NSRange(location: contentLocation, length: contentLength)
+        substring = match.output.content
         
       case .leadingSyntax:
-        let leadingLocation = totalRange.location
-        let leadingLength = leadingCount
-        
-        // Validate leadingSyntaxRange
-        if leadingLocation + leadingLength > self.string.utf16.count || leadingLength < 0 {
-          print("Invalid leadingSyntaxRange: location \(leadingLocation), length \(leadingLength).")
-          return nil
-        }
-        
-        return NSRange(location: leadingLocation, length: leadingLength)
+        substring = match.output.leading
         
       case .trailingSyntax:
-        let trailingLength = trailingCount
-        let trailingLocation = totalRange.location + totalRange.length - trailingLength
+        substring = match.output.trailing
         
-        // Validate trailingSyntaxRange
-        if trailingLocation + trailingLength > self.string.utf16.count || trailingLocation < 0 || trailingLength < 0 {
-          print("Invalid trailingSyntaxRange: location \(trailingLocation), length \(trailingLength).")
-          return nil
-        }
-        
-        return NSRange(location: trailingLocation, length: trailingLength)
     }
+    
+    return String(substring)
+    
+//    guard let string = textStorage?.string as? NSString else {
+//      print("Couldn't cast to ns string")
+//      return "nil"
+//    }
+//    
+//    let range = getRange(for: type, in: match)
+//    
+//    let matchedText: String = string.substring(with: range)
+//    
+//    //    let matchedText = self.attributedSubstring(forProposedRange: getRange(for: .total, in: match), actualRange: nil)
+//    return matchedText
+    
   }
+  
+//  func getRange(for type: SyntaxRangeType, in match: MarkdownRegexMatch) -> NSRange {
+//    
+//    let fullText: String = String(match.output.0)
+//    
+////    let fullNSString = fullText as NSString
+//    
+//    let fullRange = fullText.lower
+//    
+////    let fullRange = fullNSString.range(of: fullText)
+//    
+////    print("String length: \(self.string.count)")
+////    print("Match content: \()")
+//    
+//
+////    let totalRange = NSRange(match.range, in: self.string)
+//    
+//    let leadingCount = match.output.leading.count
+//    let trailingCount = match.output.trailing.count
+//    
+//    switch type {
+//        
+//      case .total:
+//        return fullRange
+//        
+//      case .content:
+//        let contentRange = NSRange
+////        let contentRange = NSRange(location: totalRange.location + leadingCount, length: totalRange.length - (leadingCount + trailingCount))
+//        return contentRange
+//        
+//      case .leadingSyntax:
+//        let leadingSyntaxRange = NSRange(location: totalRange.location, length: leadingCount)
+//        return leadingSyntaxRange
+//        
+//      case .trailingSyntax:
+//        let trailingSyntaxRange = NSRange(location: (totalRange.upperBound - trailingCount), length: trailingCount)
+//        return trailingSyntaxRange
+//        
+//    }
+//  }
 }
