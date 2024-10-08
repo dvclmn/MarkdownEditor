@@ -28,27 +28,34 @@ extension MarkdownTextView {
   ///
   
   
-  func parseAndRedraw() {
+  func parseMarkdownDebounced() {
+    
+    guard !isUpdatingFrame || !isUpdatingText else {
+      print("Let's let the operation happen (frame, text), before starting another.")
+      return
+    }
+    
+    self.isUpdatingText = true
     
     /// There would be a way to make it work, but currently I think that
     /// as soon as I style something, I think I'm then taking it away, by resetting
     /// all the elements in the Set. Need to improve this.
     Task {
-      await parseDebouncer.processTask {
+      await parsingDebouncer.processTask {
         
         /// I learned that `Task { @MainActor in` is `async`,
         /// whereas `await MainActor.run {` is synchronous.
         ///
         //        await MainActor.run {
         Task { @MainActor in
+          
           self.parseCodeBlocks()
-          
-          self.styleElement()
-          
-          self.needsDisplay = true
+
+          self.isUpdatingText = false
         }
       }
     }
+    
     
     
   } // END parse and redraw
@@ -74,10 +81,9 @@ extension MarkdownTextView {
     //      return
     //    }
     
-    
-    
-    
     //     Temporary set to collect new elements
+    textStorage.beginEditing()
+
     var newElements = Set<Markdown.Element>()
     
     var matchesString: String = ""
@@ -88,7 +94,6 @@ extension MarkdownTextView {
       return
     }
     
-    textStorage.beginEditing()
     
     pattern.enumerateMatches(in: self.string, range: NSRange(location: 0, length: self.string.count)) { result, flags, stop in
       
@@ -121,9 +126,15 @@ extension MarkdownTextView {
       }
     } // END enumerate matches
     
-    print(Box(header: "Enumeration results", content: matchesString))
+    print(matchesString)
+//    print(Box(header: "Enumeration results", content: matchesString))
     
     
+    self.elements = newElements
+    
+    textStorage.endEditing()
+    
+  } // END parse code blocks
     
     //    let matches = self.string.matches(of: pattern)
     //
@@ -192,14 +203,7 @@ extension MarkdownTextView {
     //      print(Box(header: "Attribute info", content: attributeInfo))
     
     
-    
-    self.elements = newElements
-    
-    textStorage.endEditing()
-    
-    
-    
-  } // END parse code blocks
+
   
   
   

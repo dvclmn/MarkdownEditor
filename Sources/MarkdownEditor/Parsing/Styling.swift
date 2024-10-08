@@ -9,6 +9,28 @@ import AppKit
 import Highlightr
 
 extension MarkdownTextView {
+  
+  func styleMarkdownDebounced() {
+    
+    Task {
+      await stylingDebouncer.processTask {
+        
+        Task { @MainActor in
+          
+          let currentSelection = self.selectedRange
+          
+          self.styleElement()
+          
+//          self.needsDisplay = true
+
+          self.setSelectedRange(currentSelection)
+          
+        }
+      }
+    }
+  } // END style debounced
+  
+  
   func styleElement() {
     
     //    guard let layoutManager = self.layoutManager else {
@@ -19,8 +41,9 @@ extension MarkdownTextView {
     guard let textStorage = self.textStorage else {
       fatalError("Issue getting the text storage")
     }
+    
     textStorage.beginEditing()
-    let currentSelection = selectedRange
+    
     
     for element in self.elements {
       if element.syntax == .codeBlock {
@@ -42,9 +65,8 @@ extension MarkdownTextView {
       }
     }
     
-    setSelectedRange(currentSelection)
     textStorage.endEditing()
     
-  }
+  } // END styling
   
 }

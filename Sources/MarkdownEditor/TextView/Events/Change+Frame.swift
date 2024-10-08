@@ -37,10 +37,11 @@ extension MarkdownTextView {
         //    super.layout()
         
         updateFrameDebounced()
-        parseAndRedraw()
+//        parseMarkdownDebounced()
         // Do things in here when layout changes
       }
   }
+  
   
   
   func updateFrameDebounced() {
@@ -65,8 +66,6 @@ extension MarkdownTextView {
         Task { @MainActor in
           await self.infoHandler.update(newFrame)
           self.lastSentHeight = newFrame.height
-          
-          
           
           self.isUpdatingFrame = false
         }

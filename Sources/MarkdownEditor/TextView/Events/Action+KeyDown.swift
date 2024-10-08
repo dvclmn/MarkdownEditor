@@ -12,39 +12,39 @@ extension MarkdownTextView {
   
   typealias DefaultKeyEvent = () -> Void
   
-  public override func keyDown(with event: NSEvent) {
-    
-    guard let pressedKey = event.charactersIgnoringModifiers, pressedKey.count == 1 else {
-      print("Key `\(event.keyCode)` not needed for this operation.")
-      return super.keyDown(with: event)
-    }
-    
-    let modifierFlags = event.modifierFlags.intersection(.deviceIndependentFlagsMask)
-    let pressedShortcut = Keyboard.Shortcut(.character(Character(pressedKey)), modifierFlags: modifierFlags)
-    
-    if let matchingSyntax = Markdown.Syntax.findMatchingSyntax(for: pressedShortcut) {
-      
-      let hasSelection: Bool = self.selectedRange().length > 0
-      guard hasSelection else {
-        print("Zero-length selection not yet supported for keyboard shortcuts.")
-        return super.keyDown(with: event)
-      }
-      
-      handleWrapping(for: matchingSyntax)
-    } else if pressedKey == "\n" || event.keyCode == 36 {
-      
-//      handleNewListItem {
-        super.keyDown(with: event)
+//  public override func keyDown(with event: NSEvent) {
+//    
+//    guard let pressedKey = event.charactersIgnoringModifiers, pressedKey.count == 1 else {
+//      print("Key `\(event.keyCode)` not needed for this operation.")
+//      return super.keyDown(with: event)
+//    }
+//    
+//    let modifierFlags = event.modifierFlags.intersection(.deviceIndependentFlagsMask)
+//    let pressedShortcut = Keyboard.Shortcut(.character(Character(pressedKey)), modifierFlags: modifierFlags)
+//    
+//    if let matchingSyntax = Markdown.Syntax.findMatchingSyntax(for: pressedShortcut) {
+//      
+//      let hasSelection: Bool = self.selectedRange().length > 0
+//      guard hasSelection else {
+//        print("Zero-length selection not yet supported for keyboard shortcuts.")
+//        return super.keyDown(with: event)
 //      }
-      
-//      print("Pressed return")
-    
-  } else {
-//      print("Shortcut didn't match any syntax shortcuts, handing the event back to the system.")
-      super.keyDown(with: event)
-    }
-    
-  } // END key down override
+//      
+//      handleWrapping(for: matchingSyntax)
+//    } else if pressedKey == "\n" || event.keyCode == 36 {
+//      
+////      handleNewListItem {
+//        super.keyDown(with: event)
+////      }
+//      
+////      print("Pressed return")
+//    
+//  } else {
+////      print("Shortcut didn't match any syntax shortcuts, handing the event back to the system.")
+//      super.keyDown(with: event)
+//    }
+//    
+//  } // END key down override
   
   
 //  func currentLineContents() -> String? {
