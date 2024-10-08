@@ -26,7 +26,7 @@ extension Markdown.Syntax {
         
       case .bold: "(__|\\*\\*)([^_|\\*]*?)(__|\\*\\*)"
       case .inlineCode: "(`)((?:[^`\n])+?)(`)"
-      case .codeBlock: "(```[a-zA-Z]*)\n(.*?)(```)"
+      case .codeBlock: "(```[\\s\\S]*?)(.*?)(```)"
         
         
       default: nil
@@ -41,13 +41,14 @@ extension Markdown.Syntax {
     }
   }
   
-  private static var cachedRegexes: [Markdown.Syntax: NSRegularExpression] = [:]
+//  private static var cachedRegexes: [Markdown.Syntax: NSRegularExpression] = [:]
   
   var regex: NSRegularExpression? {
     
-    if let cachedRegex = Markdown.Syntax.cachedRegexes[self] {
-      return cachedRegex
-    }
+//    if let cachedRegex = Markdown.Syntax.cachedRegexes[self] {
+//      print("Nothing here")
+//      return cachedRegex
+//    }
     
     guard let pattern = self.regexPattern else {
       print("noooohhh")
@@ -56,7 +57,7 @@ extension Markdown.Syntax {
     
     do {
       let regex = try NSRegularExpression(pattern: pattern, options: self.regexOptions)
-      Markdown.Syntax.cachedRegexes[self] = regex
+//      Markdown.Syntax.cachedRegexes[self] = regex
       return regex
     } catch {
       print("Error creating regex for \(self): \(error)")

@@ -13,12 +13,20 @@ import TextCore
 
 public struct Markdown {
   
-  struct Element: Hashable {
+  public struct Element: Hashable {
     var string: String
     var syntax: Markdown.Syntax
     var range: NSRange
+//    var range: Range
     var rect: NSRect
   }
-  
+}
+
+public extension Markdown.Element {
+  struct Range: Hashable {
+    var leading: NSRange
+    var content: NSRange
+    var trailing: NSRange
+  }
 }
 
