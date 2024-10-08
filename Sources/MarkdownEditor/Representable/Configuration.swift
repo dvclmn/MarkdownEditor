@@ -81,6 +81,7 @@ extension MarkdownEditorConfiguration {
   var defaultParagraphStyle: NSParagraphStyle {
     let paragraphStyle = NSMutableParagraphStyle()
     paragraphStyle.lineHeightMultiple = self.lineHeight
+//    paragraphStyle.lineSpacing = 30
     
     return paragraphStyle
   }

@@ -45,7 +45,7 @@ extension MarkdownTextView {
     
   } // END parse and redraw
   
-
+  
   
   func parseCodeBlocks() {
     
@@ -67,7 +67,7 @@ extension MarkdownTextView {
     let currentSelection = selectedRange
     //     Temporary set to collect new elements
     var newElements = Set<Markdown.Element>()
-
+    
     
     guard let pattern = Markdown.Syntax.codeBlock.regex else {
       print("There was an issue with the regex for code blocks")
@@ -79,23 +79,23 @@ extension MarkdownTextView {
     
     let matches = documentText.matches(of: pattern)
     
-//    highlightr.setTheme(to: "xcode-dark")
+    //    highlightr.setTheme(to: "xcode-dark")
     
     for match in matches {
       
-//      let elementRange = getRange(for: .total, in: match)
-//      let elementString = getString(for: .total, in: match)
+      //      let elementRange = getRange(for: .total, in: match)
+      //      let elementString = getString(for: .total, in: match)
       
       let totalString = getString(for: .total, in: match)
       let totalRange: NSRange = documentNSString.range(of: totalString)
-
+      
       guard let highlightedCode: NSAttributedString = highlightr.highlight(totalString, as: "swift") else {
-          print("Couldn't get the Highlighted string")
-          return
-        }
-        
-      textStorage.replaceCharacters(in: totalRange, with: highlightedCode)
-
+        print("Couldn't get the Highlighted string")
+        return
+      }
+      
+      //      textStorage.replaceCharacters(in: totalRange, with: highlightedCode)
+      
       let element = Markdown.Element(
         string: totalString,
         syntax: .codeBlock,
@@ -104,7 +104,7 @@ extension MarkdownTextView {
       )
       
       newElements.insert(element)
-
+      
     } // END matches
     
     
@@ -118,7 +118,7 @@ extension MarkdownTextView {
   } // END parse code blocks
   
   
-
+  
   
   
 } // END extension MD text view
@@ -160,30 +160,30 @@ extension MarkdownTextView {
 
 extension MarkdownTextView {
   
-//  func applyAttributedString(_ attrString: NSAttributedString) {
-    
-    //          // Apply attributes instead of replacing the text
-    //          highlightedCode.enumerateAttributes(in: getRange(for: .total, in: match), options: []) { attrs, range, _ in
-    //
-    //            let effectiveRange = NSRange(location: codeRange.location + range.location, length: range.length)
-    //
-    //            textStorage.setAttributes(attrs, range: effectiveRange)
-    //          }
-    //
-    //            textStorage.setAttributes(highlightedCode, range: getRange(for: .content, in: match))
-    //
-    //
-    //
-    //            for attribute in highlightedCode {
-    //              attribute.
-    //            }
-    //
-    //            textStorage.addAttributes(T##attrs: [NSAttributedString.Key : Any]##[NSAttributedString.Key : Any], range: T##NSRange)
-    //
-    //            ts.setAttributedString(highlightedCode)
-    
-    
-//  }
+  //  func applyAttributedString(_ attrString: NSAttributedString) {
+  
+  //          // Apply attributes instead of replacing the text
+  //          highlightedCode.enumerateAttributes(in: getRange(for: .total, in: match), options: []) { attrs, range, _ in
+  //
+  //            let effectiveRange = NSRange(location: codeRange.location + range.location, length: range.length)
+  //
+  //            textStorage.setAttributes(attrs, range: effectiveRange)
+  //          }
+  //
+  //            textStorage.setAttributes(highlightedCode, range: getRange(for: .content, in: match))
+  //
+  //
+  //
+  //            for attribute in highlightedCode {
+  //              attribute.
+  //            }
+  //
+  //            textStorage.addAttributes(T##attrs: [NSAttributedString.Key : Any]##[NSAttributedString.Key : Any], range: T##NSRange)
+  //
+  //            ts.setAttributedString(highlightedCode)
+  
+  
+  //  }
   
   
   
@@ -194,7 +194,7 @@ extension MarkdownTextView {
     switch type {
       case .total:
         substring = match.output.0
-
+        
       case .content:
         substring = match.output.content
         
@@ -207,9 +207,9 @@ extension MarkdownTextView {
     }
     
     return String(substring)
-
+    
     
   }
   
-
+  
 }

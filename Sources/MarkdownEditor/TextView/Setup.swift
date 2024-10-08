@@ -66,8 +66,7 @@ extension MarkdownTextView {
     
     self.font = NSFont.systemFont(ofSize: self.configuration.theme.fontSize)
     
-    //
-//        typingAttributes = self.configuration.defaultTypingAttributes
+    
     
 //    let defaultAttributes: Attributes = [.foregroundColor: NSColor.textColor.withAlphaComponent(0.9)]
     
@@ -75,6 +74,10 @@ extension MarkdownTextView {
     
 //    let nsString = self.string as NSString
     
+    /// Typing attributes need to be set, otherwise important things like paragraph
+    /// line spacing will be wrong, when I type new characters somewhere.
+    ///
+    self.typingAttributes = self.configuration.defaultTypingAttributes
     self.defaultParagraphStyle = self.configuration.defaultParagraphStyle
     
 //    self.textStorage?.setAttributes(defaults, range: NSRange(location: 0, length: nsString.length))
