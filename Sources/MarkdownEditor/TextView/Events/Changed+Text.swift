@@ -17,7 +17,7 @@ extension MarkdownTextView {
     
     super.didChangeText()
     
-//    onAppearAndTextChange()
+    onAppearAndTextChange()
     
   }
 

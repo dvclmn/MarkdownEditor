@@ -34,22 +34,11 @@ extension MarkdownTextView {
 //    }
 //
     
-//    onAppearAndTextChange()
+    onAppearAndTextChange()
     
     /// I have observed this only working if I place this directly here in `viewDidMoveToWindow`.
     /// Nesting it in another function, then calling that function here, seems not to work?
-    Task { @MainActor in
-      
-      let newSize = self.updatedEditorHeight()
-      let newInfo = self.elements.count.string
-      let newLines: Int = 24
-      
-      infoUpdater.update(\.size, value: newSize)
-//      infoUpdater.update(\.lineCount, value: newLines)
-      
-//      await infoUpdater.update(\.elementSummary, value: newInfo)
-//      displayTypingAttributes()
-    }
+    
     
 //    Task {
 //      await parsingDebouncer.processTask {
@@ -87,9 +76,22 @@ extension MarkdownTextView {
   
   func onAppearAndTextChange() {
     
-    parseMarkdownDebounced()
+    Task { @MainActor in
+      
+      let newSize = self.updatedEditorHeight()
+      let newInfo = self.elements.count.string
+      let newLines: Int = countLinesTK2()
+      
+      infoUpdater.update(\.size, value: newSize)
+            infoUpdater.update(\.lineCount, value: newLines)
+      
+      //      await infoUpdater.update(\.elementSummary, value: newInfo)
+      //      displayTypingAttributes()
+    }
     
-    displayTypingAttributes()
+//    parseMarkdownDebounced()
+    
+//    displayTypingAttributes()
   }
   
 //  func lineCount() {
