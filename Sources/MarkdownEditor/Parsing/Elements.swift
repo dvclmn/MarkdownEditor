@@ -13,12 +13,12 @@ import TextCore
 
 public struct Markdown {
   
-  public struct Element: Hashable {
+  public struct Element: Hashable, Sendable {
     var string: String
     var syntax: Markdown.Syntax
     var range: NSRange
 //    var range: Range
-    var rect: NSRect
+    var rect: NSRect?
   }
 }
 
@@ -36,6 +36,14 @@ public extension Markdown.Element {
     self.rect = layoutManager.boundingRect(forGlyphRange: self.range, in: textContainer)
   }
   
-  
+  var summary: String {
+    let result: String = """
+    Preview: \(self.string.preview())
+    Syntax: \(self.syntax.name)
+    Range: \(self.range.info)
+    """
+    
+    return result
+  }
 }
 

@@ -25,15 +25,18 @@ extension MarkdownTextView {
     
     super.viewDidMoveToWindow()
     
-    Task { @MainActor in
-      await self.infoDebouncer.processTask {
-        
-        let newInfo = "Updated metrics or debugging info"
-        self.infoHandler.updateMetric(keyPath: \.testMessage, value: newInfo)
-      }
-    }
+//    Task { @MainActor in
+//      await self.infoDebouncer.processTask {
+//        
+//        let newInfo = "Updated metrics or debugging info"
+//        self.infoHandler.updateMetric(keyPath: \.testMessage, value: newInfo)
+//      }
+//    }
+//
     
+    parseMarkdownDebounced()
     updateFrameDebounced()
+    updateElementSummary()
 
 //    let codeFontSize: CGFloat = 13
 

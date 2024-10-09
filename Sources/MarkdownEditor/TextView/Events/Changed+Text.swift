@@ -21,11 +21,32 @@ extension MarkdownTextView {
     updateFrameDebounced()
     
     parseMarkdownDebounced()
+    
+    updateElementSummary()
 //    styleMarkdownDebounced()
     
     
     //    updateParagraphInfo(firstSelected: nil)
     
+  }
+  
+  func updateElementSummary() {
+    
+//    var totalElementSummary: String {
+//      self.elements.map { element in
+//        let result = """
+//        Total count: \(element.)
+//        """
+//      }
+//    }
+    
+    Task { @MainActor in
+      await self.infoDebouncer.processTask {
+        
+        let newInfo: String = await self.elements.count.string
+        self.infoHandler.updateMetric(keyPath: \.elementSummary, value: newInfo)
+      }
+    }
   }
   
   /// Initiates a series of delegate messages (and general notifications) to determine

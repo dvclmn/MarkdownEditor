@@ -144,7 +144,7 @@ extension MarkdownTextView {
           string: elementString,
           syntax: .codeBlock,
           range: elementRange,
-          rect: .zero
+          rect: nil
 //          rect: getRect(for: result.range)
         )
         
