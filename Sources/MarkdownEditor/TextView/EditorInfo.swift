@@ -51,7 +51,7 @@ final class EditorInfoUpdater: Sendable {
   private var editorInfo: EditorInfo
   private let debouncer: Debouncer
   public var onInfoUpdate: InfoUpdate?
-  private var latestUpdates: [PartialKeyPath<EditorInfo>: Any] = [:]
+  private var pendingUpdates: [(inout EditorInfo) -> Void] = []
   private var isUpdateScheduled = false
   
   
@@ -67,7 +67,7 @@ final class EditorInfoUpdater: Sendable {
     _ keyPath: WritableKeyPath<EditorInfo, T>,
     value: T
   ) {
-    latestUpdates[keyPath] = value
+    pendingUpdates.append { $0[keyPath: keyPath] = value }
     if !isUpdateScheduled {
       scheduleUpdate()
     }
@@ -77,26 +77,22 @@ final class EditorInfoUpdater: Sendable {
     isUpdateScheduled = true
     Task {
       await debouncer.processTask { [weak self] in
-        await self?.processLatestUpdates()
+        await self?.processPendingUpdates()
       }
     }
   }
   
-  private func processLatestUpdates() {
-    guard !latestUpdates.isEmpty else { return }
+  private func processPendingUpdates() {
+    guard !pendingUpdates.isEmpty else { return }
     
     var updatedInfo = self.editorInfo
-    for (keyPath, value) in latestUpdates {
-      if let typedKeyPath = keyPath as? WritableKeyPath<EditorInfo, Any> {
-        updatedInfo[keyPath: typedKeyPath] = value
-      } else {
-        print("That didn't work, the key path")
-      }
+    for update in pendingUpdates {
+      update(&updatedInfo)
     }
     
     self.editorInfo = updatedInfo
     self.onInfoUpdate?(self.editorInfo)
-    latestUpdates.removeAll()
+    pendingUpdates.removeAll()
     isUpdateScheduled = false
   }
   
