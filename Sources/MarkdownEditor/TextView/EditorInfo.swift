@@ -9,21 +9,16 @@ import SwiftUI
 
 
 public struct EditorInfo: Sendable {
-  
   public var size: CGSize
-  public var metrics: EditorInfo.Metrics
+  public var metrics: Metrics
   
   public init(
     size: CGSize = .zero,
-    metrics: EditorInfo.Metrics = .init()
+    metrics: Metrics = .init()
   ) {
     self.size = size
     self.metrics = metrics
   }
-  
-}
-
-extension EditorInfo {
   
   public struct Metrics: Sendable {
     public var lineCount: Int
@@ -39,70 +34,51 @@ extension EditorInfo {
   }
 }
 
-
-extension EditorInfo {
-  
-  mutating func updateSize(_ size: CGSize) {
-    self.size = size
-  }
-  
-  mutating func updateMetrics(_ metrics: Metrics) {
-    self.metrics = metrics
-  }
-}
-
-enum MetricType {
-  case lineCount
-  case characterCount
-}
-
-
-extension EditorInfoHandler {
-  func updateLineCount(to count: Int) {
-    var currentMetrics = editorInfo.metrics
-    currentMetrics.lineCount = count
-    updateMetrics(currentMetrics)
-  }
-  
-  func updateCharacterCount(to count: Int) {
-    var currentMetrics = editorInfo.metrics
-    currentMetrics.characterCount = count
-    updateMetrics(currentMetrics)
-  }
-  
-}
-
-
-
-actor EditorInfoHandler {
-  
-  /// This just holds on to the instance of the `EditorInfo` struct
+final class EditorInfoHandler {
   private var editorInfo = EditorInfo()
-  
   var onInfoUpdate: InfoUpdate?
   
-  /// Updates the size of the editor and notifies listeners.
   func updateSize(_ size: CGSize) {
     editorInfo.size = size
     notifyUpdate()
   }
   
-  /// Updates the info string of the editor and notifies listeners.
-  func updateInfo(_ info: String) {
-    editorInfo.info = info
+  func updateMetrics(_ metrics: EditorInfo.Metrics) {
+    editorInfo.metrics = metrics
     notifyUpdate()
   }
   
-  /// Notifies listeners about the updated `EditorInfo`.
+  func updateLineCount(to count: Int) {
+    editorInfo.metrics.lineCount = count
+    notifyUpdate()
+  }
+  
+  func updateCharacterCount(to count: Int) {
+    editorInfo.metrics.characterCount = count
+    notifyUpdate()
+  }
+  
   private func notifyUpdate() {
     onInfoUpdate?(editorInfo)
+//    Task { @MainActor in
+//    }
   }
 }
+//
+//extension MarkdownTextView {
+//  func setupInfoHandler() {
+//    infoHandler.onInfoUpdate = { [weak self] info in
+//      self?.onInfoUpdate(info)
+//    }
+//  }
+//}
 
 extension MarkdownTextView {
   func setupInfoHandler() {
-    infoHandler.onInfoUpdate = { [weak self] info in
-      self?.onInfoUpdate(info)
+    Task {
+      self.infoHandler.onInfoUpdate = { [weak self] info in
+        self?.onInfoUpdate(info)
+      }
     }
   }
 }
