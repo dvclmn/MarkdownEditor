@@ -11,16 +11,32 @@ import SwiftUI
 public struct EditorInfo: Sendable {
   
   public var size: CGSize
-  public var info: String
-
+  public var metrics: EditorInfo.Metrics
+  
   public init(
     size: CGSize = .zero,
-    info: String = "No info"
+    metrics: EditorInfo.Metrics = .init()
   ) {
     self.size = size
-    self.info = info
+    self.metrics = metrics
   }
+  
+}
 
+extension EditorInfo {
+  
+  public struct Metrics: Sendable {
+    public var lineCount: Int
+    public var characterCount: Int
+    
+    public init(
+      lineCount: Int = 0,
+      characterCount: Int = 0
+    ) {
+      self.lineCount = lineCount
+      self.characterCount = characterCount
+    }
+  }
 }
 
 
@@ -30,17 +46,35 @@ extension EditorInfo {
     self.size = size
   }
   
-  mutating func updateInfo(_ info: String) {
-    self.info = info
+  mutating func updateMetrics(_ metrics: Metrics) {
+    self.metrics = metrics
+  }
+}
+
+enum MetricType {
+  case lineCount
+  case characterCount
+}
+
+
+extension EditorInfoHandler {
+  func updateLineCount(to count: Int) {
+    var currentMetrics = editorInfo.metrics
+    currentMetrics.lineCount = count
+    updateMetrics(currentMetrics)
   }
   
-  
+  func updateCharacterCount(to count: Int) {
+    var currentMetrics = editorInfo.metrics
+    currentMetrics.characterCount = count
+    updateMetrics(currentMetrics)
+  }
   
 }
 
 
-@MainActor
-final class EditorInfoHandler: Sendable {
+
+actor EditorInfoHandler {
   
   /// This just holds on to the instance of the `EditorInfo` struct
   private var editorInfo = EditorInfo()
