@@ -10,37 +10,32 @@ import SwiftUI
 
 public struct EditorInfo: Sendable {
   
-  public var frame: EditorInfo.Frame
+  public var size: CGSize
+  public var info: String
 
   public init(
-    frame: EditorInfo.Frame = .init()
+    size: CGSize = .zero,
+    info: String = "No info"
   ) {
-    self.frame = frame
+    self.size = size
+    self.info = info
   }
 
-  public struct Frame: Sendable {
-    public var width: CGFloat
-    public var height: CGFloat
-    
-    public init(
-      width: CGFloat = .zero,
-      height: CGFloat = .zero
-    ) {
-      self.width = width
-      self.height = height
-    }
-  }
 }
 
 
-protocol EditorInfoUpdatable {
-  func updateIn(_ editorInfo: inout EditorInfo)
-}
-
-extension EditorInfo.Frame: EditorInfoUpdatable {
-  func updateIn(_ editorInfo: inout EditorInfo) {
-    editorInfo.frame = self
+extension EditorInfo {
+  
+  mutating func updateSize(_ size: CGSize) {
+    self.size = size
   }
+  
+  mutating func updateInfo(_ info: String) {
+    self.info = info
+  }
+  
+  
+  
 }
 
 @MainActor

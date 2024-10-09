@@ -36,7 +36,7 @@ extension MarkdownTextView {
 //    highlightr.theme.boldCodeFont = NSFont.monospacedSystemFont(ofSize: codeFontSize, weight: .bold)
     
     
-    parseMarkdownDebounced()
+//    parseMarkdownDebounced()
 //    styleMarkdownDebounced()
     
     //        exploreTextSegments()
