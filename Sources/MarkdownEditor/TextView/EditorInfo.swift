@@ -38,13 +38,37 @@ extension EditorInfo {
   
 }
 
+
 @MainActor
-class EditorInfoHandler {
-  private var editorInfo = EditorInfo()
-  var onInfoUpdate: ((EditorInfo) -> Void)?
+final class EditorInfoHandler: Sendable {
   
-  func update<T: EditorInfoUpdatable>(_ updatable: T) async {
-    updatable.updateIn(&editorInfo)
+  /// This just holds on to the instance of the `EditorInfo` struct
+  private var editorInfo = EditorInfo()
+  
+  var onInfoUpdate: InfoUpdate?
+  
+  /// Updates the size of the editor and notifies listeners.
+  func updateSize(_ size: CGSize) {
+    editorInfo.size = size
+    notifyUpdate()
+  }
+  
+  /// Updates the info string of the editor and notifies listeners.
+  func updateInfo(_ info: String) {
+    editorInfo.info = info
+    notifyUpdate()
+  }
+  
+  /// Notifies listeners about the updated `EditorInfo`.
+  private func notifyUpdate() {
     onInfoUpdate?(editorInfo)
+  }
+}
+
+extension MarkdownTextView {
+  func setupInfoHandler() {
+    infoHandler.onInfoUpdate = { [weak self] info in
+      self?.onInfoUpdate(info)
+    }
   }
 }

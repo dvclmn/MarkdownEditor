@@ -27,7 +27,16 @@ extension MarkdownTextView {
     
 //    setupViewportLayoutController()
     
+    Task {
+      await self.infoDebouncer.processTask {
+        
+        let newInfo = "Updated metrics or debugging info"
+        await self.infoHandler.updateInfo(newInfo)
+      }
+    }
     
+    updateFrameDebounced()
+
 //    let codeFontSize: CGFloat = 13
 
 //    highlightr.setTheme(to: "xcode-dark")
@@ -83,17 +92,6 @@ extension MarkdownTextView {
   //    } // END perform edit
   //  }
   
-  
-  //  func setupScrollObservation() {
-  //
-  //    NotificationCenter.default.addObserver(
-  //      self,
-  //      selector: #selector(handleScrollViewDidScroll),
-  //      name: NSView.boundsDidChangeNotification,
-  //      object: enclosingScrollView?.contentView
-  //    )
-  //
-  //  }
-  
+
   
 }

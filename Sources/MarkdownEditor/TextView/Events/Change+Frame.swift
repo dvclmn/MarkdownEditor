@@ -14,7 +14,7 @@ extension MarkdownTextView {
   /// Trying to use a `layout` override, as a way to trigger parsing/styling/frame
   /// changes, is a BAD idea, and results in such messages as
   /// `attempted layout while textStorage is editing. It is not valid to cause the layoutManager to do layout while the textStorage is editing` etc
-
+  
   
   public override var intrinsicContentSize: NSSize {
     guard let container = textContainer,
@@ -23,34 +23,38 @@ extension MarkdownTextView {
     }
     
     layoutManager.ensureLayout(for: container)
-
+    
     let usedRect = layoutManager.usedRect(for: container).size
-
+    
     return usedRect
-
+    
   }
-  
-  
   
   func updateFrameDebounced() {
     
     Task {
       await frameDebouncer.processTask {
         Task { @MainActor in
-          
-          let newHeight = self.updatedEditorHeight()
-          
-          
-          
-          await self.infoHandler.update(newHeight)
+          let newSize = self.updatedEditorHeight()
+          self.infoHandler.updateSize(newSize)
         }
       }
     } // END Task
   } // END update frame debounced
   
   
+  //  // Example method to trigger size update
+  //  private func someMethodThatChangesSize() {
+  //    let newSize = self.frame.size
+  //    frameDebouncer.run { [weak self] in
+  //      self?.infoHandler.updateSize(newSize)
+  //    }
+  //  }
+
   
-  func updatedEditorHeight() -> EditorInfo.Frame {
+  
+  
+  func updatedEditorHeight() -> CGSize {
     
     invalidateIntrinsicContentSize()
     
@@ -59,13 +63,12 @@ extension MarkdownTextView {
     let minHeight: CGFloat = 80
     
     let adjustedHeight: CGFloat = newSize.height + extraHeightBuffer
-
+    
     let finalHeight = max(adjustedHeight, minHeight)
     
-    return EditorInfo.Frame(
-      width: newSize.width,
-      height: finalHeight
-    )
+    let result = CGSize(width: newSize.width, height: finalHeight)
+    
+    return result
     
   }
   

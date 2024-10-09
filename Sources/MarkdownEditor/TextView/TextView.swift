@@ -29,11 +29,13 @@ public class MarkdownTextView: NSTextView {
   ///
   var frameDebouncer = Debouncer(interval: 0.3)
   var parsingDebouncer = Debouncer(interval: 0.3)
+  var infoDebouncer = Debouncer(interval: 0.3)
+  
 //  var stylingDebouncer = Debouncer(interval: 0.3)
   
   let infoHandler = EditorInfoHandler()
   
-  public var onInfoUpdate: MarkdownEditor.InfoUpdate = { _ in }
+  public var onInfoUpdate: InfoUpdate = { _ in }
   
 
   
@@ -85,10 +87,7 @@ public class MarkdownTextView: NSTextView {
     
     self.textViewSetup()
     
-    self.infoHandler.onInfoUpdate = { [weak self] info in
-//      print("How often is this called? \(Date.now.friendlyDateAndTime)")
-      self?.onInfoUpdate(info)
-    }
+    self.setupInfoHandler()
     
   }
   

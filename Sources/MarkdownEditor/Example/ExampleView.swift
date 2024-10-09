@@ -51,7 +51,7 @@ public struct ExampleView: View {
       ) { info in
         self.editorInfo = info
       }
-      .frame(height: self.editorInfo?.frame.height)
+      .frame(height: self.editorInfo?.size.height)
       
     }
     .scrollWithOffset()
