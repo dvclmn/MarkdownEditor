@@ -64,7 +64,6 @@ final class EditorInfoHandler: Sendable {
     notifyUpdate()
   }
   
-  // Generic method to update metrics using a key path
   func updateMetric<T>(keyPath: WritableKeyPath<EditorInfo.Metrics, T>, value: T) {
     let updatedMetrics = editorInfo.metrics.updating(keyPath: keyPath, value: value)
     editorInfo = EditorInfo(size: editorInfo.size, metrics: updatedMetrics)
@@ -90,6 +89,7 @@ extension EditorInfo.Metrics {
 
 
 extension MarkdownTextView {
+  
   func setupInfoHandler() {
     Task {
       self.infoHandler.onInfoUpdate = { [weak self] info in
@@ -97,4 +97,5 @@ extension MarkdownTextView {
       }
     }
   }
+  
 }

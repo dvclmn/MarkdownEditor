@@ -23,10 +23,19 @@ public struct Markdown {
 }
 
 public extension Markdown.Element {
-  struct Range: Hashable {
-    var leading: NSRange
-    var content: NSRange
-    var trailing: NSRange
+//  struct Range: Hashable {
+//    var leading: NSRange
+//    var content: NSRange
+//    var trailing: NSRange
+//  }
+  
+  mutating func updateRect(
+    layoutManager: NSLayoutManager,
+    textContainer: NSTextContainer
+  ) {
+    self.rect = layoutManager.boundingRect(forGlyphRange: self.range, in: textContainer)
   }
+  
+  
 }
 

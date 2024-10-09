@@ -25,8 +25,6 @@ extension MarkdownTextView {
     
     super.viewDidMoveToWindow()
     
-//    setupViewportLayoutController()
-    
     Task { @MainActor in
       await self.infoDebouncer.processTask {
         
