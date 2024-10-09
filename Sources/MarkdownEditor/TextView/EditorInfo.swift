@@ -45,6 +45,7 @@ public extension EditorInfo {
 }
 
 public extension EditorInfo.Metrics {
+  
   var summary: String {
     let result: String = """
     Line count: \(lineCount)
@@ -81,8 +82,11 @@ final class EditorInfoHandler: Sendable {
 
 
 extension EditorInfo.Metrics {
-  // Generalized method for updating any property
-  public func updating<T>(keyPath: WritableKeyPath<EditorInfo.Metrics, T>, value: T) -> EditorInfo.Metrics {
+  
+  public func updating<T>(
+    keyPath: WritableKeyPath<EditorInfo.Metrics, T>,
+    value: T
+  ) -> EditorInfo.Metrics {
     var updatedMetrics = self
     updatedMetrics[keyPath: keyPath] = value
     return updatedMetrics
