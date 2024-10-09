@@ -37,6 +37,7 @@ extension MarkdownTextView {
     parseMarkdownDebounced()
     updateFrameDebounced()
     updateElementSummary()
+    displayTypingAttributes()
 
 //    let codeFontSize: CGFloat = 13
 

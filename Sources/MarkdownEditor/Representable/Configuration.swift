@@ -90,7 +90,7 @@ extension MarkdownEditorConfiguration {
 public extension AttributeContainer {
   static var markdownRenderingDefaults: AttributeContainer {
     var container = AttributeContainer()
-    container.foregroundColor = NSColor.textColor.withAlphaComponent(0.9)
+    container.foregroundColor = NSColor.systemCyan
 
     return container
   }

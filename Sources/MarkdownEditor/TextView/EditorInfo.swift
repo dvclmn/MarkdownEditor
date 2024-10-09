@@ -27,16 +27,19 @@ public extension EditorInfo {
   struct Metrics: Sendable {
     public var lineCount: Int
     public var elementSummary: String
-    public var testMessage: String
+    public var typingAttributes: String
+
     
     public init(
       lineCount: Int = 0,
       elementSummary: String = "No summary",
-      testMessage: String = "nil"
+      typingAttributes: String = "No attributes"
+
     ) {
       self.lineCount = lineCount
       self.elementSummary = elementSummary
-      self.testMessage = testMessage
+      self.typingAttributes = typingAttributes
+
     }
   }
 }
@@ -46,7 +49,7 @@ public extension EditorInfo.Metrics {
     let result: String = """
     Line count: \(lineCount)
     Elements: \(elementSummary)
-    Message: \(testMessage)
+    Typing attributes: \n\(typingAttributes)
     """
     
     return result
