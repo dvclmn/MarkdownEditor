@@ -87,7 +87,7 @@ extension MarkdownTextView {
     
     
     Task {
-      await infoUpdater.updateMetric(\.typingAttributes, value: result)
+      await infoUpdater.update(\.typingAttributes, value: result)
     }
     
 //

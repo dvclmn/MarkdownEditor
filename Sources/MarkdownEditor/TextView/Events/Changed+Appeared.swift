@@ -42,9 +42,13 @@ extension MarkdownTextView {
       
       let newSize = self.updatedEditorHeight()
       let newInfo = self.elements.count.string
-
-      await infoUpdater.updateSize(newSize)
-//      await infoUpdater.updateMetric(\.elementSummary, value: newInfo)
+      let newLines: Int = 24
+      
+      infoUpdater.update(\.size, value: newSize)
+//      infoUpdater.update(\.lineCount, value: newLines)
+      
+//      await infoUpdater.update(\.elementSummary, value: newInfo)
+//      displayTypingAttributes()
     }
     
 //    Task {
