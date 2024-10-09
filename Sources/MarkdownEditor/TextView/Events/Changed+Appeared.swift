@@ -34,10 +34,7 @@ extension MarkdownTextView {
 //    }
 //
     
-    parseMarkdownDebounced()
-    updateFrameDebounced()
-    updateElementSummary()
-    displayTypingAttributes()
+    onAppearAndTextChange()
 
 //    let codeFontSize: CGFloat = 13
 
@@ -55,6 +52,14 @@ extension MarkdownTextView {
     
 //    basicInlineMarkdown()
     
+  }
+  
+  func onAppearAndTextChange() {
+    
+    parseMarkdownDebounced()
+    updateFrameDebounced()
+    updateElementSummary()
+    displayTypingAttributes()
   }
   
 //  func lineCount() {

@@ -65,7 +65,15 @@ extension MarkdownTextView {
           valueString = number.stringValue
           
         case let paragraphStyle as NSParagraphStyle:
-          valueString = "Alignment: \(paragraphStyle.alignment.rawValue), LineSpacing: \(paragraphStyle.lineSpacing)"
+          
+          let paragraphInfo: String = """
+          Line spacing: \(paragraphStyle.lineSpacing)
+          Line height multiple: \(paragraphStyle.lineHeightMultiple)
+          Line break mode: \(paragraphStyle.lineBreakMode.displayName)
+          """
+          
+          valueString = "\n" + paragraphInfo.indentingEachLine(2)
+
           
         default:
           valueString = "Default: " + String(describing: value)

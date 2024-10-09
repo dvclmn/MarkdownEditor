@@ -17,16 +17,7 @@ extension MarkdownTextView {
     
     super.didChangeText()
     
-    
-    updateFrameDebounced()
-    
-    parseMarkdownDebounced()
-    
-    updateElementSummary()
-//    styleMarkdownDebounced()
-    
-    
-    //    updateParagraphInfo(firstSelected: nil)
+    onAppearAndTextChange()
     
   }
   
