@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-
+// MARK: - EditorInfo
 public struct EditorInfo: Sendable {
   public var size: CGSize
   public var metrics: Metrics
@@ -19,8 +19,11 @@ public struct EditorInfo: Sendable {
     self.size = size
     self.metrics = metrics
   }
-  
-  public struct Metrics: Sendable {
+}
+
+// MARK: - EditorInfo.Metrics
+public extension EditorInfo {
+  struct Metrics: Sendable {
     public var lineCount: Int
     public var characterCount: Int
     
@@ -33,6 +36,8 @@ public struct EditorInfo: Sendable {
     }
   }
 }
+
+
 
 final class EditorInfoHandler {
   private var editorInfo = EditorInfo()
@@ -60,8 +65,53 @@ final class EditorInfoHandler {
   
   private func notifyUpdate() {
     onInfoUpdate?(editorInfo)
-//    Task { @MainActor in
-//    }
+    //    Task { @MainActor in
+    //    }
+  }
+  
+  
+  func updateMetrics<Property: MetricUpdatable>(_ property: inout Property, value: Property.ValueType) {
+    var currentMetrics = editorInfo.metrics
+    currentMetrics.update(&property, with: value)
+    editorInfo.metrics = currentMetrics
+    notifyUpdate()
+  }
+  
+  private func notifyUpdate() {
+    onInfoUpdate?(editorInfo)
+  }
+}
+
+public protocol MetricUpdatable {
+  associatedtype ValueType
+  
+  var name: String { get } // Name of the property for logging or updating
+  mutating func update(with value: ValueType)
+}
+
+extension Int: MetricUpdatable {
+  public var name: String { "Int" }
+  
+  public mutating func update(with value: Int) {
+    self = value
+  }
+}
+
+extension String: MetricUpdatable {
+  public var name: String { "String" }
+  
+  public mutating func update(with value: String) {
+    self = value
+  }
+}
+
+// Extend Metrics to conform to the protocol
+extension EditorInfo.Metrics {
+  mutating func update<Property: MetricUpdatable>(
+    _ property: inout Property,
+    with value: Property.ValueType
+  ) {
+    property.update(with: value)
   }
 }
 //
