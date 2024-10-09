@@ -47,6 +47,8 @@ extension MarkdownTextView {
 //    /// There would be a way to make it work, but currently I think that
 //    /// as soon as I style something, I think I'm then taking it away, by resetting
 //    /// all the elements in the Set. Need to improve this.
+    
+              
     Task {
       await parsingDebouncer.processTask {
         
@@ -58,12 +60,11 @@ extension MarkdownTextView {
           for syntax in Markdown.Syntax.testCases {
             self.parseSyntax(syntax)
           }
-          
-
-          self.isUpdatingText = false
         }
       }
     }
+    
+              
     
 //    
     
@@ -81,22 +82,12 @@ extension MarkdownTextView {
       return
     }
     
-    
     var generalInfo: String = "General info\n\n"
     
     guard let textStorage = self.textStorage else {
       fatalError("Issue getting the text storage")
     }
 
-    //    let documentText = textStorage.string
-    
-    //    guard let documentNSString = self.string as NSString? else {
-    //      print("Error getting NSString")
-    //      return
-    //    }
-    
-    //     Temporary set to collect new elements
-    
     let string = self.string
     
     generalInfo += string.preview()
@@ -112,6 +103,8 @@ extension MarkdownTextView {
     
     var matchesString: String = "Enumeration results:\n"
     var resultCount: Int = 0
+    
+    
     
     
     
@@ -135,15 +128,17 @@ extension MarkdownTextView {
         matchesString += newInfo
         
         
-        guard let highlightedCode: NSAttributedString = highlightr.highlight(elementString, as: nil) else {
-          print("Couldn't get the Highlighted string")
-          return
-        }
-        
-        
-        
-        textStorage.replaceCharacters(in: elementRange, with: highlightedCode)
-        
+//        guard let highlightedCode: NSAttributedString = highlightr.highlight(elementString, as: nil) else {
+//          print("Couldn't get the Highlighted string")
+//          return
+//        }
+//        
+//        
+//        let currentSelection = self.selectedRange
+//        
+//        textStorage.replaceCharacters(in: elementRange, with: highlightedCode)
+//        
+//        self.setSelectedRange(currentSelection)
         
         let element = Markdown.Element(
           string: elementString,
@@ -161,11 +156,13 @@ extension MarkdownTextView {
       }
     } // END enumerate matches
     
-    generalInfo += "Total \(syntax.name)s found: \(resultCount)\n\n"
     
+    
+    
+    
+    generalInfo += "Total \(syntax.name)s found: \(resultCount)\n\n"
     generalInfo += matchesString
     
-//    print(matchesString)
     print(Box(header: "Parsing markdown", content: generalInfo))
     
     self.elements = newElements
