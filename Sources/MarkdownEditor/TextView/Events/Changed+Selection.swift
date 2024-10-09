@@ -85,11 +85,17 @@ extension MarkdownTextView {
       .map { "\t\($0): \($1)" }
       .joined(separator: "\n")
     
-    Task { @MainActor in
-      await self.infoDebouncer.processTask {
-        self.infoHandler.updateMetric(keyPath: \.typingAttributes, value: result)
-      }
+    
+    Task {
+      await infoUpdater.updateMetric(\.typingAttributes, value: result)
     }
+    
+//
+//    Task { @MainActor in
+//      await self.infoDebouncer.processTask {
+//        self.infoHandler.updateMetric(keyPath: \.typingAttributes, value: result)
+//      }
+//    }
   }
   
   //  func printNewSelection() {

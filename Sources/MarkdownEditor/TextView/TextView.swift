@@ -33,7 +33,9 @@ public class MarkdownTextView: NSTextView {
   
 //  var stylingDebouncer = Debouncer(interval: 0.3)
   
-  let infoHandler = EditorInfoHandler()
+//  let infoHandler = EditorInfoHandler()
+  
+  let infoUpdater: EditorInfoUpdater
   
   public var onInfoUpdate: InfoUpdate = { _ in }
   
@@ -51,6 +53,7 @@ public class MarkdownTextView: NSTextView {
     
     self.configuration = configuration
     self.highlightr = highlightr
+    self.infoUpdater = EditorInfoUpdater()
     
     if configuration.isTextKit2 {
       

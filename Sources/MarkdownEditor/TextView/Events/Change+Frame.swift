@@ -30,29 +30,7 @@ extension MarkdownTextView {
     
   }
   
-  func updateFrameDebounced() {
-    
-    Task {
-      await frameDebouncer.processTask {
-        Task { @MainActor in
-          let newSize = self.updatedEditorHeight()
-          self.infoHandler.updateSize(newSize)
-        }
-      }
-    } // END Task
-  } // END update frame debounced
-  
-  
-  //  // Example method to trigger size update
-  //  private func someMethodThatChangesSize() {
-  //    let newSize = self.frame.size
-  //    frameDebouncer.run { [weak self] in
-  //      self?.infoHandler.updateSize(newSize)
-  //    }
-  //  }
 
-  
-  
   
   func updatedEditorHeight() -> CGSize {
     

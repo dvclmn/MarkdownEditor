@@ -49,20 +49,7 @@ extension MarkdownTextView {
 //    /// all the elements in the Set. Need to improve this.
     
               
-    Task {
-      await parsingDebouncer.processTask {
-        
-        /// I learned that `Task { @MainActor in` is `async`,
-        /// whereas `await MainActor.run {` is synchronous.
-        ///
-        //        await MainActor.run {
-        Task { @MainActor in
-          for syntax in Markdown.Syntax.testCases {
-            self.parseSyntax(syntax)
-          }
-        }
-      }
-    }
+    
     
               
     

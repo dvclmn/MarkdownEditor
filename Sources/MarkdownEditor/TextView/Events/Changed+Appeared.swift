@@ -34,7 +34,34 @@ extension MarkdownTextView {
 //    }
 //
     
-    onAppearAndTextChange()
+//    onAppearAndTextChange()
+    
+    /// I have observed this only working if I place this directly here in `viewDidMoveToWindow`.
+    /// Nesting it in another function, then calling that function here, seems not to work?
+    Task { @MainActor in
+      
+      let newSize = self.updatedEditorHeight()
+      let newInfo = self.elements.count.string
+
+      await infoUpdater.updateSize(newSize)
+//      await infoUpdater.updateMetric(\.elementSummary, value: newInfo)
+    }
+    
+//    Task {
+//      await parsingDebouncer.processTask {
+//        
+//        /// I learned that `Task { @MainActor in` is `async`,
+//        /// whereas `await MainActor.run {` is synchronous.
+//        ///
+//        //        await MainActor.run {
+//        Task { @MainActor in
+//          for syntax in Markdown.Syntax.testCases {
+//            self.parseSyntax(syntax)
+//          }
+//        }
+//      }
+//    }
+    
 
 //    let codeFontSize: CGFloat = 13
 
@@ -57,8 +84,7 @@ extension MarkdownTextView {
   func onAppearAndTextChange() {
     
     parseMarkdownDebounced()
-    updateFrameDebounced()
-    updateElementSummary()
+    
     displayTypingAttributes()
   }
   
