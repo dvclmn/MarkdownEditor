@@ -30,11 +30,11 @@ extension MarkdownTextView {
   
   func parseMarkdownDebounced() {
     
-//    DispatchQueue.main.async {
-//      for syntax in Markdown.Syntax.testCases {
-//        self.parseSyntax(syntax)
-//      }
-//    }
+    DispatchQueue.main.async {
+      for syntax in Markdown.Syntax.testCases {
+        self.parseSyntax(syntax)
+      }
+    }
 //    
     
 //    guard !isUpdatingFrame || !isUpdatingText else {
@@ -59,10 +59,6 @@ extension MarkdownTextView {
   
  
   func parseSyntax(_ syntax: Markdown.Syntax) {
-    
-    //    guard let layoutManager = self.layoutManager else {
-    //      fatalError("Issue getting the layout manager")
-    //    }
     
     guard let pattern = syntax.regex else {
       print("No regex defined for \(syntax.name)")

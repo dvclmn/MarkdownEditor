@@ -13,68 +13,35 @@ import BaseHelpers
 
 extension MarkdownTextView {
   
-//  public override func viewDidMoveToSuperview() {
-//    super.viewDidMoveToSuperview()
-//    
-//    //    if configuration.isScrollable {
-//    //      setupScrollObservation()
-//    //    }
-//  }
-  
   public override func viewDidMoveToWindow() {
     
     super.viewDidMoveToWindow()
-    
-//    Task { @MainActor in
-//      await self.infoDebouncer.processTask {
-//        
-//        let newInfo = "Updated metrics or debugging info"
-//        self.infoHandler.updateMetric(keyPath: \.testMessage, value: newInfo)
-//      }
-//    }
-//
-    
+
     onAppearAndTextChange()
     
-    /// I have observed this only working if I place this directly here in `viewDidMoveToWindow`.
-    /// Nesting it in another function, then calling that function here, seems not to work?
+ 
+    
+    //    let codeFontSize: CGFloat = 13
+    
+    //    highlightr.setTheme(to: "xcode-dark")
+    //
+    //    highlightr.theme.codeFont = NSFont.monospacedSystemFont(ofSize: codeFontSize, weight: .medium)
+    //    highlightr.theme.boldCodeFont = NSFont.monospacedSystemFont(ofSize: codeFontSize, weight: .bold)
     
     
-//    Task {
-//      await parsingDebouncer.processTask {
-//        
-//        /// I learned that `Task { @MainActor in` is `async`,
-//        /// whereas `await MainActor.run {` is synchronous.
-//        ///
-//        //        await MainActor.run {
-//        Task { @MainActor in
-//          for syntax in Markdown.Syntax.testCases {
-//            self.parseSyntax(syntax)
-//          }
-//        }
-//      }
-//    }
-    
-
-//    let codeFontSize: CGFloat = 13
-
-//    highlightr.setTheme(to: "xcode-dark")
-//    
-//    highlightr.theme.codeFont = NSFont.monospacedSystemFont(ofSize: codeFontSize, weight: .medium)
-//    highlightr.theme.boldCodeFont = NSFont.monospacedSystemFont(ofSize: codeFontSize, weight: .bold)
-    
-    
-//    parseMarkdownDebounced()
-//    styleMarkdownDebounced()
+    //    parseMarkdownDebounced()
+    //    styleMarkdownDebounced()
     
     //        exploreTextSegments()
     
     
-//    basicInlineMarkdown()
+    //    basicInlineMarkdown()
     
   }
   
   func onAppearAndTextChange() {
+    
+    parseMarkdownDebounced()
     
     Task { @MainActor in
       
@@ -83,21 +50,14 @@ extension MarkdownTextView {
       let newLines: Int = countLinesTK2()
       
       infoUpdater.update(\.size, value: newSize)
-            infoUpdater.update(\.lineCount, value: newLines)
+      infoUpdater.update(\.lineCount, value: newLines)
+      infoUpdater.update(\.elementSummary, value: newInfo)
       
-      //      await infoUpdater.update(\.elementSummary, value: newInfo)
-      //      displayTypingAttributes()
     }
     
-//    parseMarkdownDebounced()
-    
-//    displayTypingAttributes()
   }
   
-//  func lineCount() {
-//    
-//  }
- 
+
   //  func exploreTextSegments() {
   //
   //    guard let tlm = self.textLayoutManager,
@@ -131,6 +91,6 @@ extension MarkdownTextView {
   //    } // END perform edit
   //  }
   
-
+  
   
 }
