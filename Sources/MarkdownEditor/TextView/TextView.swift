@@ -55,7 +55,7 @@ public class MarkdownTextView: NSTextView {
     self.highlightr = highlightr
     self.infoUpdater = EditorInfoUpdater()
     
-    if configuration.isTextKit2 {
+//    if configuration.isTextKit2 {
       
       /// First, we provide TextKit with a frame
       ///
@@ -82,11 +82,11 @@ public class MarkdownTextView: NSTextView {
       
       super.init(frame: frameRect, textContainer: nsTextContainer)
       
-    } else {
-      
-      super.init(frame: frameRect, textContainer: container)
-      
-    }
+//    } else {
+//      
+//      super.init(frame: frameRect, textContainer: container)
+//      
+//    }
     
     self.textViewSetup()
     

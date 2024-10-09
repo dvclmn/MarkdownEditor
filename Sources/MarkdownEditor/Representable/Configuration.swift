@@ -22,7 +22,7 @@ public struct MarkdownEditorConfiguration: Sendable, Equatable {
   public var isShowingFrames: Bool
   public var maxReadingWidth: CGFloat
   
-  let isTextKit2: Bool = false
+//  let isTextKit2: Bool = false
   
   /// I've been switching Neon on and off a lot, so this is here to save me
   /// constantly toggling blocks of code everywhere.

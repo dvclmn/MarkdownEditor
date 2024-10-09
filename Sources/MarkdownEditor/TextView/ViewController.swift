@@ -29,31 +29,31 @@ public class MarkdownViewController: NSViewController {
       fatalError("Why no Highlightr?")
     }
     
-    if configuration.isTextKit2 {
-      self.textView = MarkdownTextView(
-        frame: .zero,
-        textContainer: nil,
-        configuration: configuration,
-        highlightr: highlightr
-      )
-    } else {
+    self.textView = MarkdownTextView(
+      frame: .zero,
+      textContainer: nil,
+      configuration: configuration,
+      highlightr: highlightr
+    )
+//    if configuration.isTextKit2 {
+//    } else {
+//      
+//      /// TextKit 1 setup
+//      let container = NSTextContainer()
+//      let textStorage = NSTextStorage()
+//      let layoutManager = NSLayoutManager()
+//      textStorage.addLayoutManager(layoutManager)
+//      
+//      layoutManager.addTextContainer(container)
+//      
+//      self.textView = MarkdownTextView(
+//        frame: .zero,
+//        textContainer: container,
+//        configuration: configuration,
+//        highlightr: highlightr
+//      )
       
-      /// TextKit 1 setup
-      let container = NSTextContainer()
-      let textStorage = NSTextStorage()
-      let layoutManager = NSLayoutManager()
-      textStorage.addLayoutManager(layoutManager)
-      
-      layoutManager.addTextContainer(container)
-      
-      self.textView = MarkdownTextView(
-        frame: .zero,
-        textContainer: container,
-        configuration: configuration,
-        highlightr: highlightr
-      )
-      
-    }
+//    }
     
     
     if configuration.isScrollable {

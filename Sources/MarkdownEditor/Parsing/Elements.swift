@@ -29,13 +29,42 @@ public extension Markdown.Element {
 //    var trailing: NSRange
 //  }
   
-  mutating func updateRect(
-    layoutManager: NSLayoutManager,
-    textContainer: NSTextContainer
-  ) {
-    self.rect = layoutManager.boundingRect(forGlyphRange: self.range, in: textContainer)
-  }
+//  mutating func updateRect(tlm: NSTextLayoutManager) {
+//    
+//    guard let tcm = tlm.textContentManager,
+//    let textRange = NSTextRange(self.range, provider: tcm)
+//    else {
+//      self.rect = nil
+//    }
+//    
+//    var totalRect = CGRect.zero
+//    
+//    tlm.enumerateTextLayoutFragments(from: textRange.location, options: .ensuresLayout) { fragment in
+//      if let fragmentTextRange = fragment.rangeInElement,
+//         fragmentTextRange.intersects(textRange) {
+//        let intersectionRange = fragmentTextRange.intersection(textRange)
+//        if let rect = fragment.layoutFragmentFrame {
+//          totalRect = totalRect.union(rect)
+//        }
+//      }
+//      return fragment.rangeInElement.endLocation.compare(textRange.endLocation) != .orderedDescending
+//    }
+//    
+//    self.rect = totalRect
+//  }
   
+  
+  
+//  mutating func updateRect(
+//    layoutManager: NSLayoutManager,
+//    textContainer: NSTextContainer
+//  ) {
+//    
+//    
+//    
+//    self.rect = layoutManager.boundingRect(forGlyphRange: self.range, in: textContainer)
+//  }
+//  
   var summary: String {
     let result: String = """
     Preview: \(self.string.preview())
