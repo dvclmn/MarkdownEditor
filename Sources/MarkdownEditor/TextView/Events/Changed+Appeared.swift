@@ -27,11 +27,11 @@ extension MarkdownTextView {
     
 //    setupViewportLayoutController()
     
-    Task {
+    Task { @MainActor in
       await self.infoDebouncer.processTask {
         
         let newInfo = "Updated metrics or debugging info"
-        await self.infoHandler.updateLineCount(to: <#T##Int#>)
+        await self.infoHandler.updateMetric(keyPath: \.testMessage, value: newInfo)
       }
     }
     

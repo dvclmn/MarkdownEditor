@@ -31,7 +31,7 @@ public enum SyntaxEvent {
   case wrap(Markdown.Syntax)
 }
 
-public typealias InfoUpdate = (EditorInfo) -> Void
+public typealias InfoUpdate = @Sendable (EditorInfo) -> Void
 
 public struct MarkdownEditor: NSViewControllerRepresentable {
   

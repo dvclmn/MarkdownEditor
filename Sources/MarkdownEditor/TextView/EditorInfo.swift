@@ -23,105 +23,70 @@ public struct EditorInfo: Sendable {
 
 // MARK: - EditorInfo.Metrics
 public extension EditorInfo {
+  
   struct Metrics: Sendable {
     public var lineCount: Int
     public var characterCount: Int
+    public var testMessage: String
     
     public init(
       lineCount: Int = 0,
-      characterCount: Int = 0
+      characterCount: Int = 0,
+      testMessage: String = "nil"
     ) {
       self.lineCount = lineCount
       self.characterCount = characterCount
+      self.testMessage = testMessage
     }
   }
 }
 
+extension EditorInfo.Metrics {
+  var summary: String {
+    let result: String = """
+    Line count: \(lineCount)
+    Character count: \(characterCount)
+    """
+    
+    return result
+  }
+}
 
 
-final class EditorInfoHandler {
+final class EditorInfoHandler: Sendable {
   private var editorInfo = EditorInfo()
   var onInfoUpdate: InfoUpdate?
   
+  // Method to update size immutably
   func updateSize(_ size: CGSize) {
-    editorInfo.size = size
+    editorInfo = EditorInfo(size: size, metrics: editorInfo.metrics)
     notifyUpdate()
   }
   
-  func updateMetrics(_ metrics: EditorInfo.Metrics) {
-    editorInfo.metrics = metrics
-    notifyUpdate()
-  }
-  
-  func updateLineCount(to count: Int) {
-    editorInfo.metrics.lineCount = count
-    notifyUpdate()
-  }
-  
-  func updateCharacterCount(to count: Int) {
-    editorInfo.metrics.characterCount = count
-    notifyUpdate()
-  }
-  
-  private func notifyUpdate() {
-    onInfoUpdate?(editorInfo)
-    //    Task { @MainActor in
-    //    }
-  }
-  
-  
-  func updateMetrics<Property: MetricUpdatable>(_ property: inout Property, value: Property.ValueType) {
-    var currentMetrics = editorInfo.metrics
-    currentMetrics.update(&property, with: value)
-    editorInfo.metrics = currentMetrics
+  // Generic method to update metrics using a key path
+  func updateMetric<T>(keyPath: WritableKeyPath<EditorInfo.Metrics, T>, value: T) {
+    let updatedMetrics = editorInfo.metrics.updating(keyPath: keyPath, value: value)
+    editorInfo = EditorInfo(size: editorInfo.size, metrics: updatedMetrics)
     notifyUpdate()
   }
   
   private func notifyUpdate() {
     onInfoUpdate?(editorInfo)
   }
-}
-
-public protocol MetricUpdatable {
-  associatedtype ValueType
   
-  var name: String { get } // Name of the property for logging or updating
-  mutating func update(with value: ValueType)
 }
 
-extension Int: MetricUpdatable {
-  public var name: String { "Int" }
-  
-  public mutating func update(with value: Int) {
-    self = value
-  }
-}
 
-extension String: MetricUpdatable {
-  public var name: String { "String" }
-  
-  public mutating func update(with value: String) {
-    self = value
-  }
-}
-
-// Extend Metrics to conform to the protocol
 extension EditorInfo.Metrics {
-  mutating func update<Property: MetricUpdatable>(
-    _ property: inout Property,
-    with value: Property.ValueType
-  ) {
-    property.update(with: value)
+  // Generalized method for updating any property
+  public func updating<T>(keyPath: WritableKeyPath<EditorInfo.Metrics, T>, value: T) -> EditorInfo.Metrics {
+    var updatedMetrics = self
+    updatedMetrics[keyPath: keyPath] = value
+    return updatedMetrics
   }
 }
-//
-//extension MarkdownTextView {
-//  func setupInfoHandler() {
-//    infoHandler.onInfoUpdate = { [weak self] info in
-//      self?.onInfoUpdate(info)
-//    }
-//  }
-//}
+
+
 
 extension MarkdownTextView {
   func setupInfoHandler() {
