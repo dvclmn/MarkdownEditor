@@ -41,11 +41,12 @@ public extension EditorInfo {
   }
 }
 
-extension EditorInfo.Metrics {
+public extension EditorInfo.Metrics {
   var summary: String {
     let result: String = """
     Line count: \(lineCount)
     Character count: \(characterCount)
+    Message: \(testMessage)
     """
     
     return result

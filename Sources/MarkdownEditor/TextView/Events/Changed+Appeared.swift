@@ -31,7 +31,7 @@ extension MarkdownTextView {
       await self.infoDebouncer.processTask {
         
         let newInfo = "Updated metrics or debugging info"
-        await self.infoHandler.updateMetric(keyPath: \.testMessage, value: newInfo)
+        self.infoHandler.updateMetric(keyPath: \.testMessage, value: newInfo)
       }
     }
     
