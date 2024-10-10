@@ -28,4 +28,8 @@ extension MarkdownTextView {
     return textStorage.attributedSubstring(from: validRange).string
   }
   
+  
+  
+  
+  
 }

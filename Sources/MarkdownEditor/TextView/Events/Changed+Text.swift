@@ -25,7 +25,6 @@ extension MarkdownTextView {
 
     onAppearAndTextChange()
     
-    
   }
   
   

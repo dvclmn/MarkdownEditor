@@ -60,6 +60,8 @@ extension MarkdownTextView {
     allowsUndo = true
     isRichText = false
     smartInsertDeleteEnabled = false
+    usesFindBar = true
+    usesFindPanel = true
    
     self.applyConfiguration()
     

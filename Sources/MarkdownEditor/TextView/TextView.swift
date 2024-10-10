@@ -126,6 +126,7 @@ public class MarkdownTextView: NSTextView {
   }
   
   func handleWidthChange(newWidth: CGFloat) {
+    
     // Perform your task here when the width changes
     print("Text view width changed to: \(newWidth)")
   }

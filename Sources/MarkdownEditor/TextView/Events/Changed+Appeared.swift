@@ -24,8 +24,7 @@ extension MarkdownTextView {
     }
 
     onAppearAndTextChange()
-    
-    
+
     //    let codeFontSize: CGFloat = 13
     
     //    highlightr.setTheme(to: "xcode-dark")
@@ -49,12 +48,13 @@ extension MarkdownTextView {
     Task { @MainActor in
       
       let newSize = self.updatedEditorHeight()
-      let newInfo = self.elements.count.string
       let newLines: Int = countLinesTK2()
+      
+      
+      infoUpdater.update(\.elementSummary, value: self.elementsSummary)
       
       infoUpdater.update(\.size, value: newSize)
       infoUpdater.update(\.lineCount, value: newLines)
-      infoUpdater.update(\.elementSummary, value: newInfo)
       
     }
     

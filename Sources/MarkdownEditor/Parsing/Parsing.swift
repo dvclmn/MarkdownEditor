@@ -38,6 +38,8 @@ extension MarkdownTextView {
   
   func parseSyntax(_ syntax: Markdown.Syntax) {
     
+    print("Parsing text for instances of \(syntax.name).")
+    
     //    guard let regexLiteral = syntax.regexLiteral else {
     //      return
     //    }
@@ -48,20 +50,16 @@ extension MarkdownTextView {
     }
     
     
-    var generalInfo: String = "General info\n\n"
+//    var generalInfo: String = "General info\n\n"
     
     //      let rangeOfRenderedText: NSTextRange = tlm.textLayoutFragment(for: CGPointZero)!.rangeInElement
     
-    
-    
-    var newElements = Set<Markdown.Element>()
-    
-    
+
     tcm.performEditingTransaction {
       
       
       
-      var matchesString: String = "Match results:\n"
+//      var matchesString: String = "Match results:\n"
       var resultCount: Int = 0
       
       
@@ -85,14 +83,14 @@ extension MarkdownTextView {
         
         resultCount += 1
         
-        let newInfo: String = "Regex result \(resultCount):\n"
-        
-        /// We won't print the `NSTextCheckingResult.CheckingType`, as it's always regularExpression
-        + elementString.preview()
-        + match.range.info
-        + "\n"
-        
-        matchesString += newInfo
+//        let newInfo: String = "Regex result \(resultCount):\n"
+//        
+//        /// We won't print the `NSTextCheckingResult.CheckingType`, as it's always regularExpression
+//        + elementString.preview()
+//        + match.range.info
+//        + "\n"
+//        
+//        matchesString += newInfo
         
         
         //        guard let highlightedCode: NSAttributedString = highlightr.highlight(elementString, as: nil) else {
@@ -109,22 +107,23 @@ extension MarkdownTextView {
         
         let element = Markdown.Element(
           string: elementString,
-          syntax: .codeBlock,
+          syntax: syntax,
           range: elementRange,
           originY: elementRect.origin.y,
           rectHeight: elementRect.height
         )
         
-        newElements.insert(element)
+        self.elements.insert(element)
+        
         
       } // END match loop
       
-      generalInfo += "Total \(syntax.name)s found: \(resultCount)\n\n"
-      generalInfo += matchesString
+//      generalInfo += "Total \(syntax.name)s found: \(resultCount)\n\n"
+//      generalInfo += matchesString
+//
+//      print(Box(header: "Parsing markdown", content: generalInfo))
+      print("Found \(resultCount) instances of \(syntax.name).")
       
-      print(Box(header: "Parsing markdown", content: generalInfo))
-      
-      self.elements = newElements
       
       
     } // END perform edit

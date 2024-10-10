@@ -59,7 +59,8 @@ extension MarkdownTextView {
           valueString = "\(font.displayName ?? font.fontName), \(font.pointSize)pt"
           
         case let color as NSColor:
-          valueString = color.colorNameComponent
+          valueString = color.description
+//          valueString = color.colorNameComponent
           
         case let number as NSNumber:
           valueString = number.stringValue
@@ -87,7 +88,7 @@ extension MarkdownTextView {
     
     
     Task {
-      await infoUpdater.update(\.typingAttributes, value: result)
+      infoUpdater.update(\.typingAttributes, value: result)
     }
     
 //

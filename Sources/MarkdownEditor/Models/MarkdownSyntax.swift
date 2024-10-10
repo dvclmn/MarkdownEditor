@@ -234,6 +234,7 @@ extension Markdown.Syntax {
   }
   
   static public var allCases: [Markdown.Syntax] {
+    
     return [
       .heading(level: 1),
       .heading(level: 2),
