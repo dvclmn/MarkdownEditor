@@ -21,57 +21,57 @@ public typealias MarkdownRegexMatch = MarkdownRegexOutput.Match
 
 extension Markdown.Syntax {
   
-  var regexPattern: String? {
-    switch self {
-        
-      case .bold: "(__|\\*\\*)([^_|\\*]*?)(__|\\*\\*)"
-      case .inlineCode: "(`)((?:[^`\n])+?)(`)"
-      case .codeBlock: "(```[\\s\\S]*?)(.*?)(```)"
-        
-        
-      default: nil
-    }
-  }
+//  var regexPattern: String? {
+//    switch self {
+//        
+//      case .bold: "(__|\\*\\*)([^_|\\*]*?)(__|\\*\\*)"
+//      case .inlineCode: "(`)((?:[^`\n])+?)(`)"
+//      case .codeBlock: "(```[\\s\\S]*?)(.*?)(```)"
+//        
+//        
+//      default: nil
+//    }
+//  }
   
-  var regexOptions: NSRegularExpression.Options {
-    switch self {
-      case .codeBlock:
-        [.allowCommentsAndWhitespace, .anchorsMatchLines]
-      default: []
-    }
-  }
+//  var regexOptions: NSRegularExpression.Options {
+//    switch self {
+//      case .codeBlock:
+//        [.allowCommentsAndWhitespace, .anchorsMatchLines]
+//      default: []
+//    }
+//  }
   
 //  private static var cachedRegexes: [Markdown.Syntax: NSRegularExpression] = [:]
   
-  var regex: NSRegularExpression? {
-    
-//    if let cachedRegex = Markdown.Syntax.cachedRegexes[self] {
-//      print("Nothing here")
-//      return cachedRegex
-//    }
-    
-    guard let pattern = self.regexPattern else {
-      print("noooohhh")
-      return nil
-    }
-    
-    do {
-      let regex = try NSRegularExpression(pattern: pattern, options: self.regexOptions)
-//      Markdown.Syntax.cachedRegexes[self] = regex
-      return regex
-    } catch {
-      print("Error creating regex for \(self): \(error)")
-      return nil
-    }
-    
-//    guard let pattern = self.regexPattern, let regex = try? NSRegularExpression(pattern: pattern, options: self.regexOptions) else {
-//      fatalError("Invalid regex pattern for \(self)")
-//    }
-    
-//    Markdown.Syntax.cachedRegexes[self] = regex
+//  var regex: NSRegularExpression? {
 //    
-//    return regex
-  }
+////    if let cachedRegex = Markdown.Syntax.cachedRegexes[self] {
+////      print("Nothing here")
+////      return cachedRegex
+////    }
+//    
+//    guard let pattern = self.regexPattern else {
+//      print("noooohhh")
+//      return nil
+//    }
+//    
+//    do {
+//      let regex = try NSRegularExpression(pattern: pattern, options: self.regexOptions)
+////      Markdown.Syntax.cachedRegexes[self] = regex
+//      return regex
+//    } catch {
+//      print("Error creating regex for \(self): \(error)")
+//      return nil
+//    }
+//    
+////    guard let pattern = self.regexPattern, let regex = try? NSRegularExpression(pattern: pattern, options: self.regexOptions) else {
+////      fatalError("Invalid regex pattern for \(self)")
+////    }
+//    
+////    Markdown.Syntax.cachedRegexes[self] = regex
+////    
+////    return regex
+//  }
   
   //  func matches(in text: String) -> [NSTextCheckingResult] {
   //
@@ -132,7 +132,7 @@ extension Markdown.Syntax {
   //  }
   
   
-  public var swiftRegex: MarkdownRegex? {
+  public var regexLiteral: MarkdownRegex? {
     switch self {
         
         /// `^# ` The caret ensures this only matches if the string starts on a new line

@@ -65,7 +65,7 @@ extension MarkdownTextView {
 //      return
 //    }
     
-    guard let pattern = syntax.regexPattern else {
+    guard let pattern = syntax.regexLiteral else {
       return
     }
     
@@ -91,8 +91,6 @@ extension MarkdownTextView {
 //    }
     
 //    tcm.performEditingTransaction {
-      <#code#>
-    
       
       
       
@@ -103,19 +101,20 @@ extension MarkdownTextView {
       var matchesString: String = "Enumeration results:\n"
       var resultCount: Int = 0
       
-      let documentNSRange = NSRange(tcm.documentRange, provider: tcm)
     
     
-    do {
-      let shrimb = try NSRegularExpression(pattern: pattern)
+    
+    
+//      let shrimb = try NSRegularExpression(pattern: pattern)
      
-      shrimb.enumerateMatches(in: "Hello", range: NSRange(location: 0, length: 500)) { match, _, _ in
+//      shrimb.enumerateMatches(in: "Hello", range: NSRange(location: 0, length: 500)) { match, _, _ in
         
-        if let match = match as? NSTextCheckingResult {
+        
           
           let elementString: String = "textStorage.attributedSubstring(from: result.range).string"
           let elementRange: NSRange = match.range
           let elementRect: CGRect = self.firstRect(forCharacterRange: elementRange)
+          
           
           
           resultCount += 1
@@ -152,12 +151,8 @@ extension MarkdownTextView {
           )
           
           newElements.insert(element)
+
           
-          
-        } else {
-          matchesString += "No result"
-        }
-        
       } // END enumerate matches
       
       
