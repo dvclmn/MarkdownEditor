@@ -28,7 +28,6 @@ extension Markdown.Syntax {
       case .inlineCode: "(`)((?:[^`\n])+?)(`)"
       case .codeBlock: "(```[\\s\\S]*?)(.*?)(```)"
         
-        
       default: nil
     }
   }
@@ -44,7 +43,7 @@ extension Markdown.Syntax {
   var nsRegex: NSRegularExpression? {
 
     guard let pattern = self.regexPattern else {
-      print("noooohhh")
+//      print("No regex pattern defined for \(self.name), so no need to create a `NSRegularExpression` object.")
       return nil
     }
     

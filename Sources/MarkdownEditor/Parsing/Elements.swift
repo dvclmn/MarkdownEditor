@@ -18,11 +18,27 @@ public struct Markdown {
     var syntax: Markdown.Syntax
     var range: NSRange
 //    var range: Range
-    var rect: NSRect?
+    var rect: NSRect
   }
 }
 
 public extension Markdown.Element {
+  
+  mutating func updateRectWidth(_ width: CGFloat) {
+    
+    let newSize = CGSize(
+      width: width,
+      height: self.rect.height
+    )
+    
+    let newRect = NSRect(
+      origin: self.rect.origin,
+      size: newSize
+    )
+    
+    self.rect = newRect
+  }
+  
 //  struct Range: Hashable {
 //    var leading: NSRange
 //    var content: NSRange

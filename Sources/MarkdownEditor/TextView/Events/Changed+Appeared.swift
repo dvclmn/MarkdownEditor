@@ -17,9 +17,14 @@ extension MarkdownTextView {
     
     super.viewDidMoveToWindow()
 
+    /// This allows a quick parse on load, and then the debounced
+    /// parsing is over in `Changed+Text.swift`
+    DispatchQueue.main.async {
+      self.parseAllCases()
+    }
+
     onAppearAndTextChange()
     
- 
     
     //    let codeFontSize: CGFloat = 13
     
@@ -40,8 +45,6 @@ extension MarkdownTextView {
   }
   
   func onAppearAndTextChange() {
-    
-    parseMarkdownDebounced()
     
     Task { @MainActor in
       

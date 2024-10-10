@@ -27,30 +27,13 @@ extension MarkdownTextView {
   /// Because inline elements shouldn't be extending past that anyway.
   ///
   
-  
-  func parseMarkdownDebounced() {
-    
-//    Task {
-//      await parsingDebouncer.processTask { [weak self] in
-//        for syntax in Markdown.Syntax.testCases {
-//          await self?.parseSyntax(syntax)
-//        }
-//      }
-//    }
-    
-        DispatchQueue.main.async {
-          for syntax in Markdown.Syntax.testCases {
-            self.parseSyntax(syntax)
-          }
-        }
-    
 
-    
-    
-    
-    //
-    
-  } // END parse and redraw
+  
+  func parseAllCases() {
+    for syntax in Markdown.Syntax.allCases {
+      self.parseSyntax(syntax)
+    }
+  }
   
   
   func parseSyntax(_ syntax: Markdown.Syntax) {
@@ -60,6 +43,7 @@ extension MarkdownTextView {
     //    }
     
     guard let nsRegex = syntax.nsRegex else {
+//      print("Don't need to perform a parse for \(syntax.name), no regex found.")
       return
     }
     
@@ -70,9 +54,7 @@ extension MarkdownTextView {
     
     
     
-    
     var newElements = Set<Markdown.Element>()
-    
     
     
     tcm.performEditingTransaction {
@@ -88,11 +70,18 @@ extension MarkdownTextView {
       
       for match in matches {
         
-        let elementString: String = "textStorage.attributedSubstring(from: result.range).string"
+        
+        guard let elementString: String = self.string(for: match.range) else {
+          print("Error getting the string, for this match? Range: \(match.range)")
+          continue
+        }
+        
         let elementRange: NSRange = match.range
-        //        let elementRect: CGRect = self.firstRect(forCharacterRange: elementRange)
         
-        
+        guard let elementRect: NSRect = self.boundingRect(for: elementRange) else {
+          print("Error getting the NSRect, for this match, with range: \(match.range)")
+          continue
+        }
         
         resultCount += 1
         
@@ -122,9 +111,7 @@ extension MarkdownTextView {
           string: elementString,
           syntax: .codeBlock,
           range: elementRange,
-          rect: nil
-          //          rect: self.boundingRect(for: elementRange)?.size
-          //          rect: getRect(for: result.range)
+          rect: elementRect
         )
         
         newElements.insert(element)

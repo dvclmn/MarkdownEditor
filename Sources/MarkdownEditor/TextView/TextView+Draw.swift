@@ -19,10 +19,8 @@ extension MarkdownTextView {
         let backgroundColour: NSColor = NSColor.black.withAlphaComponent(0.2)
     //
         for element in elements where element.syntax == .codeBlock {
-    
-          guard let rect = element.rect else { continue }
           
-          let path = NSBezierPath(roundedRect: rect, xRadius: cornerRadius, yRadius: cornerRadius)
+          let path = NSBezierPath(roundedRect: element.rect, xRadius: cornerRadius, yRadius: cornerRadius)
     
           backgroundColour.setFill()
           path.fill()

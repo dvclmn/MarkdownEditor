@@ -28,6 +28,8 @@ public class MarkdownTextView: NSTextView {
   
   var elements: Set<Markdown.Element> = []
   
+  var onWidthChange: ((CGFloat) -> Void)?
+  
   
   /// Debouncers
   ///
@@ -93,6 +95,10 @@ public class MarkdownTextView: NSTextView {
     
     self.setupInfoHandler()
     
+    self.onWidthChange = { [weak self] newWidth in
+      self?.handleWidthChange(newWidth: newWidth)
+    }
+    
   }
   
   @available(*, unavailable)
@@ -117,6 +123,11 @@ public class MarkdownTextView: NSTextView {
       return configuration.insets
     }
     
+  }
+  
+  func handleWidthChange(newWidth: CGFloat) {
+    // Perform your task here when the width changes
+    print("Text view width changed to: \(newWidth)")
   }
   
 }
