@@ -48,6 +48,7 @@ public extension EditorInfo {
 
 @MainActor
 final class EditorInfoUpdater: Sendable {
+  
   private var editorInfo: EditorInfo
   private let debouncer: Debouncer
   public var onInfoUpdate: InfoUpdate?

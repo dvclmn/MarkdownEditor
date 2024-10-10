@@ -12,34 +12,38 @@ import Highlightr
 public class MarkdownTextView: NSTextView {
   
   var configuration: MarkdownEditorConfiguration
+  
+  let tlm: NSTextLayoutManager
+  let tcm: NSTextContentManager
+  
   let highlightr: Highlightr
   
   var scrollView: NSScrollView?
   
   var isUpdatingFrame: Bool = false
   var isUpdatingText: Bool = false
-
+  
   var lastSentHeight: CGFloat = 0
   var lastSelectedText: String = ""
   
   var elements: Set<Markdown.Element> = []
-
-
+  
+  
   /// Debouncers
   ///
   var frameDebouncer = Debouncer(interval: 0.3)
   var parsingDebouncer = Debouncer(interval: 0.3)
   var infoDebouncer = Debouncer(interval: 0.3)
   
-//  var stylingDebouncer = Debouncer(interval: 0.3)
+  //  var stylingDebouncer = Debouncer(interval: 0.3)
   
-//  let infoHandler = EditorInfoHandler()
+  //  let infoHandler = EditorInfoHandler()
   
   let infoUpdater: EditorInfoUpdater
   
   public var onInfoUpdate: InfoUpdate = { _ in }
   
-
+  
   
   
   public init(
@@ -55,39 +59,36 @@ public class MarkdownTextView: NSTextView {
     self.highlightr = highlightr
     self.infoUpdater = EditorInfoUpdater()
     
-//    if configuration.isTextKit2 {
-      
-      /// First, we provide TextKit with a frame
-      ///
-      let nsTextContainer = NSTextContainer()
-      
-      /// Then we need some content to display, which is handled by `NSTextContentManager`,
-      /// which uses `NSTextContentStorage` by default
-      ///
-      let textContentStorage = NSTextContentStorage()
-      
-      /// This content is then laid out by `NSTextLayoutManager`
-      ///
-      let textLayoutManager = NSTextLayoutManager()
-      
-      /// Finally we connect these parts together.
-      ///
-      /// > Important: Access to the text container is through the `textLayoutManager`.
-      /// > There is still a `textContainer` property directly on `NSTextView`, but as
-      /// > I understand it, that isn't the one we use.
-      ///
-      textLayoutManager.textContainer = nsTextContainer
-      textContentStorage.addTextLayoutManager(textLayoutManager)
-      textContentStorage.primaryTextLayoutManager = textLayoutManager
-      
-      super.init(frame: frameRect, textContainer: nsTextContainer)
-      
-//    } else {
-//      
-//      super.init(frame: frameRect, textContainer: container)
-//      
-//    }
+    //    if configuration.isTextKit2 {
     
+    /// First, we provide TextKit with a frame
+    ///
+    let nsTextContainer = NSTextContainer()
+    
+    /// Then we need some content to display, which is handled by `NSTextContentManager`,
+    /// which uses `NSTextContentStorage` by default
+    ///
+    let textContentStorage = NSTextContentStorage()
+    
+    /// This content is then laid out by `NSTextLayoutManager`
+    ///
+    let textLayoutManager = NSTextLayoutManager()
+    
+    /// Finally we connect these parts together.
+    ///
+    /// > Important: Access to the text container is through the `textLayoutManager`.
+    /// > There is still a `textContainer` property directly on `NSTextView`, but as
+    /// > I understand it, that isn't the one we use.
+    ///
+    textLayoutManager.textContainer = nsTextContainer
+    textContentStorage.addTextLayoutManager(textLayoutManager)
+    textContentStorage.primaryTextLayoutManager = textLayoutManager
+    
+    self.tlm = textLayoutManager
+    self.tcm = textLayoutManager.textContentManager!
+        
+    super.init(frame: frameRect, textContainer: nsTextContainer)
+
     self.textViewSetup()
     
     self.setupInfoHandler()
@@ -98,10 +99,10 @@ public class MarkdownTextView: NSTextView {
   public required init?(coder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
-
-//  deinit {
-//    NotificationCenter.default.removeObserver(self)
-//  }
+  
+  //  deinit {
+  //    NotificationCenter.default.removeObserver(self)
+  //  }
   
   var horizontalInsets: CGFloat {
     
