@@ -10,7 +10,7 @@ import AppKit
 import BaseHelpers
 import TextCore
 import Rearrange
-import Wrecktangle
+//import Wrecktangle
 
 enum SyntaxRangeType {
   case total
@@ -30,11 +30,11 @@ extension MarkdownTextView {
   
   func parseMarkdownDebounced() {
     
-    DispatchQueue.main.async {
-      for syntax in Markdown.Syntax.testCases {
-        self.parseSyntax(syntax)
-      }
-    }
+//    DispatchQueue.main.async {
+//      for syntax in Markdown.Syntax.testCases {
+//        self.parseSyntax(syntax)
+//      }
+//    }
 //    
     
 //    guard !isUpdatingFrame || !isUpdatingText else {
@@ -60,97 +60,127 @@ extension MarkdownTextView {
  
   func parseSyntax(_ syntax: Markdown.Syntax) {
     
-    guard let pattern = syntax.regex else {
-      print("No regex defined for \(syntax.name)")
+//    guard let regexPattern = syntax.regex else {
+//      print("No regex defined for \(syntax.name)")
+//      return
+//    }
+    
+    guard let pattern = syntax.regexPattern else {
+      return
+    }
+    
+    guard let tlm = textLayoutManager,
+          let tcm = tlm.textContentManager
+    else {
       return
     }
     
     var generalInfo: String = "General info\n\n"
     
-    guard let textStorage = self.textStorage else {
-      fatalError("Issue getting the text storage")
-    }
+//    guard let textStorage = self.textStorage else {
+//      fatalError("Issue getting the text storage")
+//    }
 
-    let string = self.string
+//    let string: String = self.string
     
-    generalInfo += string.preview()
+//    generalInfo += string.preview()
     
-    guard let nsString = string as NSString? else {
-      print("NSString issue")
-      return
-    }
+//    guard let nsString = string as NSString? else {
+//      print("NSString issue")
+//      return
+//    }
     
-    textStorage.beginEditing()
-
-    var newElements = Set<Markdown.Element>()
+//    tcm.performEditingTransaction {
+      <#code#>
     
-    var matchesString: String = "Enumeration results:\n"
-    var resultCount: Int = 0
-    
-    
-    
-    
-    
-    pattern.enumerateMatches(in: string, range: NSRange(location: 0, length: nsString.length)) { result, flags, stop in
       
-      if let result = result {
-        
-        let elementString: String = textStorage.attributedSubstring(from: result.range).string
-        let elementRange: NSRange = result.range
-
-        resultCount += 1
-        
-        let newInfo: String = "Regex result \(resultCount):\n"
-        /// We won't print the `NSTextCheckingResult.CheckingType`, as it's always regularExpression
-//        + "\(result.resultType)"
-//        + "\n"
-        + elementString.preview()
-        + result.range.info
-        + "\n"
-        
-        matchesString += newInfo
-        
-        
-//        guard let highlightedCode: NSAttributedString = highlightr.highlight(elementString, as: nil) else {
-//          print("Couldn't get the Highlighted string")
-//          return
-//        }
-//        
-//        
-//        let currentSelection = self.selectedRange
-//        
-//        textStorage.replaceCharacters(in: elementRange, with: highlightedCode)
-//        
-//        self.setSelectedRange(currentSelection)
-        
-        let element = Markdown.Element(
-          string: elementString,
-          syntax: .codeBlock,
-          range: elementRange,
-          rect: nil
-//          rect: getRect(for: result.range)
-        )
-        
-        newElements.insert(element)
-        
-        
-      } else {
-        matchesString += "No result"
-      }
-    } // END enumerate matches
+      
+      
+      //    textStorage.beginEditing()
+      
+      var newElements = Set<Markdown.Element>()
+      
+      var matchesString: String = "Enumeration results:\n"
+      var resultCount: Int = 0
+      
+      let documentNSRange = NSRange(tcm.documentRange, provider: tcm)
     
     
+    do {
+      let shrimb = try NSRegularExpression(pattern: pattern)
+     
+      shrimb.enumerateMatches(in: "Hello", range: NSRange(location: 0, length: 500)) { match, _, _ in
+        
+        if let match = match as? NSTextCheckingResult {
+          
+          let elementString: String = "textStorage.attributedSubstring(from: result.range).string"
+          let elementRange: NSRange = match.range
+          let elementRect: CGRect = self.firstRect(forCharacterRange: elementRange)
+          
+          
+          resultCount += 1
+          
+          let newInfo: String = "Regex result \(resultCount):\n"
+          /// We won't print the `NSTextCheckingResult.CheckingType`, as it's always regularExpression
+          //        + "\(result.resultType)"
+          //        + "\n"
+          + elementString.preview()
+          + match.range.info
+          + "\n"
+          
+          matchesString += newInfo
+          
+          
+          //        guard let highlightedCode: NSAttributedString = highlightr.highlight(elementString, as: nil) else {
+          //          print("Couldn't get the Highlighted string")
+          //          return
+          //        }
+          //
+          //
+          //        let currentSelection = self.selectedRange
+          //
+          //        textStorage.replaceCharacters(in: elementRange, with: highlightedCode)
+          //
+          //        self.setSelectedRange(currentSelection)
+          
+          let element = Markdown.Element(
+            string: elementString,
+            syntax: .codeBlock,
+            range: elementRange,
+            rect: self.boundingRect(for: elementRange)?.size
+            //          rect: getRect(for: result.range)
+          )
+          
+          newElements.insert(element)
+          
+          
+        } else {
+          matchesString += "No result"
+        }
+        
+      } // END enumerate matches
+      
+      
+      
+      
+    } catch {
+      print("No luck with the regex")
+    }
     
+      
+      
+      
+      
+      generalInfo += "Total \(syntax.name)s found: \(resultCount)\n\n"
+      generalInfo += matchesString
+      
+//      print(Box(header: "Parsing markdown", content: generalInfo))
+      
+      self.elements = newElements
+      
+//    } // END perform edit
     
-    
-    generalInfo += "Total \(syntax.name)s found: \(resultCount)\n\n"
-    generalInfo += matchesString
-    
-    print(Box(header: "Parsing markdown", content: generalInfo))
-    
-    self.elements = newElements
-    
-    textStorage.endEditing()
+//    textStorage.endEditing()
     
   } // END parse code blocks
  
