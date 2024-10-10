@@ -31,12 +31,24 @@ extension MarkdownTextView {
   
   func parseAllCases() {
     for syntax in Markdown.Syntax.allCases {
-      self.parseSyntax(syntax)
+      
+      let newElements = parseSyntax(syntax)
+      updateElements(ofType: syntax, with: newElements)
+      
+//      self.parseSyntax(syntax)
     }
   }
   
+  func updateElements(ofType syntax: Markdown.Syntax, with newElements: Set<Markdown.Element>) {
+    // Remove existing elements of the specified syntax
+    elements = elements.filter { $0.syntax != syntax }
+    
+    // Add the new elements
+    elements.formUnion(newElements)
+  }
   
-  func parseSyntax(_ syntax: Markdown.Syntax) {
+  
+  func parseSyntax(_ syntax: Markdown.Syntax) -> Set<Markdown.Element> {
     
     print("Parsing text for instances of \(syntax.name).")
     
@@ -46,7 +58,7 @@ extension MarkdownTextView {
     
     guard let nsRegex = syntax.nsRegex else {
 //      print("Don't need to perform a parse for \(syntax.name), no regex found.")
-      return
+      return []
     }
     
     
@@ -54,6 +66,7 @@ extension MarkdownTextView {
     
     //      let rangeOfRenderedText: NSTextRange = tlm.textLayoutFragment(for: CGPointZero)!.rangeInElement
     
+    var newElements: Set<Markdown.Element> = []
 
     tcm.performEditingTransaction {
       
@@ -61,8 +74,6 @@ extension MarkdownTextView {
       
 //      var matchesString: String = "Match results:\n"
       var resultCount: Int = 0
-      
-      
       
       let matches: [NSTextCheckingResult] = nsRegex.matches(in: self.string, range: documentNSRange)
       
@@ -109,11 +120,11 @@ extension MarkdownTextView {
           string: elementString,
           syntax: syntax,
           range: elementRange,
-          originY: elementRect.origin.y,
+          originY:  elementRect.origin.y,
           rectHeight: elementRect.height
         )
         
-        self.elements.insert(element)
+        newElements.insert(element)
         
         
       } // END match loop
@@ -128,6 +139,7 @@ extension MarkdownTextView {
       
     } // END perform edit
     
+    return newElements
     
     
   } // END parse code blocks

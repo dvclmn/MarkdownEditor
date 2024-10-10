@@ -17,10 +17,16 @@ extension MarkdownTextView {
     //    // MARK: - Code block backgrounds
         let cornerRadius: CGFloat = 5.0
         let backgroundColour: NSColor = NSColor.black.withAlphaComponent(0.2)
-    //
+        
+    
+    
         for element in elements where element.syntax == .codeBlock {
-
-          let path = NSBezierPath(roundedRect: element.getRect(with: self.frame.width, config: self.configuration), xRadius: cornerRadius, yRadius: cornerRadius)
+          
+          guard let rect = element.getRect(with: self.frame.width, config: self.configuration) else {
+            break
+          }
+          
+          let path = NSBezierPath(roundedRect: rect, xRadius: cornerRadius, yRadius: cornerRadius)
     
           backgroundColour.setFill()
           path.fill()
