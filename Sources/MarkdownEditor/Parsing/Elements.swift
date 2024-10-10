@@ -9,14 +9,14 @@ import Foundation
 import AppKit
 import BaseHelpers
 import TextCore
-
+import Rearrange
 
 public struct Markdown {
   
   public struct Element: Hashable, Sendable {
     var string: String
     var syntax: Markdown.Syntax
-    var range: NSRange
+    var ranges: Markdown.Ranges
     
     
     /// These are really only for code block background, should
@@ -24,6 +24,17 @@ public struct Markdown {
     var originY: CGFloat?
     var rectHeight: CGFloat?
   }
+}
+
+public extension Markdown {
+  
+  struct Ranges: Sendable, Hashable {
+    var all: NSRange
+    var leading: NSRange
+    var content: NSRange
+    var trailing: NSRange
+  }
+  
 }
 
 public extension Markdown.Element {
@@ -57,7 +68,7 @@ public extension Markdown.Element {
     let result: String = """
     Preview: \(self.string.preview())
     Syntax: \(self.syntax.name)
-    Range: \(self.range.info)
+    Range: \(self.ranges.all.info)
     """
     
     return result

@@ -7,29 +7,21 @@
 
 import AppKit
 import Highlightr
+import Glyph
 
 extension MarkdownTextView {
   
-//  func styleMarkdownDebounced() {
-//    
-//    Task {
-//      await stylingDebouncer.processTask {
-//        
-//        Task { @MainActor in
-//          
-//          let currentSelection = self.selectedRange
-//          
-//          self.styleElement()
-//          
-////          self.needsDisplay = true
-//
-//          self.setSelectedRange(currentSelection)
-//          
-//        }
-//      }
-//    }
-//  } // END style debounced
-//  
+  func styleMarkdown() {
+    
+    let currentSelection = self.selectedRange
+    
+    self.styleElement()
+    //          self.needsDisplay = true
+    
+    self.setSelectedRange(currentSelection)
+
+  } // END style debounced
+  
   
   func styleElement() {
     
@@ -42,30 +34,43 @@ extension MarkdownTextView {
       fatalError("Issue getting the text storage")
     }
     
-    textStorage.beginEditing()
-    
-    
-    for element in self.elements {
-      if element.syntax == .codeBlock {
-        print("Here's a code block")
+
+    tcm.performEditingTransaction {
+      
+      for element in self.elements {
         
-        
-        guard let highlightedCode: NSAttributedString = highlightr.highlight(element.string, as: nil) else {
-          print("Couldn't get the Highlighted string")
-          return
+        if element.syntax == .codeBlock {
+//          guard let highlightedCode: NSAttributedString = highlightr.highlight(element.string, as: nil) else {
+//            print("Couldn't get the Highlighted string")
+//            return
+//          }
+//          
+//          highlightedCode.enumerateAttribute(.foregroundColor, in: documentNSRange) { value, range, stop in
+//            
+//            if let color = value as? NSColor {
+//              textStorage.addAttribute(.foregroundColor, value: color, range: range)
+//            }
+//            
+//          }
+        } else {
+          
+          
+          
+          textStorage.addAttributes(element.syntax.contentAttributes(with: self.configuration).attributes, range: element.ranges.content)
+          
+          textStorage.addAttributes(element.syntax.syntaxAttributes(with: self.configuration).attributes, range: element.ranges.leading)
+          textStorage.addAttributes(element.syntax.syntaxAttributes(with: self.configuration).attributes, range: element.ranges.trailing)
+          
         }
         
-        
-        
-        textStorage.replaceCharacters(in: element.range, with: highlightedCode)
-        
-        
-      } else {
-        print("Not a code block, ignoring for now")
-      }
-    }
-    
-    textStorage.endEditing()
+          
+//          textStorage.replaceCharacters(in: element.range, with: highlightedCode)
+
+      } // END elements loop
+
+      
+    } // END perform editing
+
     
   } // END styling
   

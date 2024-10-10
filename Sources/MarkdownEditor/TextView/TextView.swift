@@ -34,10 +34,9 @@ public class MarkdownTextView: NSTextView {
   /// Debouncers
   ///
   var frameDebouncer = Debouncer(interval: 0.3)
-  var parsingDebouncer = Debouncer(interval: 0.3)
+  var parsingDebouncer = Debouncer(interval: 0.1)
   var infoDebouncer = Debouncer(interval: 0.3)
-  
-  //  var stylingDebouncer = Debouncer(interval: 0.3)
+//  var stylingDebouncer = Debouncer(interval: 0.3)
   
   //  let infoHandler = EditorInfoHandler()
   
@@ -88,9 +87,9 @@ public class MarkdownTextView: NSTextView {
     
     self.tlm = textLayoutManager
     self.tcm = textLayoutManager.textContentManager!
-        
+    
     super.init(frame: frameRect, textContainer: nsTextContainer)
-
+    
     self.textViewSetup()
     
     self.setupInfoHandler()

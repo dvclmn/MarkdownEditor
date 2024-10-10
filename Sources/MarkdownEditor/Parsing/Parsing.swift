@@ -85,10 +85,13 @@ extension MarkdownTextView {
           continue
         }
         
-        let elementRange: NSRange = match.range
+        let elementRangeTotal: NSRange = match.range(at: 0)
+        let elementRangeLeading: NSRange = match.range(at: 1)
+        let elementRangeContent: NSRange = match.range(at: 2)
+        let elementRangeTrailing: NSRange = match.range(at: 3)
         
-        guard let elementRect: NSRect = self.boundingRect(for: elementRange) else {
-          print("Error getting the NSRect, for this match, with range: \(match.range)")
+        guard let elementRect: NSRect = self.boundingRect(for: elementRangeTotal) else {
+          print("Error getting the NSRect, for this match, with range: \(elementRangeTotal)")
           continue
         }
         
@@ -116,10 +119,17 @@ extension MarkdownTextView {
         //
         //        self.setSelectedRange(currentSelection)
         
+        let ranges = Markdown.Ranges(
+          all: elementRangeTotal,
+          leading: elementRangeLeading,
+          content: elementRangeContent,
+          trailing: elementRangeTrailing
+        )
+        
         let element = Markdown.Element(
           string: elementString,
           syntax: syntax,
-          range: elementRange,
+          ranges: ranges,
           originY:  elementRect.origin.y,
           rectHeight: elementRect.height
         )

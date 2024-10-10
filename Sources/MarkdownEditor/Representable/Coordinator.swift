@@ -41,27 +41,27 @@ public extension MarkdownEditor {
 //        print("Issue getting the text view, within the `NSTextStorageDelegate`")
 //        return
 //      }
-      
-      
-      
+//      
+//      
+//      
 //      textView.parseAndRedraw()
-      
+//      
 //      Task { @MainActor in
-
+//
 //        let currentLines = currentLineCount()
-        
-        // Check if the number of lines has changed
+//        
+//         Check if the number of lines has changed
 //        if currentLines != lastLineCount {
 //          lastLineCount = currentLines
-          
-          // Trigger expensive operations
-          
+//          
+//           Trigger expensive operations
+//          
 //        } else {
-          // Optional: Handle minimal updates if necessary
-          // For example, updating line-specific highlights
+//           Optional: Handle minimal updates if necessary
+//           For example, updating line-specific highlights
 //        }
-      
-        
+//      
+//        
 //      }
 //    }
     

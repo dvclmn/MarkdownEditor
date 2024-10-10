@@ -28,7 +28,35 @@ extension MarkdownTextView {
     return textStorage.attributedSubstring(from: validRange).string
   }
   
-  
+//  
+//  func lineInfoForCurrentSelection() -> (range: NSRange, content: String)? {
+//    guard let textLayoutManager = self.textLayoutManager,
+//          let textContentManager = textLayoutManager.textContentManager,
+//          let selectedRange = self.selectedRanges.first?.rangeValue else {
+//      return nil
+//    }
+//    
+//    // Get the text element for the selection start
+//    let locationElement = textLayoutManager.lineFragmentRange(for: T##CGPoint, inContainerAt: T##any NSTextLocation)
+//
+//    // Find the paragraph that contains the selection
+//    guard let paragraphRange = textLayoutManager.textSegment(for: .paragraph, enclosing: selectedRange.location) else {
+//      return nil
+//    }
+//    
+//    // Get the content of the paragraph
+//    let paragraphContent = textContentManager.attributedString(in: paragraphRange)?.string ?? ""
+//    
+//    // Find the line break range within the paragraph
+//    let nsString = paragraphContent as NSString
+//    let lineRange = nsString.lineRange(for: NSRange(location: 0, length: 0))
+//    
+//    // Adjust the range to be relative to the entire text content
+//    let adjustedRange = NSRange(location: paragraphRange.location + lineRange.location,
+//                                length: lineRange.length)
+//    
+//    return (adjustedRange, nsString.substring(with: lineRange))
+//  }
   
   
   
