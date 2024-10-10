@@ -60,6 +60,10 @@ public struct MarkdownEditorConfiguration: Sendable, Equatable {
 
 extension MarkdownEditorConfiguration {
   
+  var codeBlockPadding: CGFloat {
+    self.insets * 0.4
+  }
+  
   var defaultTypingAttributes: Attributes {
     
     let renderingAttributes: Attributes = self.renderingAttributes.getAttributes() ?? [:]
@@ -90,7 +94,7 @@ extension MarkdownEditorConfiguration {
 public extension AttributeContainer {
   static var markdownRenderingDefaults: AttributeContainer {
     var container = AttributeContainer()
-    container.foregroundColor = NSColor.systemCyan
+    container.foregroundColor = NSColor.textColor.withAlphaComponent(0.9)
 
     return container
   }

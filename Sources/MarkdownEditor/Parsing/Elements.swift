@@ -17,27 +17,38 @@ public struct Markdown {
     var string: String
     var syntax: Markdown.Syntax
     var range: NSRange
-//    var range: Range
-    var rect: NSRect
+    
+    /// These are really only for code block background, will probably split into a more dedicated type at some point
+    var originY: CGFloat
+    var rectHeight: CGFloat
   }
 }
 
 public extension Markdown.Element {
   
-  mutating func updateRectWidth(_ width: CGFloat) {
+  func getRect(
+    with width: CGFloat,
+    config: MarkdownEditorConfiguration
+  ) -> NSRect {
     
-    let newSize = CGSize(
-      width: width,
-      height: self.rect.height
+    let insets: CGFloat = config.insets
+    let padding: CGFloat = config.codeBlockPadding
+    
+    let originX: CGFloat = insets - padding
+    let originY: CGFloat = self.originY - padding
+    
+    let adjustedWidth = width - (insets * 2) + (padding * 2)
+    let adjustedHeight = self.rectHeight + (padding * 2)
+    
+    let rect = NSRect(
+      origin: CGPoint(x: originX, y: originY),
+      size: CGSize(width: adjustedWidth, height: adjustedHeight)
     )
     
-    let newRect = NSRect(
-      origin: self.rect.origin,
-      size: newSize
-    )
-    
-    self.rect = newRect
+    return rect
   }
+  
+
   
 //  struct Range: Hashable {
 //    var leading: NSRange

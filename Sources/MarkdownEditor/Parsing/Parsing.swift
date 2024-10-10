@@ -111,7 +111,8 @@ extension MarkdownTextView {
           string: elementString,
           syntax: .codeBlock,
           range: elementRange,
-          rect: elementRect
+          originY: elementRect.origin.y,
+          rectHeight: elementRect.height
         )
         
         newElements.insert(element)
