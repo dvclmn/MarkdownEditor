@@ -10,7 +10,7 @@ import Shortcuts
 
 extension MarkdownTextView {
   
-  typealias DefaultKeyEvent = () -> Void
+  typealias PassthroughKeyEvent = () -> Void
   
   public override func keyDown(with event: NSEvent) {
     
@@ -23,13 +23,15 @@ extension MarkdownTextView {
     /// Create shortcuts, on-the-fly, for every key press
     let modifierFlags = event.modifierFlags.intersection(.deviceIndependentFlagsMask)
     let pressedShortcut = KBShortcut(.character(Character(pressedKey)), modifierFlags: modifierFlags)
-    
-    print("---\nPressed shortcut: \(pressedShortcut)\n---\n\n")
+    let returnKey: String = "\n"
+
     
     // MARK: - Handle registered shortcuts
     /// This is where we determine if the above `pressedShortcut`
     /// is 'registered' or used by an action somewhere else in the code.
     if let matchingSyntax = Markdown.Syntax.findMatchingSyntax(for: pressedShortcut) {
+      
+      print("---\nPressed shortcut: \(pressedShortcut)\n---\n\n")
       
       let hasSelection: Bool = self.selectedRange().length > 0
       
@@ -42,9 +44,9 @@ extension MarkdownTextView {
     }
     /// There are also other useful key events, that aren't `KBShortcut`s,
     /// that can trigger actions
-    else if pressedKey == "\n" || event.keyCode == 36 {
+    else if pressedKey == returnKey || event.keyCode == 36 {
       
-      handleNewListItem {
+      handleNewLine {
         super.keyDown(with: event)
       }
       

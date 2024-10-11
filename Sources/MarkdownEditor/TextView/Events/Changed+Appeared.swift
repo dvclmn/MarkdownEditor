@@ -66,14 +66,18 @@ extension MarkdownTextView {
   func onAppearAndSelectionChanged() {
     
     
+    
     Task { @MainActor in
       
       await self.paragraphDebouncer.processTask { [weak self] in
         
         guard let self else { return }
-        await self.updateParagraphInfo()
         
-        await self.infoUpdater.update(\.paragraph, value: self.currentParagraph.description)
+        await MainActor.run {
+           self.paragraphHandler.updateParagraphInfo(using: self)
+          self.infoUpdater.update(\.paragraph, value: self.paragraphHandler.currentParagraph.description)
+          
+        } // END synchronous run
 
       }
       

@@ -9,6 +9,19 @@ import AppKit
 import Rearrange
 import Wrecktangle
 
+@MainActor
+struct ParagraphHandler: Sendable {
+  
+  private(set) var currentParagraph: ParagraphInfo
+  private(set) var previousParagraph: ParagraphInfo
+  
+  init() {
+    self.currentParagraph = .zero
+    self.previousParagraph = .zero
+  }
+}
+
+
 struct ParagraphInfo {
   var string: String
   var range: NSRange
@@ -44,17 +57,21 @@ extension ParagraphInfo: CustomStringConvertible {
   }
 }
 
-extension MarkdownTextView {
+extension ParagraphHandler {
   
-  func updateParagraphInfo() {
+  mutating func updateParagraphInfo(using textView: MarkdownTextView) {
     
     print("Going to try and update paragraph info")
     
     // Get the text safely
-    guard let currentParagraphText = self.attributedSubstring(forProposedRange: safeCurrentParagraphRange, actualRange: nil)?.string else {
+    guard let currentParagraphText = textView.attributedSubstring(forProposedRange: textView.safeCurrentParagraphRange, actualRange: nil)?.string else {
       print("Couldn't get that text")
       return
     }
+    
+    // Update previous paragraph
+    self.previousParagraph = self.currentParagraph
+    
     
     var syntax: BlockSyntax
     
@@ -77,7 +94,7 @@ extension MarkdownTextView {
     
     let result = ParagraphInfo(
       string: currentParagraphText,
-      range: safeCurrentParagraphRange,
+      range: textView.safeCurrentParagraphRange,
       type: syntax
     )
 
