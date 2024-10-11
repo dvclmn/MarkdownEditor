@@ -25,77 +25,66 @@ struct ParagraphInfo {
   }
 }
 
+extension ParagraphInfo {
+  public static let zero = ParagraphInfo()
+}
+
 extension ParagraphInfo: CustomStringConvertible {
   var description: String {
     
+    // - Selected: \(Date.now.friendlyDateAndTime)
     let output: String = """
-     \(Date.now.friendlyDateAndTime)
-    Type: \(type)
-    Range: \(range.info)
-    String: \(string.trimmingCharacters(in: .whitespacesAndNewlines).preview(40))...
+    
+      - Range: \(range.info)
+      - Type: \(type)
+      - String: \(string.trimmingCharacters(in: .whitespacesAndNewlines).preview(40, hasDividers: false))
     """
     
     return output
   }
 }
 
-
 extension MarkdownTextView {
   
-//  func updateParagraphInfo(firstSelected: NSRange?) {
-//    
-//    let nsString = self.string as NSString
-//    let documentLength = nsString.length
-//    
-//    // Ensure the selected range is within bounds
-//    let selectedRange: NSRange = firstSelected ?? self.selectedRange()
-//    let safeSelectedRange = NSRange(
-//      location: min(selectedRange.location, documentLength),
-//      length: min(selectedRange.length, documentLength - selectedRange.location)
-//    )
-//    
-//    // Calculate paragraph range safely
-//    let paragraphRange = nsString.paragraphRange(for: safeSelectedRange)
-//    let safeParagraphRange = NSRange(
-//      location: min(paragraphRange.location, documentLength),
-//      length: min(paragraphRange.length, documentLength - paragraphRange.location)
-//    )
-//    
-//    // Get the text safely
-//    guard let text = self.attributedSubstring(forProposedRange: safeParagraphRange, actualRange: nil)?.string else {
-//      print("Couldn't get that text")
-//      return
-//    }
-//    
-//    var syntax: BlockSyntax
-//    
-//    if text.hasPrefix("#") {
-//      
-//      let headingLevel = text.prefix(while: { $0 == "#" }).count
-//      
-//      if headingLevel <= 6 && (text.count == headingLevel || text[text.index(text.startIndex, offsetBy: headingLevel)] == " ") {
-//        syntax = BlockSyntax.heading(level: headingLevel)
-//      } else {
-//        syntax = BlockSyntax.heading(level: 1)
-//      }
-//      
-//    } else if text.hasPrefix("- ") {
-//      syntax = .list
-//    } else {
-//      // TODO: Implement more cases
-//      syntax = .none
-//    }
-//    
-//    let result = ParagraphInfo(string: text, range: safeParagraphRange, type: syntax)
-//    
-//    
-////    let box = Box(header: "Paragraph Info", content: result.description + "Paragraph count: \(self)")
-////    print(box)
-//    
-//    self.currentParagraph = result
-//    
-//  }
-//  
+  func updateParagraphInfo() {
+    
+    print("Going to try and update paragraph info")
+    
+    // Get the text safely
+    guard let currentParagraphText = self.attributedSubstring(forProposedRange: safeCurrentParagraphRange, actualRange: nil)?.string else {
+      print("Couldn't get that text")
+      return
+    }
+    
+    var syntax: BlockSyntax
+    
+    if currentParagraphText.hasPrefix("#") {
+      
+      let headingLevel = currentParagraphText.prefix(while: { $0 == "#" }).count
+      
+      if headingLevel <= 6 && (currentParagraphText.count == headingLevel || currentParagraphText[currentParagraphText.index(currentParagraphText.startIndex, offsetBy: headingLevel)] == " ") {
+        syntax = BlockSyntax.heading(level: headingLevel)
+      } else {
+        syntax = BlockSyntax.heading(level: 1)
+      }
+      
+    } else if currentParagraphText.hasPrefix("- ") {
+      syntax = .list
+    } else {
+      // TODO: Implement more cases
+      syntax = .none
+    }
+    
+    let result = ParagraphInfo(
+      string: currentParagraphText,
+      range: safeCurrentParagraphRange,
+      type: syntax
+    )
+
+    self.currentParagraph = result
+    
+  }
+  
 
   
 }

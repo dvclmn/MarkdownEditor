@@ -30,8 +30,6 @@ public class MarkdownViewController: NSViewController {
       fatalError("Why no Highlightr?")
     }
     
-    
-    
     let scrollView: NSScrollView?
     
     if configuration.isScrollable {
@@ -49,8 +47,6 @@ public class MarkdownViewController: NSViewController {
       highlightr: highlightr
     )
     
-//    super.init(nibName: nil, bundle: nil)
-    
     if configuration.isNeonEnabled {
       do {
         self.highlighter = try Self.makeHighlighter(for: textView)
@@ -62,7 +58,6 @@ public class MarkdownViewController: NSViewController {
     } else {
       
       self.highlighter = nil
-      
       super.init(nibName: nil, bundle: nil)
     }
     
@@ -71,6 +66,7 @@ public class MarkdownViewController: NSViewController {
   required init?(coder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
+  
   
   public override func loadView() {
 

@@ -24,7 +24,13 @@ extension MarkdownTextView {
 //      self.styleMarkdown()
 //    }
     
-//    onAppearAndTextChange()
+//    guard let layoutManager = self.layoutManager else {
+//      fatalError("Layout mananaager is nil")
+//    }
+    
+    onAppearAndTextChange()
+    
+    onAppearAndSelectionChanged()
     
 //    let codeFontSize: CGFloat = 13
     
@@ -42,6 +48,7 @@ extension MarkdownTextView {
   
   func onAppearAndTextChange() {
     
+    
     Task { @MainActor in
       
       let newSize = self.updatedEditorHeight()
@@ -49,12 +56,28 @@ extension MarkdownTextView {
       
       
       infoUpdater.update(\.elementSummary, value: self.elementsSummary)
-      
       infoUpdater.update(\.size, value: newSize)
       infoUpdater.update(\.lineCount, value: newLines)
       
     }
     
+  }
+  
+  func onAppearAndSelectionChanged() {
+    
+    
+    Task { @MainActor in
+      
+      await self.paragraphDebouncer.processTask { [weak self] in
+        
+        guard let self else { return }
+        await self.updateParagraphInfo()
+        
+        await self.infoUpdater.update(\.paragraph, value: self.currentParagraph.description)
+
+      }
+      
+    }
   }
   
   

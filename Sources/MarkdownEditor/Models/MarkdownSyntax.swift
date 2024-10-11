@@ -134,11 +134,11 @@ public extension Markdown {
     }
     
     
-    public var shortcuts: [Keyboard.Shortcut] {
+    public var shortcuts: [KBShortcut] {
       switch self {
         case .heading(let level):
           return [
-            Keyboard.Shortcut(
+            KBShortcut(
               .character(Character("\(level)")),
               modifiers: [.command]
             )
@@ -146,44 +146,44 @@ public extension Markdown {
           
         case .bold:
           return [
-            Keyboard.Shortcut(
+            KBShortcut(
               .character("b"),
               modifiers: [.command],
-              label: Keyboard.Shortcut.Label(title: self.name, icon: "bold")
+              label: KBShortcut.Label(title: self.name, icon: "bold")
             )
           ]
         case .italic:
           return [
-            Keyboard.Shortcut(
+            KBShortcut(
               .character("i"),
               modifiers: [.command],
-              label: Keyboard.Shortcut.Label(title: self.name, icon: "italic")
+              label: KBShortcut.Label(title: self.name, icon: "italic")
             )
           ]
         case .boldItalic:
           return [
-            Keyboard.Shortcut(
+            KBShortcut(
               .character("b"),
               modifiers: [.command, .shift]
             )
           ]
         case .inlineCode:
           return [
-            Keyboard.Shortcut(
+            KBShortcut(
               .character("`"),
-              label: Keyboard.Shortcut.Label(title: self.name, icon: "chevron.left.forwardslash.chevron.right")
+              label: KBShortcut.Label(title: self.name, icon: "chevron.left.forwardslash.chevron.right")
             )
           ]
         case .highlight:
           return [
-            Keyboard.Shortcut(
+            KBShortcut(
               .character("h"),
               modifiers: [.command]
             )
           ]
         case .strikethrough:
           return [
-            Keyboard.Shortcut(
+            KBShortcut(
               .character("s"),
               modifiers: [.command]
             )
@@ -195,7 +195,7 @@ public extension Markdown {
     }
 
     
-    static func findMatchingSyntax(for shortcut: Keyboard.Shortcut) -> Markdown.Syntax? {
+    static func findMatchingSyntax(for shortcut: KBShortcut) -> Markdown.Syntax? {
       for syntax in Markdown.Syntax.allCases {
         if syntax.shortcuts.contains(shortcut) {
           return syntax

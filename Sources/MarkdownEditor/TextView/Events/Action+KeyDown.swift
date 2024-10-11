@@ -12,128 +12,59 @@ extension MarkdownTextView {
   
   typealias DefaultKeyEvent = () -> Void
   
-//  public override func keyDown(with event: NSEvent) {
-//    
-//    guard let pressedKey = event.charactersIgnoringModifiers, pressedKey.count == 1 else {
-//      print("Key `\(event.keyCode)` not needed for this operation.")
-//      return super.keyDown(with: event)
-//    }
-//    
-//    let modifierFlags = event.modifierFlags.intersection(.deviceIndependentFlagsMask)
-//    let pressedShortcut = Keyboard.Shortcut(.character(Character(pressedKey)), modifierFlags: modifierFlags)
-//    
-//    if let matchingSyntax = Markdown.Syntax.findMatchingSyntax(for: pressedShortcut) {
-//      
-//      let hasSelection: Bool = self.selectedRange().length > 0
-//      guard hasSelection else {
-//        print("Zero-length selection not yet supported for keyboard shortcuts.")
-//        return super.keyDown(with: event)
-//      }
-//      
-//      handleWrapping(for: matchingSyntax)
-//    } else if pressedKey == "\n" || event.keyCode == 36 {
-//      
-////      handleNewListItem {
-//        super.keyDown(with: event)
-////      }
-//      
-////      print("Pressed return")
-//    
-//  } else {
-////      print("Shortcut didn't match any syntax shortcuts, handing the event back to the system.")
-//      super.keyDown(with: event)
-//    }
-//    
-//  } // END key down override
-  
-  
-//  func currentLineContents() -> String? {
-//    guard let textStorage = textStorage else { return nil }
-//    let string = textStorage.string
-//    let selectedRange = self.selectedRange()
-//    
-//    // Find the start of the current line
-//    
-//    
-//
-//    
-//    // Find the end of the current line
-//    let lineEnd = (string as NSString).lineRange(for: selectedRange).upperBound
-//    
-//    // Extract the contents of the current line
-//    let currentLine = (string as NSString).substring(with: NSRange(location: lineStart, length: lineEnd - lineStart))
-//    
-//    return currentLine
-//  }
-  
-  
-  
-  func handleNewListItem(
-    defaultKey: DefaultKeyEvent
-  ) {
+  public override func keyDown(with event: NSEvent) {
     
-    let nsString = self.string as NSString
-    let paragraphRange = nsString.paragraphRange(for: self.selectedRange())
-    guard let paragraphText = self.attributedSubstring(forProposedRange: paragraphRange, actualRange: nil)?.string else {
-      defaultKey()
-      return
+    /// `charactersIgnoringModifiers` returns an optional, so we unwrap it here
+    guard let pressedKey = event.charactersIgnoringModifiers, pressedKey.count == 1 else {
+      print("Key `\(event.keyCode)` not needed for this operation.")
+      return super.keyDown(with: event)
     }
     
-//    print("Paragraph: \(paragraphText)")
+    /// Create shortcuts, on-the-fly, for every key press
+    let modifierFlags = event.modifierFlags.intersection(.deviceIndependentFlagsMask)
+    let pressedShortcut = KBShortcut(.character(Character(pressedKey)), modifierFlags: modifierFlags)
     
-//    let paragraphStartPattern: Regex<(Substring, listContent: Substring)> = /^ -(?<listContent>.*?)/
-    let newListItemPattern = "- "
-    let trimmedParagraph = paragraphText.trimmingCharacters(in: .whitespacesAndNewlines)
+    print("---\nPressed shortcut: \(pressedShortcut)\n---\n\n")
     
-    
-    
-    if trimmedParagraph.hasPrefix(newListItemPattern) {
-      // We're in a list item
-      if trimmedParagraph == newListItemPattern {
-        
-        print(paragraphRange)
-        
-        // The list item is empty, so break out of the list
-//        replaceCharacters(in: , with: "\n")
-//        moveSelectedRange(by: 1) // Move cursor to the new line
-      } else {
-        // Continue the list
-//        print("Trimmed paragraph: `\(trimmedParagraph)` was not equal to `\(newListItemPattern)`")
-        let cursorPosition = selectedRange().location
-        let textToInsert = "\n- "
-        insertText(textToInsert, replacementRange: NSRange(location: cursorPosition, length: 0))
-        
-//        moveSelectedRange(by: textToInsert.count) // Move cursor to end of inserted text
+    // MARK: - Handle registered shortcuts
+    /// This is where we determine if the above `pressedShortcut`
+    /// is 'registered' or used by an action somewhere else in the code.
+    if let matchingSyntax = Markdown.Syntax.findMatchingSyntax(for: pressedShortcut) {
+      
+      let hasSelection: Bool = self.selectedRange().length > 0
+      
+      guard hasSelection else {
+        print("Zero-length selection not yet supported for keyboard shortcuts.")
+        return super.keyDown(with: event)
       }
-    } else {
-      // Not in a list item, perform default behavior
-      defaultKey()
+      
+      handleWrapping(for: matchingSyntax)
+    }
+    /// There are also other useful key events, that aren't `KBShortcut`s,
+    /// that can trigger actions
+    else if pressedKey == "\n" || event.keyCode == 36 {
+      
+      handleNewListItem {
+        super.keyDown(with: event)
+      }
+      
+      //      print("Pressed return")
+      
+    }
+    /// We've now exhausted all usefulness checks. If we haven't used this key by now,
+    /// for a shortcut, then we pass it through to the system, as any normal key press.
+    else {
+      super.keyDown(with: event)
     }
     
-    
-//    if paragraphText.hasPrefix(newListItemPattern) {
-//      
-//      if paragraphText == newListItemPattern {
-//
-//        replaceCharacters(in: paragraphRange, with: "\n")
-////        insertText("\n", replacementRange: self.selectedRange())
-//      } else {
-//        insertText("\n- ", replacementRange: self.selectedRange())
-//      }
-//      
-//    } else {
-//      defaultKey()
-//    }
-    
-  }
-  
+  } // END key down override
   
   
   enum WrapAction {
     case wrap
     case unwrap
   }
-
+  
   func handleWrapping(
     _ action: WrapAction = .wrap,
     for syntax: Markdown.Syntax

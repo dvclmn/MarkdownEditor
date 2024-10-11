@@ -41,7 +41,7 @@ public struct MarkdownEditorConfiguration: Sendable, Equatable {
     
     isShowingFrames: Bool = false,
     insets: CGFloat = 20,
-    isNeonEnabled: Bool = false,
+    isNeonEnabled: Bool = true,
     maxReadingWidth: CGFloat = 580
   ) {
     self.isEditable = isEditable

@@ -20,6 +20,8 @@ extension MarkdownViewController {
   
   @MainActor static func makeHighlighter(for textView: MarkdownTextView) throws -> TextViewHighlighter {
     
+//    print("Let's set up `TextViewHighlighter`.")
+    
     textView.typingAttributes = textView.configuration.defaultTypingAttributes
     
     let markdownConfig = try LanguageConfiguration(
@@ -31,13 +33,18 @@ extension MarkdownViewController {
       name: "Markdown Inline",
       bundleName: "TreeSitterMarkdown_TreeSitterMarkdownInline"
     )
+    let swiftConfig = try LanguageConfiguration(
+      tree_sitter_swift(),
+      name: "Swift",
+      bundleName: "TreeSitterSwift_TreeSitterSwift"
+    )
     
     let provider: TokenAttributeProvider = { token in
       
-      //      let string = textView.attributedSubstring(forProposedRange: token.range, actualRange: nil)
+//            let string = textView.attributedSubstring(forProposedRange: token.range, actualRange: nil)
       
-      //      print("Token: \(token)")
-      //      print("String: \(string?.string ?? "nil")\n")
+//            print("Token: \(token)")
+//            print("String: \(string?.string ?? "nil")\n")
       
       return switch token.name {
           
@@ -61,13 +68,18 @@ extension MarkdownViewController {
       attributeProvider: provider,
       languageProvider: { name in
         
-        //        print("Embedded language: ", name)
+//                print("Embedded language: ", name)
         
         switch name {
           case "markdown_inline": // tried both this and "Markdown Inline"
             //          case "Markdown Inline":
-            //            print("Let's fire up markdown inline")
+//                        print("Let's fire up markdown inline")
             return markdownInlineConfig
+            
+          case "swift":
+//            print("Found swift grammar")
+            return swiftConfig
+            
           default:
             return nil
         }
@@ -78,55 +90,4 @@ extension MarkdownViewController {
     return try TextViewHighlighter(textView: textView, configuration: highlighterConfig)
     
   }
-  
-  
-  
-  func neonSetup() throws {
-    
-    let languageConfig = try LanguageConfiguration(
-      tree_sitter_markdown(),
-      name: "Markdown"
-    )
-    
-    let clientConfig = TreeSitterClient.Configuration(
-      languageProvider: { identifier in
-        print("Nested languages? \(identifier)")
-        return languageConfig
-      },
-      contentProvider: { [textView] length in
-        
-        print("contentProvider `length`: \(length.description)")
-        
-        return .init(string: textView.string)
-      },
-      lengthProvider: { [textView] in
-        textView.string.utf16.count
-        
-      },
-      invalidationHandler: { set in
-        print("Invalidations: \(set)")
-      },
-      locationTransformer: { location in
-        
-        return nil
-      }
-    )
-    
-    let client = try TreeSitterClient(
-      rootLanguageConfig: languageConfig,
-      configuration: clientConfig
-    )
-    
-    let source = textView.string
-    
-    let provider = source.predicateTextProvider
-    
-    Task { @MainActor in
-      
-      let highlights = try await client.highlights(in: textView.visibleTextRange, provider: provider)
-      
-      print("Highlights: ", highlights)
-    }
-    
-  } // END neon setup
 }

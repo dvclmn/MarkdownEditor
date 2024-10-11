@@ -16,6 +16,8 @@ public class MarkdownTextView: NSTextView {
   let tlm: NSTextLayoutManager
   let tcm: NSTextContentManager
   
+  
+  
   let highlightr: Highlightr
   
   var scrollView: NSScrollView?
@@ -27,6 +29,7 @@ public class MarkdownTextView: NSTextView {
   var lastSelectedText: String = ""
   
   var elements: Set<Markdown.Element> = []
+  var currentParagraph: ParagraphInfo = .zero
   
   var onWidthChange: ((CGFloat) -> Void)?
   
@@ -36,6 +39,7 @@ public class MarkdownTextView: NSTextView {
   var frameDebouncer = Debouncer(interval: 0.3)
   var parsingDebouncer = Debouncer(interval: 0.1)
   var infoDebouncer = Debouncer(interval: 0.3)
+  var paragraphDebouncer = Debouncer(interval: 0.3)
 //  var stylingDebouncer = Debouncer(interval: 0.3)
   
   //  let infoHandler = EditorInfoHandler()

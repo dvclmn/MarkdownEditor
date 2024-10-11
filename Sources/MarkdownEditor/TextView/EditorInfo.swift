@@ -15,35 +15,47 @@ public struct EditorInfo: Sendable {
   public var lineCount: Int
   public var elementSummary: String
   public var typingAttributes: String
+  public var paragraph: String
   
   public init(
     size: CGSize = .zero,
     lineCount: Int = 0,
     elementSummary: String = "No summary",
-    typingAttributes: String = "No attributes"
+    typingAttributes: String = "No attributes",
+    paragraph: String = "No paragraph info"
     
   ) {
     self.size = size
     self.lineCount = lineCount
     self.elementSummary = elementSummary
     self.typingAttributes = typingAttributes
-    
+    self.paragraph = paragraph
   }
 }
 
 
 public extension EditorInfo {
   
+  
   var summary: String {
     let result: String = """
-    Editor width: \(size.width.toDecimal(0)), height: \(size.height.toDecimal(0)) 
     Line count: \(lineCount)
-    Elements: \(elementSummary)
-    Typing attributes: \n\(typingAttributes)
+    Selected paragraph: \(paragraph)
     """
     
     return result
   }
+  
+//  var summary: String {
+//    let result: String = """
+//    Editor width: \(size.width.toDecimal(0)), height: \(size.height.toDecimal(0)) 
+//    Line count: \(lineCount)
+//    Elements: \(elementSummary)
+//    Typing attributes: \n\(typingAttributes)
+//    """
+//    
+//    return result
+//  }
 }
 
 @MainActor
