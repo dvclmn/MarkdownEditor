@@ -7,11 +7,12 @@
 
 import AppKit
 
-//import Neon
-//import TreeSitterMarkdown
-//import TreeSitterMarkdownInline
-//import SwiftTreeSitter
-//import TreeSitterClient
+import Neon
+import TreeSitterMarkdown
+import TreeSitterMarkdownInline
+import SwiftTreeSitter
+import TreeSitterSwift
+import TreeSitterClient
 import Highlightr
 
 
@@ -19,7 +20,7 @@ public class MarkdownViewController: NSViewController {
   
   var textView: MarkdownTextView
   
-//  private let highlighter: TextViewHighlighter?
+  private let highlighter: TextViewHighlighter?
   
   init(
     configuration: MarkdownEditorConfiguration
@@ -29,60 +30,41 @@ public class MarkdownViewController: NSViewController {
       fatalError("Why no Highlightr?")
     }
     
+    
+    
+    let scrollView: NSScrollView?
+    
+    if configuration.isScrollable {
+      scrollView = NSScrollView()
+      
+    } else {
+      scrollView = nil
+    }
+    
     self.textView = MarkdownTextView(
       frame: .zero,
       textContainer: nil,
+      scrollView: scrollView,
       configuration: configuration,
       highlightr: highlightr
     )
-//    if configuration.isTextKit2 {
-//    } else {
-//      
-//      /// TextKit 1 setup
-//      let container = NSTextContainer()
-//      let textStorage = NSTextStorage()
-//      let layoutManager = NSLayoutManager()
-//      textStorage.addLayoutManager(layoutManager)
-//      
-//      layoutManager.addTextContainer(container)
-//      
-//      self.textView = MarkdownTextView(
-//        frame: .zero,
-//        textContainer: container,
-//        configuration: configuration,
-//        highlightr: highlightr
-//      )
-      
-//    }
     
+//    super.init(nibName: nil, bundle: nil)
     
-    if configuration.isScrollable {
-      let scrollView = NSScrollView()
-      
-      scrollView.hasVerticalScroller = true
-      scrollView.drawsBackground = false
-      scrollView.documentView = textView
-      scrollView.additionalSafeAreaInsets.bottom = configuration.bottomSafeArea
+    if configuration.isNeonEnabled {
+      do {
+        self.highlighter = try Self.makeHighlighter(for: textView)
+        print("`TextViewHighlighter` is running.")
+        super.init(nibName: nil, bundle: nil)
+      } catch {
+        fatalError("Error setting up the highlighter: \(error)")
+      }
     } else {
-//      print("No scroll view set up, text view is not editable, and scrolling is handled in SwiftUI.")
+      
+      self.highlighter = nil
+      
+      super.init(nibName: nil, bundle: nil)
     }
-    
-    super.init(nibName: nil, bundle: nil)
-    
-//    if configuration.isNeonEnabled {
-//      do {
-//        self.highlighter = try Self.makeHighlighter(for: textView)
-//        print("`TextViewHighlighter` is running.")
-//        super.init(nibName: nil, bundle: nil)
-//      } catch {
-//        fatalError("Error setting up the highlighter: \(error)")
-//      }
-//    } else {
-//      
-//      self.highlighter = nil
-//      
-//      super.init(nibName: nil, bundle: nil)
-//    }
     
   }
   
@@ -98,9 +80,9 @@ public class MarkdownViewController: NSViewController {
       self.view = textView
     }
     
-//    if let highlighter = highlighter {
-//      highlighter.observeEnclosingScrollView()
-//    }
+    if let highlighter = highlighter {
+      highlighter.observeEnclosingScrollView()
+    }
     
   }
   

@@ -50,7 +50,7 @@ public class MarkdownTextView: NSTextView {
   public init(
     frame frameRect: NSRect,
     textContainer container: NSTextContainer?,
-    
+    scrollView: NSScrollView? = nil,
     configuration: MarkdownEditorConfiguration,
     highlightr: Highlightr
     
@@ -59,6 +59,7 @@ public class MarkdownTextView: NSTextView {
     self.configuration = configuration
     self.highlightr = highlightr
     self.infoUpdater = EditorInfoUpdater()
+    
     
     //    if configuration.isTextKit2 {
     
@@ -87,6 +88,8 @@ public class MarkdownTextView: NSTextView {
     
     self.tlm = textLayoutManager
     self.tcm = textLayoutManager.textContentManager!
+    
+    self.scrollView = scrollView
     
     super.init(frame: frameRect, textContainer: nsTextContainer)
     

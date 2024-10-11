@@ -19,16 +19,16 @@ extension MarkdownTextView {
     
     /// This allows a quick parse on load, and then the debounced
     /// parsing is over in `Changed+Text.swift`
-    DispatchQueue.main.async {
-      self.parseAllCases()
-      self.styleMarkdown()
-    }
+//    DispatchQueue.main.async {
+//      self.parseAllCases()
+//      self.styleMarkdown()
+//    }
     
-    onAppearAndTextChange()
+//    onAppearAndTextChange()
     
-    let codeFontSize: CGFloat = 13
+//    let codeFontSize: CGFloat = 13
     
-    highlightr.theme.setCodeFont(NSFont.monospacedSystemFont(ofSize: codeFontSize, weight: .medium))
+//    highlightr.theme.setCodeFont(NSFont.monospacedSystemFont(ofSize: codeFontSize, weight: .medium))
     
     //    parseMarkdownDebounced()
     //    styleMarkdownDebounced()

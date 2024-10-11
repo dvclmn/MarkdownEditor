@@ -1,5 +1,5 @@
 {
-  "originHash" : "b4e0715aa9b62be47950e9e8ce4775b93d517da9bccef7b1a24785b9814e414a",
+  "originHash" : "0616c8bc45a1147c338d2cdc6c4df540ab56f1e25d577baeb8f7665434d78564",
   "pins" : [
     {
       "identity" : "collection",
@@ -17,6 +17,24 @@
       "state" : {
         "revision" : "9fa31f4403da54855f1e2aeaeff478f4f0e40b13",
         "version" : "1.0.2"
+      }
+    },
+    {
+      "identity" : "glyph",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/ChimeHQ/Glyph.git",
+      "state" : {
+        "branch" : "main",
+        "revision" : "154d332e4fdcec2766150f52e0c248d8482a2a49"
+      }
+    },
+    {
+      "identity" : "highlightr",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/raspu/Highlightr.git",
+      "state" : {
+        "revision" : "bcf2d0590f32ac2528feb72d7e34f5b463801a47",
+        "version" : "2.2.1"
       }
     },
     {
@@ -151,6 +169,24 @@
       "state" : {
         "branch" : "split_parser",
         "revision" : "b7eba93e6a3e588e259e831416ac11abdaa8616a"
+      }
+    },
+    {
+      "identity" : "tree-sitter-swift",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/alex-pinkus/tree-sitter-swift",
+      "state" : {
+        "revision" : "c9c669b4513479e07a0ff44cf14f72351959ac21",
+        "version" : "0.5.0"
+      }
+    },
+    {
+      "identity" : "wrecktangle",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/dvclmn/Wrecktangle.git",
+      "state" : {
+        "branch" : "main",
+        "revision" : "5eb10b9029209b7a676973f903e56a8dcb4ecdfd"
       }
     },
     {

@@ -10,25 +10,50 @@ import TextCore
 import Highlightr
 
 extension MarkdownTextView {
-
+  
   func textViewSetup() {
     
-    print("How often does text view setup get called?")
-    
     isEditable = self.configuration.isEditable
-
-//    highlightr.setTheme(to: "xcode-dark")
+    isSelectable = true
+    drawsBackground = false
+    allowsUndo = true
+    isRichText = false
+    smartInsertDeleteEnabled = false
+    usesFindBar = true
+    usesFindPanel = true
     
-    if self.configuration.isScrollable {
+    self.applyConfiguration()
+    
+    
+    //    highlightr.setTheme(to: "xcode-dark")
+    
+    if self.configuration.isScrollable, let scrollView = scrollView {
       
       /// *Scrolling* version
-      isVerticallyResizable = true
-      isHorizontallyResizable = true
       
-      autoresizingMask = [.width, .height]
+      scrollView.hasVerticalScroller = true
+      scrollView.drawsBackground = false
+      scrollView.documentView = self
+      scrollView.additionalSafeAreaInsets.bottom = configuration.bottomSafeArea
+      
+      let contentSize = scrollView.contentSize
+      
+      textContainer?.containerSize = CGSize(width: contentSize.width, height: CGFloat.greatestFiniteMagnitude)
+      
+      minSize = CGSize(width: 0, height: 0)
+      maxSize = CGSize(width: CGFloat.greatestFiniteMagnitude, height: CGFloat.greatestFiniteMagnitude)
+      
+      isVerticallyResizable = true
+      isHorizontallyResizable = false
+      
+      autoresizingMask = [.width]
       
       textContainer?.widthTracksTextView = true
       textContainer?.heightTracksTextView = false
+      
+      
+      
+      
       
     } else {
       
@@ -55,15 +80,6 @@ extension MarkdownTextView {
       
     }
     
-    isSelectable = true
-    drawsBackground = false
-    allowsUndo = true
-    isRichText = false
-    smartInsertDeleteEnabled = false
-    usesFindBar = true
-    usesFindPanel = true
-   
-    self.applyConfiguration()
     
   }
   
@@ -75,19 +91,19 @@ extension MarkdownTextView {
     self.insertionPointColor = NSColor(self.configuration.theme.insertionPointColour)
     //
     textContainer?.lineFragmentPadding = configuration.insets
-//    textContainer?.lineFragmentPadding = self.horizontalInsets
-
+    //    textContainer?.lineFragmentPadding = self.horizontalInsets
+    
     textContainerInset = NSSize(width: 0, height: self.configuration.insets)
     
     self.font = NSFont.systemFont(ofSize: self.configuration.theme.fontSize)
     
     
     
-//    let defaultAttributes: Attributes = [.foregroundColor: NSColor.textColor.withAlphaComponent(0.9)]
+    //    let defaultAttributes: Attributes = [.foregroundColor: NSColor.textColor.withAlphaComponent(0.9)]
     
-//    let defaults = self.configuration.defaultTypingAttributes
+    //    let defaults = self.configuration.defaultTypingAttributes
     
-//    let nsString = self.string as NSString
+    //    let nsString = self.string as NSString
     
     /// Typing attributes need to be set, otherwise important things like paragraph
     /// line spacing will be wrong, when I type new characters somewhere.
@@ -95,10 +111,10 @@ extension MarkdownTextView {
     self.typingAttributes = self.configuration.defaultTypingAttributes
     self.defaultParagraphStyle = self.configuration.defaultParagraphStyle
     
-//    self.textStorage?.setAttributes(defaults, range: NSRange(location: 0, length: nsString.length))
+    //    self.textStorage?.setAttributes(defaults, range: NSRange(location: 0, length: nsString.length))
     
     
   }
-
+  
   
 }

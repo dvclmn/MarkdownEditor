@@ -17,14 +17,14 @@ extension MarkdownTextView {
     
     super.didChangeText()
     
-    Task { @MainActor in
-      await parsingDebouncer.processTask { [weak self] in
-        await self?.parseAllCases()
-        await self?.styleMarkdown()
-      }
-    }
-
-    onAppearAndTextChange()
+//    Task { @MainActor in
+//      await parsingDebouncer.processTask { [weak self] in
+//        await self?.parseAllCases()
+//        await self?.styleMarkdown()
+//      }
+//    }
+//
+//    onAppearAndTextChange()
     
   }
   
