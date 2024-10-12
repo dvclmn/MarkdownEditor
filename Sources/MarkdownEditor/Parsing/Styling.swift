@@ -40,6 +40,10 @@ extension MarkdownTextView {
       for element in self.elements {
         
         if element.syntax == .codeBlock {
+          
+          textStorage.addAttribute(.font, value: configuration.theme.codeFont, range: element.ranges.all)
+          
+          
 //          guard let highlightedCode: NSAttributedString = highlightr.highlight(element.string, as: nil) else {
 //            print("Couldn't get the Highlighted string")
 //            return

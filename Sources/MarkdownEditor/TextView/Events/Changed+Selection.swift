@@ -26,7 +26,7 @@ extension MarkdownTextView {
     
     self.paragraphHandler.updateParagraphInfo(using: self)
     
-    onAppearAndSelectionChanged()
+//    onAppearAndSelectionChanged()
     //    print("Text view frame: `\(self.frame)`")
     //    updateParagraphInfo(firstSelected: ranges.first?.rangeValue)
     

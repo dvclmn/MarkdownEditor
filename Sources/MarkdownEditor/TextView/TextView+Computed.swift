@@ -8,6 +8,7 @@
 import AppKit
 import Glyph
 import Rearrange
+import Foundation
 
 extension MarkdownTextView {
   
@@ -17,18 +18,24 @@ extension MarkdownTextView {
   }
   
   var nsString: NSString {
-    let string: String = self.textStorage?.string ?? self.string
-    let result = string as NSString
-    return result
+    return self.string as NSString
   }
   
   var documentLength: Int {
     self.nsString.length
   }
   
+  var safeCurrentParagraphRange: NSRange {
+    let paragraphRange: NSRange = nsString.paragraphRange(for: safeSelectedRange)
+    return paragraphRange.clamped(to: documentLength)
+  }
   
   var safeSelectedRange: NSRange {
-    return selectedRange.clamped(to: documentLength)
+    
+    let result: NSRange = selectedRange.clamped(to: documentLength)
+    
+    print("Calculated safeSelectedRange: \(result)")
+    return result
   }
   
   func getSafeRange(for range: NSRange) -> NSRange {

@@ -19,27 +19,24 @@ extension MarkdownTextView {
     
     /// This allows a quick parse on load, and then the debounced
     /// parsing is over in `Changed+Text.swift`
-//    DispatchQueue.main.async {
-//      self.parseAllCases()
-//      self.styleMarkdown()
-//    }
+    DispatchQueue.main.async {
+      self.parseAllCases()
+      self.styleMarkdown()
+    }
     
-//    guard let layoutManager = self.layoutManager else {
-//      fatalError("Layout mananaager is nil")
-//    }
+    //    guard let layoutManager = self.layoutManager else {
+    //      fatalError("Layout mananaager is nil")
+    //    }
     
     onAppearAndTextChange()
     
-    onAppearAndSelectionChanged()
+    //    onAppearAndSelectionChanged()
     
-//    let codeFontSize: CGFloat = 13
+    //    let codeFontSize: CGFloat = 13
     
-//    highlightr.theme.setCodeFont(NSFont.monospacedSystemFont(ofSize: codeFontSize, weight: .medium))
-    
-    //    parseMarkdownDebounced()
-    //    styleMarkdownDebounced()
-    
-    //        exploreTextSegments()
+    //    highlightr.theme.setCodeFont(NSFont.monospacedSystemFont(ofSize: codeFontSize, weight: .medium))
+
+    exploreTextSegments()
     
     
     //    basicInlineMarkdown()
@@ -63,59 +60,59 @@ extension MarkdownTextView {
     
   }
   
-  func onAppearAndSelectionChanged() {
-    
-    
-    
-    Task { @MainActor in
-      
-      await self.paragraphDebouncer.processTask { [weak self] in
-        
-        guard let self else { return }
-        
-        await MainActor.run {
-          self.infoUpdater.update(\.paragraph, value: self.paragraphHandler.currentParagraph.description)
-          
-        } // END synchronous run
-
-      }
-      
-    }
-  }
-  
-  
-  //  func exploreTextSegments() {
+  //  func onAppearAndSelectionChanged() {
   //
-  //    guard let tlm = self.textLayoutManager,
-  //          let tcm = tlm.textContentManager
-  //    else { return }
+  //    Task { @MainActor in
   //
-  
-  //    tcm.performEditingTransaction {
-  
-  //      tlm.enumerateTextLayoutFragments(from: tlm.documentRange.location) { fragment in
+  //      await self.paragraphDebouncer.processTask { [weak self] in
   //
-  //        guard let paragraph = fragment.textElement as? NSTextParagraph else { return false }
+  //        guard let self else { return }
   //
-  //        let string = paragraph.attributedString.string
+  //        await MainActor.run {
+  //          self.infoUpdater.update(\.paragraph, value: self.paragraphHandler.currentParagraph.description)
   //
-  //        guard let paragraphRange = paragraph.elementRange
-  //        else {
-  //          print("Returned false: \(string)")
-  //          return false
-  //        }
+  //        } // END synchronous run
   //
-  //        let nsRange = NSRange(paragraphRange, provider: tcm)
+  //      }
   //
-  
-  
-  
-  //        return true
-  //
-  //      } // END enumerate fragments
-  //
-  //    } // END perform edit
+  //    }
   //  }
+  
+  
+  func exploreTextSegments() {
+    
+    guard let tlm = self.textLayoutManager,
+          let tcm = tlm.textContentManager
+    else { return }
+    
+    var paraCount: Int = 0
+    
+    tcm.performEditingTransaction {
+      
+      tlm.enumerateTextLayoutFragments(from: tlm.documentRange.location) { fragment in
+        
+        paraCount += 1
+        guard let paragraph = fragment.textElement as? NSTextParagraph else { return false }
+        
+        let string = paragraph.attributedString.string
+        
+        guard let paragraphRange = paragraph.elementRange else {
+          print("Returned false: \(string)")
+          return false
+        }
+        
+        let nsRange = NSRange(paragraphRange, provider: tcm)
+        
+        
+        
+        return true
+        
+      } // END enumerate fragments
+      
+      print("`enumerateTextLayoutFragments` found \(paraCount) paragraphs.")
+      
+    } // END perform edit
+  }
   
   
   

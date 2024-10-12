@@ -87,13 +87,13 @@ extension MarkdownTextView {
       
       
     } else if arrivedLineIsList {
-      
+      passthroughKey()
       
       
     } else if bothLinesAreList {
-      
+      passthroughKey()
     } else {
-      
+      passthroughKey()
     }
     
     

@@ -61,13 +61,8 @@ extension ParagraphHandler {
   
   mutating func updateParagraphInfo(using textView: MarkdownTextView) {
     
-    print("Going to try and update paragraph info")
-    
-    let paragraphRange: NSRange = textView.nsString.paragraphRange(for: textView.safeSelectedRange)
-    
-    let safeCurrentParagraphRange: NSRange = paragraphRange.clamped(to: textView.documentLength)
-
-    guard let currentParagraphText = textView.attributedSubstring(forProposedRange: safeCurrentParagraphRange, actualRange: nil)?.string else {
+    let safeRange = textView.safeCurrentParagraphRange
+    guard let currentParagraphText = textView.attributedSubstring(forProposedRange: safeRange, actualRange: nil)?.string else {
       print("Couldn't get that text")
       return
     }
@@ -79,9 +74,11 @@ extension ParagraphHandler {
     
     let result = ParagraphInfo(
       string: currentParagraphText,
-      range: safeCurrentParagraphRange,
+      range: safeRange,
       type: blockSyntax
     )
+    
+    print(result)
 
     self.currentParagraph = result
     
@@ -111,6 +108,7 @@ extension ParagraphHandler {
     
   } // END identify syntax
   
+
 
   
 } // END paragraph handler extension

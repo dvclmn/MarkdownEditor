@@ -24,7 +24,6 @@ extension MarkdownTextView {
     let modifierFlags = event.modifierFlags.intersection(.deviceIndependentFlagsMask)
     let pressedShortcut = KBShortcut(.character(Character(pressedKey)), modifierFlags: modifierFlags)
     let returnKey: String = "\n"
-
     
     // MARK: - Handle registered shortcuts
     /// This is where we determine if the above `pressedShortcut`
