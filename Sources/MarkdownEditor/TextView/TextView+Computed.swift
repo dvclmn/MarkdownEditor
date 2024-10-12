@@ -31,11 +31,6 @@ extension MarkdownTextView {
     return selectedRange.clamped(to: documentLength)
   }
   
-  var safeCurrentParagraphRange: NSRange {
-    let paragraphRange = nsString.paragraphRange(for: safeSelectedRange)
-    return paragraphRange.clamped(to: documentLength)
-  }
-  
   func getSafeRange(for range: NSRange) -> NSRange {
     return range.clamped(to: documentLength)
   }

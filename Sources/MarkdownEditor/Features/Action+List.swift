@@ -21,21 +21,19 @@ extension MarkdownTextView {
     }
 
     /// This is the paragraph we just left, the one we were on before pressing Return
-    let paragraphTextDeparted = self.paragraphHandler.previousParagraph.string
-    let departedTrimmed = trimmedForReference(paragraphTextDeparted)
-    let paragraphRangeDeparted = self.paragraphHandler.previousParagraph.range
+    let lineDepartedText = self.paragraphHandler.previousParagraph.string
+    let lineDepartedTrimmed = trimmedForReference(lineDepartedText)
+    let rangeDeparted = self.paragraphHandler.previousParagraph.range
         
     /// This is the paragraph we've now landed on, after pressing Return
-    let paragraphTextArrived = self.paragraphHandler.currentParagraph.string
-    let arrivedTrimmed = trimmedForReference(paragraphTextArrived)
-    let paragraphRangeArrived = self.paragraphHandler.currentParagraph.range
-    
-    
+    let lineArrivedText = self.paragraphHandler.currentParagraph.string
+    let lineArrivedTrimmed = trimmedForReference(lineArrivedText)
+//    let rangeArrived = self.paragraphHandler.currentParagraph.range
     
     print("""
     Trimmed for reference:
-      Departed paragraph: \(trimmedForReference(paragraphTextDeparted))
-      Arrived paragraph: \(trimmedForReference(paragraphTextArrived))
+      Departed paragraph: \(lineDepartedTrimmed)
+      Arrived paragraph: \(lineArrivedTrimmed)
     """)
     
     let newListItemPattern = "- "
@@ -46,8 +44,11 @@ extension MarkdownTextView {
       return
     }
     
-    let departedLineIsList: Bool = departedTrimmed.hasPrefix(newListItemPattern)
-    let arrivedLineIsList: Bool = arrivedTrimmed.hasPrefix(newListItemPattern)
+    let departedLineIsList: Bool = lineDepartedTrimmed.hasPrefix(newListItemPattern)
+    
+    /// It's occured to me that the 'arrived' line will be a bit of a different case,
+    /// as it'll be the result of whatever I brought with me when pressing Return (if anything)
+    let arrivedLineIsList: Bool = lineArrivedTrimmed.hasPrefix(newListItemPattern)
     let bothLinesAreList: Bool = departedLineIsList && arrivedLineIsList
     
     
@@ -57,7 +58,7 @@ extension MarkdownTextView {
       /// that means were in a list item with some content. Further down, after this,
       /// we handle the case where there's no content (empty list item)
       ///
-      if departedTrimmed != newListItemPattern {
+      if lineDepartedTrimmed != newListItemPattern {
         
         let cursorPosition = selectedRange().location
         let textToInsert = "\n- "
@@ -74,7 +75,7 @@ extension MarkdownTextView {
         
         print("If this fires, it should replace the characters with an empty string, because the list item is empty.")
         
-        textStorage.replaceCharacters(in: paragraphRangeDeparted, with: "")
+        textStorage.replaceCharacters(in: rangeDeparted, with: "")
         
         // The list item is empty, so break out of the list
         //        replaceCharacters(in: , with: "\n")

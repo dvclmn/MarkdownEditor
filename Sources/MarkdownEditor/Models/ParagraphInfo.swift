@@ -63,45 +63,54 @@ extension ParagraphHandler {
     
     print("Going to try and update paragraph info")
     
-    // Get the text safely
-    guard let currentParagraphText = textView.attributedSubstring(forProposedRange: textView.safeCurrentParagraphRange, actualRange: nil)?.string else {
+    let paragraphRange: NSRange = textView.nsString.paragraphRange(for: textView.safeSelectedRange)
+    
+    let safeCurrentParagraphRange: NSRange = paragraphRange.clamped(to: textView.documentLength)
+
+    guard let currentParagraphText = textView.attributedSubstring(forProposedRange: safeCurrentParagraphRange, actualRange: nil)?.string else {
       print("Couldn't get that text")
       return
     }
     
-    // Update previous paragraph
+    /// Update previous paragraph
     self.previousParagraph = self.currentParagraph
     
-    
-    var syntax: BlockSyntax
-    
-    if currentParagraphText.hasPrefix("#") {
-      
-      let headingLevel = currentParagraphText.prefix(while: { $0 == "#" }).count
-      
-      if headingLevel <= 6 && (currentParagraphText.count == headingLevel || currentParagraphText[currentParagraphText.index(currentParagraphText.startIndex, offsetBy: headingLevel)] == " ") {
-        syntax = BlockSyntax.heading(level: headingLevel)
-      } else {
-        syntax = BlockSyntax.heading(level: 1)
-      }
-      
-    } else if currentParagraphText.hasPrefix("- ") {
-      syntax = .list
-    } else {
-      // TODO: Implement more cases
-      syntax = .none
-    }
+    let blockSyntax = self.identifyBlockSyntax(for: currentParagraphText)
     
     let result = ParagraphInfo(
       string: currentParagraphText,
-      range: textView.safeCurrentParagraphRange,
-      type: syntax
+      range: safeCurrentParagraphRange,
+      type: blockSyntax
     )
 
     self.currentParagraph = result
     
   }
   
+  func identifyBlockSyntax(for text: String) -> BlockSyntax {
+    
+    var syntax: BlockSyntax
+    
+    if text.hasPrefix("#") {
+      
+      let headingLevel = text.prefix(while: { $0 == "#" }).count
+      
+      if headingLevel <= 6 && (text.count == headingLevel || text[text.index(text.startIndex, offsetBy: headingLevel)] == " ") {
+        syntax = BlockSyntax.heading(level: headingLevel)
+      } else {
+        syntax = BlockSyntax.heading(level: 1)
+      }
+      
+    } else if text.hasPrefix("- ") {
+      syntax = .list
+    } else {
+      // TODO: Implement more cases
+      syntax = .none
+    }
+    return syntax
+    
+  } // END identify syntax
+  
 
   
-}
+} // END paragraph handler extension
