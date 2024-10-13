@@ -34,14 +34,22 @@ extension MarkdownTextView {
       fatalError("Issue getting the text storage")
     }
     
+    let leadingTestColour = NSColor.orange.withAlphaComponent(0.5)
+    let contentTestColour = NSColor.blue.withAlphaComponent(0.5)
+    let trailingTestColour = NSColor.green.withAlphaComponent(0.5)
 
     tcm.performEditingTransaction {
       
       for element in self.elements {
         
+        textStorage.addAttribute(.backgroundColor, value: leadingTestColour, range: element.ranges.leading)
+        textStorage.addAttribute(.backgroundColor, value: contentTestColour, range: element.ranges.content)
+        textStorage.addAttribute(.backgroundColor, value: trailingTestColour, range: element.ranges.trailing)
+
         if element.syntax == .codeBlock {
           
           textStorage.addAttribute(.font, value: configuration.theme.codeFont, range: element.ranges.all)
+          
           
           
 //          guard let highlightedCode: NSAttributedString = highlightr.highlight(element.string, as: nil) else {

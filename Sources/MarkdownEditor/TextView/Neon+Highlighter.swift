@@ -28,11 +28,11 @@ extension MarkdownViewController {
       tree_sitter_markdown(),
       name: "Markdown"
     )
-    let markdownInlineConfig = try LanguageConfiguration(
-      tree_sitter_markdown_inline(),
-      name: "Markdown Inline",
-      bundleName: "TreeSitterMarkdown_TreeSitterMarkdownInline"
-    )
+//    let markdownInlineConfig = try LanguageConfiguration(
+//      tree_sitter_markdown_inline(),
+//      name: "Markdown Inline",
+//      bundleName: "TreeSitterMarkdown_TreeSitterMarkdownInline"
+//    )
     let swiftConfig = try LanguageConfiguration(
       tree_sitter_swift(),
       name: "Swift",
@@ -73,7 +73,7 @@ extension MarkdownViewController {
         // Return empty dictionary or default styling for non-code-block tokens
         
         return switch token.name {
-          case "punctuation.delimiter":   [.foregroundColor: NSColor.red]      /// ❤️ — Default leading/trailing syntax characters, e.g. `~`, `*`
+//          case "punctuation.delimiter":   [.foregroundColor: NSColor.red]      /// ❤️ — Default leading/trailing syntax characters, e.g. `~`, `*`
           case "punctuation.special":     [.foregroundColor: NSColor.yellow]   /// 💛 — Heading `#` and list `-`
           case "text.title":              [.foregroundColor: NSColor.green]    /// 💚 — Heading text
           case "text.literal":            [.foregroundColor: NSColor.purple]   /// 💜 — Default 'code' text
@@ -96,10 +96,10 @@ extension MarkdownViewController {
       languageProvider: { name in
         
         switch name {
-          case "markdown_inline":
-            print("Found inline markdown grammar.")
-            return markdownInlineConfig
-            
+//          case "markdown_inline":
+//            print("Found inline markdown grammar.")
+//            return markdownInlineConfig
+//            
           case "swift":
             print("Found swift grammar")
             return swiftConfig

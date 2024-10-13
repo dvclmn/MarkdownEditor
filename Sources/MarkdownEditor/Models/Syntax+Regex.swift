@@ -21,11 +21,40 @@ public typealias MarkdownRegexMatch = MarkdownRegexOutput.Match
 
 extension Markdown.Syntax {
   
+  
   var regexPattern: String? {
-    switch self {
+    
+    /// This matches emphasised content, places it in a group,
+    /// and ensures it doesn't add in other emphasis characters
+    /// such as `*` and `_`
+    let emphasisContent: String = "(.*?)"
+    
+    let italicSyntax: String = "(_|\\*)"
+    let boldSyntax: String = "(__|\\*\\*)"
+    let boldItalicSyntax: String = "(___|\\*\\*\\*)"
+    
+    return switch self {
         
-      case .bold: "(__|\\*\\*)([^_|\\*]*?)(__|\\*\\*)"
       case .inlineCode: "(`)((?:[^`\n])+?)(`)"
+
+      case .strikethrough: "(~~)([^~]*?)(~~)"
+        
+//      case .italic: italicSyntax + emphasisContent + italicSyntax
+//      case .bold: boldSyntax + emphasisContent + boldSyntax
+//      case .boldItalic: boldItalicSyntax + emphasisContent + boldItalicSyntax
+        
+
+      case .boldItalic: "(\\*{3}|_{3})(?=\\S)(.+?)(?<=\\S)\\1"
+      case .bold: "(\\*{2}|_{2})(?=\\S)(.+?)(?<=\\S)\\1"
+      case .italic: "(\\*|_)(?=\\S)(.+?)(?<=\\S)\\1"
+        
+        
+        
+        /// These were from Claude, and they crashed the view
+//      case .boldItalic: "(_{3}|\\*{3})([^_|\\*]*?)(_{3}|\\*{3})"
+//      case .bold: "(_{2}|\\*{2})(?:[^_|\\*]|_(?!_)|\\*(?!\\*))*?(_{2}|\\*{2})"
+//      case .italic: "(_|\\*)(?:[^_|\\*]|_(?!_)|\\*(?!\\*))*?(_|\\*)"
+      
         
       case .codeBlock: "(```(?:\\s*\\w+)?\n?)([\\s\\S]*?)(```)"
         
