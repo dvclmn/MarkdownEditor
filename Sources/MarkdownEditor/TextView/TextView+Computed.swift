@@ -34,7 +34,7 @@ extension MarkdownTextView {
     
     let result: NSRange = selectedRange.clamped(to: documentLength)
     
-    print("Calculated safeSelectedRange: \(result)")
+//    print("Calculated safeSelectedRange: \(result)")
     return result
   }
   

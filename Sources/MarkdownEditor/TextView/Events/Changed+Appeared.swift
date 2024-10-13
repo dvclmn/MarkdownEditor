@@ -31,10 +31,6 @@ extension MarkdownTextView {
     onAppearAndTextChange()
     
     //    onAppearAndSelectionChanged()
-    
-    //    let codeFontSize: CGFloat = 13
-    
-    //    highlightr.theme.setCodeFont(NSFont.monospacedSystemFont(ofSize: codeFontSize, weight: .medium))
 
     exploreTextSegments()
     

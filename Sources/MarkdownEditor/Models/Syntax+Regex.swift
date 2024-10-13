@@ -26,7 +26,8 @@ extension Markdown.Syntax {
         
       case .bold: "(__|\\*\\*)([^_|\\*]*?)(__|\\*\\*)"
       case .inlineCode: "(`)((?:[^`\n])+?)(`)"
-      case .codeBlock: "(```[\\s\\S]*?)(.*?)(```)"
+        
+      case .codeBlock: "(```(?:\\s*\\w+)?\n?)([\\s\\S]*?)(```)"
         
       default: nil
     }

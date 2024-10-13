@@ -13,7 +13,7 @@ import TreeSitterMarkdownInline
 import SwiftTreeSitter
 import TreeSitterSwift
 import TreeSitterClient
-import Highlightr
+//import Highlightr
 
 
 public class MarkdownViewController: NSViewController {
@@ -26,9 +26,9 @@ public class MarkdownViewController: NSViewController {
     configuration: MarkdownEditorConfiguration
   ) {
     
-    guard let highlightr = Highlightr() else {
-      fatalError("Why no Highlightr?")
-    }
+//    guard let highlightr = Highlightr() else {
+//      fatalError("Why no Highlightr?")
+//    }
     
     let scrollView: NSScrollView?
     
@@ -43,8 +43,8 @@ public class MarkdownViewController: NSViewController {
       frame: .zero,
       textContainer: nil,
       scrollView: scrollView,
-      configuration: configuration,
-      highlightr: highlightr
+      configuration: configuration
+//      highlightr: highlightr
     )
     
     if configuration.isNeonEnabled {

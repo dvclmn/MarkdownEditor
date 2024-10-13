@@ -78,7 +78,7 @@ extension ParagraphHandler {
       type: blockSyntax
     )
     
-    print(result)
+//    print("Updated paragraph info:\n\(result)")
 
     self.currentParagraph = result
     

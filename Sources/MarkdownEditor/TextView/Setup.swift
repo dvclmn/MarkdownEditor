@@ -7,7 +7,7 @@
 
 import SwiftUI
 import TextCore
-import Highlightr
+//import Highlightr
 
 extension MarkdownTextView {
   

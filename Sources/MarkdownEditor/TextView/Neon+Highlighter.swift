@@ -20,19 +20,19 @@ extension MarkdownViewController {
   
   @MainActor static func makeHighlighter(for textView: MarkdownTextView) throws -> TextViewHighlighter {
     
-//    print("Let's set up `TextViewHighlighter`.")
+    //    print("Let's set up `TextViewHighlighter`.")
     
-//    textView.typingAttributes = textView.configuration.defaultTypingAttributes
+    //    textView.typingAttributes = textView.configuration.defaultTypingAttributes
     
-//    let markdownConfig = try LanguageConfiguration(
-//      tree_sitter_markdown(),
-//      name: "Markdown"
-//    )
-//    let markdownInlineConfig = try LanguageConfiguration(
-//      tree_sitter_markdown_inline(),
-//      name: "Markdown Inline",
-//      bundleName: "TreeSitterMarkdown_TreeSitterMarkdownInline"
-//    )
+    let markdownConfig = try LanguageConfiguration(
+      tree_sitter_markdown(),
+      name: "Markdown"
+    )
+    let markdownInlineConfig = try LanguageConfiguration(
+      tree_sitter_markdown_inline(),
+      name: "Markdown Inline",
+      bundleName: "TreeSitterMarkdown_TreeSitterMarkdownInline"
+    )
     let swiftConfig = try LanguageConfiguration(
       tree_sitter_swift(),
       name: "Swift",
@@ -43,13 +43,13 @@ extension MarkdownViewController {
       
       let codeBlockElements = textView.elements.filter { $0.syntax == .codeBlock }
       
-          // Check if the token's range intersects with any code block range
+      // Check if the token's range intersects with any code block range
       let intersectsCodeBlock = codeBlockElements.contains { element in
         token.range.intersection(element.ranges.content) != nil
       }
       
       if intersectsCodeBlock {
-       
+        
         //            let string = textView.attributedSubstring(forProposedRange: token.range, actualRange: nil)
         
         print("Token: \(token)")
@@ -65,52 +65,50 @@ extension MarkdownViewController {
             .font: NSFont.boldSystemFont(ofSize: 12)
           ]
             
-            
-            //        case "punctuation.delimiter":   [.foregroundColor: NSColor.red]      /// ❤️ — Default leading/trailing syntax characters, e.g. `~`, `*`
-            //        case "punctuation.special":     [.foregroundColor: NSColor.yellow]   /// 💛 — Heading `#` and list `-`
-            //        case "text.title":              [.foregroundColor: NSColor.green]    /// 💚 — Heading text
-            //        case "text.literal":            [.foregroundColor: NSColor.purple]   /// 💜 — Default 'code' text
-            //        case "text.emphasis":           [.foregroundColor: NSColor.cyan]     /// 🩵 — Italics
-            //        case "text.strong":             [.foregroundColor: NSColor.brown]    /// 🤎 — Bold
-            //        case "text.uri":                [.foregroundColor: NSColor.magenta]  /// 🩷 — Links
-            //        case "text.reference":          [.foregroundColor: NSColor.gray]     /// 🩶 — Link label e.g. `[label](http://link.com)`
-            //        case "none":                    [.foregroundColor: NSColor.orange]   /// 🧡 — Also seems related to 'code' text?
-            
-          default: [.foregroundColor: NSColor.blue]
+          default: [.foregroundColor: NSColor.cyan]
             
         }
         
       } else {
         // Return empty dictionary or default styling for non-code-block tokens
-        return [:]
-      }
+        
+        return switch token.name {
+          case "punctuation.delimiter":   [.foregroundColor: NSColor.red]      /// ❤️ — Default leading/trailing syntax characters, e.g. `~`, `*`
+          case "punctuation.special":     [.foregroundColor: NSColor.yellow]   /// 💛 — Heading `#` and list `-`
+          case "text.title":              [.foregroundColor: NSColor.green]    /// 💚 — Heading text
+          case "text.literal":            [.foregroundColor: NSColor.purple]   /// 💜 — Default 'code' text
+          case "text.emphasis":           [.foregroundColor: NSColor.cyan]     /// 🩵 — Italics
+          case "text.strong":             [.foregroundColor: NSColor.brown]    /// 🤎 — Bold
+          case "text.uri":                [.foregroundColor: NSColor.magenta]  /// 🩷 — Links
+          case "text.reference":          [.foregroundColor: NSColor.gray]     /// 🩶 — Link label e.g. `[label](http://link.com)`
+          case "none":                    [.foregroundColor: NSColor.orange]   /// 🧡 — Also seems related to 'code' text?
+            ///
+          default: [.foregroundColor: NSColor.blue]
+        } // END switch and return
+      } // END code block check
       
       
     }
     
     let highlighterConfig = TextViewHighlighter.Configuration(
-      languageConfiguration: swiftConfig,
+      languageConfiguration: markdownConfig,
       attributeProvider: provider,
-      languageProvider: { _ in
+      languageProvider: { name in
         
-        return nil
-        
-//                print("Embedded language: ", name)
-        
-//        switch name {
-//          case "markdown_inline": // tried both this and "Markdown Inline"
-//            //          case "Markdown Inline":
-////                        print("Let's fire up markdown inline")
-//            return markdownInlineConfig
-//            
-//          case "swift":
-////            print("Found swift grammar")
-//            return swiftConfig
-//            
-//          default:
-//            return nil
-//        }
+        switch name {
+          case "markdown_inline":
+            print("Found inline markdown grammar.")
+            return markdownInlineConfig
+            
+          case "swift":
+            print("Found swift grammar")
+            return swiftConfig
+            
+          default:
+            return nil
+        }
       },
+      
       locationTransformer: { _ in nil }
     )
     
@@ -123,8 +121,8 @@ extension NSColor {
   static let lightBlue = NSColor(#colorLiteral(red: 0.5372549295425415, green: 0.8666666746139526, blue: 0.9843137264251709, alpha: 1))
   static let darkGrey = NSColor(#colorLiteral(red: 0.14509804546833038, green: 0.14509804546833038, blue: 0.16470588743686676, alpha: 1))
   static let xcodePink = NSColor(#colorLiteral(red: 0.9333333373069763, green: 0.5058823823928833, blue: 0.6901960968971252, alpha: 1))
-//  static let lightBlue = NSColor(#colorLiteral(red: 0.5372549295425415, green: 0.8666666746139526, blue: 0.9843137264251709, alpha: 1))
-//  static let lightBlue = NSColor(#colorLiteral(red: 0.5372549295425415, green: 0.8666666746139526, blue: 0.9843137264251709, alpha: 1))
-//  static let lightBlue = NSColor(#colorLiteral(red: 0.5372549295425415, green: 0.8666666746139526, blue: 0.9843137264251709, alpha: 1))
-//  static let lightBlue = NSColor(#colorLiteral(red: 0.5372549295425415, green: 0.8666666746139526, blue: 0.9843137264251709, alpha: 1))
+  static let offWhite = NSColor(#colorLiteral(red: 0.8705882430076599, green: 0.8745098114013672, blue: 0.8745098114013672, alpha: 1))
+  static let xcodePurple = NSColor(#colorLiteral(red: 0.6705882549285889, green: 0.5137255191802979, blue: 0.8941176533699036, alpha: 1))
+  static let xcodeMint = NSColor(#colorLiteral(red: 0.729411780834198, green: 0.9411764740943909, blue: 0.8941176533699036, alpha: 1))
+  
 }

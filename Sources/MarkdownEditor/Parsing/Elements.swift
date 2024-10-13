@@ -37,6 +37,26 @@ public extension Markdown {
   
 }
 
+extension Markdown.Ranges: CustomStringConvertible {
+  
+  public var description: String {
+    
+    let result: String = """
+    ---
+    Markdown Ranges:
+      - All:      \(all.info)
+      - Leading:  \(leading.info)
+      - Content:  \(content.info)
+      - Trailing: \(trailing.info)
+    ---
+    
+    """
+    return result
+    
+  }
+  
+}
+
 public extension Markdown.Element {
   
   func getRect(
@@ -68,7 +88,7 @@ public extension Markdown.Element {
     let result: String = """
     Preview: \(self.string.preview())
     Syntax: \(self.syntax.name)
-    Range: \(self.ranges.all.info)
+    Range: \(self.ranges)
     """
     
     return result

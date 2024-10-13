@@ -7,7 +7,7 @@
 
 import SwiftUI
 import BaseHelpers
-import Highlightr
+//import Highlightr
 
 public class MarkdownTextView: NSTextView {
   
@@ -16,7 +16,7 @@ public class MarkdownTextView: NSTextView {
   let tlm: NSTextLayoutManager
   let tcm: NSTextContentManager
   
-  let highlightr: Highlightr
+//  let highlightr: Highlightr
   
   var scrollView: NSScrollView?
   
@@ -54,13 +54,13 @@ public class MarkdownTextView: NSTextView {
     frame frameRect: NSRect,
     textContainer container: NSTextContainer?,
     scrollView: NSScrollView? = nil,
-    configuration: MarkdownEditorConfiguration,
-    highlightr: Highlightr
+    configuration: MarkdownEditorConfiguration
+//    highlightr: Highlightr
     
   ) {
     
     self.configuration = configuration
-    self.highlightr = highlightr
+//    self.highlightr = highlightr
     self.infoUpdater = EditorInfoUpdater()
     
     

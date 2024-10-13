@@ -26,16 +26,11 @@ extension MarkdownTextView {
   ///
   /// Because inline elements shouldn't be extending past that anyway.
   ///
-  
 
-  
   func parseAllCases() {
     for syntax in Markdown.Syntax.allCases {
-      
       let newElements = parseSyntax(syntax)
       updateElements(ofType: syntax, with: newElements)
-      
-//      self.parseSyntax(syntax)
     }
   }
   
@@ -50,11 +45,10 @@ extension MarkdownTextView {
   
   func parseSyntax(_ syntax: Markdown.Syntax) -> Set<Markdown.Element> {
     
-    print("Parsing text for instances of \(syntax.name).")
-    
-    //    guard let regexLiteral = syntax.regexLiteral else {
-    //      return
-    //    }
+//    print("Parsing text for instances of \(syntax.name).")
+    if !syntax.regexOptions.isEmpty {
+      print("Note: \(syntax.name) `nsRegex` has options: \(syntax.regexOptions).")
+    }
     
     guard let nsRegex = syntax.nsRegex else {
 //      print("Don't need to perform a parse for \(syntax.name), no regex found.")
@@ -134,6 +128,8 @@ extension MarkdownTextView {
           rectHeight: elementRect.height
         )
         
+//        print("Let's check this element: \(element.summary)")
+        
         newElements.insert(element)
         
         
@@ -143,7 +139,8 @@ extension MarkdownTextView {
 //      generalInfo += matchesString
 //
 //      print(Box(header: "Parsing markdown", content: generalInfo))
-      print("Found \(resultCount) instances of \(syntax.name).")
+      
+//      print("Found \(resultCount) instances of \(syntax.name).")
       
       
       
