@@ -12,6 +12,14 @@ import RegexBuilder
 import Shortcuts
 
 public extension Markdown {
+  enum SyntaxType {
+    case inline
+    case block
+  }
+}
+
+
+public extension Markdown {
   
   enum Syntax: Identifiable, Equatable, Hashable, Sendable {
     
@@ -67,6 +75,30 @@ public extension Markdown {
         case .image: return "Image"
       }
       
+    }
+    
+    var type: SyntaxType {
+      switch self {
+        case
+            .bold,
+            .italic,
+            .boldItalic,
+            .strikethrough,
+            .highlight,
+            .inlineCode:
+          return .inline
+          
+        case
+            .heading,
+            .codeBlock,
+            .quoteBlock,
+            .list,
+            .link,
+            .image,
+            .horizontalRule:
+          return .block
+
+      }
     }
     
     var leadingCharacter: Character? {

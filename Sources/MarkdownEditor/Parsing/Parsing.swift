@@ -27,24 +27,30 @@ extension MarkdownTextView {
   /// Because inline elements shouldn't be extending past that anyway.
   ///
 
-  func parseAllCases() {
-    for syntax in Markdown.Syntax.allCases {
-      let newElements = parseSyntax(syntax)
-      updateElements(ofType: syntax, with: newElements)
-    }
-  }
-  
-  func updateElements(ofType syntax: Markdown.Syntax, with newElements: [Markdown.Element]) {
-    // Remove existing elements of the specified syntax
-    elements = elements.filter { $0.syntax != syntax }
+  func parseAllMarkdown() {
     
-    // Add the new elements
-//    elements.formUnion(newElements)
-    elements.append(contentsOf: newElements)
+    var newElements: [Markdown.Element] = []
+    
+    for syntax in Markdown.Syntax.allCases {
+//    for case let syntax in Markdown.Syntax.allCases where syntax.type == .inline  {
+      let newElementsForSyntax = parseSingleSyntax(syntax)
+      newElements.append(contentsOf: newElementsForSyntax)
+    }
+    
+    self.elements = newElements
   }
   
+//  func updateElements(ofType syntax: Markdown.Syntax, with newElements: [Markdown.Element]) {
+//    // Remove existing elements of the specified syntax
+//    elements = elements.filter { $0.syntax != syntax }
+//    
+//    // Add the new elements
+//   elements.formUnion(newElements)
+//    elements.append(contentsOf: newElements)
+//  }
   
-  func parseSyntax(_ syntax: Markdown.Syntax) -> [Markdown.Element] {
+  
+  func parseSingleSyntax(_ syntax: Markdown.Syntax) -> [Markdown.Element] {
     
 //    print("Parsing text for instances of \(syntax.name).")
 //    if !syntax.regexOptions.isEmpty {
@@ -64,7 +70,6 @@ extension MarkdownTextView {
     var newElements: [Markdown.Element] = []
 
     tcm.performEditingTransaction {
-      
       
 //      var matchesString: String = "Match results:\n"
       var resultCount: Int = 0

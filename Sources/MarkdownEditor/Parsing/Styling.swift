@@ -11,7 +11,7 @@ import Glyph
 
 extension MarkdownTextView {
   
-  func styleMarkdown() {
+  func styleInlineMarkdown() {
     
     let currentSelection = self.selectedRange
     
@@ -42,7 +42,7 @@ extension MarkdownTextView {
 
     tcm.performEditingTransaction {
       
-      for element in self.elements {
+      for element in self.elements where element.syntax.type == .inline {
         
         /// This is a bit silly, I'm writing this as if the user has pressed Return
         /// (i.e., departed one paragraph and arrived at another)

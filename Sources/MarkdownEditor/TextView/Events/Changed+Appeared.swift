@@ -20,8 +20,8 @@ extension MarkdownTextView {
     /// This allows a quick parse on load, and then the debounced
     /// parsing is over in `Changed+Text.swift`
     DispatchQueue.main.async {
-      self.parseAllCases()
-      self.styleMarkdown()
+      self.parseAllMarkdown()
+      self.styleInlineMarkdown()
     }
     
     //    guard let layoutManager = self.layoutManager else {

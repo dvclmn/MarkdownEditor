@@ -20,8 +20,8 @@ extension MarkdownTextView {
     
     Task { @MainActor in
       await parsingDebouncer.processTask { [weak self] in
-        await self?.parseAllCases()
-        await self?.styleMarkdown()
+        await self?.parseAllMarkdown()
+        await self?.styleInlineMarkdown()
       }
     }
 
