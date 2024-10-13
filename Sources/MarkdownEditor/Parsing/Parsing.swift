@@ -34,21 +34,22 @@ extension MarkdownTextView {
     }
   }
   
-  func updateElements(ofType syntax: Markdown.Syntax, with newElements: Set<Markdown.Element>) {
+  func updateElements(ofType syntax: Markdown.Syntax, with newElements: [Markdown.Element]) {
     // Remove existing elements of the specified syntax
     elements = elements.filter { $0.syntax != syntax }
     
     // Add the new elements
-    elements.formUnion(newElements)
+//    elements.formUnion(newElements)
+    elements.append(contentsOf: newElements)
   }
   
   
-  func parseSyntax(_ syntax: Markdown.Syntax) -> Set<Markdown.Element> {
+  func parseSyntax(_ syntax: Markdown.Syntax) -> [Markdown.Element] {
     
 //    print("Parsing text for instances of \(syntax.name).")
-    if !syntax.regexOptions.isEmpty {
-      print("Note: \(syntax.name) `nsRegex` has options: \(syntax.regexOptions).")
-    }
+//    if !syntax.regexOptions.isEmpty {
+//      print("Note: \(syntax.name) `nsRegex` has options: \(syntax.regexOptions).")
+//    }
     
     guard let nsRegex = syntax.nsRegex else {
 //      print("Don't need to perform a parse for \(syntax.name), no regex found.")
@@ -60,10 +61,9 @@ extension MarkdownTextView {
     
     //      let rangeOfRenderedText: NSTextRange = tlm.textLayoutFragment(for: CGPointZero)!.rangeInElement
     
-    var newElements: Set<Markdown.Element> = []
+    var newElements: [Markdown.Element] = []
 
     tcm.performEditingTransaction {
-      
       
       
 //      var matchesString: String = "Match results:\n"
@@ -130,7 +130,14 @@ extension MarkdownTextView {
         
 //        print("Let's check this element: \(element.summary)")
         
-        newElements.insert(element)
+        newElements.append(element)
+        
+
+#if DEBUG
+        textStorage?.addAttribute(.underlineColor, value: NSColor.red.withAlphaComponent(0.6), range: elementRangeTotal)
+        textStorage?.addAttribute(.underlineStyle, value: NSNumber(value: 2), range: elementRangeTotal)
+#endif
+        
         
         
       } // END match loop

@@ -26,7 +26,7 @@ public class MarkdownTextView: NSTextView {
   var lastSentHeight: CGFloat = 0
   var lastSelectedText: String = ""
   
-  var elements: Set<Markdown.Element> = []
+  var elements: [Markdown.Element] = []
   
   var paragraphHandler = ParagraphHandler()
   

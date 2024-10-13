@@ -39,14 +39,14 @@ extension Markdown.Syntax {
 
       case .strikethrough: "(~~)([^~]*?)(~~)"
         
-//      case .italic: italicSyntax + emphasisContent + italicSyntax
-//      case .bold: boldSyntax + emphasisContent + boldSyntax
-//      case .boldItalic: boldItalicSyntax + emphasisContent + boldItalicSyntax
+      case .italic: italicSyntax + emphasisContent + italicSyntax
+      case .bold: boldSyntax + emphasisContent + boldSyntax
+      case .boldItalic: boldItalicSyntax + emphasisContent + boldItalicSyntax
         
 
-      case .boldItalic: "(\\*{3}|_{3})(?=\\S)(.+?)(?<=\\S)\\1"
-      case .bold: "(\\*{2}|_{2})(?=\\S)(.+?)(?<=\\S)\\1"
-      case .italic: "(\\*|_)(?=\\S)(.+?)(?<=\\S)\\1"
+//      case .boldItalic: "(\\*{3}|_{3})(?=\\S)(.+?)(?<=\\S)\\1"
+//      case .bold: "(\\*{2}|_{2})(?=\\S)(.+?)(?<=\\S)\\1"
+//      case .italic: "(\\*|_)(?=\\S)(.+?)(?<=\\S)\\1"
         
         
         

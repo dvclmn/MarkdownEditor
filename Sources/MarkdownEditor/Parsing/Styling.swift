@@ -34,18 +34,43 @@ extension MarkdownTextView {
       fatalError("Issue getting the text storage")
     }
     
-    let leadingTestColour = NSColor.orange.withAlphaComponent(0.5)
-    let contentTestColour = NSColor.blue.withAlphaComponent(0.5)
-    let trailingTestColour = NSColor.green.withAlphaComponent(0.5)
+    let opacity: CGFloat = 0.15
+    
+    let leadingTestColour = NSColor.orange.withAlphaComponent(opacity)
+    let contentTestColour = NSColor.blue.withAlphaComponent(opacity)
+    let trailingTestColour = NSColor.green.withAlphaComponent(opacity)
 
     tcm.performEditingTransaction {
       
       for element in self.elements {
         
+        /// This is a bit silly, I'm writing this as if the user has pressed Return
+        /// (i.e., departed one paragraph and arrived at another)
+        ///
+//        let rangeToRemoveDeparted: NSRange = self.paragraphHandler.previousParagraph.range
+//        let rangeToRemoveArrived: NSRange = self.paragraphHandler.currentParagraph.range
+//        
+//        /// Remove stale attributes
+//        textStorage.removeAttribute(.foregroundColor, range: rangeToRemoveDeparted)
+//        textStorage.removeAttribute(.foregroundColor, range: rangeToRemoveArrived)
+//        
+//        textStorage.removeAttribute(.backgroundColor, range: rangeToRemoveDeparted)
+//        textStorage.removeAttribute(.backgroundColor, range: rangeToRemoveArrived)
+//        
+//        /// Add default styles
+//        textStorage.setAttributes(configuration.defaultTypingAttributes, range: rangeToRemoveArrived)
+//        textStorage.setAttributes(configuration.defaultTypingAttributes, range: rangeToRemoveDeparted)
+//
+        
+        
+        
         textStorage.addAttribute(.backgroundColor, value: leadingTestColour, range: element.ranges.leading)
         textStorage.addAttribute(.backgroundColor, value: contentTestColour, range: element.ranges.content)
         textStorage.addAttribute(.backgroundColor, value: trailingTestColour, range: element.ranges.trailing)
 
+        
+        
+        
         if element.syntax == .codeBlock {
           
           textStorage.addAttribute(.font, value: configuration.theme.codeFont, range: element.ranges.all)
