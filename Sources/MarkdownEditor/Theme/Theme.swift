@@ -10,10 +10,12 @@ import SwiftUI
 public struct MarkdownTheme: Sendable, Equatable {
   
   public var fontSize: CGFloat
+  public var textColour: NSColor
   
   public var codeColour: Color
   public var codeBackgroundColour: Color
   
+  public var lineHeight: CGFloat
   
   public var heading1Colour: Color
   public var heading2Colour: Color
@@ -23,9 +25,12 @@ public struct MarkdownTheme: Sendable, Equatable {
   
   public init(
     fontSize: CGFloat = 15,
+    textColour: NSColor = .textColor.withAlphaComponent(0.9),
     
     codeColour: Color = .green,
     codeBackgroundColour: Color = .blue.opacity(0.4),
+    
+    lineHeight: CGFloat = 8,
     
     heading1Colour: Color = .indigo,
     heading2Colour: Color = .blue,
@@ -33,9 +38,11 @@ public struct MarkdownTheme: Sendable, Equatable {
     insertionPointColour: Color = .purple
   ) {
     self.fontSize = fontSize
+    self.textColour = textColour
     
     self.codeColour = codeColour
     self.codeBackgroundColour = codeBackgroundColour
+    self.lineHeight = lineHeight
     
     self.heading1Colour = heading1Colour
     self.heading2Colour = heading2Colour

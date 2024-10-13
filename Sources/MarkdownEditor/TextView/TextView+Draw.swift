@@ -12,33 +12,35 @@ extension MarkdownTextView {
   public override func draw(_ rect: NSRect) {
     super.draw(rect)
     
-    //
-    //
-    //    // MARK: - Code block backgrounds
-    let cornerRadius: CGFloat = 5.0
-    let backgroundColour: NSColor = NSColor.black.withAlphaComponent(0.2)
-    
-    
-    
-    for element in elements where element.syntax == .codeBlock {
-      
-      guard let rect = element.getRect(with: self.frame.width, config: self.configuration) else {
-        break
-      }
-      
-      let path = NSBezierPath(roundedRect: rect, xRadius: cornerRadius, yRadius: cornerRadius)
-      
-      backgroundColour.setFill()
-      path.fill()
-      
-    }
-    //
+    codeBlockBackgrounds()
     debugFrames()
-    //
-    //    // MARK: - Showing Frames
-    //
+
   } // END draw override
   
+  
+  func codeBlockBackgrounds() {
+    if configuration.drawsCodeBlockBackgrounds {
+
+      // MARK: - Code block backgrounds
+      let cornerRadius: CGFloat = 5.0
+      let backgroundColour: NSColor = NSColor.black.withAlphaComponent(0.2)
+      
+      
+      
+      for element in elements where element.syntax == .codeBlock {
+        
+        guard let rect = element.getRect(with: self.frame.width, config: self.configuration) else {
+          break
+        }
+        
+        let path = NSBezierPath(roundedRect: rect, xRadius: cornerRadius, yRadius: cornerRadius)
+        
+        backgroundColour.setFill()
+        path.fill()
+        
+      }
+    }
+  } // END code block bg's
   
   
   //  func getRect(

@@ -34,6 +34,8 @@ extension MarkdownTextView {
       fatalError("Issue getting the text storage")
     }
     
+    
+    
     let opacity: CGFloat = 0.15
     
     let leadingTestColour = NSColor.orange.withAlphaComponent(opacity)
@@ -41,6 +43,16 @@ extension MarkdownTextView {
     let trailingTestColour = NSColor.green.withAlphaComponent(opacity)
 
     tcm.performEditingTransaction {
+      
+      /// I think (for now) the first thing to do would be to remove all existing styles?
+      /// Even just to get more repsonsive formatting working
+      ///
+      textStorage.removeAttribute(.foregroundColor, range: documentNSRange)
+      textStorage.removeAttribute(.backgroundColor, range: documentNSRange)
+      
+      /// Then ensure defaults are added:
+      textStorage.addAttribute(.foregroundColor, value: configuration.theme.textColour, range: documentNSRange)
+      
       
       for element in self.elements where element.syntax.type == .inline {
         

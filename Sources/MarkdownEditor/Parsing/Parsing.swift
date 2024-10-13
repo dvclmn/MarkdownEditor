@@ -32,24 +32,13 @@ extension MarkdownTextView {
     var newElements: [Markdown.Element] = []
     
     for syntax in Markdown.Syntax.allCases {
-//    for case let syntax in Markdown.Syntax.allCases where syntax.type == .inline  {
       let newElementsForSyntax = parseSingleSyntax(syntax)
       newElements.append(contentsOf: newElementsForSyntax)
     }
     
     self.elements = newElements
   }
-  
-//  func updateElements(ofType syntax: Markdown.Syntax, with newElements: [Markdown.Element]) {
-//    // Remove existing elements of the specified syntax
-//    elements = elements.filter { $0.syntax != syntax }
-//    
-//    // Add the new elements
-//   elements.formUnion(newElements)
-//    elements.append(contentsOf: newElements)
-//  }
-  
-  
+
   func parseSingleSyntax(_ syntax: Markdown.Syntax) -> [Markdown.Element] {
     
 //    print("Parsing text for instances of \(syntax.name).")
