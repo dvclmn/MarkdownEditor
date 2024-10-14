@@ -29,14 +29,16 @@ extension MarkdownTextView {
 
   func parseAllMarkdown() {
     
-    var newElements: [Markdown.Element] = []
-    
-    for syntax in Markdown.Syntax.allCases {
-      let newElementsForSyntax = parseSingleSyntax(syntax)
-      newElements.append(contentsOf: newElementsForSyntax)
+    guard configuration.isParsing else {
+      print("Parsing is switched OFF in configuration.")
+      return
     }
-    
-    self.elements = newElements
+    self.elements = []
+      
+      for syntax in Markdown.Syntax.allCases {
+        let newElementsForSyntax = parseSingleSyntax(syntax)
+        self.elements.append(contentsOf: newElementsForSyntax)
+      }
   }
 
   func parseSingleSyntax(_ syntax: Markdown.Syntax) -> [Markdown.Element] {

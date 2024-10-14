@@ -14,6 +14,17 @@ extension MarkdownTextView {
   
   public override func keyDown(with event: NSEvent) {
     
+    if configuration.isHandlingKeyPress {
+      handleKeyPress(event)
+    } else {
+      super.keyDown(with: event)
+    }
+    
+    
+  } // END key down override
+  
+  
+  func handleKeyPress(_ event: NSEvent) {
     /// `charactersIgnoringModifiers` returns an optional, so we unwrap it here
     guard let pressedKey = event.charactersIgnoringModifiers, pressedKey.count == 1 else {
       print("Key `\(event.keyCode)` not needed for this operation.")
@@ -57,9 +68,7 @@ extension MarkdownTextView {
     else {
       super.keyDown(with: event)
     }
-    
-  } // END key down override
-  
+  }
   
   enum WrapAction {
     case wrap

@@ -26,10 +26,8 @@ public extension MarkdownEditor {
     var parent: MarkdownEditor
     weak var textView: MarkdownTextView?
     
-    //    var lastLineCount: Int = 0
-    
     var selectedRanges: [NSValue] = []
-    //    var selections: [NSTextSelection] = []
+
     var updatingNSView = false
     
     init(_ parent: MarkdownEditor) { self.parent = parent }
@@ -102,22 +100,7 @@ public extension MarkdownEditor {
     //      }
     //    }
     
-    public func textDidChange(_ notification: Notification) {
-      
-      guard let textView = notification.object as? MarkdownTextView,
-            !updatingNSView
-              
-      else { return }
-      
-      self.parent.text = textView.string
-      self.selectedRanges = textView.selectedRanges
-      
-      /// I have learned, and need to remember, that this `Coordinator` is
-      /// a delegate, for my ``MarkdownTextView``. Which means I can take
-      /// full advantage of methods here, just like I can with overrides in `MarkdownTextView`. They often have different functionalities to
-      /// experiment with.
-      
-    }
+
     
     public func textViewDidChangeSelection(_ notification: Notification) {
       guard let textView = notification.object as? MarkdownTextView,

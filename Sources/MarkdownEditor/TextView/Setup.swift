@@ -24,7 +24,6 @@ extension MarkdownTextView {
     
     self.applyConfiguration()
     
-    
     //    highlightr.setTheme(to: "xcode-dark")
     
     if self.configuration.isScrollable, let scrollView = scrollView {
@@ -52,9 +51,6 @@ extension MarkdownTextView {
       textContainer?.heightTracksTextView = false
       
       
-      
-      
-      
     } else {
       
       /// *NON-scrolling* version
@@ -63,12 +59,10 @@ extension MarkdownTextView {
       /// and SwiftUI just seems to take care of the height stuff. KEEP THIS FALSE for
       /// (seemingly) predictable, normal, horizontal text reflow.
       
-      
       setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
       setContentCompressionResistancePriority(.defaultHigh, for: .vertical)
       setContentHuggingPriority(.defaultLow, for: .horizontal)
       setContentHuggingPriority(.defaultHigh, for: .vertical)
-      
       
       isVerticallyResizable = false
       isHorizontallyResizable = false

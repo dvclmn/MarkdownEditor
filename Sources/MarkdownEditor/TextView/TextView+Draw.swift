@@ -19,6 +19,7 @@ extension MarkdownTextView {
   
   
   func codeBlockBackgrounds() {
+    
     if configuration.drawsCodeBlockBackgrounds {
 
       // MARK: - Code block backgrounds

@@ -19,23 +19,18 @@ extension MarkdownTextView {
     
     /// This allows a quick parse on load, and then the debounced
     /// parsing is over in `Changed+Text.swift`
-    DispatchQueue.main.async {
-      self.parseAllMarkdown()
-      self.styleInlineMarkdown()
-    }
+    ///
+      DispatchQueue.main.async {
+        self.parseAllMarkdown()
+        self.styleInlineMarkdown()
+      }
     
-    //    guard let layoutManager = self.layoutManager else {
-    //      fatalError("Layout mananaager is nil")
-    //    }
-    
+
     onAppearAndTextChange()
     
     //    onAppearAndSelectionChanged()
 
     exploreTextSegments()
-    
-    
-    //    basicInlineMarkdown()
     
   }
   
@@ -44,12 +39,13 @@ extension MarkdownTextView {
     
     Task { @MainActor in
       
-      let newSize = self.updatedEditorHeight()
+      if configuration.isSendingEditorHeight {
+        let newSize = self.updatedEditorHeight()
+        infoUpdater.update(\.size, value: newSize)
+      }
+
       let newLines: Int = countLinesTK2()
-      
-      
       infoUpdater.update(\.elementSummary, value: self.elementsSummary)
-      infoUpdater.update(\.size, value: newSize)
       infoUpdater.update(\.lineCount, value: newLines)
       
     }

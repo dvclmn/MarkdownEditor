@@ -47,7 +47,7 @@ public class MarkdownViewController: NSViewController {
 //      highlightr: highlightr
     )
     
-    if configuration.isNeonEnabled {
+    if configuration.neonConfig == .textViewHighlighter {
       do {
         self.highlighter = try Self.makeHighlighter(for: textView)
         print("`TextViewHighlighter` is running.")

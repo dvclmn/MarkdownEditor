@@ -30,11 +30,11 @@ extension MarkdownTextView {
     let lineArrivedTrimmed = trimmedForReference(lineArrivedText)
 //    let rangeArrived = self.paragraphHandler.currentParagraph.range
     
-    print("""
-    Trimmed for reference:
-      Departed paragraph: \(lineDepartedTrimmed)
-      Arrived paragraph: \(lineArrivedTrimmed)
-    """)
+//    print("""
+//    Trimmed for reference:
+//      Departed paragraph: \(lineDepartedTrimmed)
+//      Arrived paragraph: \(lineArrivedTrimmed)
+//    """)
     
     let newListItemPattern = "- "
     

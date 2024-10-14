@@ -28,12 +28,17 @@ public struct MarkdownEditorConfiguration: Sendable, Equatable {
   
 #if DEBUG
   
-  var isNeonEnabled: Bool = false
-  var drawsCodeBlockBackgrounds: Bool = false
+  let neonConfig: NeonConfiguration = .textViewHighlighter
+  let drawsCodeBlockBackgrounds: Bool = false
+  let isHandlingKeyPress: Bool = true
+  let isSendingEditorHeight: Bool = false
   
-  //  let isTextKit2: Bool = false
+  let isDebugFragmentsMode: Bool = true
   
-  
+  let isParsing: Bool = false
+  let isStyling: Bool = true
+
+
 #endif
   
   public init(
@@ -58,6 +63,12 @@ public struct MarkdownEditorConfiguration: Sendable, Equatable {
     self.insets = insets
     self.maxReadingWidth = maxReadingWidth
   }
+}
+
+enum NeonConfiguration {
+  case textViewHighlighter
+  case manual // Not yet implemented
+  case none
 }
 
 extension MarkdownEditorConfiguration {

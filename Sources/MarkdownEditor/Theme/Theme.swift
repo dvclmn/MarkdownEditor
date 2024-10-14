@@ -23,6 +23,18 @@ public struct MarkdownTheme: Sendable, Equatable {
   
   public var insertionPointColour: Color
   
+  
+  
+//  var lineHeight: CGFloat {
+//    get {
+//      return _lineHeight
+//    }
+//    set {
+//      
+//      _lineHeight = self.isDebugFragmentsMode ? 20 : newValue
+//    }
+//  }
+  
   public init(
     fontSize: CGFloat = 15,
     textColour: NSColor = .textColor.withAlphaComponent(0.9),
@@ -30,7 +42,7 @@ public struct MarkdownTheme: Sendable, Equatable {
     codeColour: Color = .green,
     codeBackgroundColour: Color = .blue.opacity(0.4),
     
-    lineHeight: CGFloat = 8,
+    lineHeight: CGFloat = 0,
     
     heading1Colour: Color = .indigo,
     heading2Colour: Color = .blue,
