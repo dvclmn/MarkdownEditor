@@ -34,17 +34,8 @@ public extension MarkdownEditor {
     
     var attachmentRanges: Array<NSRange> = []
     
-    public func textLayoutManager( _ textLayoutManager: NSTextLayoutManager, textLayoutFragmentFor location: NSTextLocation, in textElement: NSTextElement) -> NSTextLayoutFragment {
-      
-      if let parItemTextElement = textElement as? MarkdownParagraph {
-        return CodeBlockBackground(
-          textElement: parItemTextElement,
-          range: parItemTextElement.elementRange,
-          viewWidth: .greatestFiniteMagnitude
-        )
-      }
-      return NSTextLayoutFragment(textElement: textElement, range: textElement.elementRange)
-    }
+    
+   
     
     // Returning a ParItemAttachmentTextElement if there is a ParagraphItemAttachment in the text range
     public func textContentStorage(_ textContentStorage: NSTextContentStorage, textParagraphWith range: NSRange) -> NSTextParagraph? {
@@ -115,29 +106,6 @@ public extension MarkdownEditor {
     
     //    }
     
-    
-    
-    
-    /// Counts the number of lines in the text view.
-    //    @MainActor
-    //    func currentLineCount() -> Int {
-    //
-    //      guard let layoutManager = self.textView?.layoutManager,
-    //            let textContainer = self.textView?.textContainer else {
-    //        return 0
-    //      }
-    //
-    //      let glyphRange = layoutManager.glyphRange(for: textContainer)
-    //      var lineCount = 0
-    //
-    //      layoutManager.enumerateLineFragments(forGlyphRange: glyphRange) { (_, _, _, _, _) in
-    //        lineCount += 1
-    //      }
-    //
-    //      print("Current line count is: \(lineCount)")
-    //
-    //      return lineCount
-    //    }
-    //
+
   }
 }
