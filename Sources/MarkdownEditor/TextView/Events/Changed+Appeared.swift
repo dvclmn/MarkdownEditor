@@ -6,7 +6,7 @@
 //
 
 import SwiftUI
-import TextCore
+
 //import Rearrange
 import BaseHelpers
 //import STTextKitPlus

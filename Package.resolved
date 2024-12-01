@@ -1,5 +1,5 @@
 {
-  "originHash" : "0616c8bc45a1147c338d2cdc6c4df540ab56f1e25d577baeb8f7665434d78564",
+  "originHash" : "8be985eacd8acaea585fca80a1059e0d8b62c06bd21c70047ef07063835e6f66",
   "pins" : [
     {
       "identity" : "collection",
@@ -7,7 +7,16 @@
       "location" : "https://github.com/dvclmn/Collection.git",
       "state" : {
         "branch" : "main",
-        "revision" : "1489b5fc0107dec127a892e1a9335ef50ded1ace"
+        "revision" : "64009a2de45d58a71a13b2f8604760c5e9ef8787"
+      }
+    },
+    {
+      "identity" : "colortoolbox",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/raymondjavaxx/ColorToolbox",
+      "state" : {
+        "revision" : "f5f668df9af9a31a6fee7f514c21992f4ab7384c",
+        "version" : "1.1.0"
       }
     },
     {
@@ -29,15 +38,6 @@
       }
     },
     {
-      "identity" : "highlightr",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/raspu/Highlightr.git",
-      "state" : {
-        "revision" : "bcf2d0590f32ac2528feb72d7e34f5b463801a47",
-        "version" : "2.2.1"
-      }
-    },
-    {
       "identity" : "keychain-swift",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/evgenyneu/keychain-swift.git",
@@ -52,16 +52,7 @@
       "location" : "https://github.com/ChimeHQ/Neon.git",
       "state" : {
         "branch" : "main",
-        "revision" : "8d01febc54d0bedba1136ef3bc833ddd7c843528"
-      }
-    },
-    {
-      "identity" : "nsui",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/mattmassicotte/nsui",
-      "state" : {
-        "revision" : "8792b2f789bf03be1be9ecb4df43d2bfe0e5d361",
-        "version" : "1.3.0"
+        "revision" : "f3c717b5bbf2118aa93f16a0aa4adf9a9c39ad43"
       }
     },
     {
@@ -78,8 +69,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/danielsaidi/ScrollKit.git",
       "state" : {
-        "revision" : "b3142033da3769046770e38d459203756db879b5",
-        "version" : "0.5.1"
+        "revision" : "d1642f705834ca7718458885d838671c51ca2e17",
+        "version" : "0.6.0"
       }
     },
     {
@@ -92,12 +83,39 @@
       }
     },
     {
+      "identity" : "swift-case-paths",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/pointfreeco/swift-case-paths",
+      "state" : {
+        "revision" : "bc92c4b27f9a84bfb498cdbfdf35d5a357e9161f",
+        "version" : "1.5.6"
+      }
+    },
+    {
       "identity" : "swift-clocks",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/swift-clocks",
       "state" : {
         "revision" : "b9b24b69e2adda099a1fa381cda1eeec272d5b53",
         "version" : "1.0.5"
+      }
+    },
+    {
+      "identity" : "swift-collections",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/apple/swift-collections",
+      "state" : {
+        "revision" : "671108c96644956dddcd89dd59c203dcdb36cec7",
+        "version" : "1.1.4"
+      }
+    },
+    {
+      "identity" : "swift-composable-architecture",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/pointfreeco/swift-composable-architecture.git",
+      "state" : {
+        "revision" : "56149436a3c3dbf605a89a204aaa904de8ba4580",
+        "version" : "1.15.2"
       }
     },
     {
@@ -110,6 +128,15 @@
       }
     },
     {
+      "identity" : "swift-custom-dump",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/pointfreeco/swift-custom-dump",
+      "state" : {
+        "revision" : "82645ec760917961cfa08c9c0c7104a57a0fa4b1",
+        "version" : "1.3.3"
+      }
+    },
+    {
       "identity" : "swift-dependencies",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/swift-dependencies.git",
@@ -119,12 +146,39 @@
       }
     },
     {
+      "identity" : "swift-identified-collections",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/pointfreeco/swift-identified-collections",
+      "state" : {
+        "revision" : "2f5ab6e091dd032b63dacbda052405756010dc3b",
+        "version" : "1.1.0"
+      }
+    },
+    {
       "identity" : "swift-memberwise-init-macro",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/gohanlon/swift-memberwise-init-macro.git",
       "state" : {
         "revision" : "21ca6d8c8f9e4ce27e92f82da294e0d91953b8b6",
         "version" : "0.5.1"
+      }
+    },
+    {
+      "identity" : "swift-navigation",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/pointfreeco/swift-navigation",
+      "state" : {
+        "revision" : "16a27ab7ae0abfefbbcba73581b3e2380b47a579",
+        "version" : "2.2.2"
+      }
+    },
+    {
+      "identity" : "swift-perception",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/pointfreeco/swift-perception",
+      "state" : {
+        "revision" : "bc67aa8e461351c97282c2419153757a446ae1c9",
+        "version" : "1.3.5"
       }
     },
     {
@@ -141,7 +195,7 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/ChimeHQ/SwiftTreeSitter",
       "state" : {
-        "revision" : "d0938d3607abcc5669bdf1d7d3b0485a8740fc65"
+        "revision" : "f01316eaf3aae07e30478f8afa76192ab4a96420"
       }
     },
     {
@@ -150,7 +204,16 @@
       "location" : "https://github.com/dvclmn/TextCore.git",
       "state" : {
         "branch" : "main",
-        "revision" : "1e61456a5db92d479ad7675ce24946df8d2e9ff8"
+        "revision" : "8b3397ee68f9670260606d27a9c180d301897767"
+      }
+    },
+    {
+      "identity" : "themepark",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/ChimeHQ/ThemePark.git",
+      "state" : {
+        "branch" : "main",
+        "revision" : "24139ad84042b070d2d11e54c22a22b01703e993"
       }
     },
     {
@@ -168,7 +231,7 @@
       "location" : "https://github.com/tree-sitter-grammars/tree-sitter-markdown.git",
       "state" : {
         "branch" : "split_parser",
-        "revision" : "b7eba93e6a3e588e259e831416ac11abdaa8616a"
+        "revision" : "5cdc549ab8f461aff876c5be9741027189299cec"
       }
     },
     {
@@ -176,8 +239,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/alex-pinkus/tree-sitter-swift",
       "state" : {
-        "revision" : "c9c669b4513479e07a0ff44cf14f72351959ac21",
-        "version" : "0.5.0"
+        "branch" : "with-generated-files",
+        "revision" : "33e56e4e2a6455f3fd4e04cfe5c7a314d498612d"
       }
     },
     {
@@ -186,7 +249,7 @@
       "location" : "https://github.com/dvclmn/Wrecktangle.git",
       "state" : {
         "branch" : "main",
-        "revision" : "5eb10b9029209b7a676973f903e56a8dcb4ecdfd"
+        "revision" : "3557077d8f9a97cea12aa33892dfda2ada528102"
       }
     },
     {

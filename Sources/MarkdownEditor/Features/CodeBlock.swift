@@ -52,9 +52,9 @@ class CodeBlockBackground: NSTextLayoutFragment {
     
     path.move(to: point)
     
-    path.line(to: point.shiftRight(20))
+//    path.line(to: point.shiftRight(20))
     
-    path.curve(to: point.shift(dx: 40, dy: 80), controlPoint: point.shiftRight(viewWidth))
+//    path.curve(to: point.shift(dx: 40, dy: 80), controlPoint: point.shiftRight(viewWidth))
     
     path.close()
     

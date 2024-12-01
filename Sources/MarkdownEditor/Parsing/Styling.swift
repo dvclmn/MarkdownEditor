@@ -13,8 +13,6 @@ extension MarkdownTextView {
   
   func styleInlineMarkdown() {
     
-    
-    
     guard configuration.isStyling else {
       print("Styling is switched OFF in configuration.")
       return

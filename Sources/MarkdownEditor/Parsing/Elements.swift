@@ -8,8 +8,8 @@
 import Foundation
 import AppKit
 import BaseHelpers
-import TextCore
-import Rearrange
+
+//import Rearrange
 
 public struct Markdown {
   

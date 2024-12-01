@@ -7,11 +7,9 @@
 
 import SwiftUI
 import BaseHelpers
-import Scrolling
 //import Resizable
 
 public struct ExampleView: View {
-  
   
   @State private var text: String = TestStrings.Markdown.shortMarkdownBasics
   
@@ -48,13 +46,14 @@ public struct ExampleView: View {
         text: $text,
         configuration: MarkdownEditorConfiguration(isShowingFrames: true)
 //        eventEmitter: self.emitter,
-      ) { info in
-        self.editorInfo = info
-      }
+      )
+//      { info in
+//        self.editorInfo = info
+//      }
       .frame(height: self.editorInfo?.size.height)
       
     }
-    .scrollWithOffset()
+//    .scrollWithOffset()
     //    .overlay(alignment: .bottom) {
     //      HStack {
     //

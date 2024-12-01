@@ -6,8 +6,8 @@
 //
 
 import SwiftUI
-import TextCore
-import Rearrange
+import BaseHelpers
+//import Rearrange
 //import STTextKitPlus
 
 public extension MarkdownEditor {
@@ -37,25 +37,25 @@ public extension MarkdownEditor {
     
    
     
-    // Returning a ParItemAttachmentTextElement if there is a ParagraphItemAttachment in the text range
-    public func textContentStorage(_ textContentStorage: NSTextContentStorage, textParagraphWith range: NSRange) -> NSTextParagraph? {
-      if let attributedString = textContentStorage.attributedString {
-        self.attachmentRanges = Array()
-        attributedString.enumerateAttribute(.attachment, in: range) { (attachment: Any?, characterRange:NSRange, stopIt: UnsafeMutablePointer<ObjCBool>) in
-          if let _ = attachment as? MarkdownTextView.HighlightTextAttachment {
-            self.attachmentRanges.append(characterRange)
-          }
-        }
-        if !self.attachmentRanges.isEmpty {
-          let textElementAttributedString = attributedString.attributedSubstring(from: range)
-//          let textRange = textContentStorage.textElement(for: )
-//          let parItemTextElement = ParItemAttachmentTextParagraph(attributedString: textElementAttributedString, textContentManager: textContentStorage, elementRange: textRange, attachmentRanges: self.attachmentRanges)
-//          return parItemTextElement
-        }
-      }
-      return nil
-    }
-    
+//    // Returning a ParItemAttachmentTextElement if there is a ParagraphItemAttachment in the text range
+//    public func textContentStorage(_ textContentStorage: NSTextContentStorage, textParagraphWith range: NSRange) -> NSTextParagraph? {
+//      if let attributedString = textContentStorage.attributedString {
+//        self.attachmentRanges = Array()
+//        attributedString.enumerateAttribute(.attachment, in: range) { (attachment: Any?, characterRange:NSRange, stopIt: UnsafeMutablePointer<ObjCBool>) in
+//          if let _ = attachment as? MarkdownTextView.HighlightTextAttachment {
+//            self.attachmentRanges.append(characterRange)
+//          }
+//        }
+//        if !self.attachmentRanges.isEmpty {
+//          let textElementAttributedString = attributedString.attributedSubstring(from: range)
+////          let textRange = textContentStorage.textElement(for: )
+////          let parItemTextElement = ParItemAttachmentTextParagraph(attributedString: textElementAttributedString, textContentManager: textContentStorage, elementRange: textRange, attachmentRanges: self.attachmentRanges)
+////          return parItemTextElement
+//        }
+//      }
+//      return nil
+//    }
+//    
     //
     //    @MainActor public func textStorage(
     //      _ textStorage: NSTextStorage,

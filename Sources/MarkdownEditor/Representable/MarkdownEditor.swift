@@ -9,49 +9,24 @@ import SwiftUI
 import OSLog
 import BaseHelpers
 
-
-
-public class EventEmitter<Event> {
-  
-  private var eventHandlers: [(Event) -> Void] = []
-  
-  public init() {}
-  
-  public func on(_ handler: @escaping (Event) -> Void) {
-    eventHandlers.append(handler)
-  }
-  
-  public func emit(_ event: Event) {
-    print("Let's emit event: \(event)")
-    eventHandlers.forEach { $0(event) }
-  }
-}
-
-public enum SyntaxEvent {
-  case wrap(Markdown.Syntax)
-}
-
 public typealias InfoUpdate = @Sendable (EditorInfo) -> Void
 
+@MainActor
 public struct MarkdownEditor: NSViewControllerRepresentable {
   
   public typealias NSViewControllerType = MarkdownViewController
   
   @Binding var text: String
   
-//  var eventEmitter: EventEmitter<SyntaxEvent>
-  
   var configuration: MarkdownEditorConfiguration
   var info: InfoUpdate
   
   public init(
     text: Binding<String>,
-//    eventEmitter: EventEmitter<SyntaxEvent>,
     configuration: MarkdownEditorConfiguration = .init(),
     info: @escaping InfoUpdate = { _ in }
   ) {
     self._text = text
-//    self.eventEmitter = eventEmitter
     self.configuration = configuration
     self.info = info
   }

@@ -6,8 +6,10 @@
 //
 
 import AppKit
-import Rearrange
+//import Rearrange
 import Wrecktangle
+import BaseHelpers
+
 
 @MainActor
 struct ParagraphHandler: Sendable {
@@ -48,9 +50,9 @@ extension ParagraphInfo: CustomStringConvertible {
     // - Selected: \(Date.now.friendlyDateAndTime)
     let output: String = """
     
-      - Range: \(range.info)
+      - Range: \\(range.info)
       - Type: \(type)
-      - String: \(string.trimmingCharacters(in: .whitespacesAndNewlines).preview(40, hasDividers: false))
+      - String: \(string.trimmingCharacters(in: .whitespacesAndNewlines).preview(40))
     """
     
     return output

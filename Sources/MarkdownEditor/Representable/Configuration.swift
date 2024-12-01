@@ -8,7 +8,7 @@
 
 import Foundation
 import SwiftUI
-import TextCore
+import BaseHelpers
 
 public struct MarkdownEditorConfiguration: Sendable, Equatable {
   
@@ -26,7 +26,7 @@ public struct MarkdownEditorConfiguration: Sendable, Equatable {
   /// constantly toggling blocks of code everywhere.
   public var insets: CGFloat
   
-#if DEBUG
+
   
   let neonConfig: NeonConfiguration = .textViewHighlighter
   let drawsCodeBlockBackgrounds: Bool = false
@@ -39,7 +39,7 @@ public struct MarkdownEditorConfiguration: Sendable, Equatable {
   let isStyling: Bool = true
 
 
-#endif
+
   
   public init(
     isEditable: Bool = true,

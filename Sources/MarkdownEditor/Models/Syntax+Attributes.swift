@@ -8,7 +8,7 @@
 import AppKit
 import Foundation
 import BaseHelpers
-import TextCore
+
 
 
 public extension Markdown.Syntax {
@@ -36,27 +36,27 @@ public extension Markdown.Syntax {
         
       case .bold:
         font = theme.defaultFont
-        foregroundColour = .label
+        foregroundColour = .labelColor
         backgroundColour = .clear
         
       case .italic:
         font = theme.defaultFont
-        foregroundColour = .label
+        foregroundColour = .labelColor
         backgroundColour = .clear
         
       case .boldItalic:
         font = theme.defaultFont
-        foregroundColour = .label
+        foregroundColour = .labelColor
         backgroundColour = .clear
         
       case .strikethrough:
         font = theme.defaultFont
-        foregroundColour = .label
+        foregroundColour = .labelColor
         backgroundColour = .clear
         
       case .highlight:
         font = theme.defaultFont
-        foregroundColour = .label
+        foregroundColour = .labelColor
         backgroundColour = .clear
         
       case .inlineCode:
@@ -66,12 +66,12 @@ public extension Markdown.Syntax {
         
       case .list:
         font = theme.defaultFont
-        foregroundColour = .label
+        foregroundColour = .labelColor
         backgroundColour = .clear
         
       case .horizontalRule:
         font = theme.defaultFont
-        foregroundColour = .label
+        foregroundColour = .labelColor
         backgroundColour = .clear
         
       case .codeBlock:
@@ -82,17 +82,17 @@ public extension Markdown.Syntax {
         
       case .quoteBlock:
         font = theme.defaultFont
-        foregroundColour = .label
+        foregroundColour = .labelColor
         backgroundColour = .clear
         
       case .link:
         font = theme.defaultFont
-        foregroundColour = .label
+        foregroundColour = .labelColor
         backgroundColour = .clear
         
       case .image:
         font = theme.defaultFont
-        foregroundColour = .label
+        foregroundColour = .labelColor
         backgroundColour = .clear
         
     }
@@ -128,27 +128,27 @@ public extension Markdown.Syntax {
         
       case .bold:
         font = theme.defaultFont
-        foregroundColour = .label
+        foregroundColour = .labelColor
         backgroundColour = .clear
         
       case .italic:
         font = theme.defaultFont
-        foregroundColour = .label
+        foregroundColour = .labelColor
         backgroundColour = .clear
         
       case .boldItalic:
         font = theme.defaultFont
-        foregroundColour = .label
+        foregroundColour = .labelColor
         backgroundColour = .clear
         
       case .strikethrough:
         font = theme.defaultFont
-        foregroundColour = .label
+        foregroundColour = .labelColor
         backgroundColour = .clear
         
       case .highlight:
         font = theme.defaultFont
-        foregroundColour = .label
+        foregroundColour = .labelColor
         backgroundColour = .clear
         
       case .inlineCode:
@@ -158,12 +158,12 @@ public extension Markdown.Syntax {
         
       case .list:
         font = theme.defaultFont
-        foregroundColour = .label
+        foregroundColour = .labelColor
         backgroundColour = .clear
         
       case .horizontalRule:
         font = theme.defaultFont
-        foregroundColour = .label
+        foregroundColour = .labelColor
         backgroundColour = .clear
         
       case .codeBlock:
@@ -173,17 +173,17 @@ public extension Markdown.Syntax {
         
       case .quoteBlock:
         font = theme.defaultFont
-        foregroundColour = .label
+        foregroundColour = .labelColor
         backgroundColour = .clear
         
       case .link:
         font = theme.defaultFont
-        foregroundColour = .label
+        foregroundColour = .labelColor
         backgroundColour = .clear
         
       case .image:
         font = theme.defaultFont
-        foregroundColour = .label
+        foregroundColour = .labelColor
         backgroundColour = .clear
         
     }

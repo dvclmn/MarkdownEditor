@@ -20,13 +20,14 @@ extension MarkdownViewController {
   
   @MainActor static func makeHighlighter(for textView: MarkdownTextView) throws -> TextViewHighlighter {
     
-    //    print("Let's set up `TextViewHighlighter`.")
-    
-    //    textView.typingAttributes = textView.configuration.defaultTypingAttributes
-    
+    guard let queriesURL = Bundle.module.url(forResource: "custom-highlights", withExtension: "scm") else {
+      fatalError("Error finding the custom queries URL")
+    }
+
     let markdownConfig = try LanguageConfiguration(
       tree_sitter_markdown(),
-      name: "Markdown"
+      name: "Markdown",
+      queriesURL: queriesURL
     )
     let markdownInlineConfig = try LanguageConfiguration(
       tree_sitter_markdown_inline(),

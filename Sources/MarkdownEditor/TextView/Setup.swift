@@ -6,7 +6,7 @@
 //
 
 import SwiftUI
-import TextCore
+import BaseHelpers
 //import Highlightr
 
 extension MarkdownTextView {

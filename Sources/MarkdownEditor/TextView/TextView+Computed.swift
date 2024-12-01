@@ -7,7 +7,7 @@
 
 import AppKit
 import Glyph
-import Rearrange
+//import Rearrange
 import Foundation
 
 extension MarkdownTextView {
