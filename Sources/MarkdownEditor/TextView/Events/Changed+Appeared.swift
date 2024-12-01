@@ -39,10 +39,10 @@ extension MarkdownTextView {
     
     Task { @MainActor in
       
-      if configuration.isSendingEditorHeight {
-        let newSize = self.updatedEditorHeight()
-        infoUpdater.update(\.size, value: newSize)
-      }
+//      if configuration.isSendingEditorHeight {
+//        let newSize = self.updatedEditorHeight()
+//        infoUpdater.update(\.size, value: newSize)
+//      }
 
       let newLines: Int = countLinesTK2()
       infoUpdater.update(\.elementSummary, value: self.elementsSummary)

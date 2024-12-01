@@ -13,11 +13,10 @@ import TreeSitterMarkdownInline
 import SwiftTreeSitter
 import TreeSitterSwift
 import TreeSitterClient
-//import Highlightr
-
 
 public class MarkdownViewController: NSViewController {
   
+  let configuration: MarkdownEditorConfiguration
   var textView: MarkdownTextView
   
   private let highlighter: TextViewHighlighter?
@@ -25,26 +24,13 @@ public class MarkdownViewController: NSViewController {
   init(
     configuration: MarkdownEditorConfiguration
   ) {
-    
-//    guard let highlightr = Highlightr() else {
-//      fatalError("Why no Highlightr?")
-//    }
-    
-    let scrollView: NSScrollView?
-    
-    if configuration.isScrollable {
-      scrollView = NSScrollView()
-      
-    } else {
-      scrollView = nil
-    }
+    self.configuration = configuration
+    let scrollView = NSScrollView()
     
     self.textView = MarkdownTextView(
       frame: .zero,
       textContainer: nil,
-      scrollView: scrollView,
       configuration: configuration
-//      highlightr: highlightr
     )
     
     if configuration.neonConfig == .textViewHighlighter {
@@ -69,12 +55,25 @@ public class MarkdownViewController: NSViewController {
   
   
   public override func loadView() {
-
-    if let scrollView = textView.scrollView {
-      self.view = scrollView
-    } else {
-      self.view = textView
-    }
+    
+    let scrollView = NSScrollView()
+    
+    scrollView.hasVerticalScroller = true
+    scrollView.documentView = textView
+    scrollView.drawsBackground = false
+    scrollView.additionalSafeAreaInsets.bottom =
+    configuration.bottomSafeArea
+    
+    let max = CGFloat.greatestFiniteMagnitude
+    
+    textView.minSize = NSSize.zero
+    textView.maxSize = NSSize(width: max, height: max)
+    textView.isVerticallyResizable = true
+    textView.isHorizontallyResizable = true
+    
+    textView.isRichText = false  // Discards any attributes when pasting.
+    
+    self.view = scrollView
     
     if let highlighter = highlighter {
       highlighter.observeEnclosingScrollView()

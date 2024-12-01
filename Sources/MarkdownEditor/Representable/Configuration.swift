@@ -13,7 +13,6 @@ import BaseHelpers
 public struct MarkdownEditorConfiguration: Sendable, Equatable {
   
   public var isEditable: Bool
-  public var isScrollable: Bool
   public var theme: MarkdownTheme
 
   public var bottomSafeArea: CGFloat
@@ -43,7 +42,6 @@ public struct MarkdownEditorConfiguration: Sendable, Equatable {
   
   public init(
     isEditable: Bool = true,
-    isScrollable: Bool = false,
     theme: MarkdownTheme = .default,
 
     bottomSafeArea: CGFloat = .zero,
@@ -54,7 +52,6 @@ public struct MarkdownEditorConfiguration: Sendable, Equatable {
     maxReadingWidth: CGFloat = 580
   ) {
     self.isEditable = isEditable
-    self.isScrollable = isScrollable
     self.theme = theme
 
     self.bottomSafeArea = bottomSafeArea

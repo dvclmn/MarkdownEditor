@@ -24,57 +24,6 @@ extension MarkdownTextView {
     }
   }
   
-  public override var intrinsicContentSize: NSSize {
-    
-    guard let tlm = self.textLayoutManager,
-          let tcm = tlm.textContentManager
-//          let container = self.textContainer
-    else { return super.intrinsicContentSize }
-    
-//    guard let container = textContainer,
-//          let layoutManager = layoutManager else {
-//      return super.intrinsicContentSize
-//    }
-    
-    
-    let documentRange = tlm.documentRange
-//    tlm.ensureLayout(for: documentRange)
-    
-    let documentNSRange = NSRange(documentRange, provider: tcm)
-    
-//    layoutManager.ensureLayout(for: container)
-    
-    guard let usedRect = self.boundingRect(for: documentNSRange)?.size else {
-      return super.intrinsicContentSize
-    }
-    
-//    let usedRect = layoutManager.usedRect(for: container).size
-    
-    return usedRect
-    
-  }
-  
-
-  
-  func updatedEditorHeight() -> CGSize {
-    
-    invalidateIntrinsicContentSize()
-    
-    let newSize = intrinsicContentSize
-    let extraHeightBuffer: CGFloat = configuration.isScrollable ? 0 : configuration.bottomSafeArea
-    let minHeight: CGFloat = 80
-    
-    let adjustedHeight: CGFloat = newSize.height + extraHeightBuffer
-    
-    let finalHeight = max(adjustedHeight, minHeight)
-    
-    let result = CGSize(width: newSize.width, height: finalHeight)
-    
-    return result
-    
-  }
-  
-  
   
   func countLinesSimple() -> Int {
     

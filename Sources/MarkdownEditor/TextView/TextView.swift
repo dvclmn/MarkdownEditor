@@ -16,10 +16,6 @@ public class MarkdownTextView: NSTextView {
   let tlm: NSTextLayoutManager
   let tcm: NSTextContentManager
   
-//  let highlightr: Highlightr
-  
-  var scrollView: NSScrollView?
-  
   var isUpdatingFrame: Bool = false
   var isUpdatingText: Bool = false
   
@@ -53,7 +49,6 @@ public class MarkdownTextView: NSTextView {
   public init(
     frame frameRect: NSRect,
     textContainer container: NSTextContainer?,
-    scrollView: NSScrollView? = nil,
     configuration: MarkdownEditorConfiguration
 //    highlightr: Highlightr
     
@@ -91,8 +86,6 @@ public class MarkdownTextView: NSTextView {
     
     self.tlm = textLayoutManager
     self.tcm = textLayoutManager.textContentManager!
-    
-    self.scrollView = scrollView
     
     super.init(frame: frameRect, textContainer: nsTextContainer)
     
