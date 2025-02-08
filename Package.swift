@@ -15,10 +15,10 @@ let package = Package(
   ],
   dependencies: [
     
-    .package(url: "https://github.com/raspu/Highlightr.git", from: "2.2.1"),
-    .package(url: "https://github.com/ChimeHQ/Rearrange.git", from: "1.8.1"),
+//    .package(url: "https://github.com/raspu/Highlightr.git", from: "2.2.1"),
+//    .package(url: "https://github.com/ChimeHQ/Rearrange.git", from: "1.8.1"),
     .package(url: "https://github.com/ChimeHQ/Glyph.git", branch: "main"),
-    .package(url: "https://github.com/ChimeHQ/ThemePark.git", branch: "main"),
+//    .package(url: "https://github.com/ChimeHQ/ThemePark.git", branch: "main"),
     .package(url: "https://github.com/dvclmn/Collection.git", branch: "main"),
     .package(url: "https://github.com/dvclmn/MarkdownModels.git", branch: "main")
     
@@ -28,24 +28,24 @@ let package = Package(
       name: "MarkdownEditor",
       dependencies: [
         "MarkdownModels",
-        "Rearrange",
+//        "Rearrange",
         "Glyph",
-        "Highlightr",
+//        "Highlightr",
 //        "Neon",
-        "ThemePark",
+//        "ThemePark",
         .product(name: "BaseHelpers", package: "Collection"),
         .product(name: "BaseStyles", package: "Collection"),
       ]
     ),
-    .testTarget(
-      name: "MarkdownEditorTests",
-      dependencies: [
-        "MarkdownEditor",
-        .product(name: "BaseHelpers", package: "Collection"),
-
-      ]
-    ),
-    
+//    .testTarget(
+//      name: "MarkdownEditorTests",
+//      dependencies: [
+//        "MarkdownEditor",
+//        .product(name: "BaseHelpers", package: "Collection"),
+//
+//      ]
+//    ),
+//    
   ]
 )
 

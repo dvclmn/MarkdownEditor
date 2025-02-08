@@ -12,14 +12,14 @@ import MarkdownModels
 public struct EditorView: View {
   @State private var windowWidth: CGFloat = .zero
   @Binding var text: String
-  let config: MarkdownEditorConfiguration
+  let configuration: MarkdownEditorConfiguration
   
   public init(
     text: Binding<String>,
-    config: MarkdownEditorConfiguration = .init()
+    configuration: MarkdownEditorConfiguration = .init()
   ) {
     self._text = text
-    self.config = config
+    self.configuration = configuration
   }
   
   public var body: some View {
@@ -27,7 +27,7 @@ public struct EditorView: View {
     MarkdownEditor(
       text: $text,
       width: windowWidth,
-      configuration: config
+      configuration: configuration
     )
     .onGeometryChange(for: CGFloat.self) { proxy in
       return proxy.size.width

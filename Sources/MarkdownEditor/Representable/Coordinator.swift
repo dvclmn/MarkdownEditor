@@ -21,7 +21,7 @@ extension MarkdownEditor {
     }
     public func textDidChange(_ notification: Notification) {
       print("Ran `textDidChange`")
-      guard let textView = notification.object as? NSTextView else { return }
+      guard let textView = notification.object as? MarkdownTextView else { return }
 
       /// Update the binding with the latest text.
       parent.text = textView.string
@@ -43,7 +43,7 @@ extension MarkdownEditor {
 }
 
 extension MarkdownEditor {
-  func styleText(textView: NSTextView) {
+  func styleText(textView: MarkdownTextView) {
     print("Ran `styleText`")
     guard let textStorage = textView.textStorage else { return }
     
