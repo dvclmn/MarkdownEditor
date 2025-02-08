@@ -42,7 +42,7 @@ let package = Package(
         .product(name: "TreeSitterMarkdown", package: "tree-sitter-markdown"),
         .product(name: "BaseHelpers", package: "Collection"),
         .product(name: "BaseStyles", package: "Collection"),
-        .product(name: "Utilities", package: "Collection"),
+//        .product(name: "Utilities", package: "Collection"),
       ],
       resources: [
         .process("Resources/custom-highlights.scm")

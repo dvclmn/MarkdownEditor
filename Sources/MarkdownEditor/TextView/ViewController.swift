@@ -25,7 +25,6 @@ public class MarkdownViewController: NSViewController {
     configuration: MarkdownEditorConfiguration
   ) {
     self.configuration = configuration
-    let scrollView = NSScrollView()
     
     self.textView = MarkdownTextView(
       frame: .zero,

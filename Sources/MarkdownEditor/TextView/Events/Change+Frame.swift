@@ -16,13 +16,13 @@ extension MarkdownTextView {
   /// changes, is a BAD idea, and results in such messages as
   /// `attempted layout while textStorage is editing. It is not valid to cause the layoutManager to do layout while the textStorage is editing` etc
   
-  public override var frame: NSRect {
-    didSet {
-      if frame.width != oldValue.width {
-        onWidthChange?(frame.width)
-      }
-    }
-  }
+//  public override var frame: NSRect {
+//    didSet {
+//      if frame.width != oldValue.width {
+//        onWidthChange?(frame.width)
+//      }
+//    }
+//  }
   
   
   func countLinesSimple() -> Int {

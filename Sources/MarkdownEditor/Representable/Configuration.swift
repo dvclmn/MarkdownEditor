@@ -20,24 +20,16 @@ public struct MarkdownEditorConfiguration: Sendable, Equatable {
   public var isShowingFrames: Bool
   public var maxReadingWidth: CGFloat
   
-  
-  /// I've been switching Neon on and off a lot, so this is here to save me
-  /// constantly toggling blocks of code everywhere.
   public var insets: CGFloat
-  
-
   
   let neonConfig: NeonConfiguration = .textViewHighlighter
   let drawsCodeBlockBackgrounds: Bool = false
   let isHandlingKeyPress: Bool = true
-  let isSendingEditorHeight: Bool = false
   
   let isDebugFragmentsMode: Bool = true
   
-  let isParsing: Bool = false
+  let isParsing: Bool = true
   let isStyling: Bool = true
-
-
 
   
   public init(

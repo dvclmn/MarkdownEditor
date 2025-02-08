@@ -7,7 +7,6 @@
 
 import Testing
 import Foundation
-import Shortcuts
 
 @testable import MarkdownEditor
 

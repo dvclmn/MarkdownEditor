@@ -6,71 +6,70 @@
 //
 
 import AppKit
-import Shortcuts
 import BaseHelpers
 
 extension MarkdownTextView {
   
   typealias PassthroughKeyEvent = () -> Void
   
-  public override func keyDown(with event: NSEvent) {
-    
-    if configuration.isHandlingKeyPress {
-      handleKeyPress(event)
-    } else {
-      super.keyDown(with: event)
-    }
-    
-    
-  } // END key down override
+//  public override func keyDown(with event: NSEvent) {
+//    
+//    if configuration.isHandlingKeyPress {
+//      handleKeyPress(event)
+//    } else {
+//      super.keyDown(with: event)
+//    }
+//    
+//    
+//  } // END key down override
   
-  
-  func handleKeyPress(_ event: NSEvent) {
-    /// `charactersIgnoringModifiers` returns an optional, so we unwrap it here
-    guard let pressedKey = event.charactersIgnoringModifiers, pressedKey.count == 1 else {
-      print("Key `\(event.keyCode)` not needed for this operation.")
-      return super.keyDown(with: event)
-    }
-    
-    /// Create shortcuts, on-the-fly, for every key press
-    let modifierFlags = event.modifierFlags.intersection(.deviceIndependentFlagsMask)
-    let pressedShortcut = KBShortcut(.character(Character(pressedKey)), modifierFlags: modifierFlags)
-    let returnKey: String = "\n"
-    
-    // MARK: - Handle registered shortcuts
-    /// This is where we determine if the above `pressedShortcut`
-    /// is 'registered' or used by an action somewhere else in the code.
-    if let matchingSyntax = Markdown.Syntax.findMatchingSyntax(for: pressedShortcut) {
-      
-      print("---\nPressed shortcut: \(pressedShortcut)\n---\n\n")
-      
-      let hasSelection: Bool = self.selectedRange().length > 0
-      
-      guard hasSelection else {
-        print("Zero-length selection not yet supported for keyboard shortcuts.")
-        return super.keyDown(with: event)
-      }
-      
-      handleWrapping(for: matchingSyntax)
-    }
-    /// There are also other useful key events, that aren't `KBShortcut`s,
-    /// that can trigger actions
-    else if pressedKey == returnKey || event.keyCode == 36 {
-      
-      handleNewLine {
-        super.keyDown(with: event)
-      }
-      
-      //      print("Pressed return")
-      
-    }
-    /// We've now exhausted all usefulness checks. If we haven't used this key by now,
-    /// for a shortcut, then we pass it through to the system, as any normal key press.
-    else {
-      super.keyDown(with: event)
-    }
-  }
-  
+#warning("Needs keyboard shortcut handling to be improved/implemented")
+//  func handleKeyPress(_ event: NSEvent) {
+//    /// `charactersIgnoringModifiers` returns an optional, so we unwrap it here
+//    guard let pressedKey = event.charactersIgnoringModifiers, pressedKey.count == 1 else {
+//      print("Key `\(event.keyCode)` not needed for this operation.")
+//      return super.keyDown(with: event)
+//    }
+//    
+//    /// Create shortcuts, on-the-fly, for every key press
+//    let modifierFlags = event.modifierFlags.intersection(.deviceIndependentFlagsMask)
+//    let pressedShortcut = KBShortcut(.character(Character(pressedKey)), modifierFlags: modifierFlags)
+//    let returnKey: String = "\n"
+//    
+//    // MARK: - Handle registered shortcuts
+//    /// This is where we determine if the above `pressedShortcut`
+//    /// is 'registered' or used by an action somewhere else in the code.
+//    if let matchingSyntax = Markdown.Syntax.findMatchingSyntax(for: pressedShortcut) {
+//      
+//      print("---\nPressed shortcut: \(pressedShortcut)\n---\n\n")
+//      
+//      let hasSelection: Bool = self.selectedRange().length > 0
+//      
+//      guard hasSelection else {
+//        print("Zero-length selection not yet supported for keyboard shortcuts.")
+//        return super.keyDown(with: event)
+//      }
+//      
+//      handleWrapping(for: matchingSyntax)
+//    }
+//    /// There are also other useful key events, that aren't `KBShortcut`s,
+//    /// that can trigger actions
+//    else if pressedKey == returnKey || event.keyCode == 36 {
+//      
+//      handleNewLine {
+//        super.keyDown(with: event)
+//      }
+//      
+//      //      print("Pressed return")
+//      
+//    }
+//    /// We've now exhausted all usefulness checks. If we haven't used this key by now,
+//    /// for a shortcut, then we pass it through to the system, as any normal key press.
+//    else {
+//      super.keyDown(with: event)
+//    }
+//  }
+//  
   enum WrapAction {
     case wrap
     case unwrap

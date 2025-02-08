@@ -118,55 +118,55 @@ extension MarkdownViewController {
   } // END make highlighter
   
   
-  func makeManualHighlighter() throws {
-    
-    let languageConfig = try LanguageConfiguration(
-      tree_sitter_swift(),
-      name: "Swift"
-    )
-    
-    let clientConfig = TreeSitterClient.Configuration(
-      languageProvider: { identifier in
-        // look up nested languages by identifier here. If done
-        // asynchronously, inform the client they are ready with
-        // `languageConfigurationChanged(for:)`
-        return nil
-      },
-      contentProvider: { [textView] length in
-        // given a maximum needed length, produce a `Content` structure
-        // that will be used to access the text data
-        
-        // this can work for any system that efficiently produce a `String`
-        return .init(string: textView.string)
-      },
-      lengthProvider: { [textView] in
-        textView.string.utf16.count
-        
-      },
-      invalidationHandler: { set in
-        // take action on invalidated regions of the text
-      },
-      locationTransformer: { location in
-        // optionally, use the UTF-16 location to produce a line-relative Point structure.
-        return nil
-      }
-    )
-    
-    let client = try TreeSitterClient(
-      rootLanguageConfig: languageConfig,
-      configuration: clientConfig
-    )
-    
-    let source = textView.string
-    
-    let provider = source.predicateTextProvider
-    
-    // this uses the synchronous query API, but with the `.required` mode, which will force the client
-    // to do all processing necessary to satisfy the request.
-    let highlights = try client.highlights(in: NSRange(0..<24), provider: provider, mode: .required)!
-    
-    print("highlights:", highlights)
-  }
+//  func makeManualHighlighter() throws {
+//    
+//    let languageConfig = try LanguageConfiguration(
+//      tree_sitter_swift(),
+//      name: "Swift"
+//    )
+//    
+//    let clientConfig = TreeSitterClient.Configuration(
+//      languageProvider: { identifier in
+//        // look up nested languages by identifier here. If done
+//        // asynchronously, inform the client they are ready with
+//        // `languageConfigurationChanged(for:)`
+//        return nil
+//      },
+//      contentProvider: { [textView] length in
+//        // given a maximum needed length, produce a `Content` structure
+//        // that will be used to access the text data
+//        
+//        // this can work for any system that efficiently produce a `String`
+//        return .init(string: textView.string)
+//      },
+//      lengthProvider: { [textView] in
+//        textView.string.utf16.count
+//        
+//      },
+//      invalidationHandler: { set in
+//        // take action on invalidated regions of the text
+//      },
+//      locationTransformer: { location in
+//        // optionally, use the UTF-16 location to produce a line-relative Point structure.
+//        return nil
+//      }
+//    )
+//    
+//    let client = try TreeSitterClient(
+//      rootLanguageConfig: languageConfig,
+//      configuration: clientConfig
+//    )
+//    
+//    let source = textView.string
+//    
+//    let provider = source.predicateTextProvider
+//    
+//    // this uses the synchronous query API, but with the `.required` mode, which will force the client
+//    // to do all processing necessary to satisfy the request.
+//    let highlights = try client.highlights(in: NSRange(0..<24), provider: provider, mode: .required)!
+//    
+//    print("highlights:", highlights)
+//  }
   
   
 }
