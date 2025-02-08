@@ -33,11 +33,8 @@ let package = Package(
         "Highlightr",
 //        "Neon",
         "ThemePark",
-//        .product(name: "TreeSitterSwift", package: "tree-sitter-swift"),
-//        .product(name: "TreeSitterMarkdown", package: "tree-sitter-markdown"),
         .product(name: "BaseHelpers", package: "Collection"),
         .product(name: "BaseStyles", package: "Collection"),
-//        .product(name: "Utilities", package: "Collection"),
       ]
     ),
     .testTarget(

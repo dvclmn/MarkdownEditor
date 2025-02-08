@@ -9,9 +9,6 @@ import BaseHelpers
 import SwiftUI
 import MarkdownModels
 
-//import Rearrange
-//import STTextKitPlus
-
 extension MarkdownEditor {
 
   public class Coordinator: NSObject, NSTextViewDelegate {

@@ -91,39 +91,39 @@ extension MarkdownTextView {
 //    
 //  }
   
-  func drawLineBreaks() {
-    guard let tlm = self.textLayoutManager,
-          let tcm = tlm.textContentManager else {
-      fatalError("Couldn't get TextKit 2 components")
-    }
-    
-    tlm.ensureLayout(for: tcm.documentRange)
-    
-    tlm.enumerateTextLayoutFragments(
-      from: tcm.documentRange.location,
-      options: [.ensuresLayout, .ensuresExtraLineFragment]
-    ) { fragment in
-      for lineFragment in fragment.textLineFragments {
-        let lineRect = lineFragment.typographicBounds
-        
-        // Convert the rect to view coordinates
-        //          let convertedRect = self.convert(lineRect, from: nil)
-        
-        let lineHeightShape = NSBezierPath(rect: lineRect)
-        
-        let fillColour = NSColor.cyan.withAlphaComponent(0.1)
-        let strokeColour = NSColor.red.withAlphaComponent(0.3)
-        
-        fillColour.setFill()
-        lineHeightShape.fill()
-        
-        strokeColour.setStroke()
-        lineHeightShape.stroke()
-      }
-      
-      return true // Continue enumeration
-    }
-    
-  }
+//  func drawLineBreaks() {
+//    guard let tlm = self.textLayoutManager,
+//          let tcm = tlm.textContentManager else {
+//      fatalError("Couldn't get TextKit 2 components")
+//    }
+//    
+//    tlm.ensureLayout(for: tcm.documentRange)
+//    
+//    tlm.enumerateTextLayoutFragments(
+//      from: tcm.documentRange.location,
+//      options: [.ensuresLayout, .ensuresExtraLineFragment]
+//    ) { fragment in
+//      for lineFragment in fragment.textLineFragments {
+//        let lineRect = lineFragment.typographicBounds
+//        
+//        // Convert the rect to view coordinates
+//        //          let convertedRect = self.convert(lineRect, from: nil)
+//        
+//        let lineHeightShape = NSBezierPath(rect: lineRect)
+//        
+//        let fillColour = NSColor.cyan.withAlphaComponent(0.1)
+//        let strokeColour = NSColor.red.withAlphaComponent(0.3)
+//        
+//        fillColour.setFill()
+//        lineHeightShape.fill()
+//        
+//        strokeColour.setStroke()
+//        lineHeightShape.stroke()
+//      }
+//      
+//      return true // Continue enumeration
+//    }
+//    
+//  }
   
 }

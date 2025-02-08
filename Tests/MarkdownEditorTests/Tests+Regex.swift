@@ -6,11 +6,11 @@
 //
 
 
-import SwiftUI
-import Testing
-import RegexBuilder
-
-@testable import MarkdownEditor
+//import SwiftUI
+//import Testing
+//import RegexBuilder
+//
+//@testable import MarkdownEditor
 
 //
 //@MainActor @Suite("Regex tests")

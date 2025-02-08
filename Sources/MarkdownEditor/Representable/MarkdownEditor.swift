@@ -6,7 +6,6 @@
 //
 
 import SwiftUI
-import OSLog
 import BaseHelpers
 import MarkdownModels
 
