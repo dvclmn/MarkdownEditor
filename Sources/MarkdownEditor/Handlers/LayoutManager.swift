@@ -9,7 +9,18 @@ import AppKit
 import BaseStyles
 import MarkdownModels
 
-class InlineCodeLayoutManager: NSLayoutManager {
+class CodeBackgroundLayoutManager: NSLayoutManager {
+  
+  let configuration: MarkdownEditorConfiguration
+  
+  public init(configuration: MarkdownEditorConfiguration) {
+    self.configuration = configuration
+    super.init()
+  }
+  
+  required init?(coder: NSCoder) {
+    fatalError("I don't know")
+  }
   
   override func drawBackground(
     forGlyphRange glyphsToShow: NSRange,
@@ -34,7 +45,7 @@ class InlineCodeLayoutManager: NSLayoutManager {
             
             let roundedPath = NSBezierPath(roundedRect: drawRect, xRadius: 4, yRadius: 4)
             
-            NSColor(red: 208, green: 201, blue: 200, alpha: 1.0).setFill()
+            self.configuration.theme.codeBackgroundColour.nsColour.setFill()
             roundedPath.fill()
           }
         }

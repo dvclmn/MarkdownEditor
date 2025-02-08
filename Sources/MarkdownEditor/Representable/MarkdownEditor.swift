@@ -34,9 +34,7 @@ public struct MarkdownEditor: NSViewRepresentable {
       let textContainer = textView.textContainer
     {
       let oldLM = textView.layoutManager
-
-      let codeLM = InlineCodeLayoutManager()
-
+      let codeLM = CodeBackgroundLayoutManager(configuration: configuration)
       textStorage.removeLayoutManager(oldLM!)
       textStorage.addLayoutManager(codeLM)
       codeLM.addTextContainer(textContainer)

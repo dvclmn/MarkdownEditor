@@ -58,12 +58,17 @@ extension MarkdownEditor {
       else { return }
       
       /// Get the range of just the content between backticks
-      let contentRange = match.range(at: 2)
+//      let contentRange = match.range(at: 2)
       
       /// Only style if we have both opening and closing backticks
 //      let fullMatchString = (string as NSString).substring(with: match.range)
 //      guard fullMatchString.hasPrefix("`") && fullMatchString.hasSuffix("`") else { return }
-      let newAttrs = syntax.contentAttributes(with: configuration).attributes
+      var newAttrs = syntax.contentAttributes(with: configuration).attributes
+      
+      if syntax.isCodeSyntax {
+        newAttrs.updateValue(true, forKey: CodeBackground.codeBlock.attributeKey)
+        newAttrs.updateValue(true, forKey: CodeBackground.inlineCode.attributeKey)
+      }
       
       /// Apply attributes only to the content between backticks
       textStorage.addAttributes(newAttrs, range: match.range)
