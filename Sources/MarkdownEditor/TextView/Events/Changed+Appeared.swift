@@ -13,43 +13,43 @@ import SwiftUI
 
 extension MarkdownTextView {
 
-  public override func viewDidMoveToWindow() {
+//  public override func viewDidMoveToWindow() {
+//
+//    super.viewDidMoveToWindow()
+//
+//    /// This allows a quick parse on load, and then the debounced
+//    /// parsing is over in `Changed+Text.swift`
+//    ///
+////    DispatchQueue.main.async {
+////      self.parseAllMarkdown()
+////      self.styleInlineMarkdown()
+////    }
+//
+////    onAppearAndTextChange()
+//
+//    //    onAppearAndSelectionChanged()
+//
+////    exploreTextSegments()
+//
+//  }
 
-    super.viewDidMoveToWindow()
-
-    /// This allows a quick parse on load, and then the debounced
-    /// parsing is over in `Changed+Text.swift`
-    ///
-//    DispatchQueue.main.async {
-//      self.parseAllMarkdown()
-//      self.styleInlineMarkdown()
+//  func onAppearAndTextChange() {
+//
+//    Task { @MainActor in
+//
+//      //      if configuration.isSendingEditorHeight {
+//      //        let newSize = self.updatedEditorHeight()
+//      //        infoUpdater.update(\.size, value: newSize)
+//      //      }
+//
+//      //      let newLines: Int = countLinesTK2()
+//      infoUpdater.update(
+//        \.elementSummary, value: self.elementsSummary)
+//      //      infoUpdater.update(\.lineCount, value: newLines)
+//
 //    }
-
-//    onAppearAndTextChange()
-
-    //    onAppearAndSelectionChanged()
-
-//    exploreTextSegments()
-
-  }
-
-  func onAppearAndTextChange() {
-
-    Task { @MainActor in
-
-      //      if configuration.isSendingEditorHeight {
-      //        let newSize = self.updatedEditorHeight()
-      //        infoUpdater.update(\.size, value: newSize)
-      //      }
-
-      //      let newLines: Int = countLinesTK2()
-      infoUpdater.update(
-        \.elementSummary, value: self.elementsSummary)
-      //      infoUpdater.update(\.lineCount, value: newLines)
-
-    }
-
-  }
+//
+//  }
 
   //  func onAppearAndSelectionChanged() {
   //

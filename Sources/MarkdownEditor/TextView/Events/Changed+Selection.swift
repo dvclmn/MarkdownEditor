@@ -91,9 +91,9 @@ extension MarkdownTextView {
       .joined(separator: "\n")
     
     
-    Task {
-      infoUpdater.update(\.typingAttributes, value: result)
-    }
+//    Task {
+//      infoUpdater.update(\.typingAttributes, value: result)
+//    }
     
 //
 //    Task { @MainActor in

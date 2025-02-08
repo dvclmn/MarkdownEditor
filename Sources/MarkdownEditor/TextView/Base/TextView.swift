@@ -13,7 +13,7 @@ import MarkdownModels
 public class MarkdownTextView: NSTextView {
   
   var elements: [Markdown.Element] = []
-//  var paragraphHandler = ParagraphHandler()
+  var paragraphHandler = ParagraphHandler()
   
   /// Debouncers
   ///

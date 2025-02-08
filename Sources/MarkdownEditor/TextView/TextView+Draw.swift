@@ -9,40 +9,40 @@ import AppKit
 
 extension MarkdownTextView {
   
-  public override func draw(_ rect: NSRect) {
-    super.draw(rect)
-    
-    codeBlockBackgrounds()
-    debugFrames()
-
-  } // END draw override
+//  public override func draw(_ rect: NSRect) {
+//    super.draw(rect)
+//    
+//    codeBlockBackgrounds()
+//    debugFrames()
+//
+//  } // END draw override
+//  
   
-  
-  func codeBlockBackgrounds() {
-    
-    if configuration.drawsCodeBlockBackgrounds {
-
-      // MARK: - Code block backgrounds
-      let cornerRadius: CGFloat = 5.0
-      let backgroundColour: NSColor = NSColor.black.withAlphaComponent(0.2)
-      
-      
-      
-      for element in elements where element.syntax == .codeBlock {
-        
-        guard let rect = element.getRect(with: self.frame.width, config: self.configuration) else {
-          break
-        }
-        
-        let path = NSBezierPath(roundedRect: rect, xRadius: cornerRadius, yRadius: cornerRadius)
-        
-        backgroundColour.setFill()
-        path.fill()
-        
-      }
-    }
-  } // END code block bg's
-  
+//  func codeBlockBackgrounds() {
+//    
+//    if configuration.drawsCodeBlockBackgrounds {
+//
+//      // MARK: - Code block backgrounds
+//      let cornerRadius: CGFloat = 5.0
+//      let backgroundColour: NSColor = NSColor.black.withAlphaComponent(0.2)
+//      
+//      
+//      
+//      for element in elements where element.syntax == .codeBlock {
+//        
+//        guard let rect = element.getRect(with: self.frame.width, config: self.configuration) else {
+//          break
+//        }
+//        
+//        let path = NSBezierPath(roundedRect: rect, xRadius: cornerRadius, yRadius: cornerRadius)
+//        
+//        backgroundColour.setFill()
+//        path.fill()
+//        
+//      }
+//    }
+//  } // END code block bg's
+//  
   
   //  func getRect(
   //    for range: NSRange
@@ -75,21 +75,21 @@ extension MarkdownTextView {
   //  }
   
   
-  func debugFrames() {
-    
-    if configuration.isShowingFrames {
-      
-      let colour: NSColor = configuration.isEditable ? .red : .purple
-      
-      let shape: NSBezierPath = NSBezierPath(rect: bounds)
-      let shapeColour = colour.withAlphaComponent(0.08)
-      shapeColour.set()
-      shape.lineWidth = 1.0
-      shape.fill()
-      
-    } // END is showing frames check
-    
-  }
+//  func debugFrames() {
+//    
+//    if configuration.isShowingFrames {
+//      
+//      let colour: NSColor = configuration.isEditable ? .red : .purple
+//      
+//      let shape: NSBezierPath = NSBezierPath(rect: bounds)
+//      let shapeColour = colour.withAlphaComponent(0.08)
+//      shapeColour.set()
+//      shape.lineWidth = 1.0
+//      shape.fill()
+//      
+//    } // END is showing frames check
+//    
+//  }
   
   func drawLineBreaks() {
     guard let tlm = self.textLayoutManager,

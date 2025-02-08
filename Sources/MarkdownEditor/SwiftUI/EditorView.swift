@@ -7,15 +7,16 @@
 
 import SwiftUI
 import BaseHelpers
+import MarkdownModels
 
 public struct EditorView: View {
   @State private var windowWidth: CGFloat = .zero
   @Binding var text: String
-  let config: EditorConfig
+  let config: MarkdownEditorConfiguration
   
   public init(
     text: Binding<String>,
-    config: EditorConfig = .init()
+    config: MarkdownEditorConfiguration = .init()
   ) {
     self._text = text
     self.config = config
@@ -23,10 +24,10 @@ public struct EditorView: View {
   
   public var body: some View {
     
-    TempEditor(
+    MarkdownEditor(
       text: $text,
       width: windowWidth,
-      config: config
+      configuration: config
     )
     .onGeometryChange(for: CGFloat.self) { proxy in
       return proxy.size.width

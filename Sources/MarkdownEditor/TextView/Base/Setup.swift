@@ -7,12 +7,13 @@
 
 import BaseHelpers
 import SwiftUI
+import MarkdownModels
 
 //import Highlightr
 
 extension MarkdownTextView {
 
-  func setUpTextView(_ config: EditorConfig) {
+  func setUpTextView(_ config: MarkdownEditorConfiguration) {
     
     isEditable = config.isEditable
     drawsBackground = false
