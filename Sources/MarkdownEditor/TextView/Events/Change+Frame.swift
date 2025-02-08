@@ -25,34 +25,34 @@ extension MarkdownTextView {
 //  }
   
   
-  func countLinesSimple() -> Int {
-    
-    let text = string
-    
-    let lines = text.split(separator: .newlineSequence)
-    
-    return lines.count
-  }
-  
-  func countLinesTK2() -> Int {
-    
-    guard let textLayoutManager = textLayoutManager else {
-      return 0
-    }
-    
-    var lineCount = 0
-    
-    textLayoutManager.enumerateTextLayoutFragments(
-      from: textLayoutManager.documentRange.location,
-      options: [.ensuresLayout, .ensuresExtraLineFragment]
-    ) { layoutFragment in
-      lineCount += layoutFragment.textLineFragments.count
-      return true
-    }
-    
-    return lineCount
-  }
-  
+//  func countLinesSimple() -> Int {
+//    
+//    let text = string
+//    
+//    let lines = text.split(separator: .newlineSequence)
+//    
+//    return lines.count
+//  }
+//  
+//  func countLinesTK2() -> Int {
+//    
+//    guard let textLayoutManager = textLayoutManager else {
+//      return 0
+//    }
+//    
+//    var lineCount = 0
+//    
+//    textLayoutManager.enumerateTextLayoutFragments(
+//      from: textLayoutManager.documentRange.location,
+//      options: [.ensuresLayout, .ensuresExtraLineFragment]
+//    ) { layoutFragment in
+//      lineCount += layoutFragment.textLineFragments.count
+//      return true
+//    }
+//    
+//    return lineCount
+//  }
+//  
 }
 
 
