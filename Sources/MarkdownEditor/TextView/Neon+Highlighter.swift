@@ -7,7 +7,6 @@
 
 
 import AppKit
-
 import Neon
 import TreeSitterMarkdown
 import TreeSitterMarkdownInline
@@ -20,14 +19,14 @@ extension MarkdownViewController {
   
   @MainActor static func makeHighlighter(for textView: MarkdownTextView) throws -> TextViewHighlighter {
     
-    guard let queriesURL = Bundle.module.url(forResource: "custom-highlights", withExtension: "scm") else {
-      fatalError("Error finding the custom queries URL")
-    }
+//    guard let queriesURL = Bundle.module.url(forResource: "custom-highlights", withExtension: "scm") else {
+//      fatalError("Error finding the custom queries URL")
+//    }
 
     let markdownConfig = try LanguageConfiguration(
       tree_sitter_markdown(),
-      name: "Markdown",
-      queriesURL: queriesURL
+      name: "Markdown"
+//      queriesURL: queriesURL
     )
     let markdownInlineConfig = try LanguageConfiguration(
       tree_sitter_markdown_inline(),

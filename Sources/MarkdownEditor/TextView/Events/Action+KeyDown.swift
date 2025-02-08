@@ -7,6 +7,7 @@
 
 import AppKit
 import BaseHelpers
+import MarkdownModels
 
 extension MarkdownTextView {
   

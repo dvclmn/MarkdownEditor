@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import MarkdownModels
 
 public class EventEmitter<Event> {
   

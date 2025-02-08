@@ -7,6 +7,7 @@
 
 import SwiftUI
 import BaseHelpers
+import MarkdownModels
 //import Highlightr
 
 public class MarkdownTextView: NSTextView {

@@ -13,10 +13,12 @@ import TreeSitterMarkdownInline
 import SwiftTreeSitter
 import TreeSitterSwift
 import TreeSitterClient
+import MarkdownModels
 
 public class MarkdownViewController: NSViewController {
   
   let configuration: MarkdownEditorConfiguration
+  let neonConfig: NeonConfiguration = .none
   var textView: MarkdownTextView
   
   private let highlighter: TextViewHighlighter?
@@ -32,7 +34,7 @@ public class MarkdownViewController: NSViewController {
       configuration: configuration
     )
     
-    if configuration.neonConfig == .textViewHighlighter {
+    if neonConfig == .textViewHighlighter {
       do {
         self.highlighter = try Self.makeHighlighter(for: textView)
         print("`TextViewHighlighter` is running.")
@@ -81,4 +83,10 @@ public class MarkdownViewController: NSViewController {
   }
   
   
+}
+
+enum NeonConfiguration {
+  case textViewHighlighter
+  case manual // Not yet implemented
+  case none
 }

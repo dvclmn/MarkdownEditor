@@ -6,6 +6,7 @@
 //
 
 import AppKit
+import MarkdownModels
 
 extension MarkdownEditor.Coordinator {
   

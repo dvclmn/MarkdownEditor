@@ -7,7 +7,7 @@
 
 import SwiftUI
 import BaseHelpers
-//import Resizable
+import MarkdownModels
 
 public struct ExampleView: View {
   

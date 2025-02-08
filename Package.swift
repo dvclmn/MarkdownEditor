@@ -16,7 +16,7 @@ let package = Package(
   dependencies: [
     
 //    .package(url: "https://github.com/raspu/Highlightr.git", from: "2.2.1"),
-//    .package(url: "https://github.com/ChimeHQ/Neon.git", branch: "main"),
+    .package(url: "https://github.com/ChimeHQ/Neon.git", branch: "main"),
 //    .package(url: "https://github.com/ChimeHQ/Rearrange.git", from: "1.8.1"),
     .package(url: "https://github.com/ChimeHQ/Glyph.git", branch: "main"),
     .package(url: "https://github.com/ChimeHQ/ThemePark.git", branch: "main"),

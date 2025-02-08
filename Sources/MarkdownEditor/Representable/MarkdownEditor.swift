@@ -8,6 +8,7 @@
 import SwiftUI
 import OSLog
 import BaseHelpers
+import MarkdownModels
 
 public typealias InfoUpdate = @Sendable (EditorInfo) -> Void
 

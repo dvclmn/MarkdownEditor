@@ -5,7 +5,8 @@
 //  Created by Dave Coleman on 8/2/2025.
 //
 
-import Foundation
+import AppKit
+import MarkdownModels
 
 class MarkdownLayoutFragment: NSTextLayoutFragment {
   
