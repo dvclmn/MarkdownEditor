@@ -11,6 +11,10 @@ import Rearrange
 
 extension MarkdownTextView {
   
+//  var fullRange: NSRange {
+//    return NSRange(location: 0, length: textStorage.length)
+//  }
+  
   var documentNSRange: NSRange {
     guard let tcm = self.textLayoutManager?.textContentManager else { return .notFound }
     return NSRange(tcm.documentRange, provider: tcm)

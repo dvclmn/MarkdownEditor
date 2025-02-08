@@ -9,110 +9,133 @@
 //import MarkdownModels
 
 
-import SwiftUI
+import BaseHelpers
 import MarkdownModels
+import SwiftUI
 
 extension MarkdownEditor {
-  func styleText(textView: NSTextView) {
-    print("\n\n/// `styleText` ///")
+
+//  var defaultAttributes: Attributes {
+//    [
+//      .font: configuration.theme.defaultFont,
+//      .foregroundColor: configuration.theme.textColour,
+//      CodeBackground.inlineCode.attributeKey: false,
+//      CodeBackground.codeBlock.attributeKey: false,
+//    ]
+//  }
+//  
+//  func newAttributes(syntax: Markdown.Syntax) -> Attributes {
+//    /// Define attributes for inline code
+//    let monoFont = NSFont.monospacedSystemFont(
+//      ofSize: configuration.theme.codeFontSize,
+//      weight: .regular)
+//    
+//    let newAttrs: [NSAttributedString.Key: Any] = [
+//      .inlineCode: true,
+//      .font: monoFont,
+//      .foregroundColor: configuration.theme.codeColour.nsColour,
+//    ]
+//  }
+
+  func styleSyntaxType(
+    syntax: Markdown.Syntax,
+//    range: NSRange,
+    textView: NSTextView
+  ) {
     
-    guard let textStorage = textView.textStorage else { return }
-    
-    let fullRange = NSRange(location: 0, length: textStorage.length)
-    
-    textStorage.beginEditing()
-    
-    /// Explicitly remove all custom attributes
-    let cleanAttributes: [NSAttributedString.Key: Any] = [
-      .font: textView.font ?? NSFont.systemFont(ofSize: configuration.theme.fontSize),
-      .foregroundColor: NSColor.textColor,
-      /// Use NSNumber instead of Bool for Objective-C compatibility
-      //      .inlineCode: NSNumber(value: false)
-    ]
-    textStorage.setAttributes(cleanAttributes, range: fullRange)
-    
-    guard let inlineCodePattern = Markdown.Syntax.inlineCode.nsRegex else {
-      textStorage.endEditing()
+    guard let textStorage = textView.textStorage,
+          let pattern = syntax.nsRegex else {
       print("Couldn't construct the inline code regex")
       return
     }
     
     let string = textView.string
     
-    // Enumerate matches for inline code
-    inlineCodePattern.enumerateMatches(in: string, options: [], range: fullRange) { match, _, _ in
+    /// Enumerate matches for inline code
+    pattern.enumerateMatches(in: string, options: [], range: textStorage.fullRange) { match, _, _ in
       guard let match = match,
-            match.numberOfRanges == 4 else { return }
+            match.numberOfRanges == 4
+      else { return }
       
-      // Get the range of just the content between backticks
+      /// Get the range of just the content between backticks
       let contentRange = match.range(at: 2)
       
-      // Only style if we have both opening and closing backticks
-      let fullMatchString = (string as NSString).substring(with: match.range)
-      guard fullMatchString.hasPrefix("`") && fullMatchString.hasSuffix("`") else { return }
+      /// Only style if we have both opening and closing backticks
+//      let fullMatchString = (string as NSString).substring(with: match.range)
+//      guard fullMatchString.hasPrefix("`") && fullMatchString.hasSuffix("`") else { return }
+      let newAttrs = syntax.contentAttributes(with: configuration).attributes
       
-      // Define attributes for inline code
-      let monoFont = NSFont.monospacedSystemFont(
-        ofSize: textView.font?.pointSize ?? configuration.theme.codeFontSize,
-        weight: .regular)
-      
-      let newAttrs: [NSAttributedString.Key: Any] = [
-        // Use NSNumber instead of Bool for Objective-C compatibility
-        //        .inlineCode: NSNumber(value: true),
-        .font: monoFont,
-        .foregroundColor: configuration.theme.codeColour.nsColour
-      ]
-      
-      // Apply attributes only to the content between backticks
-      textStorage.addAttributes(newAttrs, range: contentRange)
+      /// Apply attributes only to the content between backticks
+      textStorage.addAttributes(newAttrs, range: match.range)
+    }
+
+  }
+
+  func styleText(textView: NSTextView) {
+    print("\n\n/// `styleText` ///")
+
+    guard let textStorage = textView.textStorage else { return }
+    
+//    textStorage.fullRange
+
+    textStorage.beginEditing()
+
+    textStorage.setAttributes(configuration.defaultTypingAttributes, range: textStorage.fullRange)
+    
+    for syntax in Markdown.Syntax.allCases {
+      styleSyntaxType(
+        syntax: syntax,
+        textView: textView
+      )
     }
     
+   
     textStorage.endEditing()
   }
 }
 
 
 //extension ParagraphHandler {
-//  
+//
 //  public mutating func updateParagraphInfo(using textView: MarkdownTextView) {
-//    
+//
 //    let safeRange = textView.safeCurrentParagraphRange
 //    guard let currentParagraphText = textView.attributedSubstring(forProposedRange: safeRange, actualRange: nil)?.string else {
 //      print("Couldn't get that text")
 //      return
 //    }
-//    
+//
 //    /// Update previous paragraph
 //    self.previousParagraph = self.currentParagraph
-//    
+//
 //    let blockSyntax = self.identifyBlockSyntax(for: currentParagraphText)
-//    
+//
 //    let result = ParagraphInfo(
 //      string: currentParagraphText,
 //      range: safeRange,
 //      type: blockSyntax
 //    )
-//    
+//
 //    //    print("Updated paragraph info:\n\(result)")
-//    
+//
 //    self.currentParagraph = result
-//    
+//
 //  }
-  
+
 //  func identifyBlockSyntax(for text: String) -> BlockSyntax {
-//    
+//
 //    var syntax: BlockSyntax
-//    
+//
 //    if text.hasPrefix("#") {
-//      
+//
 //      let headingLevel = text.prefix(while: { $0 == "#" }).count
-//      
+//
 //      if headingLevel <= 6 && (text.count == headingLevel || text[text.index(text.startIndex, offsetBy: headingLevel)] == " ") {
 //        syntax = BlockSyntax.heading(level: headingLevel)
 //      } else {
 //        syntax = BlockSyntax.heading(level: 1)
 //      }
-//      
+//
 //    } else if text.hasPrefix("- ") {
 //      syntax = .list
 //    } else {
@@ -120,71 +143,71 @@ extension MarkdownEditor {
 //      syntax = .none
 //    }
 //    return syntax
-//    
+//
 //  } // END identify syntax
-//  
-  
+//
+
 //} // END paragraph handler extension
 
 
 //extension MarkdownTextView {
-  
+
 //  func styleInlineMarkdown() {
-//    
+//
 //    guard configuration.isStyling else {
 //      print("Styling is switched OFF in configuration.")
 //      return
 //    }
-//    
+//
 //    let currentSelection = self.selectedRange
-//    
+//
 //    self.styleElements()
 //    //              self.needsDisplay = true
-//    
+//
 //    self.setSelectedRange(currentSelection)
-//    
+//
 //  } // END style debounced
-//  
-  
+//
+
 //  func styleElements() {
-//    
+//
 //    guard let tcmTemp = self.textLayoutManager?.textContentManager else {
 //      print("Issue getting the text content manager")
 //      return
 //    }
-//    
+//
 //    guard let textStorage = self.textStorage else {
 //      fatalError("Issue getting the text storage")
 //    }
-//    
-//    
+//
+//
 //    let opacity: CGFloat = 0.15
-//    
+//
 //    let leadingTestColour = NSColor.orange.withAlphaComponent(opacity)
 //    let contentTestColour = NSColor.blue.withAlphaComponent(opacity)
 //    let trailingTestColour = NSColor.green.withAlphaComponent(opacity)
-//    
+//
 //    tcmTemp.performEditingTransaction {
-//      
+//
 //      for case let syntax in Markdown.Syntax.allCases where syntax.type == .inline {
-//        
+//
 //        guard let nsRegex = syntax.nsRegex else {
 //          //      print("Don't need to perform a parse for \(syntax.name), no regex found.")
 //          continue
 //        }
-//        
+//
 //        let matches: [NSTextCheckingResult] = nsRegex.matches(in: self.string, range: documentNSRange)
-//        
+//
 //        for match in matches {
-//          
+//
 //          let captureGroupCount: Int = match.numberOfRanges - 1
-//          
+//
 //          guard captureGroupCount == 3 else {
 //            continue
 //          }
-//          
+//
 //          //          print("The number of ranges (aka capture groups?) for \(syntax.name) is \(captureGroupCount)")
-//          
+//
 //          //          let nsRangeLeading: NSRange = match.range(at: 1)
 //          //          let nsRangeContent: NSRange = match.range(at: 2)
 //          //          let nsRangeTrailing: NSRange = match.range(at: 3)
@@ -203,26 +226,26 @@ extension MarkdownEditor {
 //          //          textStorage.addAttribute(.backgroundColor, value: leadingTestColour, range: rangeLeading)
 //          //          textStorage.addAttribute(.backgroundColor, value: contentTestColour, range: rangeContent)
 //          //          textStorage.addAttribute(.backgroundColor, value: trailingTestColour, range: rangeTrailing)
-//          
+//
 //        } // END match loop
-//        
+//
 //      } // END syntax loop
-//      
-//      
-//      
-//      
+//
+//
+//
+//
 //      /// I think (for now) the first thing to do would be to remove all existing styles?
 //      /// Even just to get more repsonsive formatting working
 //      ///
 //      //      textStorage.removeAttribute(.foregroundColor, range: documentNSRange)
 //      //      textStorage.removeAttribute(.backgroundColor, range: documentNSRange)
-//      
+//
 //      /// Then ensure defaults are added:
 //      //      textStorage.addAttribute(.foregroundColor, value: configuration.theme.textColour, range: documentNSRange)
-//      
-//      
+//
+//
 //      //      for element in self.elements where element.syntax.type == .inline {
-//      
+//
 //      /// This is a bit silly, I'm writing this as if the user has pressed Return
 //      /// (i.e., departed one paragraph and arrived at another)
 //      ///
@@ -240,22 +263,22 @@ extension MarkdownEditor {
 //      //        textStorage.setAttributes(configuration.defaultTypingAttributes, range: rangeToRemoveArrived)
 //      //        textStorage.setAttributes(configuration.defaultTypingAttributes, range: rangeToRemoveDeparted)
 //      //
-//      
-//      
-//      
+//
+//
+//
 //      //        textStorage.addAttribute(.backgroundColor, value: leadingTestColour, range: element.ranges.leading)
 //      //        textStorage.addAttribute(.backgroundColor, value: contentTestColour, range: element.ranges.content)
 //      //        textStorage.addAttribute(.backgroundColor, value: trailingTestColour, range: element.ranges.trailing)
-//      
-//      
-//      
-//      
+//
+//
+//
+//
 //      //        if element.syntax == .codeBlock {
 //      //
 //      //          textStorage.addAttribute(.font, value: configuration.theme.codeFont, range: element.ranges.all)
 //      //
-//      
-//      
+//
+//
 //      //          guard let highlightedCode: NSAttributedString = highlightr.highlight(element.string, as: nil) else {
 //      //            print("Couldn't get the Highlighted string")
 //      //            return
@@ -269,25 +292,25 @@ extension MarkdownEditor {
 //      //
 //      //          }
 //      //        } else {
-//      
-//      
-//      
+//
+//
+//
 //      //          textStorage.addAttributes(element.syntax.contentAttributes(with: self.configuration).attributes, range: element.ranges.content)
 //      //
 //      //          textStorage.addAttributes(element.syntax.syntaxAttributes(with: self.configuration).attributes, range: element.ranges.leading)
 //      //          textStorage.addAttributes(element.syntax.syntaxAttributes(with: self.configuration).attributes, range: element.ranges.trailing)
-//      
+//
 //      //        }
-//      
-//      
+//
+//
 //      //          textStorage.replaceCharacters(in: element.range, with: highlightedCode)
-//      
+//
 //      //      } // END elements loop
-//      
-//      
+//
+//
 //    } // END perform editing
-//    
-//    
+//
+//
 //  } // END styling
-//  
+//
 //}

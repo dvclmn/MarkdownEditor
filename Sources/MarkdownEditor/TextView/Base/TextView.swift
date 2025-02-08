@@ -31,7 +31,6 @@ public class MarkdownTextView: NSTextView {
 
   public override var intrinsicContentSize: NSSize {
     
-    print("Ran `intrinsicContentSize`")
     guard let layoutManager = self.layoutManager,
           let textContainer = self.textContainer
     else {
@@ -45,7 +44,6 @@ public class MarkdownTextView: NSTextView {
     let insets = self.textContainerInset.height * 2 // For top and bottom
     
     return NSSize(width: NSView.noIntrinsicMetric, height: ceil(usedRect.height) + (insets + overscroll))
-    
   }
   
   public override func layout() {

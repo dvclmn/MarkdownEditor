@@ -34,13 +34,8 @@ extension MarkdownTextView {
     font = NSFont.systemFont(
       ofSize: config.theme.fontSize)
     
+    typingAttributes = config.defaultTypingAttributes
     defaultParagraphStyle = config.defaultParagraphStyle
-    
-    /// Add default attribute for inline code
-    var attrs = config.defaultTypingAttributes
-    attrs[.inlineCode] = NSNumber(value: false)
-    typingAttributes = attrs
-//    typingAttributes = config.defaultTypingAttributes
   }
 
 }
