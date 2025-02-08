@@ -40,6 +40,7 @@ extension MarkdownTextView {
     var attrs = config.defaultTypingAttributes
     attrs[.inlineCode] = NSNumber(value: false)
     typingAttributes = attrs
+//    typingAttributes = config.defaultTypingAttributes
   }
 
 }

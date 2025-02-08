@@ -24,11 +24,13 @@ public struct EditorView: View {
   
   public var body: some View {
     
-    MarkdownEditor(
-      text: $text,
-      width: windowWidth,
-      configuration: configuration
-    )
+    ScrollView {
+      MarkdownEditor(
+        text: $text,
+        width: windowWidth,
+        configuration: configuration
+      )
+    }
     .onGeometryChange(for: CGFloat.self) { proxy in
       return proxy.size.width
     } action: { newValue in
