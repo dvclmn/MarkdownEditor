@@ -11,7 +11,7 @@ import SwiftUI
 
 //import STTextKitPlus
 
-extension MarkdownTextView {
+//extension MarkdownTextView {
 
 //  public override func viewDidMoveToWindow() {
 //
@@ -108,4 +108,4 @@ extension MarkdownTextView {
 //    }  // END perform edit
 //  }
 
-}
+//}

@@ -8,7 +8,7 @@
 import AppKit
 import Glyph
 
-extension MarkdownTextView {
+//extension MarkdownTextView {
   
   /// IMPORTANT:
   ///
@@ -53,6 +53,6 @@ extension MarkdownTextView {
 //    return lineCount
 //  }
 //  
-}
+//}
 
 

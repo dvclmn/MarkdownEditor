@@ -5,10 +5,10 @@
 //  Created by Dave Coleman on 8/2/2025.
 //
 
-import AppKit
-import MarkdownModels
+//import AppKit
+//import MarkdownModels
 
-extension ParagraphHandler {
+//extension ParagraphHandler {
 //  
 //  public mutating func updateParagraphInfo(using textView: MarkdownTextView) {
 //    
@@ -60,10 +60,10 @@ extension ParagraphHandler {
 //  } // END identify syntax
 //  
   
-} // END paragraph handler extension
+//} // END paragraph handler extension
 
 
-extension MarkdownTextView {
+//extension MarkdownTextView {
   
 //  func styleInlineMarkdown() {
 //    
@@ -226,4 +226,4 @@ extension MarkdownTextView {
 //    
 //  } // END styling
 //  
-}
+//}

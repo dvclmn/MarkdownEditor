@@ -38,7 +38,7 @@ extension MarkdownTextView {
     
     /// Add default attribute for inline code
     var attrs = config.defaultTypingAttributes
-    attrs[.inlineCode] = false
+    attrs[.inlineCode] = NSNumber(value: false)
     typingAttributes = attrs
   }
 

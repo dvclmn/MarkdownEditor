@@ -5,8 +5,8 @@
 //  Created by Dave Coleman on 8/2/2025.
 //
 
-import AppKit
-import MarkdownModels
+//import AppKit
+//import MarkdownModels
 
 //class MarkdownLayoutFragment: NSTextLayoutFragment {
 //  
@@ -98,7 +98,7 @@ import MarkdownModels
 //  }
 //}
 
-extension MarkdownTextView {
+//extension MarkdownTextView {
   
   /// Just realised; for inline Markdown elements, I *should* be safe to only perform
   /// the 'erase-and-re-apply styles' process on a paragraph-by-paragraph basis.
@@ -234,5 +234,5 @@ extension MarkdownTextView {
 //  } // END parse code blocks
 //  
   
-} // END extension MD text view
+//} // END extension MD text view
 

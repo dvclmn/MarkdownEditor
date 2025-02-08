@@ -9,8 +9,6 @@ import BaseHelpers
 import MarkdownModels
 import SwiftUI
 
-//public typealias InfoUpdate = @Sendable (EditorInfo) -> Void
-
 @MainActor
 public struct MarkdownEditor: NSViewRepresentable {
 
@@ -35,14 +33,10 @@ public struct MarkdownEditor: NSViewRepresentable {
     if let textStorage = textView.textStorage,
       let textContainer = textView.textContainer
     {
-
-      /// Save a reference to the original layout manager (if any).
       let oldLM = textView.layoutManager
 
-      /// Create an instance of our custom layout manager.
       let codeLM = InlineCodeLayoutManager()
 
-      /// Remove the old layout manager and add our custom one.
       textStorage.removeLayoutManager(oldLM!)
       textStorage.addLayoutManager(codeLM)
       codeLM.addTextContainer(textContainer)
@@ -52,14 +46,7 @@ public struct MarkdownEditor: NSViewRepresentable {
     textView.string = text
     textView.setUpTextView(configuration)
     styleText(textView: textView)
-    /// The below isn't neccesary unless I feel there's a need for a weak reference
-    /// to the `textView` held by the coordinator/
-    //    context.coordinator.textView = textView
-
-    //    textView.textStorage?.delegate = context.coordinator
-    //    textView.textLayoutManager?.delegate = context.coordinator
-
-
+    
     return textView
   }
 
@@ -68,22 +55,29 @@ public struct MarkdownEditor: NSViewRepresentable {
     let textView = nsView
 
     if textView.string != text {
-      // Begin editing.
-      textView.textStorage?.beginEditing()
-
-      // Replace the text.
-      textView.textStorage?.replaceCharacters(
-        in: NSRange(location: 0, length: textView.textStorage?.length ?? 0), with: text)
-
-      // End editing.
-      textView.textStorage?.endEditing()
+      
+      textView.string = text
+      
+//      // Begin editing.
+//      textView.textStorage?.beginEditing()
+//
+//      // Replace the text.
+//      textView.textStorage?.replaceCharacters(
+//        in: NSRange(location: 0, length: textView.textStorage?.length ?? 0), with: text)
+//
+//      // End editing.
+//      textView.textStorage?.endEditing()
 
       // Apply syntax highlighting.
-      styleText(textView: textView)
+
+//      DispatchQueue.main.async {
+        styleText(textView: textView)
+//      }
+
+      // Update container width.
+      textView.updateContainerWidth(width: width)
     }
 
-    // Update container width.
-    textView.updateContainerWidth(width: width)
 
   }
 }

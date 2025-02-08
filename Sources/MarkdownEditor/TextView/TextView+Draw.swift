@@ -7,7 +7,7 @@
 
 import AppKit
 
-extension MarkdownTextView {
+//extension MarkdownTextView {
   
 //  public override func draw(_ rect: NSRect) {
 //    super.draw(rect)
@@ -126,4 +126,4 @@ extension MarkdownTextView {
 //    
 //  }
   
-}
+//}

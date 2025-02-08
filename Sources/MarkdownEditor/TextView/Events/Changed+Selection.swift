@@ -5,10 +5,10 @@
 //  Created by Dave Coleman on 14/8/2024.
 //
 
-import SwiftUI
+//import SwiftUI
 //import Wrecktangle
 
-extension MarkdownTextView {
+//extension MarkdownTextView {
   
   //  public override func setSelectedRange(_ charRange: NSRange) {
   //
@@ -121,6 +121,6 @@ extension MarkdownTextView {
   //
   //  }
   
-}
+//}
 
 

@@ -9,9 +9,9 @@ import AppKit
 import BaseHelpers
 import MarkdownModels
 
-extension MarkdownTextView {
+//extension MarkdownTextView {
   
-  typealias PassthroughKeyEvent = () -> Void
+//  typealias PassthroughKeyEvent = () -> Void
   
 //  public override func keyDown(with event: NSEvent) {
 //    
@@ -71,94 +71,93 @@ extension MarkdownTextView {
 //    }
 //  }
 //  
-  enum WrapAction {
-    case wrap
-    case unwrap
-  }
-  
-  func handleWrapping(
-    _ action: WrapAction = .wrap,
-    for syntax: Markdown.Syntax
-  ) {
-    
-    /// 1. Check for characters, and character counts (e.g. 2x asterisks for bold `**`)
-    /// 2. Wrapping:
-    ///   - Create new string from syntax characters and selected content
-    ///   - Adjust range to compensate for new glyphs, keeping original text selected
-    /// 1. Make sure the text selection makes sense?
-    /// 2. Add the right characters (and number of them) around the selection
-    /// 3. Ensure the selection is adjusted
-    
-    let selectedRange = self.selectedRange()
-    
-    guard selectedRange.length > 0 else {
-      print("Zero-length selection not yet supported for syntax wrapping.")
-      return
-    }
-    
-    guard let leadingCharacter = syntax.leadingCharacter,
-          let trailingCharacter = syntax.trailingCharacter,
-          let leadingCount = syntax.leadingCharacterCount,
-          let trailingCount = syntax.trailingCharacterCount
-    else {
-      print("Something failed above")
-      return
-    }
-    
-    
-    let leadingString = String(repeating: leadingCharacter, count: leadingCount)
-    let trailingString = String(repeating: trailingCharacter, count: trailingCount)
-    
-    print("""
-    Let's \(action) selection '\(self.selectedText)', with \(syntax.name) syntax:  '\(leadingString)' and '\(trailingString)'
-    """)
-    
-    guard let tlm = self.textLayoutManager,
-          let tcm = tlm.textContentManager
-    else {
-      print("One of the above didn't happen")
-      return
-    }
-    
-    let selectionToReplace: NSRange
-    let selectionAdjustment: NSRange
-    let newText: String
-    
-    
-    switch action {
-      case .wrap:
-        selectionToReplace = selectedRange
-        let newLocation: Int = (selectedRange.location + leadingCount)
-        selectionAdjustment = NSRange(location: newLocation, length: selectedRange.length)
-        newText = leadingString + self.selectedText + trailingString
-        
-      case .unwrap:
-        
-        
-        let newLocation: Int = (selectedRange.location - leadingCount)
-        let newLength: Int = selectedRange.length + (leadingCount + trailingCount)
-        selectionToReplace = NSRange(location: newLocation, length: newLength)
-        
-        selectionAdjustment = NSRange(location: selectedRange.location - leadingCount, length: selectedRange.length)
-        //        selectionAdjustment = NSRange(location: selectedRange.location, length: selectedRange.length)
-        
-        newText = self.selectedText
-        
-    }
-    
-    
-    tcm.performEditingTransaction {
-      
-      
-      self.insertText(newText, replacementRange: selectionToReplace)
-      self.setSelectedRange(selectionAdjustment)
-      
-    } // END perform edit
-    
-    
-    
-  }
-  
+//  enum WrapAction {
+//    case wrap
+//    case unwrap
+//  }
+//  
+//  func handleWrapping(
+//    _ action: WrapAction = .wrap,
+//    for syntax: Markdown.Syntax
+//  ) {
+//    
+//    /// 1. Check for characters, and character counts (e.g. 2x asterisks for bold `**`)
+//    /// 2. Wrapping:
+//    ///   - Create new string from syntax characters and selected content
+//    ///   - Adjust range to compensate for new glyphs, keeping original text selected
+//    /// 1. Make sure the text selection makes sense?
+//    /// 2. Add the right characters (and number of them) around the selection
+//    /// 3. Ensure the selection is adjusted
+//    
+//    let selectedRange = self.selectedRange()
+//    
+//    guard selectedRange.length > 0 else {
+//      print("Zero-length selection not yet supported for syntax wrapping.")
+//      return
+//    }
+//    
+//    guard let leadingCharacter = syntax.leadingCharacter,
+//          let trailingCharacter = syntax.trailingCharacter,
+//          let leadingCount = syntax.leadingCharacterCount,
+//          let trailingCount = syntax.trailingCharacterCount
+//    else {
+//      print("Something failed above")
+//      return
+//    }
+//    
+//    
+//    let leadingString = String(repeating: leadingCharacter, count: leadingCount)
+//    let trailingString = String(repeating: trailingCharacter, count: trailingCount)
+//    
+//    print("""
+//    Let's \(action) selection '\(self.selectedText)', with \(syntax.name) syntax:  '\(leadingString)' and '\(trailingString)'
+//    """)
+//    
+//    guard let tlm = self.textLayoutManager,
+//          let tcm = tlm.textContentManager
+//    else {
+//      print("One of the above didn't happen")
+//      return
+//    }
+//    
+//    let selectionToReplace: NSRange
+//    let selectionAdjustment: NSRange
+//    let newText: String
+//    
+//    
+//    switch action {
+//      case .wrap:
+//        selectionToReplace = selectedRange
+//        let newLocation: Int = (selectedRange.location + leadingCount)
+//        selectionAdjustment = NSRange(location: newLocation, length: selectedRange.length)
+//        newText = leadingString + self.selectedText + trailingString
+//        
+//      case .unwrap:
+//        
+//        
+//        let newLocation: Int = (selectedRange.location - leadingCount)
+//        let newLength: Int = selectedRange.length + (leadingCount + trailingCount)
+//        selectionToReplace = NSRange(location: newLocation, length: newLength)
+//        
+//        selectionAdjustment = NSRange(location: selectedRange.location - leadingCount, length: selectedRange.length)
+//        //        selectionAdjustment = NSRange(location: selectedRange.location, length: selectedRange.length)
+//        
+//        newText = self.selectedText
+//        
+//    }
+//    
+//    
+//    tcm.performEditingTransaction {
+//      
+//      
+//      self.insertText(newText, replacementRange: selectionToReplace)
+//      self.setSelectedRange(selectionAdjustment)
+//      
+//    } // END perform edit
+//    
+//    
+//    
+//  }
   
   //  func undoWrapping() {
   //    guard let action = undoRedoManager.undo(),
@@ -210,4 +209,4 @@ extension MarkdownTextView {
   //
   
   
-}
+//}
