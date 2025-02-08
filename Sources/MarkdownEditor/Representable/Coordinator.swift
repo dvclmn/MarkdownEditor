@@ -5,107 +5,97 @@
 //  Created by Dave Coleman on 14/8/2024.
 //
 
-import SwiftUI
 import BaseHelpers
+import SwiftUI
+import MarkdownModels
+
 //import Rearrange
 //import STTextKitPlus
 
-public extension MarkdownEditor {
-  
-  func makeCoordinator() -> Coordinator {
-    Coordinator(self)
-  }
-  
-  final class Coordinator:
-    NSObject,
-    NSTextViewDelegate,
-    NSTextStorageDelegate,
-    NSTextContentStorageDelegate,
-    NSTextLayoutManagerDelegate {
-    
-    var parent: MarkdownEditor
-    weak var textView: MarkdownTextView?
-    
-    var selectedRanges: [NSValue] = []
+extension MarkdownEditor {
 
-    var updatingNSView = false
-    
-    init(_ parent: MarkdownEditor) { self.parent = parent }
-    
-    var attachmentRanges: Array<NSRange> = []
-    
-    
-   
-    
-//    // Returning a ParItemAttachmentTextElement if there is a ParagraphItemAttachment in the text range
-//    public func textContentStorage(_ textContentStorage: NSTextContentStorage, textParagraphWith range: NSRange) -> NSTextParagraph? {
-//      if let attributedString = textContentStorage.attributedString {
-//        self.attachmentRanges = Array()
-//        attributedString.enumerateAttribute(.attachment, in: range) { (attachment: Any?, characterRange:NSRange, stopIt: UnsafeMutablePointer<ObjCBool>) in
-//          if let _ = attachment as? MarkdownTextView.HighlightTextAttachment {
-//            self.attachmentRanges.append(characterRange)
-//          }
-//        }
-//        if !self.attachmentRanges.isEmpty {
-//          let textElementAttributedString = attributedString.attributedSubstring(from: range)
-////          let textRange = textContentStorage.textElement(for: )
-////          let parItemTextElement = ParItemAttachmentTextParagraph(attributedString: textElementAttributedString, textContentManager: textContentStorage, elementRange: textRange, attachmentRanges: self.attachmentRanges)
-////          return parItemTextElement
-//        }
-//      }
-//      return nil
-//    }
-//    
+  public class Coordinator: NSObject, NSTextViewDelegate {
+    let parent: MarkdownEditor
+
+    //    var selectedRanges: [NSValue] = []
+
+    public init(_ view: MarkdownEditor) {
+      self.parent = view
+    }
+    public func textDidChange(_ notification: Notification) {
+      print("Ran `textDidChange`")
+      guard let textView = notification.object as? NSTextView else { return }
+
+      /// Update the binding with the latest text.
+      parent.text = textView.string
+
+      /// Apply syntax highlighting.
+      parent.styleText(textView: textView)
+    }  // END text did change
+
+    //    public func textViewDidChangeSelection(_ notification: Notification) {
+    //      guard let textView = notification.object as? MarkdownTextView
+    //      else { return }
     //
-    //    @MainActor public func textStorage(
-    //      _ textStorage: NSTextStorage,
-    //      didProcessEditing editedMask: NSTextStorageEditActions,
-    //      range editedRange: NSRange,
-    //      changeInLength delta: Int
-    //    ) {
-    //      guard let textView = textView else {
-    //        print("Issue getting the text view, within the `NSTextStorageDelegate`")
-    //        return
-    //      }
+    //      self.selectedRanges = textView.selectedRanges
     //
-    //
-    //
-    //      textView.parseAndRedraw()
-    //
-    //      Task { @MainActor in
-    //
-    //        let currentLines = currentLineCount()
-    //
-    //         Check if the number of lines has changed
-    //        if currentLines != lastLineCount {
-    //          lastLineCount = currentLines
-    //
-    //           Trigger expensive operations
-    //
-    //        } else {
-    //           Optional: Handle minimal updates if necessary
-    //           For example, updating line-specific highlights
-    //        }
-    //
-    //
-    //      }
     //    }
-    
 
+  }
+
+}
+
+extension MarkdownEditor {
+  func styleText(textView: NSTextView) {
+    print("Ran `styleText`")
+    guard let textStorage = textView.textStorage else { return }
     
-    public func textViewDidChangeSelection(_ notification: Notification) {
-      guard let textView = notification.object as? MarkdownTextView,
-            !updatingNSView
-      else { return }
-      
-      self.selectedRanges = textView.selectedRanges
-      
+    let fullRange = NSRange(location: 0, length: textStorage.length)
+    
+    textStorage.beginEditing()
+    
+    /// Explicitly remove all custom attributes
+    let cleanAttributes: [NSAttributedString.Key: Any] = [
+      .font: textView.font ?? NSFont.systemFont(ofSize: configuration.theme.fontSize),
+      .foregroundColor: NSColor.textColor,
+      .inlineCode: false
+    ]
+    textStorage.setAttributes(cleanAttributes, range: fullRange)
+    
+    guard let inlineCodePattern = Markdown.Syntax.inlineCode.nsRegex else {
+      textStorage.endEditing()
+      return
     }
     
-    //    public func textViewWillChangeText() {
+    let string = textView.string
     
-    //    }
+    // Enumerate matches for inline code
+    inlineCodePattern.enumerateMatches(in: string, options: [], range: fullRange) { match, _, _ in
+      guard let match = match,
+            match.numberOfRanges == 4 else { return }
+      
+      /// Get the range of just the content between backticks
+      let contentRange = match.range(at: 2)
+      
+      /// Only style if we have both opening and closing backticks
+      let fullMatchString = (string as NSString).substring(with: match.range)
+      guard fullMatchString.hasPrefix("`") && fullMatchString.hasSuffix("`") else { return }
+      
+      /// Define attributes for inline code
+      let monoFont = NSFont.monospacedSystemFont(
+        ofSize: textView.font?.pointSize ?? configuration.theme.codeFontSize,
+        weight: .regular)
+      
+      let newAttrs: [NSAttributedString.Key: Any] = [
+        .inlineCode: true,
+        .font: monoFont,
+        .foregroundColor: configuration.theme.codeColour,
+      ]
+      
+      /// Apply attributes only to the content between backticks
+      textStorage.addAttributes(newAttrs, range: contentRange)
+    }
     
-
+    textStorage.endEditing()
   }
 }

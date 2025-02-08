@@ -18,16 +18,18 @@ public struct MarkdownEditor: NSViewControllerRepresentable {
   public typealias NSViewControllerType = MarkdownViewController
   
   @Binding var text: String
-  
+  var width: CGFloat
   var configuration: MarkdownEditorConfiguration
 //  var info: InfoUpdate
   
   public init(
     text: Binding<String>,
+    width: CGFloat,
     configuration: MarkdownEditorConfiguration = .init()
 //    info: @escaping InfoUpdate = { _ in }
   ) {
     self._text = text
+    self.width = width
     self.configuration = configuration
 //    self.info = info
   }
@@ -41,19 +43,35 @@ public struct MarkdownEditor: NSViewControllerRepresentable {
     
     let textView = viewController.textView
     
-    textView.string = text
-    context.coordinator.textView = textView
+    if let textStorage = textView.textStorage,
+       let textContainer = textView.textContainer {
+      
+      /// Save a reference to the original layout manager (if any).
+      let oldLM = textView.layoutManager
+      
+      /// Create an instance of our custom layout manager.
+      let codeLM = InlineCodeLayoutManager()
+      
+      /// Remove the old layout manager and add our custom one.
+      textStorage.removeLayoutManager(oldLM!)
+      textStorage.addLayoutManager(codeLM)
+      codeLM.addTextContainer(textContainer)
+    }
+    
+    
+    
     
     textView.delegate = context.coordinator
-    textView.textStorage?.delegate = context.coordinator
+    textView.string = text
+    textView.setUpTextView(configuration)
+    styleText(textView: textView)
+    /// The below isn't neccesary unless I feel there's a need for a weak reference
+    /// to the `textView` held by the coordinator/
+//    context.coordinator.textView = textView
+    
+//    textView.textStorage?.delegate = context.coordinator
 //    textView.textLayoutManager?.delegate = context.coordinator
     
-    textView.onInfoUpdate = { info in
-      DispatchQueue.main.async {
-        self.info(info)
-      }
-    }
-
     
     return viewController
   }
@@ -62,25 +80,28 @@ public struct MarkdownEditor: NSViewControllerRepresentable {
     
     let textView = nsView.textView
     
-    context.coordinator.parent = self
-    context.coordinator.textView = textView
-    
-    context.coordinator.updatingNSView = true
-    
-    if textView.string != self.text {
-      textView.string = self.text
+    if textView.string != text {
+      // Begin editing.
+      textView.textStorage?.beginEditing()
+      
+      // Replace the text.
+      textView.textStorage?.replaceCharacters(in: NSRange(location: 0, length: textView.textStorage?.length ?? 0), with: text)
+      
+      // End editing.
+      textView.textStorage?.endEditing()
+      
+      // Apply syntax highlighting.
+      styleText(textView: textView)
     }
     
-    if textView.configuration != self.configuration {
-      textView.configuration = self.configuration
-      textView.applyConfiguration()
-    }
-    
-    textView.needsLayout = true
-    textView.needsDisplay = true
-    
-    context.coordinator.updatingNSView = false
+    // Update container width.
+    textView.updateContainerWidth(width: width)
+
   }
+  
+    public func makeCoordinator() -> Coordinator {
+      Coordinator(self)
+    }
 }
 
 

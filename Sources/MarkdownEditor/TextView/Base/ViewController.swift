@@ -25,11 +25,7 @@ public class MarkdownViewController: NSViewController {
   ) {
     self.configuration = configuration
     
-    self.textView = MarkdownTextView(
-      frame: .zero,
-      textContainer: nil,
-      configuration: configuration
-    )
+    self.textView = MarkdownTextView()
     super.init(nibName: nil, bundle: nil)
   }
   
@@ -39,37 +35,7 @@ public class MarkdownViewController: NSViewController {
   
   
   public override func loadView() {
-    
-    let scrollView = NSScrollView()
-    
-    scrollView.hasVerticalScroller = true
-    scrollView.documentView = textView
-    scrollView.drawsBackground = false
-    scrollView.additionalSafeAreaInsets.bottom =
-    configuration.bottomSafeArea
-    
-    let max = CGFloat.greatestFiniteMagnitude
-    
-    textView.minSize = NSSize.zero
-    textView.maxSize = NSSize(width: max, height: max)
-    textView.isVerticallyResizable = true
-    textView.isHorizontallyResizable = true
-    
-    textView.isRichText = false  // Discards any attributes when pasting.
-    
-    self.view = scrollView
-    
-    if let highlighter = highlighter {
-      highlighter.observeEnclosingScrollView()
-    }
-    
+    self.view = textView
   }
   
-  
-}
-
-enum NeonConfiguration {
-  case textViewHighlighter
-  case manual // Not yet implemented
-  case none
 }
