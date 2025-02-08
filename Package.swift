@@ -16,7 +16,7 @@ let package = Package(
   dependencies: [
     
 //    .package(url: "https://github.com/raspu/Highlightr.git", from: "2.2.1"),
-    .package(url: "https://github.com/ChimeHQ/Neon.git", branch: "main"),
+//    .package(url: "https://github.com/ChimeHQ/Neon.git", branch: "main"),
 //    .package(url: "https://github.com/ChimeHQ/Rearrange.git", from: "1.8.1"),
     .package(url: "https://github.com/ChimeHQ/Glyph.git", branch: "main"),
     .package(url: "https://github.com/ChimeHQ/ThemePark.git", branch: "main"),
@@ -24,14 +24,15 @@ let package = Package(
     .package(url: "https://github.com/alex-pinkus/tree-sitter-swift", branch: "with-generated-files"),
 //    .package(url: "https://github.com/dvclmn/TextCore.git", branch: "main"),
     .package(url: "https://github.com/dvclmn/Collection.git", branch: "main"),
-    .package(url: "https://github.com/dvclmn/Wrecktangle.git", branch: "main")
+//    .package(url: "https://github.com/dvclmn/Wrecktangle.git", branch: "main")
+    .package(url: "https://github.com/dvclmn/MarkdownModels.git", branch: "main")
     
   ],
   targets: [
     .target(
       name: "MarkdownEditor",
       dependencies: [
-        "Wrecktangle",
+        "MarkdownModels",
         
 //        "Rearrange",
         "Glyph",
@@ -43,9 +44,6 @@ let package = Package(
         .product(name: "BaseHelpers", package: "Collection"),
         .product(name: "BaseStyles", package: "Collection"),
 //        .product(name: "Utilities", package: "Collection"),
-      ],
-      resources: [
-        .process("Resources/custom-highlights.scm")
       ]
     ),
     .testTarget(

@@ -1,13 +1,11 @@
 //
-//  Styling.swift
+//  Parsing.swift
 //  MarkdownEditor
 //
-//  Created by Dave Coleman on 8/10/2024.
+//  Created by Dave Coleman on 8/2/2025.
 //
 
-import AppKit
-//import Highlightr
-import Glyph
+import Foundation
 
 extension MarkdownTextView {
   
@@ -65,26 +63,26 @@ extension MarkdownTextView {
             continue
           }
           
-//          print("The number of ranges (aka capture groups?) for \(syntax.name) is \(captureGroupCount)")
+          //          print("The number of ranges (aka capture groups?) for \(syntax.name) is \(captureGroupCount)")
           
-//          let nsRangeLeading: NSRange = match.range(at: 1)
-//          let nsRangeContent: NSRange = match.range(at: 2)
-//          let nsRangeTrailing: NSRange = match.range(at: 3)
-//          
-//          guard let rangeLeading = NSTextRange(nsRangeLeading),
-//          let rangeContent = NSTextRange(nsRangeContent),
-//                let rangeTrailing = NSTextRange(nsRangeTrailing) else {
-//            print("Issue creating NSTextRange from the above")
-//            return
-//          }
-//          
-//          tlm.setRenderingAttributes([.backgroundColor : leadingTestColour], for: rangeLeading)
-//          tlm.setRenderingAttributes([.backgroundColor : contentTestColour], for: rangeContent)
-//          tlm.setRenderingAttributes([.backgroundColor : trailingTestColour], for: rangeTrailing)
-//          
-//          textStorage.addAttribute(.backgroundColor, value: leadingTestColour, range: rangeLeading)
-//          textStorage.addAttribute(.backgroundColor, value: contentTestColour, range: rangeContent)
-//          textStorage.addAttribute(.backgroundColor, value: trailingTestColour, range: rangeTrailing)
+          //          let nsRangeLeading: NSRange = match.range(at: 1)
+          //          let nsRangeContent: NSRange = match.range(at: 2)
+          //          let nsRangeTrailing: NSRange = match.range(at: 3)
+          //
+          //          guard let rangeLeading = NSTextRange(nsRangeLeading),
+          //          let rangeContent = NSTextRange(nsRangeContent),
+          //                let rangeTrailing = NSTextRange(nsRangeTrailing) else {
+          //            print("Issue creating NSTextRange from the above")
+          //            return
+          //          }
+          //
+          //          tlm.setRenderingAttributes([.backgroundColor : leadingTestColour], for: rangeLeading)
+          //          tlm.setRenderingAttributes([.backgroundColor : contentTestColour], for: rangeContent)
+          //          tlm.setRenderingAttributes([.backgroundColor : trailingTestColour], for: rangeTrailing)
+          //
+          //          textStorage.addAttribute(.backgroundColor, value: leadingTestColour, range: rangeLeading)
+          //          textStorage.addAttribute(.backgroundColor, value: contentTestColour, range: rangeContent)
+          //          textStorage.addAttribute(.backgroundColor, value: trailingTestColour, range: rangeTrailing)
           
         } // END match loop
         

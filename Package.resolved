@@ -1,5 +1,5 @@
 {
-  "originHash" : "8be985eacd8acaea585fca80a1059e0d8b62c06bd21c70047ef07063835e6f66",
+  "originHash" : "ffaaafcd656f92dd03bddd2c814803e41c27232814906dd9a08af096deaf2b5b",
   "pins" : [
     {
       "identity" : "collection",
@@ -47,21 +47,12 @@
       }
     },
     {
-      "identity" : "neon",
+      "identity" : "markdownmodels",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/ChimeHQ/Neon.git",
+      "location" : "https://github.com/dvclmn/MarkdownModels.git",
       "state" : {
         "branch" : "main",
-        "revision" : "f3c717b5bbf2118aa93f16a0aa4adf9a9c39ad43"
-      }
-    },
-    {
-      "identity" : "rearrange",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/ChimeHQ/Rearrange",
-      "state" : {
-        "revision" : "5ff7f3363f7a08f77e0d761e38e6add31c2136e1",
-        "version" : "1.8.1"
+        "revision" : "712f919c7e7170296f8c597c7921448ce503501c"
       }
     },
     {
@@ -191,14 +182,6 @@
       }
     },
     {
-      "identity" : "swifttreesitter",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/ChimeHQ/SwiftTreeSitter",
-      "state" : {
-        "revision" : "f01316eaf3aae07e30478f8afa76192ab4a96420"
-      }
-    },
-    {
       "identity" : "textcore",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/dvclmn/TextCore.git",
@@ -217,15 +200,6 @@
       }
     },
     {
-      "identity" : "tree-sitter",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/tree-sitter/tree-sitter",
-      "state" : {
-        "revision" : "d97db6d63507eb62c536bcb2c4ac7d70c8ec665e",
-        "version" : "0.23.2"
-      }
-    },
-    {
       "identity" : "tree-sitter-markdown",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/tree-sitter-grammars/tree-sitter-markdown.git",
@@ -241,15 +215,6 @@
       "state" : {
         "branch" : "with-generated-files",
         "revision" : "33e56e4e2a6455f3fd4e04cfe5c7a314d498612d"
-      }
-    },
-    {
-      "identity" : "wrecktangle",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/dvclmn/Wrecktangle.git",
-      "state" : {
-        "branch" : "main",
-        "revision" : "3557077d8f9a97cea12aa33892dfda2ada528102"
       }
     },
     {
