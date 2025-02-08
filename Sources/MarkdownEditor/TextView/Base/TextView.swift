@@ -1,14 +1,53 @@
 //
-//  TextView.swift
-//  Components
+//  File.swift
 //
-//  Created by Dave Coleman on 7/2/2025.
+//
+//  Created by Dave Coleman on 10/8/2024.
 //
 
-import AppKit
+import SwiftUI
+import BaseHelpers
+import MarkdownModels
+//import Highlightr
 
-public class AutoSizingTextView: NSTextView {
+public class MarkdownTextView: NSTextView {
+  
+  var elements: [Markdown.Element] = []
+//  var paragraphHandler = ParagraphHandler()
+  
+  /// Debouncers
+  ///
+//  var frameDebouncer = Debouncer(interval: 0.3)
+//  var parsingDebouncer = Debouncer(interval: 0.1)
+//  var infoDebouncer = Debouncer(interval: 0.3)
+//  var paragraphDebouncer = Debouncer(interval: 0.3)
+//  var stylingDebouncer = Debouncer(interval: 0.3)
+  
+//  let infoUpdater: EditorInfoUpdater
+//  public var onInfoUpdate: InfoUpdate = { _ in }
 
+//  var horizontalInsets: CGFloat {
+//    
+//    print("Horizontal insets, Called @ \(Date.now.friendlyDateAndTime)")
+//    
+//    let width = self.frame.width
+//    let maxWidth: CGFloat = configuration.maxReadingWidth
+//    
+//    if width > maxWidth + (configuration.insets * 2) {
+//      return (width - maxWidth) / 2
+//    } else {
+//      return configuration.insets
+//    }
+//    
+//  }
+  
+//  func handleWidthChange(newWidth: CGFloat) {
+//    
+//    // Perform your task here when the width changes
+//    print("Text view width changed to: \(newWidth)")
+//  }
+  
+  
   public override var intrinsicContentSize: NSSize {
     
     print("Ran `intrinsicContentSize`")
@@ -58,5 +97,6 @@ public class AutoSizingTextView: NSTextView {
     super.setFrameSize(newSize)
     self.invalidateIntrinsicContentSize()
   }
+  
   
 }

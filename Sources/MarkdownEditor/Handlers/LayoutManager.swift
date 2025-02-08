@@ -1,8 +1,8 @@
 //
 //  LayoutManager.swift
-//  Components
+//  MarkdownEditor
 //
-//  Created by Dave Coleman on 7/2/2025.
+//  Created by Dave Coleman on 8/2/2025.
 //
 
 import AppKit

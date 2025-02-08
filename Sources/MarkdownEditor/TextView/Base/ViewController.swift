@@ -18,10 +18,7 @@ import MarkdownModels
 public class MarkdownViewController: NSViewController {
   
   let configuration: MarkdownEditorConfiguration
-  let neonConfig: NeonConfiguration = .none
   var textView: MarkdownTextView
-  
-  private let highlighter: TextViewHighlighter?
   
   init(
     configuration: MarkdownEditorConfiguration
@@ -33,21 +30,7 @@ public class MarkdownViewController: NSViewController {
       textContainer: nil,
       configuration: configuration
     )
-    
-    if neonConfig == .textViewHighlighter {
-      do {
-        self.highlighter = try Self.makeHighlighter(for: textView)
-        print("`TextViewHighlighter` is running.")
-        super.init(nibName: nil, bundle: nil)
-      } catch {
-        fatalError("Error setting up the highlighter: \(error)")
-      }
-    } else {
-      
-      self.highlighter = nil
-      super.init(nibName: nil, bundle: nil)
-    }
-    
+    super.init(nibName: nil, bundle: nil)
   }
   
   required init?(coder: NSCoder) {

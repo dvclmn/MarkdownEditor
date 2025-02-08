@@ -1,6 +1,6 @@
 //
 //  EditorView.swift
-//  Components
+//  MarkdownEditor
 //
 //  Created by Dave Coleman on 8/2/2025.
 //
@@ -38,7 +38,7 @@ public struct EditorView: View {
 }
 #if DEBUG
 @available(macOS 15, iOS 18, *)
-#Preview(traits: .size(.normal)) {
+#Preview() {
   @Previewable @State var text: String = TestStrings.Markdown.basicMarkdown
   EditorView(text: $text)
 }

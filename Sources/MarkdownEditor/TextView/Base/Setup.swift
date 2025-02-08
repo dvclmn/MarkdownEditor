@@ -1,14 +1,17 @@
 //
-//  Setup.swift
-//  Components
+//  Settings.swift
+//  MarkdownEditor
 //
-//  Created by Dave Coleman on 8/2/2025.
+//  Created by Dave Coleman on 13/8/2024.
 //
 
-import AppKit
+import BaseHelpers
+import SwiftUI
 
-extension AutoSizingTextView {
-  
+//import Highlightr
+
+extension MarkdownTextView {
+
   func setUpTextView(_ config: EditorConfig) {
     
     isEditable = config.isEditable
@@ -29,7 +32,7 @@ extension AutoSizingTextView {
     )
     font = NSFont.systemFont(
       ofSize: config.theme.fontSize)
-
+    
     defaultParagraphStyle = config.defaultParagraphStyle
     
     /// Add default attribute for inline code
@@ -37,5 +40,5 @@ extension AutoSizingTextView {
     attrs[.inlineCode] = false
     typingAttributes = attrs
   }
-  
+
 }

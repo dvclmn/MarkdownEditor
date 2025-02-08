@@ -10,7 +10,7 @@ import OSLog
 import BaseHelpers
 import MarkdownModels
 
-public typealias InfoUpdate = @Sendable (EditorInfo) -> Void
+//public typealias InfoUpdate = @Sendable (EditorInfo) -> Void
 
 @MainActor
 public struct MarkdownEditor: NSViewControllerRepresentable {
@@ -20,16 +20,16 @@ public struct MarkdownEditor: NSViewControllerRepresentable {
   @Binding var text: String
   
   var configuration: MarkdownEditorConfiguration
-  var info: InfoUpdate
+//  var info: InfoUpdate
   
   public init(
     text: Binding<String>,
-    configuration: MarkdownEditorConfiguration = .init(),
-    info: @escaping InfoUpdate = { _ in }
+    configuration: MarkdownEditorConfiguration = .init()
+//    info: @escaping InfoUpdate = { _ in }
   ) {
     self._text = text
     self.configuration = configuration
-    self.info = info
+//    self.info = info
   }
   
   public func makeNSViewController(context: Context) -> MarkdownViewController {
