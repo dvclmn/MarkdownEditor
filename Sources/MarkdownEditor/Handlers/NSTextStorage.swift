@@ -76,6 +76,8 @@ class MarkdownTextStorage: NSTextStorage {
 
   private func applyMarkdownStyles() {
     for syntax in Markdown.Syntax.allCases {
+      
+      
       //      styleSyntaxTypeWithRegexLiteral(syntax: syntax)
       styleSyntaxType(syntax: syntax)
     }
@@ -90,6 +92,8 @@ class MarkdownTextStorage: NSTextStorage {
   private func styleSyntaxType(syntax: Markdown.Syntax) {
     guard let pattern = syntax.nsRegex else { return }
     let string = backingStore.string
+    
+    guard !syntax.isHorizontalRule else { return styleHorizontalRule(syntax: syntax) }
 
     pattern.enumerateMatches(
       in: string, options: [], range: NSRange(location: 0, length: backingStore.length)
@@ -108,7 +112,7 @@ class MarkdownTextStorage: NSTextStorage {
         let closingSyntaxRange = match.range(at: 3)
         backingStore.addAttributes(
           syntax.syntaxAttributes(with: configuration).attributes, range: closingSyntaxRange)
-      } else {
+      } else  {
         /// Fallback in case you don’t have exactly three capture groups
         backingStore.addAttributes(
           syntax.contentAttributes(with: configuration).attributes, range: match.range)
@@ -158,6 +162,40 @@ class MarkdownTextStorage: NSTextStorage {
       /// Replace the content while preserving the backticks
       backingStore.replaceCharacters(in: fullRange, with: attributedCode)
 
+    }
+  }
+}
+
+
+extension MarkdownTextStorage {
+  func styleHorizontalRule(syntax: Markdown.Syntax) {
+    guard case .horizontalRule = syntax,
+          let pattern = syntax.nsRegex else { return }
+    
+    let string = backingStore.string
+    pattern.enumerateMatches(
+      in: string,
+      options: [],
+      range: NSRange(location: 0, length: backingStore.length)
+    ) { match, _, _ in
+      guard let match = match else { return }
+      
+      // Create the attachment
+      let attachment = HorizontalRuleAttachment(
+        color: NSColor.purple,
+        thickness: 2
+      )
+      
+      // Create an attributed string with the attachment
+      let attachmentString = NSAttributedString(
+        attachment: attachment
+      )
+      
+      // Replace the original horizontal rule characters with the attachment
+      backingStore.replaceCharacters(
+        in: match.range,
+        with: attachmentString
+      )
     }
   }
 }
