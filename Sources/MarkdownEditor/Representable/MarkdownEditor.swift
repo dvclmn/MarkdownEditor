@@ -29,7 +29,7 @@ public struct MarkdownEditor: NSViewRepresentable {
   public func makeNSView(context: Context) -> MarkdownTextView {
 
     let textStorage = MarkdownTextStorage(configuration: configuration)
-    let layoutManager = TextBackgroundLayoutManager(configuration: configuration)
+    let layoutManager = MarkdownLayoutManager(configuration: configuration)
     textStorage.addLayoutManager(layoutManager)
 
     let textContainer = NSTextContainer(size: .zero)

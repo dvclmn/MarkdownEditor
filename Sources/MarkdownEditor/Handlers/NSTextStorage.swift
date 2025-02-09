@@ -121,6 +121,8 @@ class MarkdownTextStorage: NSTextStorage {
   }
 
   private func highlightCodeBlocks() {
+    
+    self.beginEditing()
     guard let regex = Markdown.Syntax.codeBlock.nsRegex else { return }
     let text = backingStore.string
 
@@ -163,26 +165,41 @@ class MarkdownTextStorage: NSTextStorage {
       backingStore.replaceCharacters(in: fullRange, with: attributedCode)
 
     }
+    self.endEditing()
   }
-}
 
-
-extension MarkdownTextStorage {
   private func styleHorizontalRule(syntax: Markdown.Syntax) {
     guard let pattern = syntax.nsRegex else { return }
     let string = backingStore.string
     
+    self.beginEditing()
     pattern.enumerateMatches(in: string, options: [], range: NSRange(location: 0, length: backingStore.length)) { match, _, _ in
       guard let match = match else { return }
       
-      // Create the horizontal rule attachment
-      let attachment = HorizontalRuleAttachment()
-      let attachmentString = NSAttributedString(attachment: attachment)
-      
-      // Replace the markdown syntax with the attachment
-      backingStore.replaceCharacters(in: match.range, with: attachmentString)
+      if match.range.location + match.range.length <= backingStore.length {
+        let attachment = HorizontalRuleAttachment()
+        let attachmentString = NSAttributedString(attachment: attachment)
+        backingStore.replaceCharacters(in: match.range, with: attachmentString)
+      }
     }
+    self.endEditing()
   }
+  
+//  private func styleHorizontalRule(syntax: Markdown.Syntax) {
+//    guard let pattern = syntax.nsRegex else { return }
+//    let string = backingStore.string
+//    
+//    pattern.enumerateMatches(in: string, options: [], range: NSRange(location: 0, length: backingStore.length)) { match, _, _ in
+//      guard let match = match else { return }
+//      
+//      /// Create the horizontal rule attachment
+//      let attachment = HorizontalRuleAttachment()
+//      let attachmentString = NSAttributedString(attachment: attachment)
+//      
+//      /// Replace the markdown syntax with the attachment
+//      backingStore.replaceCharacters(in: match.range, with: attachmentString)
+//    }
+//  }
 //  func styleHorizontalRule(syntax: Markdown.Syntax) {
 //    guard case .horizontalRule = syntax,
 //          let pattern = syntax.nsRegex else { return }
