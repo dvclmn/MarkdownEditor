@@ -70,7 +70,7 @@ public class MarkdownTextView: NSTextView {
   }
   
   public override func setFrameSize(_ newSize: NSSize) {
-    print("setFrameSize – new size: \(newSize)")
+//    print("setFrameSize – new size: \(newSize)")
     super.setFrameSize(newSize)
     self.invalidateIntrinsicContentSize()
   }

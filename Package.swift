@@ -15,7 +15,7 @@ let package = Package(
   ],
   dependencies: [
     
-//    .package(url: "https://github.com/raspu/Highlightr.git", from: "2.2.1"),
+    .package(url: "https://github.com/raspu/Highlightr.git", from: "2.2.1"),
     .package(url: "https://github.com/ChimeHQ/Rearrange.git", from: "2.0.0"),
     .package(url: "https://github.com/ChimeHQ/Glyph.git", branch: "main"),
 //    .package(url: "https://github.com/ChimeHQ/ThemePark.git", branch: "main"),
@@ -30,7 +30,7 @@ let package = Package(
         "MarkdownModels",
         "Rearrange",
         "Glyph",
-//        "Highlightr",
+        "Highlightr",
 //        "Neon",
 //        "ThemePark",
         .product(name: "BaseHelpers", package: "Collection"),

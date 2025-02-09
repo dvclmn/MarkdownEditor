@@ -15,62 +15,33 @@ import SwiftUI
 
 extension MarkdownEditor {
 
-//  var defaultAttributes: Attributes {
-//    [
-//      .font: configuration.theme.defaultFont,
-//      .foregroundColor: configuration.theme.textColour,
-//      CodeBackground.inlineCode.attributeKey: false,
-//      CodeBackground.codeBlock.attributeKey: false,
-//    ]
-//  }
-//  
-//  func newAttributes(syntax: Markdown.Syntax) -> Attributes {
-//    /// Define attributes for inline code
-//    let monoFont = NSFont.monospacedSystemFont(
-//      ofSize: configuration.theme.codeFontSize,
-//      weight: .regular)
-//    
-//    let newAttrs: [NSAttributedString.Key: Any] = [
-//      .inlineCode: true,
-//      .font: monoFont,
-//      .foregroundColor: configuration.theme.codeColour.nsColour,
-//    ]
-//  }
-
   func styleSyntaxType(
     syntax: Markdown.Syntax,
-//    range: NSRange,
     textView: NSTextView
   ) {
     
     guard let textStorage = textView.textStorage,
           let pattern = syntax.nsRegex else {
-      print("Couldn't construct the inline code regex")
+      print("Couldn't construct the \(syntax.name) regex")
       return
     }
+    
+    print("Styling \(syntax.name)")
     
     let string = textView.string
     
     /// Enumerate matches for inline code
     pattern.enumerateMatches(in: string, options: [], range: textStorage.fullRange) { match, _, _ in
-      guard let match = match,
-            match.numberOfRanges == 4
-      else { return }
-      
-      /// Get the range of just the content between backticks
-//      let contentRange = match.range(at: 2)
-      
-      /// Only style if we have both opening and closing backticks
-//      let fullMatchString = (string as NSString).substring(with: match.range)
-//      guard fullMatchString.hasPrefix("`") && fullMatchString.hasSuffix("`") else { return }
+      guard let match = match else { return }
+     
       var newAttrs = syntax.contentAttributes(with: configuration).attributes
       
+      /// Exception for `inlineCode` and `codeBlock`
       if syntax.isCodeSyntax {
         newAttrs.updateValue(true, forKey: CodeBackground.codeBlock.attributeKey)
         newAttrs.updateValue(true, forKey: CodeBackground.inlineCode.attributeKey)
       }
       
-      /// Apply attributes only to the content between backticks
       textStorage.addAttributes(newAttrs, range: match.range)
     }
 
