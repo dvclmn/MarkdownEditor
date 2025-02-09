@@ -188,7 +188,7 @@ class MarkdownTextStorage: NSTextStorage {
 
         /// Add the code block background attribute to the entire range
         attributedCode.addAttribute(
-          CodeBackground.codeBlock.attributeKey,
+          TextBackground.codeBlock.attributeKey,
           value: true,
           range: NSRange(location: 0, length: attributedCode.length))
 
@@ -198,7 +198,7 @@ class MarkdownTextStorage: NSTextStorage {
 
       /// Ensure the entire block (including backticks) has the background attribute
       backingStore.addAttribute(
-        CodeBackground.codeBlock.attributeKey,
+        TextBackground.codeBlock.attributeKey,
         value: true,
         range: fullRange
       )

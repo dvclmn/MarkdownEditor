@@ -44,7 +44,7 @@ public class MarkdownTextView: NSTextView {
     layoutManager.ensureLayout(for: textContainer)
     let usedRect = layoutManager.usedRect(for: textContainer)
     
-    let overscroll: CGFloat = configuration.bottomSafeArea
+    let overscroll: CGFloat = configuration.theme.bottomSafeArea
     let insets = self.textContainerInset.height * 2 // For top and bottom
     
     return NSSize(width: NSView.noIntrinsicMetric, height: ceil(usedRect.height) + (insets + overscroll))

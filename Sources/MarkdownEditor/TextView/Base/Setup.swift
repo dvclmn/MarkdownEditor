@@ -26,10 +26,10 @@ extension MarkdownTextView {
     textContainer?.widthTracksTextView = true
     textContainer?.heightTracksTextView = false
     
-    textContainer?.lineFragmentPadding = config.insets
+    textContainer?.lineFragmentPadding = config.theme.insets
     textContainerInset = NSSize(
       width: 0,
-      height: config.insets
+      height: config.theme.insets
     )
     font = NSFont.systemFont(
       ofSize: config.theme.fontSize)

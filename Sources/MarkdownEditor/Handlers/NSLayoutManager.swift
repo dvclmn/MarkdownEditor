@@ -9,7 +9,7 @@ import AppKit
 import BaseStyles
 import MarkdownModels
 
-class CodeBackgroundLayoutManager: NSLayoutManager {
+class TextBackgroundLayoutManager: NSLayoutManager {
 
   let configuration: MarkdownEditorConfiguration
 
@@ -46,56 +46,49 @@ class CodeBackgroundLayoutManager: NSLayoutManager {
     super.drawBackground(forGlyphRange: glyphsToShow, at: origin)
   }
 
-  private func drawInlineCodeBackgrounds(
-    in charRange: NSRange, textStorage: NSTextStorage, textContainer: NSTextContainer,
+  private func drawBackground(
+    for backgroundType: TextBackground,
+    in charRange: NSRange,
+    textStorage: NSTextStorage,
+    textContainer: NSTextContainer,
     origin: NSPoint
   ) {
     textStorage.enumerateAttribute(
-      CodeBackground.inlineCode.attributeKey, in: charRange, options: []
+      backgroundType.attributeKey, in: charRange, options: []
     ) { (value, range, _) in
-      if let syntaxType = value as? Bool, syntaxType {
-        let glyphRangeForCode = self.glyphRange(forCharacterRange: range, actualCharacterRange: nil)
-        self.enumerateEnclosingRects(
-          forGlyphRange: glyphRangeForCode,
-          withinSelectedGlyphRange: NSRange(location: NSNotFound, length: 0), in: textContainer
-        ) { (rect, _) in
-          let drawRect = rect.offsetBy(dx: origin.x, dy: origin.y).insetBy(dx: -2, dy: -1)
-          let roundedPath = NSBezierPath(
-            roundedRect: drawRect, xRadius: self.configuration.theme.codeBackgroundRounding,
-            yRadius: self.configuration.theme.codeBackgroundRounding)
-          self.configuration.theme.inlineCodeBackgroundColour.nsColour.setFill()
-          roundedPath.fill()
-        }
-      }
-    }
-  }
 
-  private func drawCodeBlockBackgrounds(
-    in charRange: NSRange, textStorage: NSTextStorage, textContainer: NSTextContainer,
-    origin: NSPoint
-  ) {
-    textStorage.enumerateAttribute(
-      CodeBackground.codeBlock.attributeKey, in: charRange, options: []
-    ) { (value, range, _) in
-      if let syntaxType = value as? Bool, syntaxType {
-        let glyphRangeForCode = self.glyphRange(forCharacterRange: range, actualCharacterRange: nil)
-        self.enumerateEnclosingRects(
-          forGlyphRange: glyphRangeForCode,
-          withinSelectedGlyphRange: NSRange(location: NSNotFound, length: 0), in: textContainer
-        ) { (rect, _) in
-          let drawRect = rect.offsetBy(dx: origin.x, dy: origin.y).insetBy(dx: -2, dy: -1)
-          let roundedPath = NSBezierPath(
-            roundedRect: drawRect, xRadius: self.configuration.theme.codeBackgroundRounding,
-            yRadius: self.configuration.theme.codeBackgroundRounding)
-          self.configuration.theme.codeBlockBackgroundColour.nsColour.setFill()
-          roundedPath.fill()
-        }
+      /// Check we're working with the correct attribute type
+      guard let backgroundValue = value as? Bool, backgroundValue else { return }
+
+      let glyphRange = self.glyphRange(forCharacterRange: range, actualCharacterRange: nil)
+      self.enumerateEnclosingRects(
+        forGlyphRange: glyphRange,
+        withinSelectedGlyphRange: NSRange(location: NSNotFound, length: 0), in: textContainer
+      ) { (rect, _) in
+
+        /// Create the rectangle
+        let drawRect = rect.offsetBy(
+          dx: origin.x,
+          dy: origin.y
+        ).insetBy(
+          dx: backgroundType.insets.dx,
+          dy: backgroundType.insets.dx
+        )
+
+        let rounding = self.configuration.theme.codeBackgroundRounding
+        let fillColour: NSColor = backgroundType.fillColour(from: self.configuration).nsColour
+        let roundedPath = NSBezierPath(roundedRect: drawRect, xRadius: rounding, yRadius: rounding)
+        fillColour.setFill()
+        roundedPath.fill()
       }
+
     }
   }
 
   private func drawMergedCodeBlockBackgrounds(
-    in charRange: NSRange, textStorage: NSTextStorage, textContainer: NSTextContainer,
+    in charRange: NSRange,
+    textStorage: NSTextStorage,
+    textContainer: NSTextContainer,
     origin: NSPoint
   ) {
     var mergedRanges: [NSRange] = []
@@ -103,7 +96,7 @@ class CodeBackgroundLayoutManager: NSLayoutManager {
 
     /// First, collect and merge all code block ranges
     textStorage.enumerateAttribute(
-      CodeBackground.codeBlock.attributeKey, in: charRange, options: []
+      TextBackground.codeBlock.attributeKey, in: charRange, options: []
     ) { (value, range, _) in
       guard let isCodeBlock = value as? Bool, isCodeBlock else { return }
 
