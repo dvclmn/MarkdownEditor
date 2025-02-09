@@ -168,34 +168,49 @@ class MarkdownTextStorage: NSTextStorage {
 
 
 extension MarkdownTextStorage {
-  func styleHorizontalRule(syntax: Markdown.Syntax) {
-    guard case .horizontalRule = syntax,
-          let pattern = syntax.nsRegex else { return }
-    
+  private func styleHorizontalRule(syntax: Markdown.Syntax) {
+    guard let pattern = syntax.nsRegex else { return }
     let string = backingStore.string
-    pattern.enumerateMatches(
-      in: string,
-      options: [],
-      range: NSRange(location: 0, length: backingStore.length)
-    ) { match, _, _ in
+    
+    pattern.enumerateMatches(in: string, options: [], range: NSRange(location: 0, length: backingStore.length)) { match, _, _ in
       guard let match = match else { return }
       
-      // Create the attachment
-      let attachment = HorizontalRuleAttachment(
-        color: NSColor.purple,
-        thickness: 2
-      )
+      // Create the horizontal rule attachment
+      let attachment = HorizontalRuleAttachment()
+      let attachmentString = NSAttributedString(attachment: attachment)
       
-      // Create an attributed string with the attachment
-      let attachmentString = NSAttributedString(
-        attachment: attachment
-      )
-      
-      // Replace the original horizontal rule characters with the attachment
-      backingStore.replaceCharacters(
-        in: match.range,
-        with: attachmentString
-      )
+      // Replace the markdown syntax with the attachment
+      backingStore.replaceCharacters(in: match.range, with: attachmentString)
     }
   }
+//  func styleHorizontalRule(syntax: Markdown.Syntax) {
+//    guard case .horizontalRule = syntax,
+//          let pattern = syntax.nsRegex else { return }
+//    
+//    let string = backingStore.string
+//    pattern.enumerateMatches(
+//      in: string,
+//      options: [],
+//      range: NSRange(location: 0, length: backingStore.length)
+//    ) { match, _, _ in
+//      guard let match = match else { return }
+//      
+//      // Create the attachment
+//      let attachment = HorizontalRuleAttachment(
+//        color: NSColor.purple,
+//        thickness: 2
+//      )
+//      
+//      // Create an attributed string with the attachment
+//      let attachmentString = NSAttributedString(
+//        attachment: attachment
+//      )
+//      
+//      // Replace the original horizontal rule characters with the attachment
+//      backingStore.replaceCharacters(
+//        in: match.range,
+//        with: attachmentString
+//      )
+//    }
+//  }
 }
