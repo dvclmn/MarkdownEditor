@@ -19,8 +19,12 @@ public class MarkdownTextView: NSTextView {
     super.init(frame: .zero)
   }
   
-  public override init(frame frameRect: NSRect, textContainer container: NSTextContainer?) {
-    self.configuration = MarkdownEditorConfiguration()
+  public init(
+    frame frameRect: NSRect,
+    textContainer container: NSTextContainer?,
+    configuration: MarkdownEditorConfiguration
+  ) {
+    self.configuration = configuration
     super.init(frame: frameRect, textContainer: container)
   }
   
