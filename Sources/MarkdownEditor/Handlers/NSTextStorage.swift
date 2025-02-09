@@ -134,12 +134,6 @@ class MarkdownTextStorage: NSTextStorage {
     ) { match, _, _ in
       guard let match = match else { return }
 
-      //      var newAttrs = syntax.contentAttributes(with: configuration).attributes
-
-      //      if syntax.isCodeSyntax {
-      //        newAttrs.updateValue(true, forKey: CodeBackground.inlineCode.attributeKey)
-      //      }
-
       /// If our regex was designed to capture three groups:
       /// fullMatch = group 0, syntax1 = group 1, content = group 2, syntax2 = group 3.
       if match.numberOfRanges == 4 {
@@ -208,16 +202,7 @@ class MarkdownTextStorage: NSTextStorage {
         value: true,
         range: fullRange
       )
-
-      /// Highlight the code block using `Highlightr`
-//      if let highlightr, let highlightedCode = highlightr.highlight(codeBlock, as: languageHint) {
-//        backingStore.replaceCharacters(in: matchRange, with: highlightedCode)
-//        backingStore.addAttribute(CodeBackground.codeBlock.attributeKey, value: true, range: matchRange)
-//      }
-      
-      
-      
-      
+ 
     }
   }
 }
