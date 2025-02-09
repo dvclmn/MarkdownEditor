@@ -35,24 +35,38 @@ class TextBackgroundLayoutManager: NSLayoutManager {
 
     let charRange = self.characterRange(forGlyphRange: glyphsToShow, actualGlyphRange: nil)
 
-    drawInlineCodeBackgrounds(
-      in: charRange, textStorage: textStorage, textContainer: textContainer, origin: origin)
-
-    //    drawCodeBlockBackgrounds(in: charRange, textStorage: textStorage, textContainer: textContainer, origin: origin)
-    drawMergedCodeBlockBackgrounds(
-      in: charRange, textStorage: textStorage, textContainer: textContainer, origin: origin)
-
-
+    for type in TextBackground.allCases {
+      drawTextBackground(
+        for: type,
+        in: charRange,
+        textStorage: textStorage,
+        textContainer: textContainer,
+        origin: origin
+      )
+    }
     super.drawBackground(forGlyphRange: glyphsToShow, at: origin)
   }
 
-  private func drawBackground(
+  private func drawTextBackground(
     for backgroundType: TextBackground,
     in charRange: NSRange,
     textStorage: NSTextStorage,
     textContainer: NSTextContainer,
     origin: NSPoint
   ) {
+    
+    /// It's a little clunky, but for now, `codeBlock` has it's own special implementation.
+    guard backgroundType != .codeBlock else {
+      return drawMergedCodeBlockBackgrounds(
+        in: charRange,
+        textStorage: textStorage,
+        textContainer: textContainer,
+        origin: origin
+      )
+    }
+    
+    /// From here, we're only dealing with non`codeBlock` backgrounds,
+    /// such as `highlight` and `inlineCode`
     textStorage.enumerateAttribute(
       backgroundType.attributeKey, in: charRange, options: []
     ) { (value, range, _) in

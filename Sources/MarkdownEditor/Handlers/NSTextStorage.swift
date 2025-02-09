@@ -84,44 +84,6 @@ class MarkdownTextStorage: NSTextStorage {
 
   private func styleSyntaxTypeWithRegexLiteral(syntax: Markdown.Syntax) {
     fatalError("Not yet implemented.")
-    //    guard let regex = syntax.regexLiteral else { return }
-    //    let text = backingStore.string
-
-    //    // Use the new Regex matching API.
-    //    // This returns a sequence of matches, each providing typed output.
-    //    for match in text.matches(of: regex) {
-    //
-    //      text.ran
-    //
-    //      match.output.content
-    //      // If your Swift version supports asking for the range of a specific capture group,
-    //      // you can use key paths on the match's output.
-    ////      if let leadingRange = match.range(of: \.leading),
-    ////         let contentRange = match.range(of: \.content),
-    ////         let trailingRange = match.range(of: \.trailing) {
-    //
-    //        // Convert the Swift ranges to NSRange (for use with the AppKit APIs)
-    //        let nsLeadingRange = NSRange(leadingRange, in: text)
-    //        let nsContentRange = NSRange(contentRange, in: text)
-    //        let nsTrailingRange = NSRange(trailingRange, in: text)
-    //
-    //        // Apply syntax (marker) attributes to the leading and trailing parts.
-    //        backingStore.addAttributes(syntax.syntaxAttributes(with: configuration).attributes,
-    //                                   range: nsLeadingRange)
-    //        backingStore.addAttributes(syntax.syntaxAttributes(with: configuration).attributes,
-    //                                   range: nsTrailingRange)
-    //
-    //        // Apply content attributes to the inner text.
-    //        backingStore.addAttributes(syntax.contentAttributes(with: configuration).attributes,
-    //                                   range: nsContentRange)
-    //
-    //      } else {
-    //        // Fallback: if for some reason the named capture groups aren’t found,
-    //        // you may apply content styling to the entire match.
-    //        let fullRange = NSRange(match.range, in: text)
-    //        backingStore.addAttributes(syntax.contentAttributes(with: configuration).attributes,
-    //                                   range: fullRange)
-    //      }
   }
 
 
@@ -134,19 +96,14 @@ class MarkdownTextStorage: NSTextStorage {
     ) { match, _, _ in
       guard let match = match else { return }
 
-      /// If our regex was designed to capture three groups:
-      /// fullMatch = group 0, syntax1 = group 1, content = group 2, syntax2 = group 3.
       if match.numberOfRanges == 4 {
-
         let openingSyntaxRange = match.range(at: 1)
         backingStore.addAttributes(
           syntax.syntaxAttributes(with: configuration).attributes, range: openingSyntaxRange)
 
-
         let contentRange = match.range(at: 2)
         backingStore.addAttributes(
           syntax.contentAttributes(with: configuration).attributes, range: contentRange)
-
 
         let closingSyntaxRange = match.range(at: 3)
         backingStore.addAttributes(
@@ -180,29 +137,27 @@ class MarkdownTextStorage: NSTextStorage {
         .trimmingCharacters(in: .whitespaces)
 
       /// Highlight the code
-      if let highlightr = highlightr,
-        let highlightedCode = highlightr.highlight(codeBlock, as: languageHint ?? "txt")
-      {
-        /// Create attributed string with the highlighted code
-        let attributedCode = NSMutableAttributedString(attributedString: highlightedCode)
 
-        /// Add the code block background attribute to the entire range
-        attributedCode.addAttribute(
-          TextBackground.codeBlock.attributeKey,
-          value: true,
-          range: NSRange(location: 0, length: attributedCode.length))
+      guard let highlightr else { return }
 
-        /// Replace the content while preserving the backticks
-        backingStore.replaceCharacters(in: fullRange, with: attributedCode)
+      highlightr.setTheme(to: "devibeans")
+      
+      guard let highlightedCode = highlightr.highlight(codeBlock, as: languageHint ?? "txt") else {
+        return
       }
 
-      /// Ensure the entire block (including backticks) has the background attribute
-      backingStore.addAttribute(
+      /// Create attributed string with the highlighted code
+      let attributedCode = NSMutableAttributedString(attributedString: highlightedCode)
+
+      /// Add the code block background attribute to the entire range
+      attributedCode.addAttribute(
         TextBackground.codeBlock.attributeKey,
         value: true,
-        range: fullRange
-      )
- 
+        range: NSRange(location: 0, length: attributedCode.length))
+
+      /// Replace the content while preserving the backticks
+      backingStore.replaceCharacters(in: fullRange, with: attributedCode)
+
     }
   }
 }
