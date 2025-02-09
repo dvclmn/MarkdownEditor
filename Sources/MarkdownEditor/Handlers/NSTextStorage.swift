@@ -85,9 +85,7 @@ class MarkdownTextStorage: NSTextStorage {
       
       var newAttrs = syntax.contentAttributes(with: configuration).attributes
       
-      // Exception for `inlineCode` and `codeBlock`
       if syntax.isCodeSyntax {
-//        newAttrs.updateValue(true, forKey: CodeBackground.codeBlock.attributeKey)
         newAttrs.updateValue(true, forKey: CodeBackground.inlineCode.attributeKey)
       }
       
@@ -114,6 +112,7 @@ class MarkdownTextStorage: NSTextStorage {
       /// Highlight the code block using `Highlightr`
       if let highlightedCode = highlightr.highlight(codeBlock, as: languageHint) {
         backingStore.replaceCharacters(in: matchRange, with: highlightedCode)
+        backingStore.addAttribute(CodeBackground.codeBlock.attributeKey, value: true, range: matchRange)
       }
     }
   }
