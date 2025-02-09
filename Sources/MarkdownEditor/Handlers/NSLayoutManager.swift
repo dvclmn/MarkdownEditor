@@ -19,7 +19,7 @@ class CodeBackgroundLayoutManager: NSLayoutManager {
   }
   
   required init?(coder: NSCoder) {
-    fatalError("I don't know")
+    fatalError("Not implemented")
   }
   
   override func drawBackground(
@@ -43,7 +43,7 @@ class CodeBackgroundLayoutManager: NSLayoutManager {
             
             let drawRect = rect.offsetBy(dx: origin.x, dy: origin.y).insetBy(dx: -2, dy: -1)
             
-            let roundedPath = NSBezierPath(roundedRect: drawRect, xRadius: 4, yRadius: 4)
+            let roundedPath = NSBezierPath(roundedRect: drawRect, xRadius: self.configuration.theme.codeBackgroundRounding, yRadius: self.configuration.theme.codeBackgroundRounding)
             
             self.configuration.theme.codeBackgroundColour.nsColour.setFill()
             roundedPath.fill()

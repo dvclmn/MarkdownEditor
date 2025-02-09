@@ -26,23 +26,13 @@ extension MarkdownEditor {
     public func textDidChange(_ notification: Notification) {
       print("Ran `textDidChange`")
       guard let textView = notification.object as? NSTextView else { return }
-
-      /// Update the binding with the latest text.
       parent.text = textView.string
-
-      /// Apply syntax highlighting.
-      DispatchQueue.main.async {
-        self.parent.styleText(textView: textView)
-      }
-      
     }  // END text did change
 
     public func textViewDidChangeSelection(_ notification: Notification) {
       guard let textView = notification.object as? MarkdownTextView
       else { return }
-
       self.selectedRanges = textView.selectedRanges
-
     }
   }
 }

@@ -27,11 +27,11 @@ public struct MarkdownEditor: NSViewRepresentable {
   }
 
   public func makeNSView(context: Context) -> MarkdownTextView {
-    
-    let textStorage = MarkdownTextStorage()
-    let layoutManager = NSLayoutManager()
+
+    let textStorage = MarkdownTextStorage(configuration: configuration)
+    let layoutManager = CodeBackgroundLayoutManager(configuration: configuration)
     textStorage.addLayoutManager(layoutManager)
-    
+
     let textContainer = NSTextContainer(size: .zero)
     layoutManager.addTextContainer(textContainer)
 
@@ -41,21 +41,10 @@ public struct MarkdownEditor: NSViewRepresentable {
       configuration: configuration
     )
 
-    if let textStorage = textView.textStorage,
-      let textContainer = textView.textContainer
-    {
-      let oldLM = textView.layoutManager
-      let codeLM = CodeBackgroundLayoutManager(configuration: configuration)
-      textStorage.removeLayoutManager(oldLM!)
-      textStorage.addLayoutManager(codeLM)
-      codeLM.addTextContainer(textContainer)
-    }
-
     textView.delegate = context.coordinator
     textView.string = text
     textView.setUpTextView(configuration)
-    styleText(textView: textView)
-    
+
     return textView
   }
 
@@ -64,29 +53,8 @@ public struct MarkdownEditor: NSViewRepresentable {
     let textView = nsView
 
     if textView.string != text {
-      
       textView.string = text
-      
-//      // Begin editing.
-//      textView.textStorage?.beginEditing()
-//
-//      // Replace the text.
-//      textView.textStorage?.replaceCharacters(
-//        in: NSRange(location: 0, length: textView.textStorage?.length ?? 0), with: text)
-//
-//      // End editing.
-//      textView.textStorage?.endEditing()
-
-      // Apply syntax highlighting.
-
-//      DispatchQueue.main.async {
-        styleText(textView: textView)
-//      }
-
-      // Update container width.
       textView.updateContainerWidth(width: width)
     }
-
-
   }
 }

@@ -13,64 +13,6 @@ import BaseHelpers
 import MarkdownModels
 import SwiftUI
 
-extension MarkdownEditor {
-
-  func styleSyntaxType(
-    syntax: Markdown.Syntax,
-    textView: NSTextView
-  ) {
-    
-    guard let textStorage = textView.textStorage,
-          let pattern = syntax.nsRegex else {
-      print("Couldn't construct the \(syntax.name) regex")
-      return
-    }
-    
-    print("Styling \(syntax.name)")
-    
-    let string = textView.string
-    
-    /// Enumerate matches for inline code
-    pattern.enumerateMatches(in: string, options: [], range: textStorage.fullRange) { match, _, _ in
-      guard let match = match else { return }
-     
-      var newAttrs = syntax.contentAttributes(with: configuration).attributes
-      
-      /// Exception for `inlineCode` and `codeBlock`
-      if syntax.isCodeSyntax {
-        newAttrs.updateValue(true, forKey: CodeBackground.codeBlock.attributeKey)
-        newAttrs.updateValue(true, forKey: CodeBackground.inlineCode.attributeKey)
-      }
-      
-      textStorage.addAttributes(newAttrs, range: match.range)
-    }
-
-  }
-
-  func styleText(textView: NSTextView) {
-    print("\n\n/// `styleText` ///")
-
-    guard let textStorage = textView.textStorage else { return }
-    
-//    textStorage.fullRange
-
-    textStorage.beginEditing()
-
-    textStorage.setAttributes(configuration.defaultTypingAttributes, range: textStorage.fullRange)
-    
-    for syntax in Markdown.Syntax.allCases {
-      styleSyntaxType(
-        syntax: syntax,
-        textView: textView
-      )
-    }
-    
-   
-    textStorage.endEditing()
-  }
-}
-
-
 //extension ParagraphHandler {
 //
 //  public mutating func updateParagraphInfo(using textView: MarkdownTextView) {
