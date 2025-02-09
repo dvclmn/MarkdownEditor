@@ -76,6 +76,32 @@ class MarkdownTextStorage: NSTextStorage {
     }
   }
   
+//        
+//        // Convert the Swift ranges to NSRange (for use with the AppKit APIs)
+//        let nsLeadingRange = NSRange(leadingRange, in: text)
+//        let nsContentRange = NSRange(contentRange, in: text)
+//        let nsTrailingRange = NSRange(trailingRange, in: text)
+//        
+//        // Apply syntax (marker) attributes to the leading and trailing parts.
+//        backingStore.addAttributes(syntax.syntaxAttributes(with: configuration).attributes,
+//                                   range: nsLeadingRange)
+//        backingStore.addAttributes(syntax.syntaxAttributes(with: configuration).attributes,
+//                                   range: nsTrailingRange)
+//        
+//        // Apply content attributes to the inner text.
+//        backingStore.addAttributes(syntax.contentAttributes(with: configuration).attributes,
+//                                   range: nsContentRange)
+//        
+//      } else {
+//        // Fallback: if for some reason the named capture groups aren’t found,
+//        // you may apply content styling to the entire match.
+//        let fullRange = NSRange(match.range, in: text)
+//        backingStore.addAttributes(syntax.contentAttributes(with: configuration).attributes,
+//                                   range: fullRange)
+//      }
+    }
+
+  
   private func styleSyntaxType(syntax: Markdown.Syntax) {
     guard let pattern = syntax.nsRegex else { return }
     let string = backingStore.string
@@ -83,13 +109,30 @@ class MarkdownTextStorage: NSTextStorage {
     pattern.enumerateMatches(in: string, options: [], range: NSRange(location: 0, length: backingStore.length)) { match, _, _ in
       guard let match = match else { return }
       
-      var newAttrs = syntax.contentAttributes(with: configuration).attributes
+//      var newAttrs = syntax.contentAttributes(with: configuration).attributes
       
-      if syntax.isCodeSyntax {
-        newAttrs.updateValue(true, forKey: CodeBackground.inlineCode.attributeKey)
+//      if syntax.isCodeSyntax {
+//        newAttrs.updateValue(true, forKey: CodeBackground.inlineCode.attributeKey)
+//      }
+
+      /// If our regex was designed to capture three groups:
+      /// fullMatch = group 0, syntax1 = group 1, content = group 2, syntax2 = group 3.
+      if match.numberOfRanges == 4 {
+        
+        let openingSyntaxRange = match.range(at: 1)
+        backingStore.addAttributes(syntax.syntaxAttributes(with: configuration).attributes, range: openingSyntaxRange)
+        
+        
+        let contentRange = match.range(at: 2)
+        backingStore.addAttributes(syntax.contentAttributes(with: configuration).attributes, range: contentRange)
+        
+        
+        let closingSyntaxRange = match.range(at: 3)
+        backingStore.addAttributes(syntax.syntaxAttributes(with: configuration).attributes, range: closingSyntaxRange)
+      } else {
+        /// Fallback in case you don’t have exactly three capture groups
+        backingStore.addAttributes(syntax.contentAttributes(with: configuration).attributes, range: match.range)
       }
-      
-      backingStore.addAttributes(newAttrs, range: match.range)
     }
   }
   
