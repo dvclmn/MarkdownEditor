@@ -34,10 +34,21 @@ public struct MarkdownEditor: NSViewRepresentable {
     view.textView.delegate = context.coordinator
     view.textView.setUpTextView(configuration)
 
+    /// For non‑editable views, assign the closure so that we get notified when the intrinsic height changes.
+    view.heightChanged = { newHeight in
+      DispatchQueue.main.async {
+        if !configuration.isEditable {
+          self.height(newHeight)
+        }
+      }
+    }
+
     return view
   }
 
   public func updateNSView(_ nsView: MarkdownScrollView, context: Context) {
+
+    print("Running `updateNSView` at \(Date())")
 
     let textView = nsView.textView
 
@@ -45,19 +56,39 @@ public struct MarkdownEditor: NSViewRepresentable {
       textView.string = text
     }
 
-    // In non-editable mode, let SwiftUI know the intrinsic height.
+
+    /// Only for non‑editable views, update height
     if !configuration.isEditable {
-      /// Force a layout update.
       nsView.layoutSubtreeIfNeeded()
-      
-      /// Retrieve the height from the text view’s intrinsic content size.
-      let intrinsicHeight = textView.intrinsicContentSize.height
-      
-      /// Call the closure so SwiftUI can update its layout.
-      DispatchQueue.main.async {
-        height(intrinsicHeight)
+      let newIntrinsicHeight = textView.intrinsicContentSize.height
+
+      /// Throttle to prevent excessive updates.
+      if let last = context.coordinator.lastUpdatedHeight, abs(last - newIntrinsicHeight) < 1.0 {
+        /// Change is minimal; do nothing.
+      } else {
+        print("The `textView` intrinsic height is \(newIntrinsicHeight)")
+        context.coordinator.lastUpdatedHeight = newIntrinsicHeight
+        DispatchQueue.main.async {
+          /// Pass the new desired height to SwiftUI.
+          self.height(newIntrinsicHeight)
+        }
       }
     }
+
+
+    //    if !configuration.isEditable {
+    //      /// Force a layout update.
+    //      nsView.layoutSubtreeIfNeeded()
+    //
+    //      /// Retrieve the height from the text view’s intrinsic content size.
+    //      let intrinsicHeight = textView.intrinsicContentSize.height
+    //      print("The `textView` intrinsic height is \(intrinsicHeight)")
+    //
+    //      /// Call the closure so SwiftUI can update its layout.
+    //      DispatchQueue.main.async {
+    //        height(intrinsicHeight)
+    //      }
+    //    }
 
   }
 }
