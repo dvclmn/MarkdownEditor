@@ -9,6 +9,9 @@ import SwiftUI
 
 @Observable
 final class EditorHandler {
+  
+  /// Obtained from AppKit, for *non-editable* text views
+  var editorHeight: CGFloat = .zero
 //  var windowWidth: CGFloat = .zero
 }
 

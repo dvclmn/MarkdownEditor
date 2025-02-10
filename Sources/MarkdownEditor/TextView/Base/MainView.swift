@@ -11,6 +11,7 @@ import MarkdownModels
 public class MarkdownScrollView: NSView {
   private let scrollView: NSScrollView
   private let textView: MarkdownTextView
+  private let minEditorHeight: CGFloat = 80
   
   public init(
     frame frameRect: NSRect,
@@ -35,15 +36,16 @@ public class MarkdownScrollView: NSView {
     textView = MarkdownTextView(
       frame: frameRect,
       textContainer: textContainer,
-      configuration: configuration
+      configuration: configuration,
+      minHeight: minEditorHeight
     )
     
     /// Create scroll view
     scrollView = NSScrollView(frame: frameRect)
-    scrollView.hasVerticalScroller = true
+    scrollView.hasVerticalScroller = configuration.isEditable
     scrollView.hasHorizontalScroller = false
     scrollView.autohidesScrollers = true
-    
+    scrollView.drawsBackground = false
     /// Configure scroll view
     scrollView.documentView = textView
     
@@ -52,14 +54,15 @@ public class MarkdownScrollView: NSView {
     /// Add scroll view as a subview
     addSubview(scrollView)
     
-    // Set up constraints
-//    scrollView.translatesAutoresizingMaskIntoConstraints = false
-//    NSLayoutConstraint.activate([
-//      scrollView.topAnchor.constraint(equalTo: topAnchor),
-//      scrollView.bottomAnchor.constraint(equalTo: bottomAnchor),
-//      scrollView.leadingAnchor.constraint(equalTo: leadingAnchor),
-//      scrollView.trailingAnchor.constraint(equalTo: trailingAnchor)
-//    ])
+    // Ensure that our subviews use autoresizing – or set up Auto Layout constraints here.
+    scrollView.translatesAutoresizingMaskIntoConstraints = false
+    NSLayoutConstraint.activate([
+      scrollView.leadingAnchor.constraint(equalTo: leadingAnchor),
+      scrollView.trailingAnchor.constraint(equalTo: trailingAnchor),
+      scrollView.topAnchor.constraint(equalTo: topAnchor),
+      scrollView.bottomAnchor.constraint(equalTo: bottomAnchor)
+    ])
+
   }
   
   required init?(coder: NSCoder) {
@@ -70,8 +73,16 @@ public class MarkdownScrollView: NSView {
   public func getTextView() -> MarkdownTextView {
     return textView
   }
+  
+  // Make sure that when our bounds change (e.g. a SwiftUI width change), we force the text view to lay out again.
+  public override func layout() {
+    super.layout()
+    // Update the text view’s frame so that its width matches our new bounds.
+    // (Since the textContainer is set to track the textView’s width, this is sufficient.)
+    let newFrame = self.bounds
+    textView.frame = newFrame
+  }
 }
-
 
 
 extension NSTextView {
@@ -89,13 +100,7 @@ extension NSTextView {
     return usableWidth - rulerView.requiredThickness
   }
   
-  /// Controls the relative sizing behavior of the NSTextView and its NSTextContainer
-  ///
-  /// `NSTextView` scrolling behavior is tricky. Correct configuration of the enclosing
-  /// `NSScrollView` is required as well. But, this method does the basic setup,
-  /// as well as adjusting frame positions to account for any `NSScrollView` rulers.
-  ///
-  /// Check out: https://developer.apple.com/library/archive/documentation/Cocoa/Conceptual/TextUILayer/Tasks/TextInScrollView.html
+
   public var wrapsTextToHorizontalBounds: Bool {
     get {
       textContainer?.widthTracksTextView ?? false
@@ -106,11 +111,7 @@ extension NSTextView {
       let max = CGFloat.greatestFiniteMagnitude
       
       textContainer?.size = NSSize(width: max, height: max)
-      
-      // if we are turning on wrapping, our view could be the wrong size,
-      // so need to adjust it. Also, the textContainer's width could have
-      // been set too large, but adjusting the frame will fix that
-      // automatically
+
       if newValue {
         let newSize = NSSize(width: maximumUsableWidth, height: frame.height)
         

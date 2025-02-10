@@ -13,26 +13,24 @@ import SwiftUI
 public struct MarkdownEditor: NSViewRepresentable {
 
   @Binding var text: String
-//  var width: CGFloat
   var configuration: EditorConfiguration
+  var height: (CGFloat) -> Void
 
   public init(
     text: Binding<String>,
-//    width: CGFloat,
-    configuration: EditorConfiguration = .init()
+    configuration: EditorConfiguration = .init(),
+    height: @escaping (CGFloat) -> Void = { _ in }
   ) {
     self._text = text
-//    self.width = width
     self.configuration = configuration
+    self.height = height
   }
 
   public func makeNSView(context: Context) -> MarkdownScrollView {
-
     let view = MarkdownScrollView(
       frame: .zero,
       configuration: configuration
     )
-    
     view.getTextView().delegate = context.coordinator
     view.getTextView().setUpTextView(configuration)
 
@@ -46,10 +44,20 @@ public struct MarkdownEditor: NSViewRepresentable {
     if textView.string != text {
       textView.string = text
     }
-    
-//    if textView.width != width {
-//      textView.width = width
-//      textView.updateContainerWidth(width: width)
-//    }
+
+    // In non-editable mode, let SwiftUI know the intrinsic height.
+    if !configuration.isEditable {
+      /// Force a layout update.
+      nsView.layoutSubtreeIfNeeded()
+      
+      /// Retrieve the height from the text view’s intrinsic content size.
+      let intrinsicHeight = textView.intrinsicContentSize.height
+      
+      /// Call the closure so SwiftUI can update its layout.
+      DispatchQueue.main.async {
+        height(intrinsicHeight)
+      }
+    }
+
   }
 }

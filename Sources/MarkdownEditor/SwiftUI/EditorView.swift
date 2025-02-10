@@ -16,26 +16,26 @@ public struct EditorView: View {
   
   @Binding var text: String
   let configuration: EditorConfiguration
-  let height: (CGFloat) -> Void
+//  let height: (CGFloat) -> Void
 
   public init(
     text: Binding<String>,
-    options: [EditorConfiguration.Option],
-    height: @escaping (CGFloat) -> Void = { _ in }
+    options: [EditorConfiguration.Option]
+//    height: @escaping (CGFloat) -> Void = { _ in }
   ) {
     self._text = text
     self.configuration = EditorConfiguration(options: options)
-    self.height = height
+//    self.height = height
   }
   
   public init(
     text: Binding<String>,
-    configuration: EditorConfiguration = .init(),
-    height: @escaping (CGFloat) -> Void = { _ in }
+    configuration: EditorConfiguration = .init()
+//    height: @escaping (CGFloat) -> Void = { _ in }
   ) {
     self._text = text
     self.configuration = configuration
-    self.height = height
+//    self.height = height
   }
 
   public var body: some View {
@@ -45,8 +45,12 @@ public struct EditorView: View {
       MarkdownEditor(
         text: $text,
         configuration: configuration
-      )
-      .border(Color.green.opacity(0.3))
+      ) { height in
+        store.editorHeight = height
+      }
+      .frame(height: configuration.isEditable ? nil : store.editorHeight)
+//      .fixedSize(horizontal: false, vertical: true)
+//      .border(Color.green.opacity(0.3))
 
   }
 }

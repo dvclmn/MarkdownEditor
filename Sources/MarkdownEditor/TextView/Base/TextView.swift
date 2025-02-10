@@ -12,13 +12,16 @@ import MarkdownModels
 public class MarkdownTextView: NSTextView {
   
   var configuration: EditorConfiguration
+  let minHeight: CGFloat
 //  var width: CGFloat
 
   public init(
-    configuration: EditorConfiguration
+    configuration: EditorConfiguration,
+    minHeight: CGFloat
 //    width: CGFloat
   ) {
     self.configuration = configuration
+    self.minHeight = minHeight
 //    self.width = width
     super.init(frame: .zero)
   }
@@ -26,19 +29,42 @@ public class MarkdownTextView: NSTextView {
   public init(
     frame frameRect: NSRect,
     textContainer container: NSTextContainer?,
-    configuration: EditorConfiguration
+    configuration: EditorConfiguration,
+    minHeight: CGFloat
 //    width: CGFloat
   ) {
     self.configuration = configuration
+    self.minHeight = minHeight
 //    self.width = width
     super.init(frame: frameRect, textContainer: container)
   }
   
   required init?(coder: NSCoder) {
     self.configuration = EditorConfiguration()
+    self.minHeight = .zero
 //    self.width = .zero
     super.init(coder: coder)
   }
+  
+  
+  // Compute our “intrinsic” height based on layoutManager’s used rect.
+  public override var intrinsicContentSize: NSSize {
+    // When in non-editable mode the text view should size itself
+    if !isEditable {
+      layoutManager?.ensureLayout(for: textContainer!)
+      // usedRect is in the text container’s coordinate system.
+      let usedRect = layoutManager?.usedRect(for: textContainer!) ?? .zero
+      // Add textContainerInsets (top + bottom) to the used height.
+      let calculatedHeight = usedRect.height + (textContainerInset.height * 2)
+      return NSSize(width: NSView.noIntrinsicMetric, height: max(calculatedHeight, minHeight))
+    }
+    // When editable, return no intrinsic height (the height is controlled externally)
+    return NSSize(width: NSView.noIntrinsicMetric, height: NSView.noIntrinsicMetric)
+  }
+  
+  
+  
+  
 
 //  public override var intrinsicContentSize: NSSize {
 //    
