@@ -22,8 +22,7 @@ class MarkdownLayoutManager: NSLayoutManager {
     fatalError("Not implemented")
   }
 
-    
-    
+
   override func drawBackground(
     forGlyphRange glyphsToShow: NSRange,
     at origin: NSPoint
@@ -36,12 +35,10 @@ class MarkdownLayoutManager: NSLayoutManager {
     }
 
     let charRange = self.characterRange(forGlyphRange: glyphsToShow, actualGlyphRange: nil)
-    
-    
+
     // Log the ranges for debugging
     print("Glyph range: \(glyphsToShow), Character range: \(charRange)")
 
-    
     /// Draw text backgrounds
     for type in TextBackground.allCases {
       drawTextBackground(
@@ -52,12 +49,12 @@ class MarkdownLayoutManager: NSLayoutManager {
         origin: origin
       )
     }
-    
+
     /// Draw horizontal rules
     drawHorizontalRules(in: charRange, at: origin)
-    
+
     super.drawBackground(forGlyphRange: glyphsToShow, at: origin)
-    
+
   }
 
   private func drawTextBackground(
@@ -67,7 +64,7 @@ class MarkdownLayoutManager: NSLayoutManager {
     textContainer: NSTextContainer,
     origin: NSPoint
   ) {
-    
+
     /// It's a little clunky, but for now, `codeBlock` has it's own special implementation.
     guard backgroundType != .codeBlock else {
       return drawMergedCodeBlockBackgrounds(
@@ -77,7 +74,7 @@ class MarkdownLayoutManager: NSLayoutManager {
         origin: origin
       )
     }
-    
+
     /// From here, we're only dealing with non`codeBlock` backgrounds,
     /// such as `highlight` and `inlineCode`
     textStorage.enumerateAttribute(
@@ -181,40 +178,75 @@ class MarkdownLayoutManager: NSLayoutManager {
       }
     }
   }
-  
-  
+
+
   private func drawHorizontalRules(in charRange: NSRange, at origin: NSPoint) {
     guard let textStorage = self.textStorage else { return }
-    
-    textStorage.enumerateAttribute(.attachment, in: charRange, options: []) { value, range, stop in
-      if let attachment = value as? HorizontalRuleAttachment {
-        // Calculate the glyph range for the attachment
-        let glyphRange = self.glyphRange(forCharacterRange: range, actualCharacterRange: nil)
-        
-        // Get the line fragment rect for the glyph range
-        var lineFragmentRect = CGRect.zero
-        self.lineFragmentRect(forGlyphAt: glyphRange.location, effectiveRange: nil, withoutAdditionalLayout: true)
-        
-        // Adjust the rect for the origin
-        lineFragmentRect.origin.x += origin.x
-        lineFragmentRect.origin.y += origin.y
-        
-        // Draw the horizontal rule
-        self.drawHorizontalRule(attachment: attachment, in: lineFragmentRect)
+
+    textStorage.enumerateAttribute(
+      TextBackground.horizontalRule.attributeKey, in: charRange, options: []
+    ) { value, range, stop in
+
+      guard let hRuleValue = value as? Bool, hRuleValue else { return }
+
+      let glyphRange = self.glyphRange(forCharacterRange: range, actualCharacterRange: nil)
+      self.enumerateLineFragments(forGlyphRange: glyphRange) {
+        rect, usedRect, textContainer, glyphRange, stop in
+        let ruleRect = CGRect(
+          x: rect.origin.x, y: rect.midY - 0.5, width: rect.size.width, height: 1)
+        NSColor.separatorColor.setStroke()
+        let path = NSBezierPath()
+        path.move(to: CGPoint(x: ruleRect.minX, y: ruleRect.midY))
+        path.line(to: CGPoint(x: ruleRect.maxX, y: ruleRect.midY))
+        path.stroke()
       }
+
+      //      super.drawBackground(forGlyphRange: glyphsToShow, at: origin)
+      //        backingStore.enumerateAttribute(NSAttributedString.Key("MarkdownHorizontalRuleAttribute"), in: glyphsToShow, options: []) { (value, range, _) in
+      //           if value as? Bool == true {
+      //              // Compute the rect for the entire line
+      //              self.enumerateLineFragments(forGlyphRange: glyphRange) { rect, usedRect, textContainer, glyphRange, stop in
+      //                 // Use your custom drawing code. For example:
+      //                 let ruleRect = CGRect(x: rect.origin.x, y: rect.midY - 0.5, width: rect.size.width, height: 1)
+      //               NSColor.separatorColor.setStroke()
+      //               let path = NSBezierPath()
+      //               path.move(to: CGPoint(x: ruleRect.minX, y: ruleRect.midY))
+      //                 path.line(to: CGPoint(x: ruleRect.maxX, y: ruleRect.midY))
+      //                 path.stroke()
+      //                }
+      //             }
+      //          }
+      //       }
+
+
+      //      if let attachment = value as? HorizontalRuleAttachment {
+      //        /// Calculate the glyph range for the attachment
+      //        let glyphRange = self.glyphRange(forCharacterRange: range, actualCharacterRange: nil)
+      //
+      //        /// Get the line fragment rect for the glyph range
+      //        var lineFragmentRect = CGRect.zero
+      //        self.lineFragmentRect(forGlyphAt: glyphRange.location, effectiveRange: nil, withoutAdditionalLayout: true)
+      //
+      //        /// Adjust the rect for the origin
+      //        lineFragmentRect.origin.x += origin.x
+      //        lineFragmentRect.origin.y += origin.y
+      //
+      //        /// Draw the horizontal rule
+      //        self.drawHorizontalRule(attachment: attachment, in: lineFragmentRect)
+      //      }
     }
   }
-  
+
   private func drawHorizontalRule(attachment: HorizontalRuleAttachment, in rect: CGRect) {
     guard let context = NSGraphicsContext.current?.cgContext else { return }
-    
+
     // Calculate the line position (centered vertically in the frame)
     let y = rect.midY
-    
+
     // Set up the line style
     context.setLineWidth(attachment.thickness)
     context.setStrokeColor(attachment.color.cgColor)
-    
+
     // Draw the line
     context.move(to: CGPoint(x: rect.minX, y: y))
     context.addLine(to: CGPoint(x: rect.maxX, y: y))

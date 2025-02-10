@@ -76,158 +76,234 @@ class MarkdownTextStorage: NSTextStorage {
 
   private func applyMarkdownStyles() {
     for syntax in Markdown.Syntax.allCases {
-      
-      
-      //      styleSyntaxTypeWithRegexLiteral(syntax: syntax)
       styleSyntaxType(syntax: syntax)
     }
   }
 
-
-  private func styleSyntaxTypeWithRegexLiteral(syntax: Markdown.Syntax) {
-    fatalError("Not yet implemented.")
-  }
-
-
   private func styleSyntaxType(syntax: Markdown.Syntax) {
     guard let pattern = syntax.nsRegex else { return }
-    let string = backingStore.string
-    
-    guard !syntax.isHorizontalRule else { return styleHorizontalRule(syntax: syntax) }
+    let text = backingStore.string
 
-    pattern.enumerateMatches(
-      in: string, options: [], range: NSRange(location: 0, length: backingStore.length)
-    ) { match, _, _ in
-      guard let match = match else { return }
+//    if syntax.isHorizontalRule {
+//      styleHorizontalRule(syntax: syntax)
+//      return
+//    }
 
-      if match.numberOfRanges == 4 {
-        let openingSyntaxRange = match.range(at: 1)
-        backingStore.addAttributes(
-          syntax.syntaxAttributes(with: configuration).attributes, range: openingSyntaxRange)
+    processRegexMatches(for: syntax, in: text, using: pattern) { ranges in
+      /// Apply leading syntax attributes
+      backingStore.addAttributes(
+        syntax.syntaxAttributes(with: configuration).attributes,
+        range: ranges.leading
+      )
 
-        let contentRange = match.range(at: 2)
-        backingStore.addAttributes(
-          syntax.contentAttributes(with: configuration).attributes, range: contentRange)
+      /// Apply content attributes
+      backingStore.addAttributes(
+        syntax.contentAttributes(with: configuration).attributes,
+        range: ranges.content
+      )
 
-        let closingSyntaxRange = match.range(at: 3)
-        backingStore.addAttributes(
-          syntax.syntaxAttributes(with: configuration).attributes, range: closingSyntaxRange)
-      } else  {
-        /// Fallback in case you don’t have exactly three capture groups
-        backingStore.addAttributes(
-          syntax.contentAttributes(with: configuration).attributes, range: match.range)
-      }
+      /// Apply closing syntax attributes
+      backingStore.addAttributes(
+        syntax.syntaxAttributes(with: configuration).attributes,
+        range: ranges.trailing
+      )
     }
   }
 
+
+  //  private func styleSyntaxType(syntax: Markdown.Syntax) {
+  //    guard let pattern = syntax.nsRegex else { return }
+  //    let string = backingStore.string
+  //
+  //    guard !syntax.isHorizontalRule else { return styleHorizontalRule(syntax: syntax) }
+  //
+  //    pattern.enumerateMatches(
+  //      in: string, options: [], range: NSRange(location: 0, length: backingStore.length)
+  //    ) { match, _, _ in
+  //      guard let match = match else { return }
+  //
+  //      if match.numberOfRanges == 4 {
+  //        let openingSyntaxRange = match.range(at: 1)
+  //        backingStore.addAttributes(
+  //          syntax.syntaxAttributes(with: configuration).attributes, range: openingSyntaxRange)
+  //
+  //        let contentRange = match.range(at: 2)
+  //        backingStore.addAttributes(
+  //          syntax.contentAttributes(with: configuration).attributes, range: contentRange)
+  //
+  //        let closingSyntaxRange = match.range(at: 3)
+  //        backingStore.addAttributes(
+  //          syntax.syntaxAttributes(with: configuration).attributes, range: closingSyntaxRange)
+  //      } else  {
+  //        /// Fallback in case you don’t have exactly three capture groups
+  //        backingStore.addAttributes(
+  //          syntax.contentAttributes(with: configuration).attributes, range: match.range)
+  //      }
+  //    }
+  //  }
+
+
   private func highlightCodeBlocks() {
-    
+
     self.beginEditing()
     guard let regex = Markdown.Syntax.codeBlock.nsRegex else { return }
     let text = backingStore.string
-
-    regex.enumerateMatches(in: text, options: [], range: NSRange(text.startIndex..., in: text)) {
-      match, _, _ in
-      guard let match = match else { return }
-
-      /// Get the full range including backticks
-      let fullRange = match.range(at: 1)
-
-      /// Extract the code content (without backticks and language hint)
-      let codeBlock = (text as NSString).substring(with: fullRange)
-      let lines = codeBlock.components(separatedBy: .newlines)
-
-      /// Extract language hint from the first line
-      let languageHint = lines.first?
-        .replacingOccurrences(of: "```", with: "")
-        .trimmingCharacters(in: .whitespaces)
-
-      /// Highlight the code
-
-      guard let highlightr else { return }
-
-      highlightr.setTheme(to: "devibeans")
-      
-      guard let highlightedCode = highlightr.highlight(codeBlock, as: languageHint ?? "txt") else {
-        return
-      }
-
-      /// Create attributed string with the highlighted code
-      let attributedCode = NSMutableAttributedString(attributedString: highlightedCode)
-
-      /// Add the code block background attribute to the entire range
-      attributedCode.addAttribute(
-        TextBackground.codeBlock.attributeKey,
-        value: true,
-        range: NSRange(location: 0, length: attributedCode.length))
-
-      /// Replace the content while preserving the backticks
-      backingStore.replaceCharacters(in: fullRange, with: attributedCode)
-
-    }
-    self.endEditing()
-  }
-
-  private func styleHorizontalRule(syntax: Markdown.Syntax) {
-    guard let pattern = syntax.nsRegex else { return }
-    let string = backingStore.string
+    let range = NSRange(location: 0, length: backingStore.length)
     
-    self.beginEditing()
-    pattern.enumerateMatches(in: string, options: [], range: NSRange(location: 0, length: backingStore.length)) { match, _, _ in
+    regex.enumerateMatches(in: text, options: [], range: range) { match, _, _ in
       guard let match = match else { return }
       
+      // Ensure the match range is valid
       if match.range.location + match.range.length <= backingStore.length {
-        let attachment = HorizontalRuleAttachment()
-        let attachmentString = NSAttributedString(attachment: attachment)
-        backingStore.replaceCharacters(in: match.range, with: attachmentString)
+        
+        /// Extract the code content (without backticks and language hint)
+        let codeBlock = (text as NSString).substring(with: fullRange)
+        let lines = codeBlock.components(separatedBy: .newlines)
+        
+        /// Extract language hint from the first line
+        let languageHint = lines.first?
+          .replacingOccurrences(of: "```", with: "")
+          .trimmingCharacters(in: .whitespaces)
+        
+        /// Highlight the code
+        
+        guard let highlightr else { return }
+        
+        highlightr.setTheme(to: "devibeans")
+        
+        guard let highlightedCode = highlightr.highlight(codeBlock, as: languageHint ?? "txt") else {
+          return
+        }
+        
+        /// Create attributed string with the highlighted code
+        let attributedCode = NSMutableAttributedString(attributedString: highlightedCode)
+        
+        /// Add the code block background attribute to the entire range
+        attributedCode.addAttribute(
+          TextBackground.codeBlock.attributeKey,
+          value: true,
+          range: NSRange(location: 0, length: attributedCode.length))
+        
+        /// Replace the content while preserving the backticks
+        backingStore.replaceCharacters(in: fullRange, with: attributedCode)
       }
     }
     self.endEditing()
   }
-  
+
 //  private func styleHorizontalRule(syntax: Markdown.Syntax) {
 //    guard let pattern = syntax.nsRegex else { return }
 //    let string = backingStore.string
-//    
-//    pattern.enumerateMatches(in: string, options: [], range: NSRange(location: 0, length: backingStore.length)) { match, _, _ in
-//      guard let match = match else { return }
-//      
-//      /// Create the horizontal rule attachment
-//      let attachment = HorizontalRuleAttachment()
-//      let attachmentString = NSAttributedString(attachment: attachment)
-//      
-//      /// Replace the markdown syntax with the attachment
-//      backingStore.replaceCharacters(in: match.range, with: attachmentString)
-//    }
-//  }
-//  func styleHorizontalRule(syntax: Markdown.Syntax) {
-//    guard case .horizontalRule = syntax,
-//          let pattern = syntax.nsRegex else { return }
-//    
-//    let string = backingStore.string
+//
+//    self.beginEditing()
 //    pattern.enumerateMatches(
-//      in: string,
-//      options: [],
-//      range: NSRange(location: 0, length: backingStore.length)
+//      in: string, options: [], range: NSRange(location: 0, length: backingStore.length)
 //    ) { match, _, _ in
 //      guard let match = match else { return }
+//
+//      if match.range.location + match.range.length <= backingStore.length {
+//        let attachment = HorizontalRuleAttachment()
+//        let attachmentString = NSAttributedString(attachment: attachment)
+//        backingStore.replaceCharacters(in: match.range, with: attachmentString)
+//      }
+//    }
+//    self.endEditing()
+//  }
+
+//  private func styleHorizontalRule(syntax: Markdown.Syntax) {
+//    
+//    guard let pattern = syntax.nsRegex else { return }
+//    let text = backingStore.string
+//    
+//    processRegexMatches(for: syntax, in: text, using: pattern) { ranges in
+//      /// Replace the horizontal rule syntax with an attachment
+//      let attachment = HorizontalRuleAttachment()
 //      
-//      // Create the attachment
-//      let attachment = HorizontalRuleAttachment(
-//        color: NSColor.purple,
-//        thickness: 2
-//      )
+//      let attachmentString = NSAttributedString(attachment: attachment)
 //      
-//      // Create an attributed string with the attachment
-//      let attachmentString = NSAttributedString(
-//        attachment: attachment
-//      )
-//      
-//      // Replace the original horizontal rule characters with the attachment
-//      backingStore.replaceCharacters(
-//        in: match.range,
-//        with: attachmentString
-//      )
+//      /// H rule ranges: MarkdownRanges(all: {378, 3}, leading: {378, 3}, content: {381, 0}, trailing: {381, 0})
+//      print("H rule ranges: \(ranges)")
+//      backingStore.replaceCharacters(in: ranges.all, with: attachmentString)
 //    }
 //  }
+  
+//  private func styleHorizontalRule(syntax: Markdown.Syntax) {
+//    guard let pattern = syntax.nsRegex else { return }
+//    let text = backingStore.string
+//    
+//    // Collect all ranges to be replaced
+//    var rangesToReplace: [NSRange] = []
+//    
+//    processRegexMatches(for: syntax, in: text, using: pattern) { ranges in
+//      rangesToReplace.append(ranges.all)
+//    }
+//    
+//    // Replace ranges in reverse order to avoid invalidating subsequent ranges
+//    for range in rangesToReplace.reversed() {
+//      // Ensure the range is valid
+//      if range.location + range.length <= backingStore.length {
+//        let attachment = HorizontalRuleAttachment()
+//        let attachmentString = NSAttributedString(attachment: attachment)
+//        backingStore.replaceCharacters(in: range, with: attachmentString)
+//      } else {
+//        print("Invalid range: \(range) for string length: \(backingStore.length)")
+//      }
+//    }
+//  }
+  
+  
+  private func processRegexMatches(
+    for syntax: Markdown.Syntax,
+    in text: String,
+    using pattern: NSRegularExpression,
+    applyAttributes: (MarkdownRanges) -> Void
+  ) {
+    let range = NSRange(location: 0, length: backingStore.length)
+
+    pattern.enumerateMatches(in: text, options: [], range: range) {
+      match,
+      _,
+      _ in
+      guard let match = match else { return }
+      
+      /// Ensure the match range is valid
+      if match.range.location + match.range.length <= backingStore.length {
+        if match.numberOfRanges == 4 {
+          /// Extract capture groups
+          let openingSyntaxRange = match.range(at: 1)
+          let contentRange = match.range(at: 2)
+          let closingSyntaxRange = match.range(at: 3)
+          
+          /// Apply attributes using the provided closure
+          let ranges = MarkdownRanges(
+            all: match.range,
+            leading: openingSyntaxRange,
+            content: contentRange,
+            trailing: closingSyntaxRange
+          )
+          applyAttributes(ranges)
+        } else {
+          let ranges = MarkdownRanges(
+            all: match.range,
+            leading: .zero,
+            content: .zero,
+            trailing: .zero
+          )
+          /// Fallback for simpler patterns
+          applyAttributes(ranges)
+        }
+      } else {
+        print("Invalid range: \(match.range) for string length: \(backingStore.length)")
+      }
+    }
+  }
+
+
+}
+
+struct MarkdownRanges {
+  let all: NSRange
+  let leading: NSRange
+  let content: NSRange
+  let trailing: NSRange
 }
