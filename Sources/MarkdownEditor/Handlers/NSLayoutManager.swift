@@ -11,9 +11,9 @@ import MarkdownModels
 
 class MarkdownLayoutManager: NSLayoutManager {
 
-  let configuration: MarkdownEditorConfiguration
+  let configuration: EditorConfiguration
 
-  public init(configuration: MarkdownEditorConfiguration) {
+  public init(configuration: EditorConfiguration) {
     self.configuration = configuration
     super.init()
   }

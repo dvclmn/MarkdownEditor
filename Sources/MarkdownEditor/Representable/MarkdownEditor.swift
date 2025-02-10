@@ -14,12 +14,12 @@ public struct MarkdownEditor: NSViewRepresentable {
 
   @Binding var text: String
   var width: CGFloat
-  var configuration: MarkdownEditorConfiguration
+  var configuration: EditorConfiguration
 
   public init(
     text: Binding<String>,
     width: CGFloat,
-    configuration: MarkdownEditorConfiguration = .init()
+    configuration: EditorConfiguration = .init()
   ) {
     self._text = text
     self.width = width

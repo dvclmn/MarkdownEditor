@@ -13,7 +13,7 @@ import MarkdownModels
 
 extension MarkdownTextView {
 
-  func setUpTextView(_ config: MarkdownEditorConfiguration) {
+  func setUpTextView(_ config: EditorConfiguration) {
     
     isEditable = config.isEditable
 //    drawsBackground = false
@@ -27,7 +27,7 @@ extension MarkdownTextView {
     
     autoresizingMask = [.width]
     
-    self.backgroundColor = config.isEditable ? .red : .clear
+    self.backgroundColor = config.isEditable ? .red.withAlphaComponent(0.3) : .clear
     
     textContainer?.widthTracksTextView = true
     textContainer?.heightTracksTextView = false
@@ -43,6 +43,7 @@ extension MarkdownTextView {
     typingAttributes = config.defaultTypingAttributes
     defaultParagraphStyle = config.defaultParagraphStyle
   }
+  
   
  
 

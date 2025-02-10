@@ -16,9 +16,9 @@ class MarkdownTextStorage: NSTextStorage {
   private let highlightr = Highlightr()
   private let codeStorage = CodeAttributedString()
 
-  let configuration: MarkdownEditorConfiguration
+  let configuration: EditorConfiguration
 
-  init(configuration: MarkdownEditorConfiguration) {
+  init(configuration: EditorConfiguration) {
     self.configuration = configuration
     super.init()
   }

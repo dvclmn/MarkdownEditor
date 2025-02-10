@@ -14,12 +14,22 @@ public struct EditorView: View {
   @State private var store: EditorHandler = .init()
   
   @Binding var text: String
-  let configuration: MarkdownEditorConfiguration
+  let configuration: EditorConfiguration
   let height: (CGFloat) -> Void
 
   public init(
     text: Binding<String>,
-    configuration: MarkdownEditorConfiguration = .init(),
+    options: [EditorConfiguration.Option],
+    height: @escaping (CGFloat) -> Void = { _ in }
+  ) {
+    self._text = text
+    self.configuration = EditorConfiguration(options: options)
+    self.height = height
+  }
+  
+  public init(
+    text: Binding<String>,
+    configuration: EditorConfiguration = .init(),
     height: @escaping (CGFloat) -> Void = { _ in }
   ) {
     self._text = text

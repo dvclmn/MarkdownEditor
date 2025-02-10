@@ -12,11 +12,11 @@ import MarkdownModels
 
 public class MarkdownTextView: NSTextView {
   
-  var configuration: MarkdownEditorConfiguration
+  var configuration: EditorConfiguration
   var width: CGFloat
 
   public init(
-    configuration: MarkdownEditorConfiguration,
+    configuration: EditorConfiguration,
     width: CGFloat
   ) {
     self.configuration = configuration
@@ -27,7 +27,7 @@ public class MarkdownTextView: NSTextView {
   public init(
     frame frameRect: NSRect,
     textContainer container: NSTextContainer?,
-    configuration: MarkdownEditorConfiguration,
+    configuration: EditorConfiguration,
     width: CGFloat
   ) {
     self.configuration = configuration
@@ -36,7 +36,7 @@ public class MarkdownTextView: NSTextView {
   }
   
   required init?(coder: NSCoder) {
-    self.configuration = MarkdownEditorConfiguration()
+    self.configuration = EditorConfiguration()
     self.width = .zero
     super.init(coder: coder)
   }
@@ -69,14 +69,16 @@ public class MarkdownTextView: NSTextView {
     self.invalidateIntrinsicContentSize()
   }
   
-  func adjustedInsets(_ config: MarkdownEditorConfiguration) -> CGFloat {
+  func adjustedInsets(_ config: EditorConfiguration) -> CGFloat {
 
     let minInsets = config.theme.insets
     let availableWidth = self.width
-    let targetContentWidth = config.theme.maxReadingWidth
+    guard let targetContentWidth = config.theme.maxReadingWidth else {
+      return minInsets
+    }
     
     /// If the available width is less than target, use minimum insets
-    if availableWidth <= targetContentWidth, !config.isEditable {
+    if availableWidth <= targetContentWidth {
       return minInsets
     }
     
