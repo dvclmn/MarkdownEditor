@@ -10,7 +10,7 @@ import MarkdownModels
 
 public class MarkdownScrollView: NSView {
   private let scrollView: NSScrollView
-  private let textView: MarkdownTextView
+  let textView: MarkdownTextView
   private let minEditorHeight: CGFloat = 80
   
   public init(
@@ -70,18 +70,17 @@ public class MarkdownScrollView: NSView {
   }
   
   /// Expose text view for additional configuration if needed
-  public func getTextView() -> MarkdownTextView {
-    return textView
-  }
+//  public func getTextView() -> MarkdownTextView {
+//    return textView
+//  }
   
-  // Make sure that when our bounds change (e.g. a SwiftUI width change), we force the text view to lay out again.
-  public override func layout() {
-    super.layout()
-    // Update the text view’s frame so that its width matches our new bounds.
-    // (Since the textContainer is set to track the textView’s width, this is sufficient.)
-    let newFrame = self.bounds
-    textView.frame = newFrame
-  }
+  /// Make sure that when our bounds change (e.g. a SwiftUI width change), we force the text view to lay out again.
+//  public override func layout() {
+//    super.layout()
+//    print("Performed layout at \(Date())")
+//    let newFrame = self.bounds
+//    textView.frame = newFrame
+//  }
 }
 
 

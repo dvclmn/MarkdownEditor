@@ -48,7 +48,7 @@ public struct EditorView: View {
       ) { height in
         store.editorHeight = height
       }
-      .frame(height: configuration.isEditable ? nil : store.editorHeight)
+//      .frame(height: configuration.isEditable ? nil : store.editorHeight)
 //      .fixedSize(horizontal: false, vertical: true)
 //      .border(Color.green.opacity(0.3))
 

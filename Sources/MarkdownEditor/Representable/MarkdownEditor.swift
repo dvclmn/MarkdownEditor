@@ -31,15 +31,15 @@ public struct MarkdownEditor: NSViewRepresentable {
       frame: .zero,
       configuration: configuration
     )
-    view.getTextView().delegate = context.coordinator
-    view.getTextView().setUpTextView(configuration)
+    view.textView.delegate = context.coordinator
+    view.textView.setUpTextView(configuration)
 
     return view
   }
 
   public func updateNSView(_ nsView: MarkdownScrollView, context: Context) {
 
-    let textView = nsView.getTextView()
+    let textView = nsView.textView
 
     if textView.string != text {
       textView.string = text
