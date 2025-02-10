@@ -12,6 +12,7 @@ import SwiftUI
 public struct EditorView: View {
   
   @State private var store: EditorHandler = .init()
+  @State private var debounceTimer: Timer?
   
   @Binding var text: String
   let configuration: EditorConfiguration
@@ -52,8 +53,16 @@ public struct EditorView: View {
     .onGeometryChange(for: CGSize.self) { proxy in
       return proxy.size
     } action: { newValue in
-      store.windowWidth = newValue.width
-      height(newValue.height)
+      
+      debounceTimer?.invalidate()
+      debounceTimer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: false) { _ in
+        store.windowWidth = newValue.width
+        height(newValue.height)
+      }
+      
+      
+//      store.windowWidth = newValue.width
+//      height(newValue.height)
     }
   }
 }

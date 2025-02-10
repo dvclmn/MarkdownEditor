@@ -8,7 +8,6 @@
 import SwiftUI
 import BaseHelpers
 import MarkdownModels
-//import Highlightr
 
 public class MarkdownTextView: NSTextView {
   
@@ -58,24 +57,23 @@ public class MarkdownTextView: NSTextView {
     return NSSize(width: NSView.noIntrinsicMetric, height: ceil(usedRect.height) + (insets + overscroll))
   }
   
+  
   public override func layout() {
     super.layout()
-//    print("Performed layout")
     if let textContainer = self.textContainer {
       textContainer.containerSize = NSSize(width: self.bounds.width, height: CGFloat.greatestFiniteMagnitude)
     }
-    let insets = adjustedInsets(configuration)
-    self.textContainer?.lineFragmentPadding = insets
     self.invalidateIntrinsicContentSize()
   }
   
   func adjustedInsets(_ config: EditorConfiguration) -> CGFloat {
 
     let minInsets = config.theme.insets
-    let availableWidth = self.width
     guard let targetContentWidth = config.theme.maxReadingWidth else {
       return minInsets
     }
+    
+    let availableWidth = self.width
     
     /// If the available width is less than target, use minimum insets
     if availableWidth <= targetContentWidth {
@@ -94,6 +92,9 @@ public class MarkdownTextView: NSTextView {
   
   func updateContainerWidth(width: CGFloat) {
     if let textContainer = self.textContainer {
+      let insets = adjustedInsets(configuration)
+      self.textContainer?.lineFragmentPadding = insets
+      
       textContainer.containerSize = NSSize(width: width, height: CGFloat.greatestFiniteMagnitude)
       self.invalidateIntrinsicContentSize()
     }
