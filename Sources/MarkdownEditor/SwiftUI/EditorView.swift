@@ -16,26 +16,26 @@ public struct EditorView: View {
   
   @Binding var text: String
   let configuration: EditorConfiguration
-//  let height: (CGFloat) -> Void
+  let editorModeHeight: (CGFloat) -> Void
 
   public init(
     text: Binding<String>,
-    options: [EditorConfiguration.Option]
-//    height: @escaping (CGFloat) -> Void = { _ in }
+    options: [EditorConfiguration.Option],
+    editorModeHeight: @escaping (CGFloat) -> Void = { _ in }
   ) {
     self._text = text
     self.configuration = EditorConfiguration(options: options)
-//    self.height = height
+    self.editorModeHeight = editorModeHeight
   }
   
   public init(
     text: Binding<String>,
-    configuration: EditorConfiguration = .init()
-//    height: @escaping (CGFloat) -> Void = { _ in }
+    configuration: EditorConfiguration = .init(),
+    editorModeHeight: @escaping (CGFloat) -> Void = { _ in }
   ) {
     self._text = text
     self.configuration = configuration
-//    self.height = height
+    self.editorModeHeight = editorModeHeight
   }
 
   public var body: some View {
@@ -46,11 +46,15 @@ public struct EditorView: View {
         text: $text,
         configuration: configuration
       ) { height in
-        store.editorHeight = height
+        if configuration.isEditable {
+          self.editorModeHeight(height)
+        } else {
+          store.displayModeHeight = height
+        }
       }
-      .frame(height: configuration.isEditable ? nil : store.editorHeight)
-//      .fixedSize(horizontal: false, vertical: true)
-//      .border(Color.green.opacity(0.3))
+    /// We only want to set a SwiftUI frame height when the
+    /// text view is in `displayMode` (non-editable)
+      .frame(height: configuration.isEditable ? nil : store.displayModeHeight)
 
   }
 }

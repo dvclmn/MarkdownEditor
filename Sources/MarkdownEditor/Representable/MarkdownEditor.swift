@@ -37,9 +37,9 @@ public struct MarkdownEditor: NSViewRepresentable {
     /// For non‑editable views, assign the closure so that we get notified when the intrinsic height changes.
     view.heightChanged = { newHeight in
       DispatchQueue.main.async {
-        if !configuration.isEditable {
+//        if !configuration.isEditable {
           self.height(newHeight)
-        }
+//        }
       }
     }
 

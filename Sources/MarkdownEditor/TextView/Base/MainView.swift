@@ -75,57 +75,67 @@ public class MarkdownScrollView: NSView {
     fatalError("init(coder:) has not been implemented")
   }
 
-  /// Expose text view for additional configuration if needed
-  //  public func getTextView() -> MarkdownTextView {
-  //    return textView
-  //  }
-
-//  /// Make sure that when our bounds change (e.g. a SwiftUI width change), we force the text view to lay out again.
-//  public override func layout() {
-//    super.layout()
-//    print("Performed layout at \(Date())")
-//
-//
-//    /// Only needed for non‑editable mode:
-//    if !textView.isEditable {
-//      /// Given that the intrinsic height depends on the width,
-//      /// force a recomputation:
-//      textView.invalidateIntrinsicContentSize()
-//      /// Optionally (or via a delegate) call back with the new height:
-//      let newHeight = textView.intrinsicContentSize.height
-//      /// You might then call a closure stored on MarkdownScrollView,
-//      /// or set some property that your NSViewRepresentable observes.
-//    }
-//
-//
-//    //    let newFrame = self.bounds
-//    //    textView.frame = newFrame
-//  }
-  
-  
-  // Override layout so that when the view's bounds change, we invalidate and recalc the intrinsic size.
+  /// Override layout so that when the view's bounds change, we invalidate and recalc the intrinsic size.
   public override func layout() {
     super.layout()
     
-    // Ensure the scroll view and text view have their frames updated.
+    /// Ensure the scroll view and text view have their frames updated.
     scrollView.frame = self.bounds
-    textView.frame = self.bounds
+//    textView.frame = self.bounds
     
-    // In non-editable mode we want the text view to report its new natural height.
-    if !textView.isEditable {
-      // Force a re-layout so that the intrinsicContentSize is recalculated.
-      textView.invalidateIntrinsicContentSize()
-      let newHeight = textView.intrinsicContentSize.height
-      
-      // Only notify if the height has changed significantly.
-      if abs(newHeight - lastReportedHeight) > 1.0 {
-        lastReportedHeight = newHeight
-        heightChanged?(newHeight)
+//    /// In non-editable mode we want the text view to report its new natural height.
+//    if !textView.isEditable {
+//      
+//      /// Force a re-layout so that the intrinsicContentSize is recalculated.
+//      textView.invalidateIntrinsicContentSize()
+//      let newHeight = textView.intrinsicContentSize.height
+//      
+//      /// Only notify if the height has changed significantly.
+//      if abs(newHeight - lastReportedHeight) > 1.0 {
+//        lastReportedHeight = newHeight
+//        heightChanged?(newHeight)
+//      }
+//    }
+    
+    if textView.isEditable {
+      /// When editable, let the document view's height be determined by its content.
+      guard let layoutManager = textView.layoutManager,
+            let textContainer = textView.textContainer else {
+        return
       }
+      /// Recalculate layout so that `usedRect` is up-to-date.
+      layoutManager.ensureLayout(for: textContainer)
+      let usedRect = layoutManager.usedRect(for: textContainer)
+      
+      /// Compute the content height including our text container insets.
+      let contentHeight = usedRect.height + (textView.textContainerInset.height * 2)
+      
+      /// The document view (textView) should be as tall as:
+      /// - self.bounds.height if content is short (so the whole visible area is used)
+      /// - or contentHeight if the text is larger than the view.
+      let newFrameHeight = max(contentHeight, self.bounds.height)
+      
+      /// Set the text view's frame accordingly.
+      textView.frame = NSRect(x: 0, y: 0, width: self.bounds.width, height: newFrameHeight)
+      
+      
+    } else {
+      /// In non-editable mode, simply match the bounds.
+      textView.frame = self.bounds
+      /// Invalidate intrinsic content size to trigger a height update.
+      
     }
+    
+    textView.invalidateIntrinsicContentSize()
+    let newHeight = textView.intrinsicContentSize.height
+    /// Only notify if the height has changed significantly.
+    if abs(newHeight - lastReportedHeight) > 1.0 {
+      lastReportedHeight = newHeight
+      heightChanged?(newHeight)
+    }
+    
+    
   }
-
-
 }
 
 
