@@ -21,6 +21,8 @@ extension MarkdownTextView {
     isVerticallyResizable = true
     isHorizontallyResizable = false
     
+    isAutomaticDashSubstitutionEnabled = false
+    
     autoresizingMask = [.width]
     
     textContainer?.widthTracksTextView = true

@@ -35,8 +35,7 @@ class MarkdownLayoutManager: NSLayoutManager {
 
     let charRange = self.characterRange(forGlyphRange: glyphsToShow, actualGlyphRange: nil)
 
-    // Log the ranges for debugging
-    print("Glyph range: \(glyphsToShow), Character range: \(charRange)")
+//    print("Glyph range: \(glyphsToShow), Character range: \(charRange)")
 
     /// Draw text backgrounds
     for type in TextBackground.allCases {
@@ -53,7 +52,6 @@ class MarkdownLayoutManager: NSLayoutManager {
 //    drawHorizontalRules(in: charRange, at: origin)
 
     super.drawBackground(forGlyphRange: glyphsToShow, at: origin)
-
   }
 
   private func drawTextBackground(
@@ -178,26 +176,26 @@ class MarkdownLayoutManager: NSLayoutManager {
   }
 
 
-  private func drawHorizontalRules(in charRange: NSRange, at origin: NSPoint) {
-    guard let textStorage = self.textStorage else { return }
-
-    textStorage.enumerateAttribute(
-      TextBackground.horizontalRule.attributeKey, in: charRange, options: []
-    ) { value, range, stop in
-
-      guard let hRuleValue = value as? Bool, hRuleValue else { return }
-
-      let glyphRange = self.glyphRange(forCharacterRange: range, actualCharacterRange: nil)
-      self.enumerateLineFragments(forGlyphRange: glyphRange) {
-        rect, usedRect, textContainer, glyphRange, stop in
-        let ruleRect = CGRect(
-          x: rect.origin.x, y: rect.midY - 0.5, width: rect.size.width, height: 1)
-        NSColor.separatorColor.setStroke()
-        let path = NSBezierPath()
-        path.move(to: CGPoint(x: ruleRect.minX, y: ruleRect.midY))
-        path.line(to: CGPoint(x: ruleRect.maxX, y: ruleRect.midY))
-        path.stroke()
-      }
-    }
-  }
+//  private func drawHorizontalRules(in charRange: NSRange, at origin: NSPoint) {
+//    guard let textStorage = self.textStorage else { return }
+//
+//    textStorage.enumerateAttribute(
+//      TextBackground.horizontalRule.attributeKey, in: charRange, options: []
+//    ) { value, range, stop in
+//
+//      guard let hRuleValue = value as? Bool, hRuleValue else { return }
+//
+//      let glyphRange = self.glyphRange(forCharacterRange: range, actualCharacterRange: nil)
+//      self.enumerateLineFragments(forGlyphRange: glyphRange) {
+//        rect, usedRect, textContainer, glyphRange, stop in
+//        let ruleRect = CGRect(
+//          x: rect.origin.x, y: rect.midY - 0.5, width: rect.size.width, height: 1)
+//        NSColor.separatorColor.setStroke()
+//        let path = NSBezierPath()
+//        path.move(to: CGPoint(x: ruleRect.minX, y: ruleRect.midY))
+//        path.line(to: CGPoint(x: ruleRect.maxX, y: ruleRect.midY))
+//        path.stroke()
+//      }
+//    }
+//  }
 }
