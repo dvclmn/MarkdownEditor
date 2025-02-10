@@ -24,12 +24,12 @@ class MarkdownTextStorage: NSTextStorage {
   }
 
   required init?(coder: NSCoder) {
-    fatalError("init(coder:) has not been implemented")
+    fatalError("Not implemented")
   }
 
   required init?(pasteboardPropertyList propertyList: Any, ofType type: NSPasteboard.PasteboardType)
   {
-    fatalError("init(pasteboardPropertyList:ofType:) has not been implemented")
+    fatalError("Not implemented")
   }
 
   override var string: String {
@@ -58,14 +58,8 @@ class MarkdownTextStorage: NSTextStorage {
 
   override func processEditing() {
     super.processEditing()
-
-    /// Apply default attributes to the entire text
     applyDefaultAttributes()
-
-    /// Apply Markdown styling
     applyMarkdownStyles()
-
-    /// Highlight code blocks
     highlightCodeBlocks()
   }
 
@@ -84,10 +78,10 @@ class MarkdownTextStorage: NSTextStorage {
     guard let pattern = syntax.nsRegex else { return }
     let text = backingStore.string
 
-//    if syntax.isHorizontalRule {
-//      styleHorizontalRule(syntax: syntax)
-//      return
-//    }
+    //    if syntax.isHorizontalRule {
+    //      styleHorizontalRule(syntax: syntax)
+    //      return
+    //    }
 
     processRegexMatches(for: syntax, in: text, using: pattern) { ranges in
       /// Apply leading syntax attributes
@@ -110,80 +104,44 @@ class MarkdownTextStorage: NSTextStorage {
     }
   }
 
-
-  //  private func styleSyntaxType(syntax: Markdown.Syntax) {
-  //    guard let pattern = syntax.nsRegex else { return }
-  //    let string = backingStore.string
-  //
-  //    guard !syntax.isHorizontalRule else { return styleHorizontalRule(syntax: syntax) }
-  //
-  //    pattern.enumerateMatches(
-  //      in: string, options: [], range: NSRange(location: 0, length: backingStore.length)
-  //    ) { match, _, _ in
-  //      guard let match = match else { return }
-  //
-  //      if match.numberOfRanges == 4 {
-  //        let openingSyntaxRange = match.range(at: 1)
-  //        backingStore.addAttributes(
-  //          syntax.syntaxAttributes(with: configuration).attributes, range: openingSyntaxRange)
-  //
-  //        let contentRange = match.range(at: 2)
-  //        backingStore.addAttributes(
-  //          syntax.contentAttributes(with: configuration).attributes, range: contentRange)
-  //
-  //        let closingSyntaxRange = match.range(at: 3)
-  //        backingStore.addAttributes(
-  //          syntax.syntaxAttributes(with: configuration).attributes, range: closingSyntaxRange)
-  //      } else  {
-  //        /// Fallback in case you don’t have exactly three capture groups
-  //        backingStore.addAttributes(
-  //          syntax.contentAttributes(with: configuration).attributes, range: match.range)
-  //      }
-  //    }
-  //  }
-
-
   private func highlightCodeBlocks() {
 
     self.beginEditing()
     guard let regex = Markdown.Syntax.codeBlock.nsRegex else { return }
     let text = backingStore.string
     let range = NSRange(location: 0, length: backingStore.length)
-    
+
     regex.enumerateMatches(in: text, options: [], range: range) { match, _, _ in
       guard let match = match else { return }
-      
+
       // Ensure the match range is valid
       if match.range.location + match.range.length <= backingStore.length {
-        
+
         /// Extract the code content (without backticks and language hint)
         let codeBlock = (text as NSString).substring(with: fullRange)
         let lines = codeBlock.components(separatedBy: .newlines)
-        
+
         /// Extract language hint from the first line
         let languageHint = lines.first?
           .replacingOccurrences(of: "```", with: "")
           .trimmingCharacters(in: .whitespaces)
-        
+
         /// Highlight the code
-        
         guard let highlightr else { return }
-        
-        highlightr.setTheme(to: "devibeans")
-        
-        guard let highlightedCode = highlightr.highlight(codeBlock, as: languageHint ?? "txt") else {
+//        highlightr.setTheme(to: "devibeans")
+        guard let highlightedCode = highlightr.highlight(codeBlock, as: languageHint ?? "txt")
+        else {
           return
         }
-        
         /// Create attributed string with the highlighted code
         let attributedCode = NSMutableAttributedString(attributedString: highlightedCode)
-        
+
         /// Add the code block background attribute to the entire range
         attributedCode.addAttribute(
           TextBackground.codeBlock.attributeKey,
           value: true,
           range: NSRange(location: 0, length: attributedCode.length))
-        
+
         /// Replace the content while preserving the backticks
         backingStore.replaceCharacters(in: fullRange, with: attributedCode)
       }
@@ -200,11 +158,9 @@ class MarkdownTextStorage: NSTextStorage {
     let range = NSRange(location: 0, length: backingStore.length)
 
     pattern.enumerateMatches(in: text, options: [], range: range) {
-      match,
-      _,
-      _ in
+      match, _, _ in
       guard let match = match else { return }
-      
+
       /// Ensure the match range is valid
       if match.range.location + match.range.length <= backingStore.length {
         if match.numberOfRanges == 4 {
@@ -212,7 +168,7 @@ class MarkdownTextStorage: NSTextStorage {
           let openingSyntaxRange = match.range(at: 1)
           let contentRange = match.range(at: 2)
           let closingSyntaxRange = match.range(at: 3)
-          
+
           /// Apply attributes using the provided closure
           let ranges = MarkdownRanges(
             all: match.range,

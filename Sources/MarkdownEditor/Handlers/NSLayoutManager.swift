@@ -22,7 +22,6 @@ class MarkdownLayoutManager: NSLayoutManager {
     fatalError("Not implemented")
   }
 
-
   override func drawBackground(
     forGlyphRange glyphsToShow: NSRange,
     at origin: NSPoint
@@ -105,7 +104,6 @@ class MarkdownLayoutManager: NSLayoutManager {
         fillColour.setFill()
         roundedPath.fill()
       }
-
     }
   }
 
