@@ -17,7 +17,6 @@ extension MarkdownEditor {
 
   public class Coordinator: NSObject, NSTextViewDelegate {
     let parent: MarkdownEditor
-    var lastUpdatedHeight: CGFloat?
 
     var selectedRanges: [NSValue] = []
 
@@ -30,14 +29,12 @@ extension MarkdownEditor {
       print("Ran `textDidChange`")
       guard let textView = notification.object as? NSTextView else { return }
       parent.text = textView.string
-    }  // END text did change
+    }
 
     public func textViewDidChangeSelection(_ notification: Notification) {
-      guard let textView = notification.object as? NSTextView
-      else { return }
+      guard let textView = notification.object as? NSTextView else { return }
       self.selectedRanges = textView.selectedRanges
     }
-    
     
   }
 }

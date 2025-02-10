@@ -12,31 +12,34 @@ import SwiftUI
 public class MarkdownTextView: NSTextView {
 
   var configuration: EditorConfiguration
-  let minHeight: CGFloat
+  private let minEditorHeight: CGFloat = 80
+  
+  /// Closure to call when the intrinsic height (of the text view) changes.
+  var heightChanged: ((CGFloat) -> Void)?
+
+  /// A stored property to throttle height updates.
+  private var lastReportedHeight: CGFloat = 0
+  private let reportableHeightThreshold: TimeInterval = 4
+
 
   public init(
-    configuration: EditorConfiguration,
-    minHeight: CGFloat
+    configuration: EditorConfiguration
   ) {
     self.configuration = configuration
-    self.minHeight = minHeight
     super.init(frame: .zero)
   }
 
   public init(
     frame frameRect: NSRect,
     textContainer container: NSTextContainer?,
-    configuration: EditorConfiguration,
-    minHeight: CGFloat
+    configuration: EditorConfiguration
   ) {
     self.configuration = configuration
-    self.minHeight = minHeight
     super.init(frame: frameRect, textContainer: container)
   }
 
   required init?(coder: NSCoder) {
     self.configuration = EditorConfiguration()
-    self.minHeight = .zero
     super.init(coder: coder)
   }
 
@@ -46,14 +49,60 @@ public class MarkdownTextView: NSTextView {
     /// usedRect is in the text container’s coordinate system.
     let usedRect = layoutManager?.usedRect(for: textContainer!) ?? .zero
     /// Add textContainerInsets (top + bottom) to the used height.
-    let calculatedHeight = usedRect.height + (textContainerInset.height * 2)
-    return NSSize(width: NSView.noIntrinsicMetric, height: max(calculatedHeight, minHeight))
+    let calculatedHeight = adjustedHeight(height: usedRect.height)
+    return NSSize(width: NSView.noIntrinsicMetric, height: max(calculatedHeight, minEditorHeight))
   }
+  
+  
+  public override func layout() {
+    super.layout()
+    
+    
+    if isEditable {
+      /// When editable, let the document view's height be determined by its content.
+      guard let layoutManager = layoutManager,
+            let textContainer = textContainer
+      else {
+        return
+      }
+      /// Recalculate layout so that `usedRect` is up-to-date.
+      layoutManager.ensureLayout(for: textContainer)
+      let usedRect = layoutManager.usedRect(for: textContainer)
+      
+      /// Compute the content height including our text container insets.
+      let contentHeight = adjustedHeight(height: usedRect.height)
+      
+      /// The document view (textView) should be as tall as:
+      /// - self.bounds.height if content is short (so the whole visible area is used)
+      /// - or contentHeight if the text is larger than the view.
+      let newFrameHeight = max(contentHeight, self.bounds.height)
+      
+      /// Set the text view's frame accordingly.
+      frame = NSRect(x: 0, y: 0, width: self.bounds.width, height: newFrameHeight)
+      
+    } else {
+      /// In non-editable mode, simply match the bounds.
+      frame = self.bounds
+    }
+    
+    /// Invalidate intrinsic content size to trigger a height update.
+    invalidateIntrinsicContentSize()
+    let newHeight = intrinsicContentSize.height
+    /// Only notify if the height has changed significantly.
+    if abs(newHeight - lastReportedHeight) > reportableHeightThreshold {
+      lastReportedHeight = newHeight
+      heightChanged?(newHeight)
+    }
+  }
+  
+  func adjustedHeight(height: CGFloat) -> CGFloat {
+    return height + (adjustedInsets() * 2) + configuration.theme.overScrollAmount
+  }
+  
+  func adjustedInsets() -> CGFloat {
 
-  func adjustedInsets(_ config: EditorConfiguration) -> CGFloat {
-
-    let minInsets = config.theme.insets
-    guard let targetContentWidth = config.theme.maxReadingWidth,
+    let minInsets = configuration.theme.insets
+    guard let targetContentWidth = configuration.theme.maxReadingWidth,
           let availableWidth = self.textContainer?.size.width
     else {
       return minInsets
