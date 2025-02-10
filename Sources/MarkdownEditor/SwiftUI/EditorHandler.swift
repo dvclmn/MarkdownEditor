@@ -9,7 +9,7 @@ import SwiftUI
 
 @Observable
 final class EditorHandler {
-  var windowWidth: CGFloat = .zero
+//  var windowWidth: CGFloat = .zero
 }
 
 struct FontSizeHandler {

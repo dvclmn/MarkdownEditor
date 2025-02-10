@@ -13,53 +13,43 @@ import SwiftUI
 public struct MarkdownEditor: NSViewRepresentable {
 
   @Binding var text: String
-  var width: CGFloat
+//  var width: CGFloat
   var configuration: EditorConfiguration
 
   public init(
     text: Binding<String>,
-    width: CGFloat,
+//    width: CGFloat,
     configuration: EditorConfiguration = .init()
   ) {
     self._text = text
-    self.width = width
+//    self.width = width
     self.configuration = configuration
   }
 
-  public func makeNSView(context: Context) -> MarkdownTextView {
+  public func makeNSView(context: Context) -> MarkdownScrollView {
 
-    let textStorage = MarkdownTextStorage(configuration: configuration)
-    let layoutManager = MarkdownLayoutManager(configuration: configuration)
-    textStorage.addLayoutManager(layoutManager)
-
-    let textContainer = NSTextContainer(size: .zero)
-    layoutManager.addTextContainer(textContainer)
-
-    let textView = MarkdownTextView(
+    let view = MarkdownScrollView(
       frame: .zero,
-      textContainer: textContainer,
-      configuration: configuration,
-      width: width
+      configuration: configuration
     )
     
-    textView.delegate = context.coordinator
-    textView.string = text
-    textView.setUpTextView(configuration)
+    view.getTextView().delegate = context.coordinator
+    view.getTextView().setUpTextView(configuration)
 
-    return textView
+    return view
   }
 
-  public func updateNSView(_ nsView: MarkdownTextView, context: Context) {
+  public func updateNSView(_ nsView: MarkdownScrollView, context: Context) {
 
-    let textView = nsView
+    let textView = nsView.getTextView()
 
     if textView.string != text {
       textView.string = text
     }
     
-    if textView.width != width {
-      textView.width = width
-      textView.updateContainerWidth(width: width)
-    }
+//    if textView.width != width {
+//      textView.width = width
+//      textView.updateContainerWidth(width: width)
+//    }
   }
 }

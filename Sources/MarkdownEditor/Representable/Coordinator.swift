@@ -30,7 +30,7 @@ extension MarkdownEditor {
     }  // END text did change
 
     public func textViewDidChangeSelection(_ notification: Notification) {
-      guard let textView = notification.object as? MarkdownTextView
+      guard let textView = notification.object as? NSTextView
       else { return }
       self.selectedRanges = textView.selectedRanges
     }

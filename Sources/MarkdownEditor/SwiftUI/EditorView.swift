@@ -42,28 +42,12 @@ public struct EditorView: View {
     
     @Bindable var store = store
 
-    ScrollView {
       MarkdownEditor(
         text: $text,
-        width: store.windowWidth,
         configuration: configuration
       )
-    }
+      .border(Color.green.opacity(0.3))
 
-    .onGeometryChange(for: CGSize.self) { proxy in
-      return proxy.size
-    } action: { newValue in
-      
-      debounceTimer?.invalidate()
-      debounceTimer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: false) { _ in
-        store.windowWidth = newValue.width
-        height(newValue.height)
-      }
-      
-      
-//      store.windowWidth = newValue.width
-//      height(newValue.height)
-    }
   }
 }
 #if DEBUG
