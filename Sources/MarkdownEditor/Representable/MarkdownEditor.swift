@@ -38,7 +38,8 @@ public struct MarkdownEditor: NSViewRepresentable {
     let textView = MarkdownTextView(
       frame: .zero,
       textContainer: textContainer,
-      configuration: configuration
+      configuration: configuration,
+      width: width
     )
     
     textView.delegate = context.coordinator
@@ -54,7 +55,13 @@ public struct MarkdownEditor: NSViewRepresentable {
 
     if textView.string != text {
       textView.string = text
-      textView.updateContainerWidth(width: width)
     }
+    
+    if textView.width != width {
+      print("text view width: \(textView.width), SwiftUI width: \(width)")
+      textView.width = width
+    }
+    
+    textView.updateContainerWidth(width: width)
   }
 }

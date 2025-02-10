@@ -27,6 +27,8 @@ extension MarkdownTextView {
     
     autoresizingMask = [.width]
     
+    
+    
     textContainer?.widthTracksTextView = true
     textContainer?.heightTracksTextView = false
     
@@ -41,5 +43,7 @@ extension MarkdownTextView {
     typingAttributes = config.defaultTypingAttributes
     defaultParagraphStyle = config.defaultParagraphStyle
   }
+  
+ 
 
 }

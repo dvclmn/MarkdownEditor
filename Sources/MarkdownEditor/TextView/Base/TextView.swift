@@ -13,23 +13,31 @@ import MarkdownModels
 public class MarkdownTextView: NSTextView {
   
   var configuration: MarkdownEditorConfiguration
+  var width: CGFloat
 
-  public init(configuration: MarkdownEditorConfiguration) {
+  public init(
+    configuration: MarkdownEditorConfiguration,
+    width: CGFloat
+  ) {
     self.configuration = configuration
+    self.width = width
     super.init(frame: .zero)
   }
   
   public init(
     frame frameRect: NSRect,
     textContainer container: NSTextContainer?,
-    configuration: MarkdownEditorConfiguration
+    configuration: MarkdownEditorConfiguration,
+    width: CGFloat
   ) {
     self.configuration = configuration
+    self.width = width
     super.init(frame: frameRect, textContainer: container)
   }
   
   required init?(coder: NSCoder) {
     self.configuration = MarkdownEditorConfiguration()
+    self.width = .zero
     super.init(coder: coder)
   }
 
@@ -52,12 +60,34 @@ public class MarkdownTextView: NSTextView {
   
   public override func layout() {
     super.layout()
-    print("Performed layout")
-    
+//    print("Performed layout")
     if let textContainer = self.textContainer {
       textContainer.containerSize = NSSize(width: self.bounds.width, height: CGFloat.greatestFiniteMagnitude)
     }
+    let insets = adjustedInsets(configuration)
+    self.textContainer?.lineFragmentPadding = insets
     self.invalidateIntrinsicContentSize()
+  }
+  
+  func adjustedInsets(_ config: MarkdownEditorConfiguration) -> CGFloat {
+
+    let minInsets = config.theme.insets
+    let availableWidth = self.width
+    let targetContentWidth = config.theme.maxReadingWidth
+    
+    /// If the available width is less than target, use minimum insets
+    if availableWidth <= targetContentWidth, !config.isEditable {
+      return minInsets
+    }
+    
+    /// Calculate how much total padding we need
+    let totalPadding = availableWidth - targetContentWidth
+    
+    /// Since lineFragmentPadding is applied to both sides,
+    /// divide by 2 to get the per-side value
+    let padding = totalPadding / 2.0
+    
+    return max(minInsets, padding)
   }
   
   func updateContainerWidth(width: CGFloat) {
