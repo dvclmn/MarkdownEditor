@@ -48,47 +48,10 @@ public struct MarkdownEditor: NSViewRepresentable {
 
   public func updateNSView(_ nsView: MarkdownScrollView, context: Context) {
 
-    print("Running `updateNSView` at \(Date())")
-
     let textView = nsView.textView
 
     if textView.string != text {
       textView.string = text
     }
-
-
-    /// Only for non‑editable views, update height
-    if !configuration.isEditable {
-      nsView.layoutSubtreeIfNeeded()
-      let newIntrinsicHeight = textView.intrinsicContentSize.height
-
-      /// Throttle to prevent excessive updates.
-      if let last = context.coordinator.lastUpdatedHeight, abs(last - newIntrinsicHeight) < 1.0 {
-        /// Change is minimal; do nothing.
-      } else {
-        print("The `textView` intrinsic height is \(newIntrinsicHeight)")
-        context.coordinator.lastUpdatedHeight = newIntrinsicHeight
-        DispatchQueue.main.async {
-          /// Pass the new desired height to SwiftUI.
-          self.height(newIntrinsicHeight)
-        }
-      }
-    }
-
-
-    //    if !configuration.isEditable {
-    //      /// Force a layout update.
-    //      nsView.layoutSubtreeIfNeeded()
-    //
-    //      /// Retrieve the height from the text view’s intrinsic content size.
-    //      let intrinsicHeight = textView.intrinsicContentSize.height
-    //      print("The `textView` intrinsic height is \(intrinsicHeight)")
-    //
-    //      /// Call the closure so SwiftUI can update its layout.
-    //      DispatchQueue.main.async {
-    //        height(intrinsicHeight)
-    //      }
-    //    }
-
   }
 }
