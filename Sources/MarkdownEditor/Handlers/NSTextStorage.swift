@@ -283,6 +283,7 @@ class MarkdownTextStorage: NSTextStorage {
           )
           applyAttributes(ranges)
         } else {
+          fatalError("Figure this out")
           let ranges = MarkdownRanges(
             all: match.range,
             leading: .zero,

@@ -51,7 +51,7 @@ class MarkdownLayoutManager: NSLayoutManager {
     }
 
     /// Draw horizontal rules
-    drawHorizontalRules(in: charRange, at: origin)
+//    drawHorizontalRules(in: charRange, at: origin)
 
     super.drawBackground(forGlyphRange: glyphsToShow, at: origin)
 
@@ -237,19 +237,19 @@ class MarkdownLayoutManager: NSLayoutManager {
     }
   }
 
-  private func drawHorizontalRule(attachment: HorizontalRuleAttachment, in rect: CGRect) {
-    guard let context = NSGraphicsContext.current?.cgContext else { return }
-
-    // Calculate the line position (centered vertically in the frame)
-    let y = rect.midY
-
-    // Set up the line style
-    context.setLineWidth(attachment.thickness)
-    context.setStrokeColor(attachment.color.cgColor)
-
-    // Draw the line
-    context.move(to: CGPoint(x: rect.minX, y: y))
-    context.addLine(to: CGPoint(x: rect.maxX, y: y))
-    context.strokePath()
-  }
+//  private func drawHorizontalRule(attachment: HorizontalRuleAttachment, in rect: CGRect) {
+//    guard let context = NSGraphicsContext.current?.cgContext else { return }
+//
+//    // Calculate the line position (centered vertically in the frame)
+//    let y = rect.midY
+//
+//    // Set up the line style
+//    context.setLineWidth(attachment.thickness)
+//    context.setStrokeColor(attachment.color.cgColor)
+//
+//    // Draw the line
+//    context.move(to: CGPoint(x: rect.minX, y: y))
+//    context.addLine(to: CGPoint(x: rect.maxX, y: y))
+//    context.strokePath()
+//  }
 }
