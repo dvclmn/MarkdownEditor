@@ -40,7 +40,7 @@ public struct MarkdownEditor: NSViewRepresentable {
       textContainer: textContainer,
       configuration: configuration
     )
-
+    
     textView.delegate = context.coordinator
     textView.string = text
     textView.setUpTextView(configuration)

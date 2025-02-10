@@ -18,6 +18,8 @@ extension MarkdownTextView {
     isEditable = config.isEditable
     drawsBackground = false
     
+    allowsUndo = true
+    
     isVerticallyResizable = true
     isHorizontallyResizable = false
     

@@ -13,13 +13,16 @@ public struct EditorView: View {
   @State private var windowWidth: CGFloat = .zero
   @Binding var text: String
   let configuration: MarkdownEditorConfiguration
+  let height: (CGFloat) -> Void
   
   public init(
     text: Binding<String>,
-    configuration: MarkdownEditorConfiguration = .init()
+    configuration: MarkdownEditorConfiguration = .init(),
+    height: @escaping (CGFloat) -> Void = { _ in }
   ) {
     self._text = text
     self.configuration = configuration
+    self.height = height
   }
   
   public var body: some View {
@@ -31,10 +34,11 @@ public struct EditorView: View {
         configuration: configuration
       )
     }
-    .onGeometryChange(for: CGFloat.self) { proxy in
-      return proxy.size.width
+    .onGeometryChange(for: CGSize.self) { proxy in
+      return proxy.size
     } action: { newValue in
-      windowWidth = newValue
+      windowWidth = newValue.width
+      height(newValue.height)
     }
     
   }

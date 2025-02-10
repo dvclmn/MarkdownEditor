@@ -99,43 +99,6 @@ class MarkdownTextStorage: NSTextStorage {
     }
   }
 
-  private func highlightCodeBlocks() {
-    self.beginEditing()
-    guard let regex = Markdown.Syntax.codeBlock.nsRegex else { return }
-    let text = backingStore.string
-    let range = NSRange(location: 0, length: backingStore.length)
-
-    regex.enumerateMatches(in: text, options: [], range: range) { match, _, _ in
-      guard let match = match else { return }
-
-      guard match.range.location + match.range.length <= backingStore.length else { return }
-
-      let fullRange = match.range
-      let codeBlock = (text as NSString).substring(with: fullRange)
-      let lines = codeBlock.components(separatedBy: .newlines)
-
-      let languageHint = lines.first?
-        .replacingOccurrences(of: "```", with: "")
-        .trimmingCharacters(in: .whitespaces)
-
-      guard let highlightr = highlightr,
-        let highlightedCode = highlightr.highlight(codeBlock, as: languageHint ?? "txt")
-      else {
-        return
-      }
-
-      let attributedCode = NSMutableAttributedString(attributedString: highlightedCode)
-      attributedCode.addAttribute(
-        TextBackground.codeBlock.attributeKey,
-        value: true,
-        range: NSRange(location: 0, length: attributedCode.length)
-      )
-
-      backingStore.replaceCharacters(in: fullRange, with: attributedCode)
-
-    }
-    self.endEditing()
-  }
 
   //  private func highlightCodeBlocks() {
   //
@@ -213,7 +176,7 @@ class MarkdownTextStorage: NSTextStorage {
           applyAttributes(ranges)
 
 
-        case .heading, .list, .quoteBlock:
+        case .heading, .quoteBlock:
           let leadingRange = match.range(at: 1)
           let contentRange = match.range(at: 2)
 
@@ -226,6 +189,19 @@ class MarkdownTextStorage: NSTextStorage {
           applyAttributes(ranges)
 
 
+        case .list:
+          let leadingRange = match.range(at: 1)
+          let contentRange = match.range(at: 2)
+          
+          let ranges = MarkdownRanges(
+            all: match.range,
+            leading: leadingRange,
+            content: contentRange,
+            trailing: .zero
+          )
+          applyAttributes(ranges)
+          
+          
         case .link, .image:
           let leadingRange = match.range(at: 1)
           let contentRange = match.range(at: 2)
@@ -252,7 +228,7 @@ class MarkdownTextStorage: NSTextStorage {
             trailing: trailingRange
           )
           applyAttributes(ranges)
-        //            }
+
         default:
           break
       }
@@ -305,6 +281,44 @@ class MarkdownTextStorage: NSTextStorage {
   //  }
 
 
+  private func highlightCodeBlocks() {
+    self.beginEditing()
+    guard let regex = Markdown.Syntax.codeBlock.nsRegex else { return }
+    let text = backingStore.string
+    let range = NSRange(location: 0, length: backingStore.length)
+    
+    regex.enumerateMatches(in: text, options: [], range: range) { match, _, _ in
+      guard let match = match else { return }
+      
+      guard match.range.location + match.range.length <= backingStore.length else { return }
+      
+      let fullRange = match.range
+      let codeBlock = (text as NSString).substring(with: fullRange)
+      let lines = codeBlock.components(separatedBy: .newlines)
+      
+      let languageHint = lines.first?
+        .replacingOccurrences(of: "```", with: "")
+        .trimmingCharacters(in: .whitespaces)
+      
+      guard let highlightr = highlightr,
+            let highlightedCode = highlightr.highlight(codeBlock, as: languageHint ?? "txt")
+      else {
+        return
+      }
+      
+      let attributedCode = NSMutableAttributedString(attributedString: highlightedCode)
+      attributedCode.addAttribute(
+        TextBackground.codeBlock.attributeKey,
+        value: true,
+        range: NSRange(location: 0, length: attributedCode.length)
+      )
+      
+      backingStore.replaceCharacters(in: fullRange, with: attributedCode)
+      
+    }
+    self.endEditing()
+  }
+  
 }
 
 struct MarkdownRanges {
