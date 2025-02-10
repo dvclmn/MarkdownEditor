@@ -10,7 +10,9 @@ import MarkdownModels
 import SwiftUI
 
 public struct EditorView: View {
-  @State private var windowWidth: CGFloat = .zero
+  
+  @State private var store: EditorHandler = .init()
+  
   @Binding var text: String
   let configuration: MarkdownEditorConfiguration
   let height: (CGFloat) -> Void
@@ -26,22 +28,23 @@ public struct EditorView: View {
   }
 
   public var body: some View {
+    
+    @Bindable var store = store
 
     ScrollView {
       MarkdownEditor(
         text: $text,
-        width: windowWidth,
+        width: store.windowWidth,
         configuration: configuration
       )
     }
-    //    .frame(maxWidth: .infinity, maxHeight: .infinity)
+
     .onGeometryChange(for: CGSize.self) { proxy in
       return proxy.size
     } action: { newValue in
-      windowWidth = newValue.width
+      store.windowWidth = newValue.width
       height(newValue.height)
     }
-
   }
 }
 #if DEBUG

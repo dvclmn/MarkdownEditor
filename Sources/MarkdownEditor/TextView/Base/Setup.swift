@@ -16,7 +16,7 @@ extension MarkdownTextView {
   func setUpTextView(_ config: MarkdownEditorConfiguration) {
     
     isEditable = config.isEditable
-    drawsBackground = false
+//    drawsBackground = false
     
     allowsUndo = true
     
@@ -27,7 +27,7 @@ extension MarkdownTextView {
     
     autoresizingMask = [.width]
     
-    
+    self.backgroundColor = config.isEditable ? .red : .clear
     
     textContainer?.widthTracksTextView = true
     textContainer?.heightTracksTextView = false
