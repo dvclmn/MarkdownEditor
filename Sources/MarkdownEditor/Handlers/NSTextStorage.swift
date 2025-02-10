@@ -191,67 +191,6 @@ class MarkdownTextStorage: NSTextStorage {
     self.endEditing()
   }
 
-//  private func styleHorizontalRule(syntax: Markdown.Syntax) {
-//    guard let pattern = syntax.nsRegex else { return }
-//    let string = backingStore.string
-//
-//    self.beginEditing()
-//    pattern.enumerateMatches(
-//      in: string, options: [], range: NSRange(location: 0, length: backingStore.length)
-//    ) { match, _, _ in
-//      guard let match = match else { return }
-//
-//      if match.range.location + match.range.length <= backingStore.length {
-//        let attachment = HorizontalRuleAttachment()
-//        let attachmentString = NSAttributedString(attachment: attachment)
-//        backingStore.replaceCharacters(in: match.range, with: attachmentString)
-//      }
-//    }
-//    self.endEditing()
-//  }
-
-//  private func styleHorizontalRule(syntax: Markdown.Syntax) {
-//    
-//    guard let pattern = syntax.nsRegex else { return }
-//    let text = backingStore.string
-//    
-//    processRegexMatches(for: syntax, in: text, using: pattern) { ranges in
-//      /// Replace the horizontal rule syntax with an attachment
-//      let attachment = HorizontalRuleAttachment()
-//      
-//      let attachmentString = NSAttributedString(attachment: attachment)
-//      
-//      /// H rule ranges: MarkdownRanges(all: {378, 3}, leading: {378, 3}, content: {381, 0}, trailing: {381, 0})
-//      print("H rule ranges: \(ranges)")
-//      backingStore.replaceCharacters(in: ranges.all, with: attachmentString)
-//    }
-//  }
-  
-//  private func styleHorizontalRule(syntax: Markdown.Syntax) {
-//    guard let pattern = syntax.nsRegex else { return }
-//    let text = backingStore.string
-//    
-//    // Collect all ranges to be replaced
-//    var rangesToReplace: [NSRange] = []
-//    
-//    processRegexMatches(for: syntax, in: text, using: pattern) { ranges in
-//      rangesToReplace.append(ranges.all)
-//    }
-//    
-//    // Replace ranges in reverse order to avoid invalidating subsequent ranges
-//    for range in rangesToReplace.reversed() {
-//      // Ensure the range is valid
-//      if range.location + range.length <= backingStore.length {
-//        let attachment = HorizontalRuleAttachment()
-//        let attachmentString = NSAttributedString(attachment: attachment)
-//        backingStore.replaceCharacters(in: range, with: attachmentString)
-//      } else {
-//        print("Invalid range: \(range) for string length: \(backingStore.length)")
-//      }
-//    }
-//  }
-  
-  
   private func processRegexMatches(
     for syntax: Markdown.Syntax,
     in text: String,

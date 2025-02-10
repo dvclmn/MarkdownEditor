@@ -200,56 +200,6 @@ class MarkdownLayoutManager: NSLayoutManager {
         path.line(to: CGPoint(x: ruleRect.maxX, y: ruleRect.midY))
         path.stroke()
       }
-
-      //      super.drawBackground(forGlyphRange: glyphsToShow, at: origin)
-      //        backingStore.enumerateAttribute(NSAttributedString.Key("MarkdownHorizontalRuleAttribute"), in: glyphsToShow, options: []) { (value, range, _) in
-      //           if value as? Bool == true {
-      //              // Compute the rect for the entire line
-      //              self.enumerateLineFragments(forGlyphRange: glyphRange) { rect, usedRect, textContainer, glyphRange, stop in
-      //                 // Use your custom drawing code. For example:
-      //                 let ruleRect = CGRect(x: rect.origin.x, y: rect.midY - 0.5, width: rect.size.width, height: 1)
-      //               NSColor.separatorColor.setStroke()
-      //               let path = NSBezierPath()
-      //               path.move(to: CGPoint(x: ruleRect.minX, y: ruleRect.midY))
-      //                 path.line(to: CGPoint(x: ruleRect.maxX, y: ruleRect.midY))
-      //                 path.stroke()
-      //                }
-      //             }
-      //          }
-      //       }
-
-
-      //      if let attachment = value as? HorizontalRuleAttachment {
-      //        /// Calculate the glyph range for the attachment
-      //        let glyphRange = self.glyphRange(forCharacterRange: range, actualCharacterRange: nil)
-      //
-      //        /// Get the line fragment rect for the glyph range
-      //        var lineFragmentRect = CGRect.zero
-      //        self.lineFragmentRect(forGlyphAt: glyphRange.location, effectiveRange: nil, withoutAdditionalLayout: true)
-      //
-      //        /// Adjust the rect for the origin
-      //        lineFragmentRect.origin.x += origin.x
-      //        lineFragmentRect.origin.y += origin.y
-      //
-      //        /// Draw the horizontal rule
-      //        self.drawHorizontalRule(attachment: attachment, in: lineFragmentRect)
-      //      }
     }
   }
-
-//  private func drawHorizontalRule(attachment: HorizontalRuleAttachment, in rect: CGRect) {
-//    guard let context = NSGraphicsContext.current?.cgContext else { return }
-//
-//    // Calculate the line position (centered vertically in the frame)
-//    let y = rect.midY
-//
-//    // Set up the line style
-//    context.setLineWidth(attachment.thickness)
-//    context.setStrokeColor(attachment.color.cgColor)
-//
-//    // Draw the line
-//    context.move(to: CGPoint(x: rect.minX, y: y))
-//    context.addLine(to: CGPoint(x: rect.maxX, y: y))
-//    context.strokePath()
-//  }
 }
