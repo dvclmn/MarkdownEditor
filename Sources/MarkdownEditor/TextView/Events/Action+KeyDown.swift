@@ -9,22 +9,24 @@ import AppKit
 import BaseHelpers
 import MarkdownModels
 
+//enum KeyboardKeyCode: UInt16 {
+//  case returnKey = 36
+//}
+//
 //extension MarkdownTextView {
-  
+//  
 //  typealias PassthroughKeyEvent = () -> Void
-  
+//  
 //  public override func keyDown(with event: NSEvent) {
 //    
-//    if configuration.isHandlingKeyPress {
+//    if configuration.isEditable {
 //      handleKeyPress(event)
 //    } else {
 //      super.keyDown(with: event)
 //    }
-//    
-//    
 //  } // END key down override
-  
-#warning("Needs keyboard shortcut handling to be improved/implemented")
+//  
+////#warning("Needs keyboard shortcut handling to be improved/implemented")
 //  func handleKeyPress(_ event: NSEvent) {
 //    /// `charactersIgnoringModifiers` returns an optional, so we unwrap it here
 //    guard let pressedKey = event.charactersIgnoringModifiers, pressedKey.count == 1 else {
@@ -35,7 +37,6 @@ import MarkdownModels
 //    /// Create shortcuts, on-the-fly, for every key press
 //    let modifierFlags = event.modifierFlags.intersection(.deviceIndependentFlagsMask)
 //    let pressedShortcut = KBShortcut(.character(Character(pressedKey)), modifierFlags: modifierFlags)
-//    let returnKey: String = "\n"
 //    
 //    // MARK: - Handle registered shortcuts
 //    /// This is where we determine if the above `pressedShortcut`
@@ -55,13 +56,13 @@ import MarkdownModels
 //    }
 //    /// There are also other useful key events, that aren't `KBShortcut`s,
 //    /// that can trigger actions
-//    else if pressedKey == returnKey || event.keyCode == 36 {
+//    else if event.keyCode == 36 {
 //      
-//      handleNewLine {
+////      handleNewLine {
 //        super.keyDown(with: event)
-//      }
+////      }
+//      print("Pressed return")
 //      
-//      //      print("Pressed return")
 //      
 //    }
 //    /// We've now exhausted all usefulness checks. If we haven't used this key by now,
@@ -70,7 +71,7 @@ import MarkdownModels
 //      super.keyDown(with: event)
 //    }
 //  }
-//  
+//
 //  enum WrapAction {
 //    case wrap
 //    case unwrap
@@ -158,7 +159,7 @@ import MarkdownModels
 //    
 //    
 //  }
-  
+//  
   //  func undoWrapping() {
   //    guard let action = undoRedoManager.undo(),
   //          let tlm = self.textLayoutManager,
@@ -207,6 +208,114 @@ import MarkdownModels
   //    }
   //  }
   //
-  
+
+//  func handleNewLine(
+//    passthroughKey: PassthroughKeyEvent
+//  ) {
+//    
+//    
+//    /// This function is called when a new line is created (via return key)
+//    /// For now it only checks for list items
+//    
+//    func trimmedForReference(_ paragraph: String) -> String {
+//      paragraph.trimmingCharacters(in: .whitespacesAndNewlines)
+//    }
+//    
+//    /// This is the paragraph we just left, the one we were on before pressing Return
+//    let lineDepartedText = self.paragraphHandler.previousParagraph.string
+//    let lineDepartedTrimmed = trimmedForReference(lineDepartedText)
+//    let rangeDeparted = self.paragraphHandler.previousParagraph.range
+//    
+//    /// This is the paragraph we've now landed on, after pressing Return
+//    let lineArrivedText = self.paragraphHandler.currentParagraph.string
+//    let lineArrivedTrimmed = trimmedForReference(lineArrivedText)
+//    //    let rangeArrived = self.paragraphHandler.currentParagraph.range
+//    
+//    //    print("""
+//    //    Trimmed for reference:
+//    //      Departed paragraph: \(lineDepartedTrimmed)
+//    //      Arrived paragraph: \(lineArrivedTrimmed)
+//    //    """)
+//    
+//    let newListItemPattern = "- "
+//    
+//    /// Let's check if we're in a list. If not, we pass the key press on through
+//    guard let textStorage else {
+//      passthroughKey()
+//      return
+//    }
+//    
+//    let departedLineIsList: Bool = lineDepartedTrimmed.hasPrefix(newListItemPattern)
+//    
+//    /// It's occured to me that the 'arrived' line will be a bit of a different case,
+//    /// as it'll be the result of whatever I brought with me when pressing Return (if anything)
+//    let arrivedLineIsList: Bool = lineArrivedTrimmed.hasPrefix(newListItemPattern)
+//    let bothLinesAreList: Bool = departedLineIsList && arrivedLineIsList
+//    
+//    
+//    if departedLineIsList {
+//      
+//      /// If the paragraph's contents doesn't exactly match the list pattern `- `,
+//      /// that means were in a list item with some content. Further down, after this,
+//      /// we handle the case where there's no content (empty list item)
+//      ///
+//      if lineDepartedTrimmed != newListItemPattern {
+//        
+//        let cursorPosition = selectedRange().location
+//        let textToInsert = "\n- "
+//        
+//        self.insertText(
+//          textToInsert,
+//          replacementRange: NSRange(location: cursorPosition, length: 0)
+//        )
+//        
+//      }
+//      /// The *only* contents of this line, is the new list pattern.
+//      /// Pressing return here, should remove the "- ", leaving a clean blank line
+//      else {
+//        
+//        print("If this fires, it should replace the characters with an empty string, because the list item is empty.")
+//        
+//        textStorage.replaceCharacters(in: rangeDeparted, with: "")
+//        
+//        // The list item is empty, so break out of the list
+//        //        replaceCharacters(in: , with: "\n")
+//        //        moveSelectedRange(by: 1) // Move cursor to the new line
+//      }
+//      
+//      
+//      
+//      
+//      
+//    } else if arrivedLineIsList {
+//      passthroughKey()
+//      
+//      
+//    } else if bothLinesAreList {
+//      passthroughKey()
+//    } else {
+//      passthroughKey()
+//    }
+//    
+//    
+//    
+//    
+//    
+//    
+//    //    if paragraphText.hasPrefix(newListItemPattern) {
+//    //
+//    //      if paragraphText == newListItemPattern {
+//    //
+//    //        replaceCharacters(in: paragraphRange, with: "\n")
+//    ////        insertText("\n", replacementRange: self.selectedRange())
+//    //      } else {
+//    //        insertText("\n- ", replacementRange: self.selectedRange())
+//    //      }
+//    //
+//    //    } else {
+//    //      defaultKey()
+//    //    }
+//    
+//  }
   
 //}
