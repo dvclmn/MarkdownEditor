@@ -49,7 +49,8 @@ public struct MarkdownEditor: NSViewRepresentable {
 
     if textView.string != text {
       textView.string = text
-      textView.invalidateIntrinsicContentSize()
+      textView.processText(text)
+//      textView.invalidateIntrinsicContentSize()
     }
   }
 }
