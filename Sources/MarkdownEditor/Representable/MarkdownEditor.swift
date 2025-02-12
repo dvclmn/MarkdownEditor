@@ -27,8 +27,15 @@ public struct MarkdownEditor: NSViewRepresentable {
   }
 
   public func makeNSView(context: Context) -> MarkdownScrollView {
+    
+    let storage = MarkdownTextStorage(configuration: configuration)
+    storage.processingStateChanged = { isProcessing in
+      // Update your loading state here
+    }
+    
     let view = MarkdownScrollView(
       frame: .zero,
+      textStorage: storage,
       configuration: configuration
     )
     view.textView.delegate = context.coordinator
@@ -49,8 +56,9 @@ public struct MarkdownEditor: NSViewRepresentable {
 
     if textView.string != text {
       textView.string = text
-      textView.processText(text)
-//      textView.invalidateIntrinsicContentSize()
+      
+//      textView.processText(text)
+      textView.invalidateIntrinsicContentSize()
     }
   }
 }

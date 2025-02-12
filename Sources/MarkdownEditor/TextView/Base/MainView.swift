@@ -15,10 +15,11 @@ public class MarkdownScrollView: NSView {
 
   public init(
     frame frameRect: NSRect,
+    textStorage: MarkdownTextStorage,
     configuration: EditorConfiguration
   ) {
     /// Create text storage and layout manager
-    let textStorage = MarkdownTextStorage(configuration: configuration)
+    
     let layoutManager = MarkdownLayoutManager(configuration: configuration)
     textStorage.addLayoutManager(layoutManager)
 

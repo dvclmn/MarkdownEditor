@@ -135,31 +135,31 @@ public class MarkdownTextView: NSTextView {
 
 extension MarkdownTextView {
   
-  func processText(_ text: String) {
-    // Cancel any existing processing
-    currentTask?.cancel()
-    
-    // Show loading state if needed
-    showLoadingOverlay()
-    
-    currentTask = Task { [weak self] in
-      guard let self = self else { return }
-      
-      let processed = await MarkdownCache.shared.cachedText(for: text) { inputText in
-        // Move your existing markdown processing here
-        // Return NSAttributedString
-        return self.processMarkdown(inputText)
-      }
-      
-      // Update UI on main thread
-      await MainActor.run {
-        guard !Task.isCancelled else { return }
-        self.textStorage?.setAttributedString(processed)
-        self.hideLoadingOverlay()
-        self.invalidateIntrinsicContentSize()
-      }
-    }
-  }
+//  func processText(_ text: String) {
+//    // Cancel any existing processing
+//    currentTask?.cancel()
+//    
+//    // Show loading state if needed
+//    showLoadingOverlay()
+//    
+//    currentTask = Task { [weak self] in
+//      guard let self = self else { return }
+//      
+//      let processed = await MarkdownCache.shared.cachedText(for: text) { inputText in
+//        // Move your existing markdown processing here
+//        // Return NSAttributedString
+//        return self.processMarkdown(inputText)
+//      }
+//      
+//      // Update UI on main thread
+//      await MainActor.run {
+//        guard !Task.isCancelled else { return }
+//        self.textStorage?.setAttributedString(processed)
+//        self.hideLoadingOverlay()
+//        self.invalidateIntrinsicContentSize()
+//      }
+//    }
+//  }
   
   private func showLoadingOverlay() {
     guard loadingOverlay == nil else { return }
@@ -188,26 +188,3 @@ extension MarkdownTextView {
 }
 
 
-final class MarkdownCache: Sendable {
-  static let shared = MarkdownCache()
-  private var cache = NSCache<NSString, NSAttributedString>()
-  private var processingQueue = DispatchQueue(label: "com.banksia.markdown.processing", qos: .userInitiated)
-  
-  func cachedText(for key: String, process: @escaping (String) -> NSAttributedString) async -> NSAttributedString {
-    if let cached = cache.object(forKey: key as NSString) {
-      return cached
-    }
-    
-    return await withCheckedContinuation { continuation in
-      processingQueue.async {
-        let processed = process(key)
-        self.cache.setObject(processed, forKey: key as NSString)
-        continuation.resume(returning: processed)
-      }
-    }
-  }
-  
-  func invalidate(for key: String) {
-    cache.removeObject(forKey: key as NSString)
-  }
-}

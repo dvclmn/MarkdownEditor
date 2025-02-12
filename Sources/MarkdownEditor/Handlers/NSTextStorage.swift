@@ -10,13 +10,20 @@ import Highlightr
 import MarkdownModels
 import Rearrange
 
-class MarkdownTextStorage: NSTextStorage {
+public class MarkdownTextStorage: NSTextStorage {
 
   private let backingStore = NSMutableAttributedString()
   private let highlightr = Highlightr()
-  private let codeStorage = CodeAttributedString()
-
+//  private let codeStorage = CodeAttributedString()
   let configuration: EditorConfiguration
+  
+  private var currentProcessingTask: Task<Void, Never>?
+  private var lastProcessedText: String?
+  private var isProcessingEnabled = true
+  
+  private let cache = MarkdownCache.shared
+  
+  var processingStateChanged: ((Bool) -> Void)?
 
   init(configuration: EditorConfiguration) {
     self.configuration = configuration
@@ -32,72 +39,114 @@ class MarkdownTextStorage: NSTextStorage {
     fatalError("Not implemented")
   }
 
-  override var string: String {
+  public override var string: String {
     backingStore.string
   }
 
-  override func attributes(
+  public override func attributes(
     at location: Int, effectiveRange range: NSRangePointer?
   ) -> [NSAttributedString.Key: Any] {
     backingStore.attributes(at: location, effectiveRange: range)
   }
 
-  override func replaceCharacters(in range: NSRange, with str: String) {
+  public override func replaceCharacters(in range: NSRange, with str: String) {
     beginEditing()
     backingStore.replaceCharacters(in: range, with: str)
     edited(.editedCharacters, range: range, changeInLength: str.count - range.length)
     endEditing()
+    /// Trigger async processing
+    scheduleProcessing()
   }
 
-  override func setAttributes(_ attrs: [NSAttributedString.Key: Any]?, range: NSRange) {
+  public override func setAttributes(_ attrs: [NSAttributedString.Key: Any]?, range: NSRange) {
     beginEditing()
     backingStore.setAttributes(attrs, range: range)
     edited(.editedAttributes, range: range, changeInLength: 0)
     endEditing()
   }
-
-  override func processEditing() {
-    super.processEditing()
-    applyDefaultAttributes()
-    applyMarkdownStyles()
-    highlightCodeBlocks()
+  
+  private func processText(_ text: String) async {
+    processingStateChanged?(true)
+    
+    guard let highlightr else {
+      fatalError("Error initializing Highlightr")
+    }
+    
+    let processed = await cache.cachedText(for: text) { inputText in
+      ProcessedMarkdown.process(
+        text: inputText,
+        configuration: self.configuration,
+        highlightr: highlightr
+//        codeStorage: self.codeStorage
+      ).attributedString
+    }
+    
+    await MainActor.run {
+      guard !Task.isCancelled else { return }
+      
+      self.beginEditing()
+      self.backingStore.setAttributedString(processed)
+      self.edited(.editedAttributes, range: NSRange(location: 0, length: self.length), changeInLength: 0)
+      self.endEditing()
+      
+      self.lastProcessedText = text
+      self.processingStateChanged?(false)
+    }
   }
+  
+  // Helper method to temporarily disable processing (useful during bulk updates)
+  func performWithoutProcessing(_ updates: () -> Void) {
+    isProcessingEnabled = false
+    updates()
+    isProcessingEnabled = true
+    scheduleProcessing()
+  }
+  
+  // Add this method to force immediate processing
+  func forceProcessing() {
+    scheduleProcessing()
+  }
+
+//  public override func processEditing() {
+//    super.processEditing()
+//    applyDefaultAttributes()
+//    applyMarkdownStyles()
+//    highlightCodeBlocks()
+//  }
+//  
+  private func scheduleProcessing() {
+    guard isProcessingEnabled else { return }
+    
+    // Cancel any existing processing
+    currentProcessingTask?.cancel()
+    
+    currentProcessingTask = Task {
+//      guard let self = self else { return }
+      
+      // Debounce by waiting a bit
+      try? await Task.sleep(nanoseconds: 100_000_000) // 100ms
+      guard !Task.isCancelled else { return }
+      
+      let currentText = self.string
+      guard currentText != self.lastProcessedText else { return }
+      
+      await self.processText(currentText)
+    }
+  }
+  
 
   private func applyDefaultAttributes() {
     let range = NSRange(location: 0, length: backingStore.length)
     backingStore.setAttributes(configuration.defaultTypingAttributes, range: range)
   }
 
-  private func applyMarkdownStyles() {
-    for syntax in Markdown.Syntax.allCases {
-      styleSyntaxType(syntax: syntax)
-    }
-  }
+//  private func applyMarkdownStyles() {
+//    for syntax in Markdown.Syntax.allCases {
+//      styleSyntaxType(syntax: syntax)
+//    }
+//  }
 
-  private func styleSyntaxType(syntax: Markdown.Syntax) {
-    guard let pattern = syntax.nsRegex else { return }
-    let text = backingStore.string
 
-    processRegexMatches(for: syntax, in: text, using: pattern) { ranges in
-      /// Apply leading syntax attributes
-      backingStore.addAttributes(
-        syntax.syntaxAttributes(with: configuration).attributes,
-        range: ranges.leading
-      )
-
-      /// Apply content attributes
-      backingStore.addAttributes(
-        syntax.contentAttributes(with: configuration).attributes,
-        range: ranges.content
-      )
-
-      /// Apply closing syntax attributes
-      backingStore.addAttributes(
-        syntax.syntaxAttributes(with: configuration).attributes,
-        range: ranges.trailing
-      )
-    }
-  }
 
 
   //  private func highlightCodeBlocks() {
@@ -145,95 +194,7 @@ class MarkdownTextStorage: NSTextStorage {
   //    self.endEditing()
   //  }
 
-  private func processRegexMatches(
-    for syntax: Markdown.Syntax,
-    in text: String,
-    using pattern: NSRegularExpression,
-    applyAttributes: (MarkdownRanges) -> Void
-  ) {
-    let range = NSRange(location: 0, length: backingStore.length)
-
-    pattern.enumerateMatches(in: text, options: [], range: range) { match, _, _ in
-      guard let match = match else { return }
-
-      /// Ensure the match range is valid
-      guard match.range.location + match.range.length <= backingStore.length else {
-        print("Invalid range: \(match.range) for string length: \(backingStore.length)")
-        return
-      }
-      switch syntax {
-        case .bold, .italic, .boldItalic, .strikethrough, .inlineCode, .highlight:
-          let leadingRange = match.range(at: 1)
-          let contentRange = match.range(at: 2)
-          let trailingRange = match.range(at: 3)
-
-          let ranges = MarkdownRanges(
-            all: match.range,
-            leading: leadingRange,
-            content: contentRange,
-            trailing: trailingRange
-          )
-          applyAttributes(ranges)
-
-
-        case .heading, .quoteBlock:
-          let leadingRange = match.range(at: 1)
-          let contentRange = match.range(at: 2)
-
-          let ranges = MarkdownRanges(
-            all: match.range,
-            leading: leadingRange,
-            content: contentRange,
-            trailing: .zero
-          )
-          applyAttributes(ranges)
-
-
-        case .list:
-          let leadingRange = match.range(at: 1)
-          let contentRange = match.range(at: 2)
-          
-          let ranges = MarkdownRanges(
-            all: match.range,
-            leading: leadingRange,
-            content: contentRange,
-            trailing: .zero
-          )
-          applyAttributes(ranges)
-          
-          
-        case .link, .image:
-          let leadingRange = match.range(at: 1)
-          let contentRange = match.range(at: 2)
-          let urlRange = match.range(at: 4)
-
-          let ranges = MarkdownRanges(
-            all: match.range,
-            leading: leadingRange,
-            content: contentRange,
-            trailing: urlRange
-          )
-          applyAttributes(ranges)
-
-
-        case .codeBlock:
-          let leadingRange = match.range(at: 1)
-          let contentRange = match.range(at: 2)
-          let trailingRange = match.range(at: 3)
-
-          let ranges = MarkdownRanges(
-            all: match.range,
-            leading: leadingRange,
-            content: contentRange,
-            trailing: trailingRange
-          )
-          applyAttributes(ranges)
-
-        default:
-          break
-      }
-    }
-  }
+  
 
   //  private func processRegexMatches(
   //    for syntax: Markdown.Syntax,
@@ -281,43 +242,7 @@ class MarkdownTextStorage: NSTextStorage {
   //  }
 
 
-  private func highlightCodeBlocks() {
-    self.beginEditing()
-    guard let regex = Markdown.Syntax.codeBlock.nsRegex else { return }
-    let text = backingStore.string
-    let range = NSRange(location: 0, length: backingStore.length)
-    
-    regex.enumerateMatches(in: text, options: [], range: range) { match, _, _ in
-      guard let match = match else { return }
-      
-      guard match.range.location + match.range.length <= backingStore.length else { return }
-      
-      let fullRange = match.range
-      let codeBlock = (text as NSString).substring(with: fullRange)
-      let lines = codeBlock.components(separatedBy: .newlines)
-      
-      let languageHint = lines.first?
-        .replacingOccurrences(of: "```", with: "")
-        .trimmingCharacters(in: .whitespaces)
-      
-      guard let highlightr = highlightr,
-            let highlightedCode = highlightr.highlight(codeBlock, as: languageHint ?? "txt")
-      else {
-        return
-      }
-      
-      let attributedCode = NSMutableAttributedString(attributedString: highlightedCode)
-      attributedCode.addAttribute(
-        TextBackground.codeBlock.attributeKey,
-        value: true,
-        range: NSRange(location: 0, length: attributedCode.length)
-      )
-      
-      backingStore.replaceCharacters(in: fullRange, with: attributedCode)
-      
-    }
-    self.endEditing()
-  }
+
   
 }
 
