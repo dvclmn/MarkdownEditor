@@ -14,7 +14,6 @@ public class MarkdownTextStorage: NSTextStorage {
 
   private let backingStore = NSMutableAttributedString()
   private let highlightr = Highlightr()
-//  private let codeStorage = CodeAttributedString()
   let configuration: EditorConfiguration
   
   private var currentProcessingTask: Task<Void, Never>?

@@ -48,9 +48,13 @@ public class MarkdownTextView: NSTextView {
 
   /// Compute our “intrinsic” height based on layoutManager’s used rect.
   public override var intrinsicContentSize: NSSize {
-    layoutManager?.ensureLayout(for: textContainer!)
+    guard let layoutManager = layoutManager,
+          let textContainer = textContainer
+    else { return .zero }
+    
+    layoutManager.ensureLayout(for: textContainer)
     /// usedRect is in the text container’s coordinate system.
-    let usedRect = layoutManager?.usedRect(for: textContainer!) ?? .zero
+    let usedRect = layoutManager.usedRect(for: textContainer)
     /// Add textContainerInsets (top + bottom) to the used height.
     let calculatedHeight = adjustedHeight(height: usedRect.height)
     return NSSize(width: NSView.noIntrinsicMetric, height: max(calculatedHeight, minEditorHeight))

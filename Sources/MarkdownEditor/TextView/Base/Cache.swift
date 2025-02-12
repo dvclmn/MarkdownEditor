@@ -6,19 +6,22 @@
 //
 
 import AppKit
-import MarkdownModels
 import Highlightr
+import MarkdownModels
 
 final class MarkdownCache: Sendable {
   static let shared = MarkdownCache()
   private var cache = NSCache<NSString, NSAttributedString>()
-  private var processingQueue = DispatchQueue(label: "com.banksia.markdown.processing", qos: .userInitiated)
-  
-  func cachedText(for key: String, process: @escaping (String) -> NSAttributedString) async -> NSAttributedString {
+  private var processingQueue = DispatchQueue(
+    label: "com.banksia.markdown.processing", qos: .userInitiated)
+
+  func cachedText(
+    for key: String, process: @escaping (String) -> NSAttributedString
+  ) async -> NSAttributedString {
     if let cached = cache.object(forKey: key as NSString) {
       return cached
     }
-    
+
     return await withCheckedContinuation { continuation in
       processingQueue.async {
         let processed = process(key)
@@ -27,7 +30,7 @@ final class MarkdownCache: Sendable {
       }
     }
   }
-  
+
   func invalidate(for key: String) {
     cache.removeObject(forKey: key as NSString)
   }
@@ -37,42 +40,39 @@ final class MarkdownCache: Sendable {
 struct ProcessedMarkdown {
   let attributedString: NSAttributedString
   let timestamp: Date
-  
+
   static func process(
     text: String,
     configuration: EditorConfiguration,
     highlightr: Highlightr
-//    codeStorage: CodeAttributedString
   ) -> ProcessedMarkdown {
     let store = NSMutableAttributedString(string: text)
-    
-    // Apply default attributes
+
+    /// Apply default attributes
     let range = NSRange(location: 0, length: store.length)
     store.setAttributes(configuration.defaultTypingAttributes, range: range)
-    
-    // Apply markdown styles
+
+    /// Apply markdown styles
     for syntax in Markdown.Syntax.allCases {
-      // Your existing styling logic here
       applySyntaxStyle(to: store, syntax: syntax, configuration: configuration)
     }
-    
+
     // Apply code highlighting
-    highlightCodeBlocks(in: store, using: highlightr)
-    
+    //    highlightCodeBlocks(in: store, using: highlightr)
+
     return ProcessedMarkdown(
       attributedString: store,
       timestamp: Date()
     )
   }
-  
+
   private static func applySyntaxStyle(
     to backingStore: NSMutableAttributedString,
     syntax: Markdown.Syntax,
     configuration: EditorConfiguration
   ) {
     guard let pattern = syntax.nsRegex else { return }
-    let text = backingStore.string
-    
+
     processRegexMatches(
       in: backingStore,
       for: syntax,
@@ -83,13 +83,13 @@ struct ProcessedMarkdown {
         syntax.syntaxAttributes(with: configuration).attributes,
         range: ranges.leading
       )
-      
+
       /// Apply content attributes
       backingStore.addAttributes(
         syntax.contentAttributes(with: configuration).attributes,
         range: ranges.content
       )
-      
+
       /// Apply closing syntax attributes
       backingStore.addAttributes(
         syntax.syntaxAttributes(with: configuration).attributes,
@@ -97,7 +97,7 @@ struct ProcessedMarkdown {
       )
     }
   }
-  
+
   private static func processRegexMatches(
     in backingStore: NSMutableAttributedString,
     for syntax: Markdown.Syntax,
@@ -106,130 +106,156 @@ struct ProcessedMarkdown {
   ) {
     let text = backingStore.string
     let range = NSRange(location: 0, length: backingStore.length)
-    
+
+    print("About to enumerate regex matches for syntax: \(syntax), pattern: \(pattern)")
+
     pattern.enumerateMatches(in: text, options: [], range: range) { match, _, _ in
       guard let match = match else { return }
-      
-      /// Ensure the match range is valid
-      guard match.range.location + match.range.length <= backingStore.length else {
-        print("Invalid range: \(match.range) for string length: \(backingStore.length)")
+      print("Match found: \(match.debugDescription)")
+
+      /// Create safe wrapper
+      guard let safeMatch = RegexMatch(match: match) else {
+        print("Failed to create RegexMatch wrapper")
         return
       }
-      switch syntax {
-        case .bold, .italic, .boldItalic, .strikethrough, .inlineCode, .highlight:
-          let leadingRange = match.range(at: 1)
-          let contentRange = match.range(at: 2)
-          let trailingRange = match.range(at: 3)
-          
-          let ranges = MarkdownRanges(
-            all: match.range,
-            leading: leadingRange,
-            content: contentRange,
-            trailing: trailingRange
-          )
-          applyAttributes(ranges)
-          
-          
-        case .heading, .quoteBlock:
-          let leadingRange = match.range(at: 1)
-          let contentRange = match.range(at: 2)
-          
-          let ranges = MarkdownRanges(
-            all: match.range,
-            leading: leadingRange,
-            content: contentRange,
-            trailing: .zero
-          )
-          applyAttributes(ranges)
-          
-          
-        case .list:
-          let leadingRange = match.range(at: 1)
-          let contentRange = match.range(at: 2)
-          
-          let ranges = MarkdownRanges(
-            all: match.range,
-            leading: leadingRange,
-            content: contentRange,
-            trailing: .zero
-          )
-          applyAttributes(ranges)
-          
-          
-        case .link, .image:
-          let leadingRange = match.range(at: 1)
-          let contentRange = match.range(at: 2)
-          let urlRange = match.range(at: 4)
-          
-          let ranges = MarkdownRanges(
-            all: match.range,
-            leading: leadingRange,
-            content: contentRange,
-            trailing: urlRange
-          )
-          applyAttributes(ranges)
-          
-          
-        case .codeBlock:
-          let leadingRange = match.range(at: 1)
-          let contentRange = match.range(at: 2)
-          let trailingRange = match.range(at: 3)
-          
-          let ranges = MarkdownRanges(
-            all: match.range,
-            leading: leadingRange,
-            content: contentRange,
-            trailing: trailingRange
-          )
-          applyAttributes(ranges)
-          
-        default:
-          break
+
+      /// Validate the full match range
+      guard safeMatch.fullRange.location + safeMatch.fullRange.length <= backingStore.length else {
+        print(
+          "Invalid match range: \(safeMatch.fullRange.debugDescription) for string length: \(backingStore.length)"
+        )
+        return
+      }
+
+      /// Process based on syntax type
+      do {
+        let ranges = try createRanges(for: syntax, from: safeMatch)
+        applyAttributes(ranges)
+      } catch let error {
+        print("Error processing \(syntax): \(error)")
       }
     }
   }
-  
-  
+
+  private static func createRanges(
+    for syntax: Markdown.Syntax, from match: RegexMatch
+  ) throws -> MarkdownRanges {
+    switch syntax {
+      case .heading, .quoteBlock:
+        guard let leadingRange = match.capture(at: 1) else {
+          throw MarkdownRegexError.missingRequiredCapture(index: 1, syntax: syntax)
+        }
+        guard let contentRange = match.capture(at: 2) else {
+          throw MarkdownRegexError.missingRequiredCapture(index: 2, syntax: syntax)
+        }
+
+        return MarkdownRanges(
+          all: match.fullRange,
+          leading: leadingRange,
+          content: contentRange,
+          trailing: .zero
+        )
+
+      case .inlineCode, .strikethrough, .codeBlock, .highlight:
+        guard let leadingRange = match.capture(at: 1),
+          let contentRange = match.capture(at: 2),
+          let trailingRange = match.capture(at: 3)
+        else {
+          throw MarkdownRegexError.missingRequiredCapture(index: 3, syntax: syntax)
+        }
+
+        return MarkdownRanges(
+          all: match.fullRange,
+          leading: leadingRange,
+          content: contentRange,
+          trailing: trailingRange
+        )
+
+      case .link, .image:
+        guard let textOpenRange = match.capture(at: 1),
+          let textRange = match.capture(at: 2),
+          let urlOpenRange = match.capture(at: 3),
+          let urlRange = match.capture(at: 4),
+          let urlCloseRange = match.capture(at: 5)
+        else {
+          throw MarkdownRegexError.missingRequiredCapture(index: 5, syntax: syntax)
+        }
+
+        // Combine ranges for leading and trailing parts
+        let leadingRange = NSRange(
+          location: textOpenRange.location,
+          length: textOpenRange.length + textRange.length
+        )
+
+        let trailingRange = NSRange(
+          location: urlOpenRange.location,
+          length: urlOpenRange.length + urlRange.length + urlCloseRange.length
+        )
+
+        return MarkdownRanges(
+          all: match.fullRange,
+          leading: leadingRange,
+          content: urlRange,
+          trailing: trailingRange
+        )
+
+      default:
+        // For other cases, use a simpler pattern
+        guard let leadingRange = match.capture(at: 1),
+          let contentRange = match.capture(at: 2)
+        else {
+          throw MarkdownRegexError.missingRequiredCapture(index: 2, syntax: syntax)
+        }
+
+        return MarkdownRanges(
+          all: match.fullRange,
+          leading: leadingRange,
+          content: contentRange,
+          trailing: .zero
+        )
+    }
+  }
+
   private static func highlightCodeBlocks(
     in backingStore: NSMutableAttributedString,
     using highlightr: Highlightr
   ) {
-//    self.beginEditing()
+    //    self.beginEditing()
     guard let regex = Markdown.Syntax.codeBlock.nsRegex else { return }
     let text = backingStore.string
     let range = NSRange(location: 0, length: backingStore.length)
-    
+
     regex.enumerateMatches(in: text, options: [], range: range) { match, _, _ in
       guard let match = match else { return }
-      
+
       guard match.range.location + match.range.length <= backingStore.length else { return }
-      
+
       let fullRange = match.range
       let codeBlock = (text as NSString).substring(with: fullRange)
       let lines = codeBlock.components(separatedBy: .newlines)
-      
+
       let languageHint = lines.first?
         .replacingOccurrences(of: "```", with: "")
         .trimmingCharacters(in: .whitespaces)
-      
+
       guard let highlightedCode = highlightr.highlight(codeBlock, as: languageHint ?? "txt") else {
         return
       }
-//      guard let highlightr = highlightr,
-//      else {
-//        return
-//      }
-      
+      //      guard let highlightr = highlightr,
+      //      else {
+      //        return
+      //      }
+
       let attributedCode = NSMutableAttributedString(attributedString: highlightedCode)
       attributedCode.addAttribute(
         TextBackground.codeBlock.attributeKey,
         value: true,
         range: NSRange(location: 0, length: attributedCode.length)
       )
-      
+
       backingStore.replaceCharacters(in: fullRange, with: attributedCode)
-      
+
     }
-//    self.endEditing()
+    //    self.endEditing()
   }
 }

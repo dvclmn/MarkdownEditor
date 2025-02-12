@@ -5,8 +5,34 @@
 //  Created by Dave Coleman on 8/2/2025.
 //
 
-//import AppKit
-//import MarkdownModels
+import AppKit
+import MarkdownModels
+import BaseHelpers
+
+struct RegexMatch {
+  let fullRange: NSRange
+  let captures: [NSRange]
+  
+  init?(match: NSTextCheckingResult) {
+    self.fullRange = match.range
+    /// Get all capture groups (including the full match at index 0)
+    self.captures = (0..<match.numberOfRanges).map { match.range(at: $0) }
+  }
+  
+  func capture(at index: Int) -> NSRange? {
+    guard index < captures.count else {
+      return nil
+    }
+    let range = captures[index]
+    return range.location == NSNotFound ? nil : range
+  }
+}
+
+enum MarkdownRegexError: Error {
+  case missingRequiredCapture(index: Int, syntax: Markdown.Syntax)
+  case invalidRange(range: NSRange, syntax: Markdown.Syntax)
+}
+
 
 //class MarkdownLayoutFragment: NSTextLayoutFragment {
 //  
