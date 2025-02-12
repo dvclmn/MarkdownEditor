@@ -9,8 +9,6 @@ import BaseHelpers
 import SwiftUI
 import MarkdownModels
 
-//import Highlightr
-
 extension MarkdownTextView {
 
   func setUpTextView(_ config: EditorConfiguration) {
@@ -26,8 +24,6 @@ extension MarkdownTextView {
     isAutomaticDashSubstitutionEnabled = false
     
     autoresizingMask = [.width]
-    
-//    self.backgroundColor = config.isEditable ? .red.withAlphaComponent(0.3) : .clear
     
     textContainer?.widthTracksTextView = true
     textContainer?.heightTracksTextView = false

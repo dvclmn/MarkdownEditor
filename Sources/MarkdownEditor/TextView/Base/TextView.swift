@@ -57,7 +57,6 @@ public class MarkdownTextView: NSTextView {
   public override func layout() {
     super.layout()
     
-    
     if isEditable {
       /// When editable, let the document view's height be determined by its content.
       guard let layoutManager = layoutManager,
