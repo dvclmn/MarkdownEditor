@@ -13,28 +13,81 @@ import TreeSitterMarkdownInline
 import TreeSitterSwift
 
 extension MarkdownController {
-  static func makeHighlighter(for textView: NSTextView) throws -> TextViewHighlighter {
+  static func makeHighlighter(for textView: MarkdownTextView) throws -> TextViewHighlighter {
 
-    //    print("Let's set up `TextViewHighlighter`.")
-
-    //    textView.typingAttributes = textView.configuration.defaultTypingAttributes
-
-    let markdownConfig = try LanguageConfiguration(
-      tree_sitter_markdown(),
-      name: "Markdown"
-    )
-    let markdownInlineConfig = try LanguageConfiguration(
-      tree_sitter_markdown_inline(),
-      name: "Markdown Inline",
-      bundleName: "TreeSitterMarkdown_TreeSitterMarkdownInline"
-    )
+    let config = textView.configuration
+    
+    textView.typingAttributes = textView.configuration.defaultTypingAttributes
+    
     let swiftConfig = try LanguageConfiguration(
       tree_sitter_swift(),
       name: "Swift",
       bundleName: "TreeSitterSwift_TreeSitterSwift"
     )
-
+    
+//    let markdownConfig = try LanguageConfiguration(
+//      tree_sitter_markdown(),
+//      name: "Markdown"
+//    )
+//    let markdownInlineConfig = try LanguageConfiguration(
+//      tree_sitter_markdown_inline(),
+//      name: "Markdown Inline"
+//    )
+    
     let provider: TokenAttributeProvider = { token in
+      
+      print("Token: \(token)")
+      
+      return switch token.name {
+        case let keyword where keyword.hasPrefix("punctuation"): [.foregroundColor: NSColor.red]
+        case let keyword where keyword.hasPrefix("text.title"): [.foregroundColor: NSColor.green]
+        case let keyword where keyword.hasPrefix("text.literal"): [.foregroundColor: NSColor.purple]
+        default: [.foregroundColor: NSColor.blue]
+      }
+    }
+    
+    let highlighterConfig = TextViewHighlighter.Configuration(
+      languageConfiguration: swiftConfig,
+      attributeProvider: provider,
+      languageProvider: { name in
+        
+        print("embedded language: ", name)
+        
+        switch name {
+          case "markdown_inline":
+            print("Let's fire up markdown inline")
+            return swiftConfig
+          default:
+            return nil
+        }
+      },
+      locationTransformer: { _ in nil }
+    )
+    
+    return try TextViewHighlighter(textView: textView, configuration: highlighterConfig)
+    
+    
+    
+    
+
+//    textView.typingAttributes = config.defaultTypingAttributes
+//
+//    let markdownConfig = try LanguageConfiguration(
+//      tree_sitter_markdown(),
+//      name: "Markdown"
+//    )
+//    let markdownInlineConfig = try LanguageConfiguration(
+//      tree_sitter_markdown_inline(),
+//      name: "Markdown Inline",
+//      bundleName: "TreeSitterMarkdown_TreeSitterMarkdownInline"
+//    )
+//    let swiftConfig = try LanguageConfiguration(
+//      tree_sitter_swift(),
+//      name: "Swift",
+//      bundleName: "TreeSitterSwift_TreeSitterSwift"
+//    )
+//
+//    let provider: TokenAttributeProvider = { token in
 
       //      let codeBlockElements = textView.elements.filter { $0.syntax == .codeBlock }
 
@@ -67,56 +120,56 @@ extension MarkdownController {
       //      } else {
       //        // Return empty dictionary or default styling for non-code-block tokens
       //
-      return switch token.name {
-        case "punctuation.delimiter": [.foregroundColor: NSColor.red]
-        /// ❤️ — Default leading/trailing syntax characters, e.g. `~`, `*`
-        case "punctuation.special": [.foregroundColor: NSColor.yellow]
-        /// 💛 — Heading `#` and list `-`
-        case "text.title": [.foregroundColor: NSColor.green]
-        /// 💚 — Heading text
-        case "text.literal": [.foregroundColor: NSColor.purple]
-        /// 💜 — Default 'code' text
-        case "text.emphasis": [.foregroundColor: NSColor.cyan]
-        /// 🩵 — Italics
-        case "text.strong": [.foregroundColor: NSColor.brown]
-        /// 🤎 — Bold
-        case "text.uri": [.foregroundColor: NSColor.magenta]
-        /// 🩷 — Links
-        case "text.reference": [.foregroundColor: NSColor.gray]
-        /// 🩶 — Link label e.g. `[label](http://link.com)`
-        case "none": [.foregroundColor: NSColor.orange]
-        /// 🧡 — Also seems related to 'code' text?
-        ///
-        default: [.foregroundColor: NSColor.blue]
-      }  // END switch and return
-      //      } // END code block check
+//      return switch token.name {
+//        case "punctuation.delimiter": [.foregroundColor: NSColor.red]
+//        /// ❤️ — Default leading/trailing syntax characters, e.g. `~`, `*`
+//        case "punctuation.special": [.foregroundColor: NSColor.yellow]
+//        /// 💛 — Heading `#` and list `-`
+//        case "text.title": [.foregroundColor: NSColor.green]
+//        /// 💚 — Heading text
+//        case "text.literal": [.foregroundColor: NSColor.purple]
+//        /// 💜 — Default 'code' text
+//        case "text.emphasis": [.foregroundColor: NSColor.cyan]
+//        /// 🩵 — Italics
+//        case "text.strong": [.foregroundColor: NSColor.brown]
+//        /// 🤎 — Bold
+//        case "text.uri": [.foregroundColor: NSColor.magenta]
+//        /// 🩷 — Links
+//        case "text.reference": [.foregroundColor: NSColor.gray]
+//        /// 🩶 — Link label e.g. `[label](http://link.com)`
+//        case "none": [.foregroundColor: NSColor.orange]
+//        /// 🧡 — Also seems related to 'code' text?
+//        ///
+//        default: [.foregroundColor: NSColor.blue]
+//      }  // END switch and return
+//      //      } // END code block check
 
 
-    }
+//    }
 
-    let highlighterConfig = TextViewHighlighter.Configuration(
-      languageConfiguration: markdownConfig,
-      attributeProvider: provider,
-      languageProvider: { name in
-
-        switch name {
-          case "markdown_inline":
-            print("Found inline markdown grammar.")
-            return markdownInlineConfig
-
-          case "swift":
-            print("Found swift grammar")
-            return swiftConfig
-
-          default:
-            return nil
-        }
-      },
-
-      locationTransformer: { _ in nil }
-    )
-
-    return try TextViewHighlighter(textView: textView, configuration: highlighterConfig)
+//    let highlighterConfig = TextViewHighlighter.Configuration(
+//      languageConfiguration: markdownConfig,
+//      attributeProvider: provider,
+//      languageProvider: { name in
+//
+//        switch name {
+//          case "markdown_inline":
+//            print("Found inline markdown grammar.")
+//            return markdownInlineConfig
+//
+//          case "swift":
+//            print("Found swift grammar")
+//            return swiftConfig
+//
+//          default:
+//            return nil
+//        }
+//      },
+//
+//      locationTransformer: { _ in nil }
+//    )
+//
+//    return try TextViewHighlighter(textView: textView, configuration: highlighterConfig)
 
   }
   //    let regularFont = NSFont.monospacedSystemFont(ofSize: 16, weight: .regular)

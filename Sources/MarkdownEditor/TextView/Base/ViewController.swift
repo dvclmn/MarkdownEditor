@@ -32,7 +32,6 @@ public class MarkdownController: NSViewController {
     textContainer.widthTracksTextView = true
     layoutManager.addTextContainer(textContainer)
     
-
     /// Create text view
     textView = MarkdownTextView(
       frame: .zero,
@@ -52,7 +51,8 @@ public class MarkdownController: NSViewController {
     } catch {
       print("Error creating highlighter: \(error)")
       self.highlighter = nil
-      super.init(nibName: nil, bundle: nil)
+      fatalError("Why didn't Neon start up? \(error)")
+//      super.init(nibName: nil, bundle: nil)
     }
     
   }

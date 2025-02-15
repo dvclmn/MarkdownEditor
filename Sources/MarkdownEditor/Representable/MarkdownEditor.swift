@@ -44,13 +44,11 @@ public struct MarkdownEditor: NSViewControllerRepresentable {
 
   public func updateNSViewController(_ nsView: MarkdownController, context: Context) {
 
-//    let textView = nsView.textView
-//
-//    if textView.string != text {
-//      textView.string = text
-//      
-////      textView.processText(text)
+    let textView = nsView.textView
+
+    if textView.string != text {
+      textView.string = text
 //      textView.invalidateIntrinsicContentSize()
-//    }
+    }
   }
 }

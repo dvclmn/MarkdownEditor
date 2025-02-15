@@ -39,6 +39,8 @@ public struct EditorView: View {
 
   public var body: some View {
     
+    Text(text.count.string)
+    
     @Bindable var store = store
 
       MarkdownEditor(
@@ -54,7 +56,7 @@ public struct EditorView: View {
     /// We only want to set a SwiftUI frame height when the
     /// text view is in `displayMode` (non-editable)
       .frame(height: configuration.isEditable ? nil : store.displayModeHeight)
-
+      .border(Color.green.opacity(0.3))
   }
 }
 #if DEBUG
