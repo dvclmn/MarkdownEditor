@@ -6,7 +6,6 @@
 //
 
 import AppKit
-import Highlightr
 
 final class MarkdownCache: Sendable {
   static let shared = MarkdownCache()

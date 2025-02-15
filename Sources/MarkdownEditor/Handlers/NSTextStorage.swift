@@ -11,7 +11,6 @@ import Rearrange
 public class MarkdownTextStorage: NSTextStorage {
 
   private let backingStore = NSMutableAttributedString()
-  private let highlightr = Highlightr()
   let configuration: EditorConfiguration
   
   private var currentProcessingTask: Task<Void, Never>?

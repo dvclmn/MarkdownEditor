@@ -9,7 +9,9 @@ import BaseHelpers
 import SwiftUI
 
 @MainActor
-public struct MarkdownEditor: NSViewRepresentable {
+public struct MarkdownEditor: NSViewControllerRepresentable {
+  
+  public typealias NSViewControllerType = MarkdownController
 
   @Binding var text: String
   var configuration: EditorConfiguration
@@ -25,7 +27,7 @@ public struct MarkdownEditor: NSViewRepresentable {
     self.height = height
   }
 
-  public func makeNSView(context: Context) -> MarkdownController {
+  public func makeNSViewController(context: Context) -> MarkdownController {
     
     let storage = MarkdownTextStorage(configuration: configuration)
     storage.processingStateChanged = { isProcessing in
@@ -49,7 +51,7 @@ public struct MarkdownEditor: NSViewRepresentable {
     return view
   }
 
-  public func updateNSView(_ nsView: MarkdownController, context: Context) {
+  public func updateNSViewController(_ nsView: MarkdownController, context: Context) {
 
     let textView = nsView.textView
 

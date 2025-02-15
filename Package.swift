@@ -21,6 +21,7 @@ let package = Package(
     .package(url: "https://github.com/ChimeHQ/Rearrange.git", from: "2.0.0"),
     .package(url: "https://github.com/ChimeHQ/Neon", branch: "main"),
     .package(url: "https://github.com/alex-pinkus/tree-sitter-swift", branch: "with-generated-files"),
+    .package(url: "https://github.com/tree-sitter-grammars/tree-sitter-markdown.git", branch: "split_parser"),
     .package(url: "https://github.com/gohanlon/swift-memberwise-init-macro.git", from: "0.5.0"),
     .package(url: "https://github.com/dvclmn/Collection.git", branch: "main"),
     
@@ -35,6 +36,7 @@ let package = Package(
 //        .product(name: "TreeSitterClient", package: "Neon"),
 //        .product(name: "RangeState", package: "Neon"),
         .product(name: "TreeSitterSwift", package: "tree-sitter-swift"),
+        .product(name: "TreeSitterMarkdown", package: "tree-sitter-markdown"),
         .product(name: "BaseHelpers", package: "Collection"),
         .product(name: "BaseStyles", package: "Collection"),
       ]

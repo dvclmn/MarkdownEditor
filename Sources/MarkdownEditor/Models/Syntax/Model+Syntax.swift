@@ -5,7 +5,7 @@
 //  Created by Dave Coleman on 10/8/2024.
 //
 
-//import BaseHelpers
+import BaseHelpers
 import SwiftUI
 
 extension Markdown {
