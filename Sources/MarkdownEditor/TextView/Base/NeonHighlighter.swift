@@ -13,17 +13,14 @@ import TreeSitterMarkdownInline
 import TreeSitterSwift
 
 extension MarkdownController {
-  static func makeHighlighter(for textView: MarkdownTextView) throws -> TextViewHighlighter {
+  static func makeHighlighter(
+    for textView: NSTextView,
+    with config: EditorConfiguration
+  ) throws -> TextViewHighlighter {
 
-    let config = textView.configuration
+    textView.typingAttributes = config.defaultTypingAttributes
     
-    textView.typingAttributes = textView.configuration.defaultTypingAttributes
     
-    let swiftConfig = try LanguageConfiguration(
-      tree_sitter_swift(),
-      name: "Swift",
-      bundleName: "TreeSitterSwift_TreeSitterSwift"
-    )
     
 //    let markdownConfig = try LanguageConfiguration(
 //      tree_sitter_markdown(),
@@ -46,6 +43,11 @@ extension MarkdownController {
       }
     }
     
+    let swiftConfig = try LanguageConfiguration(
+      tree_sitter_swift(),
+      name: "Swift"
+    )
+    
     let highlighterConfig = TextViewHighlighter.Configuration(
       languageConfiguration: swiftConfig,
       attributeProvider: provider,
@@ -54,8 +56,7 @@ extension MarkdownController {
         print("embedded language: ", name)
         
         switch name {
-          case "markdown_inline":
-            print("Let's fire up markdown inline")
+          case "swift":
             return swiftConfig
           default:
             return nil

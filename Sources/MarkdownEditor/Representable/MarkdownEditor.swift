@@ -30,9 +30,9 @@ public struct MarkdownEditor: NSViewControllerRepresentable {
   public func makeNSViewController(context: Context) -> MarkdownController {
 
     let viewController = MarkdownController(configuration: configuration)
-    viewController.textView.delegate = context.coordinator
-    viewController.textView.setUpTextView(configuration)
-
+//    viewController.textView.delegate = context.coordinator
+//    viewController.textView.setUpTextView(configuration)
+    viewController.textView.string = TestStrings.Markdown.basicMarkdown
 //    viewController.textView.heightChanged = { newHeight in
 //      DispatchQueue.main.async {
 //        self.height(newHeight)
@@ -42,12 +42,12 @@ public struct MarkdownEditor: NSViewControllerRepresentable {
     return viewController
   }
 
-  public func updateNSViewController(_ nsView: MarkdownController, context: Context) {
+  public func updateNSViewController(_ viewController: MarkdownController, context: Context) {
 
-    let textView = nsView.textView
-    if textView.string != text {
-      textView.string = text
-//      textView.invalidateIntrinsicContentSize()
-    }
+//    let textView = viewController.textView
+//    if textView.string != text {
+//      textView.string = text
+////      textView.invalidateIntrinsicContentSize()
+//    }
   }
 }

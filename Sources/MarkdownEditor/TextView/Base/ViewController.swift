@@ -13,45 +13,50 @@ import TreeSitterSwift
 import SwiftTreeSitter
 import Neon
 
+@MainActor
 public class MarkdownController: NSViewController {
 
-  let textView: MarkdownTextView
-  let scrollView: NSScrollView
-  
+  let textView: NSTextView
   private let highlighter: TextViewHighlighter
 
   public init(configuration: EditorConfiguration) {
     
-    /// Create text storage and layout manager
-    let textStorage = NSTextStorage()
-    let layoutManager = NSLayoutManager()
-//    let layoutManager = MarkdownLayoutManager(configuration: configuration)
-    textStorage.addLayoutManager(layoutManager)
-
-    /// Create text container
-    let textContainer = NSTextContainer()
-    textContainer.widthTracksTextView = true
-    layoutManager.addTextContainer(textContainer)
-    
-    /// Create text view
-    textView = MarkdownTextView(
-      frame: .zero,
-      textContainer: textContainer,
-      configuration: configuration
-    )
-    
-    scrollView = NSScrollView()
-    scrollView.hasVerticalScroller = textView.configuration.isEditable
-    scrollView.drawsBackground = false
-    scrollView.documentView = textView
-    
+    textView = NSTextView(usingTextLayoutManager: false)
+//    /// Create text storage and layout manager
+//    let textStorage = NSTextStorage()
+//    let layoutManager = NSLayoutManager()
+////    let layoutManager = MarkdownLayoutManager(configuration: configuration)
+//    textStorage.addLayoutManager(layoutManager)
+//
+//    /// Create text container
+//    let textContainer = NSTextContainer()
+//    textContainer.widthTracksTextView = true
+//    layoutManager.addTextContainer(textContainer)
+//    
+//    /// Create text view
+//    textView = MarkdownTextView(
+//      frame: .zero,
+//      textContainer: textContainer,
+//      configuration: configuration
+//    )
+//    
+//    scrollView = NSScrollView()
+//    scrollView.hasVerticalScroller = textView.configuration.isEditable
+//    scrollView.drawsBackground = false
+//    scrollView.documentView = textView
     do {
-      self.highlighter = try Self.makeHighlighter(for: textView)
+      self.highlighter = try Self.makeHighlighter(
+        for: textView,
+        with: configuration
+      )
       super.init(nibName: nil, bundle: nil)
+      
+      if textView.textLayoutManager == nil {
+        textView.layoutManager?.allowsNonContiguousLayout = true
+      }
+      
     } catch {
-      print("Error creating highlighter: \(error)")
-      fatalError("Why didn't Neon start up? \(error)")
-//      super.init(nibName: nil, bundle: nil)
+      fatalError("Error starting `TextViewHighlighter`: \(error)")
     }
     
   }
@@ -61,73 +66,163 @@ public class MarkdownController: NSViewController {
   }
   
   public override func loadView() {
-    /// Create scroll view
+    let scrollView = NSScrollView()
     
-//    let scrollView = NSScrollView()
+    scrollView.hasVerticalScroller = true
+    scrollView.documentView = textView
     
+    let max = CGFloat.greatestFiniteMagnitude
     
-
+    textView.minSize = NSSize.zero
+    textView.maxSize = NSSize(width: max, height: max)
+    textView.isVerticallyResizable = true
+    textView.isHorizontallyResizable = true
+    
+    textView.isRichText = false  // Discards any attributes when pasting.
+    
     self.view = scrollView
     
-    /// Ensure that our subviews use autoresizing – or set up Auto Layout constraints here.
-//    scrollView.translatesAutoresizingMaskIntoConstraints = false
-//    NSLayoutConstraint.activate([
-//      scrollView.leadingAnchor.constraint(equalTo: leadingAnchor),
-//      scrollView.trailingAnchor.constraint(equalTo: trailingAnchor),
-//      scrollView.topAnchor.constraint(equalTo: topAnchor),
-//      scrollView.bottomAnchor.constraint(equalTo: bottomAnchor),
-//    ])
+    textView.enclosingScrollView
     
-
+//    self.view = scrollView
     highlighter.observeEnclosingScrollView()
-
 
   }
 
-  /// Override layout so that when the view's bounds change, we invalidate and recalc the intrinsic size.
-//  public override func layout() {
-//    super.layout()
-//
-//    /// Ensure the scroll view and text view have their frames updated.
-//    scrollView.frame = self.bounds
-//
-//
-//  }
 }
 
 
-//extension NSTextView {
-//  private var maximumUsableWidth: CGFloat {
-//    guard let scrollView = enclosingScrollView else {
-//      return bounds.width
+
+//@MainActor
+//final class TextViewController: NSUIViewController {
+//  private let textView: NSUITextView
+//  private let highlighter: TextViewHighlighter
+//  
+//  init() {
+//    self.textView = NSUITextView(usingTextLayoutManager: false)
+//    
+//    self.highlighter = try! Self.makeHighlighter(for: textView)
+//    
+//    super.init(nibName: nil, bundle: nil)
+//    
+//    // enable non-continguous layout for TextKit 1
+//    if textView.textLayoutManager == nil {
+//      textView.nsuiLayoutManager?.allowsNonContiguousLayout = true
 //    }
-//
-//    let usableWidth = scrollView.contentSize.width - textContainerInset.width
-//
-//    guard scrollView.rulersVisible, let rulerView = scrollView.verticalRulerView else {
-//      return usableWidth
-//    }
-//
-//    return usableWidth - rulerView.requiredThickness
 //  }
-//
-//
-//  public var wrapsTextToHorizontalBounds: Bool {
-//    get {
-//      textContainer?.widthTracksTextView ?? false
-//    }
-//    set {
-//      textContainer?.widthTracksTextView = newValue
-//
-//      let max = CGFloat.greatestFiniteMagnitude
-//
-//      textContainer?.size = NSSize(width: max, height: max)
-//
-//      if newValue {
-//        let newSize = NSSize(width: maximumUsableWidth, height: frame.height)
-//
-//        self.frame = NSRect(origin: frame.origin, size: newSize)
+//  
+//  @available(*, unavailable)
+//  required init?(coder: NSCoder) {
+//    fatalError("init(coder:) has not been implemented")
+//  }
+//  
+//  private static func makeHighlighter(for textView: NSUITextView) throws -> TextViewHighlighter {
+//    let regularFont = NSUIFont.monospacedSystemFont(ofSize: 16, weight: .regular)
+//    let boldFont = NSUIFont.monospacedSystemFont(ofSize: 16, weight: .bold)
+//    let italicDescriptor = regularFont.fontDescriptor.nsuiWithSymbolicTraits(.traitItalic) ?? regularFont.fontDescriptor
+//    
+//    let italicFont = NSUIFont(nsuiDescriptor: italicDescriptor, size: 16) ?? regularFont
+//    
+//    // Set the default styles. This is applied by stock `NSTextStorage`s during
+//    // so-called "attribute fixing" when you type, and we emulate that as
+//    // part of the highlighting process in `TextViewSystemInterface`.
+//    textView.typingAttributes = [
+//      .foregroundColor: NSUIColor.darkGray,
+//      .font: regularFont,
+//    ]
+//    
+//    let provider: TokenAttributeProvider = { token in
+//      return switch token.name {
+//        case let keyword where keyword.hasPrefix("keyword"): [.foregroundColor: NSUIColor.red, .font: boldFont]
+//        case "comment", "spell": [.foregroundColor: NSUIColor.green, .font: italicFont]
+//          // Note: Default is not actually applied to unstyled/untokenized text.
+//        default: [.foregroundColor: NSUIColor.blue, .font: regularFont]
 //      }
+//    }
+//    
+//    // this is doing both synchronous language initialization everything, but TreeSitterClient supports lazy loading for embedded languages
+//    let markdownConfig = try! LanguageConfiguration(
+//      tree_sitter_markdown(),
+//      name: "Markdown"
+//    )
+//    
+//    let markdownInlineConfig = try! LanguageConfiguration(
+//      tree_sitter_markdown_inline(),
+//      name: "MarkdownInline",
+//      bundleName: "TreeSitterMarkdown_TreeSitterMarkdownInline"
+//    )
+//    
+//    let swiftConfig = try! LanguageConfiguration(
+//      tree_sitter_swift(),
+//      name: "Swift"
+//    )
+//    
+//    let highlighterConfig = TextViewHighlighter.Configuration(
+//      languageConfiguration: swiftConfig, // the root language
+//      attributeProvider: provider,
+//      languageProvider: { name in
+//        print("embedded language: ", name)
+//        
+//        switch name {
+//          case "swift":
+//            return swiftConfig
+//          case "markdown_inline":
+//            return markdownInlineConfig
+//          default:
+//            return nil
+//        }
+//      },
+//      locationTransformer: { _ in nil }
+//    )
+//    
+//    return try TextViewHighlighter(textView: textView, configuration: highlighterConfig)
+//  }
+//  
+//  override func loadView() {
+//#if canImport(AppKit) && !targetEnvironment(macCatalyst)
+//    let scrollView = NSScrollView()
+//    
+//    scrollView.hasVerticalScroller = true
+//    scrollView.documentView = textView
+//    
+//    let max = CGFloat.greatestFiniteMagnitude
+//    
+//    textView.minSize = NSSize.zero
+//    textView.maxSize = NSSize(width: max, height: max)
+//    textView.isVerticallyResizable = true
+//    textView.isHorizontallyResizable = true
+//    
+//    textView.isRichText = false  // Discards any attributes when pasting.
+//    
+//    self.view = scrollView
+//#else
+//    self.view = textView
+//#endif
+//    
+//    // this has to be done after the textview has been embedded in the scrollView if
+//    // it wasn't that way on creation
+//    highlighter.observeEnclosingScrollView()
+//    
+//    regularTestWithSwiftCode()
+//  }
+//  
+//  func regularTestWithSwiftCode() {
+//    let url = Bundle.main.url(forResource: "test", withExtension: "code")!
+//    let content = try! String(contentsOf: url)
+//    
+//    textView.text = content
+//  }
+//  
+//  func doBigMarkdownTest() {
+//    let url = Bundle.main.url(forResource: "big_test", withExtension: "md")!
+//    let content = try! String(contentsOf: url)
+//    
+//    textView.text = content
+//    
+//    DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(2)) {
+//      let range = NSRange(location: content.utf16.count, length: 0)
+//      
+//      self.textView.scrollRangeToVisible(range)
 //    }
 //  }
 //}
