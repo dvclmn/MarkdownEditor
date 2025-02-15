@@ -7,7 +7,6 @@
 
 import AppKit
 import Highlightr
-import MarkdownModels
 import Rearrange
 
 public class MarkdownTextStorage: NSTextStorage {

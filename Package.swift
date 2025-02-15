@@ -18,19 +18,19 @@ let package = Package(
     .package(url: "https://github.com/raspu/Highlightr.git", from: "2.2.1"),
     .package(url: "https://github.com/ChimeHQ/Rearrange.git", from: "2.0.0"),
     .package(url: "https://github.com/ChimeHQ/Glyph.git", branch: "main"),
+    .package(url: "https://github.com/gohanlon/swift-memberwise-init-macro.git", from: "0.5.0"),
 //    .package(url: "https://github.com/ChimeHQ/ThemePark.git", branch: "main"),
     .package(url: "https://github.com/dvclmn/Collection.git", branch: "main"),
-    .package(url: "https://github.com/dvclmn/MarkdownModels.git", branch: "main")
     
   ],
   targets: [
     .target(
       name: "MarkdownEditor",
       dependencies: [
-        "MarkdownModels",
         "Rearrange",
         "Glyph",
         "Highlightr",
+        .product(name: "MemberwiseInit", package: "swift-memberwise-init-macro"),
 //        "Neon",
 //        "ThemePark",
         .product(name: "BaseHelpers", package: "Collection"),

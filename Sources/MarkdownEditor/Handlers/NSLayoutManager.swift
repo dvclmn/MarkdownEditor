@@ -7,7 +7,6 @@
 
 import AppKit
 import BaseStyles
-import MarkdownModels
 
 class MarkdownLayoutManager: NSLayoutManager {
 

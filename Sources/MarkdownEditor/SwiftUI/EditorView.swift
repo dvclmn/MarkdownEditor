@@ -6,7 +6,6 @@
 //
 
 import BaseHelpers
-import MarkdownModels
 import SwiftUI
 
 public struct EditorView: View {

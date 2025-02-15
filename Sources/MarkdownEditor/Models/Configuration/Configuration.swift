@@ -8,7 +8,6 @@
 import Foundation
 import SwiftUI
 import BaseHelpers
-import MemberwiseInit
 
 public struct EditorConfiguration: Sendable, Equatable {
   

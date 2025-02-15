@@ -6,7 +6,7 @@
 //
 
 import AppKit
-import MarkdownModels
+
 
 public class MarkdownScrollView: NSView {
   private let scrollView: NSScrollView

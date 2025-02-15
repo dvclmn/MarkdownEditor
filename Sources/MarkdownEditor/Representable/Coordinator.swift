@@ -6,7 +6,6 @@
 //
 
 import BaseHelpers
-import MarkdownModels
 import SwiftUI
 
 extension MarkdownEditor {

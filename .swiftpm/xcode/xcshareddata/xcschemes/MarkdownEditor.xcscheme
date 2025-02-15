@@ -43,20 +43,6 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "MarkdownModels"
-               BuildableName = "MarkdownModels"
-               BlueprintName = "MarkdownModels"
-               ReferencedContainer = "container:../MarkdownModels">
-            </BuildableReference>
-         </BuildActionEntry>
-         <BuildActionEntry
-            buildForTesting = "YES"
-            buildForRunning = "YES"
-            buildForProfiling = "YES"
-            buildForArchiving = "YES"
-            buildForAnalyzing = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
                BlueprintIdentifier = "BaseStyles"
                BuildableName = "BaseStyles"
                BlueprintName = "BaseStyles"

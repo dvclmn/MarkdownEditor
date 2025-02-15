@@ -6,7 +6,7 @@
 //
 
 import AppKit
-import MarkdownModels
+
 import BaseHelpers
 
 struct RegexMatch {
