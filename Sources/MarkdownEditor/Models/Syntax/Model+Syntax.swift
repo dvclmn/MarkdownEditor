@@ -5,7 +5,7 @@
 //  Created by Dave Coleman on 10/8/2024.
 //
 
-import BaseHelpers
+//import BaseHelpers
 import SwiftUI
 
 extension Markdown {
@@ -21,7 +21,7 @@ extension Markdown {
 
     case heading(level: Int)
 
-    case bold
+    case bold 
     case italic
     case boldItalic
 

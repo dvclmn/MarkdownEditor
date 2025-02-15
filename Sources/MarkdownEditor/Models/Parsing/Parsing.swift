@@ -7,7 +7,6 @@
 
 import Foundation
 import AppKit
-import BaseHelpers
 
 enum SyntaxRangeType {
   case total

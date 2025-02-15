@@ -25,14 +25,14 @@ public struct MarkdownEditor: NSViewRepresentable {
     self.height = height
   }
 
-  public func makeNSView(context: Context) -> MarkdownScrollView {
+  public func makeNSView(context: Context) -> MarkdownController {
     
     let storage = MarkdownTextStorage(configuration: configuration)
     storage.processingStateChanged = { isProcessing in
       // Update your loading state here
     }
     
-    let view = MarkdownScrollView(
+    let view = MarkdownController(
       frame: .zero,
       textStorage: storage,
       configuration: configuration
@@ -49,7 +49,7 @@ public struct MarkdownEditor: NSViewRepresentable {
     return view
   }
 
-  public func updateNSView(_ nsView: MarkdownScrollView, context: Context) {
+  public func updateNSView(_ nsView: MarkdownController, context: Context) {
 
     let textView = nsView.textView
 

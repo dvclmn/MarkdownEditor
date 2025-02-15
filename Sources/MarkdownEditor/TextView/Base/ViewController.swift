@@ -7,19 +7,34 @@
 
 import AppKit
 
+import TreeSitterMarkdown
+import TreeSitterMarkdownInline
+import TreeSitterSwift
+import SwiftTreeSitter
+import Neon
 
-public class MarkdownScrollView: NSView {
-  private let scrollView: NSScrollView
+//import TreeSitterClient
+
+public class MarkdownController: NSViewController {
+
   let textView: MarkdownTextView
-  
+  private let highlighter: TextViewHighlighter
 
   public init(
-    frame frameRect: NSRect,
+//    frame frameRect: NSRect,
     textStorage: MarkdownTextStorage,
     configuration: EditorConfiguration
   ) {
     /// Create text storage and layout manager
     
+    self.highlighter = try! Self.makeHighlighter(for: textView)
+    
+    super.init(nibName: nil, bundle: nil)
+    
+//    if textView.textLayoutManager == nil {
+//      textView.nsuiLayoutManager?.allowsNonContiguousLayout = true
+//    }
+//    
     let layoutManager = MarkdownLayoutManager(configuration: configuration)
     textStorage.addLayoutManager(layoutManager)
 
@@ -40,33 +55,37 @@ public class MarkdownScrollView: NSView {
       configuration: configuration
     )
 
-    /// Create scroll view
-    scrollView = NSScrollView(frame: frameRect)
-    scrollView.hasVerticalScroller = configuration.isEditable
-    scrollView.hasHorizontalScroller = false
-    scrollView.autohidesScrollers = true
-    scrollView.drawsBackground = false
-    /// Configure scroll view
-    scrollView.documentView = textView
-
-    super.init(frame: frameRect)
-
-    /// Add scroll view as a subview
-    addSubview(scrollView)
-
-    /// Ensure that our subviews use autoresizing – or set up Auto Layout constraints here.
-    scrollView.translatesAutoresizingMaskIntoConstraints = false
-    NSLayoutConstraint.activate([
-      scrollView.leadingAnchor.constraint(equalTo: leadingAnchor),
-      scrollView.trailingAnchor.constraint(equalTo: trailingAnchor),
-      scrollView.topAnchor.constraint(equalTo: topAnchor),
-      scrollView.bottomAnchor.constraint(equalTo: bottomAnchor),
-    ])
-
+    
   }
 
   required init?(coder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
+  }
+  
+  override func loadView() {
+    /// Create scroll view
+    
+    let scrollView = NSScrollView()
+    
+    scrollView.hasVerticalScroller = configuration.isEditable
+    scrollView.drawsBackground = false
+    scrollView.documentView = textView
+
+    self.view = scrollView
+    
+    /// Ensure that our subviews use autoresizing – or set up Auto Layout constraints here.
+//    scrollView.translatesAutoresizingMaskIntoConstraints = false
+//    NSLayoutConstraint.activate([
+//      scrollView.leadingAnchor.constraint(equalTo: leadingAnchor),
+//      scrollView.trailingAnchor.constraint(equalTo: trailingAnchor),
+//      scrollView.topAnchor.constraint(equalTo: topAnchor),
+//      scrollView.bottomAnchor.constraint(equalTo: bottomAnchor),
+//    ])
+    
+
+    highlighter.observeEnclosingScrollView()
+
+
   }
 
   /// Override layout so that when the view's bounds change, we invalidate and recalc the intrinsic size.

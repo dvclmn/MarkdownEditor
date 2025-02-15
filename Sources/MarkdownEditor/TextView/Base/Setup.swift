@@ -15,11 +15,16 @@ extension MarkdownTextView {
     
     isEditable = config.isEditable
     drawsBackground = false
-    
+    isRichText = false
     allowsUndo = true
     
     isVerticallyResizable = true
     isHorizontallyResizable = false
+    
+    let max = CGFloat.greatestFiniteMagnitude
+
+    minSize = NSSize.zero
+    maxSize = NSSize(width: max, height: max)
     
     isAutomaticDashSubstitutionEnabled = false
     
