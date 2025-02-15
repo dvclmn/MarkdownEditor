@@ -66,27 +66,62 @@ public class MarkdownController: NSViewController {
   }
   
   public override func loadView() {
-    let scrollView = NSScrollView()
     
+    let scrollView = NSScrollView()
     scrollView.hasVerticalScroller = true
-    scrollView.documentView = textView
     
     let max = CGFloat.greatestFiniteMagnitude
-    
     textView.minSize = NSSize.zero
     textView.maxSize = NSSize(width: max, height: max)
     textView.isVerticallyResizable = true
     textView.isHorizontallyResizable = true
     
-    textView.isRichText = false  // Discards any attributes when pasting.
+    // Configure text container to match scroll view's width
+    if let textContainer = textView.textContainer {
+      textContainer.containerSize = NSSize(width: max, height: max)
+      textContainer.widthTracksTextView = true
+    }
     
+    scrollView.documentView = textView
     self.view = scrollView
     
-    textView.enclosingScrollView
     
+    
+//    let scrollView = NSScrollView()
+//    
+//    scrollView.hasVerticalScroller = true
+//    scrollView.documentView = textView
+//    
+//    let max = CGFloat.greatestFiniteMagnitude
+//    
+//    textView.minSize = NSSize.zero
+//    textView.maxSize = NSSize(width: max, height: max)
+//    textView.isVerticallyResizable = true
+//    textView.isHorizontallyResizable = true
+//    
+//    textView.isRichText = false  // Discards any attributes when pasting.
+//    
 //    self.view = scrollView
-    highlighter.observeEnclosingScrollView()
+//    
+//    textView.enclosingScrollView
+//    
+////    self.view = scrollView
+//    highlighter.observeEnclosingScrollView()
 
+  }
+  
+  public override func viewDidAppear() {
+    super.viewDidAppear()
+    // Move the highlighter observation here
+    highlighter.observeEnclosingScrollView()
+  }
+  
+  public override func viewWillLayout() {
+    super.viewWillLayout()
+    // Ensure proper sizing
+    if let scrollView = view as? NSScrollView {
+      textView.frame = scrollView.contentView.bounds
+    }
   }
 
 }
