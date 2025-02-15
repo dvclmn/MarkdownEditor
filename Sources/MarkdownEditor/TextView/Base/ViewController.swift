@@ -18,13 +18,14 @@ public class MarkdownController: NSViewController {
   let textView: MarkdownTextView
   let scrollView: NSScrollView
   
-  private let highlighter: TextViewHighlighter?
+  private let highlighter: TextViewHighlighter
 
   public init(configuration: EditorConfiguration) {
     
     /// Create text storage and layout manager
     let textStorage = NSTextStorage()
-    let layoutManager = MarkdownLayoutManager(configuration: configuration)
+    let layoutManager = NSLayoutManager()
+//    let layoutManager = MarkdownLayoutManager(configuration: configuration)
     textStorage.addLayoutManager(layoutManager)
 
     /// Create text container
@@ -46,11 +47,9 @@ public class MarkdownController: NSViewController {
     
     do {
       self.highlighter = try Self.makeHighlighter(for: textView)
-      
       super.init(nibName: nil, bundle: nil)
     } catch {
       print("Error creating highlighter: \(error)")
-      self.highlighter = nil
       fatalError("Why didn't Neon start up? \(error)")
 //      super.init(nibName: nil, bundle: nil)
     }
@@ -80,7 +79,7 @@ public class MarkdownController: NSViewController {
 //    ])
     
 
-    highlighter?.observeEnclosingScrollView()
+    highlighter.observeEnclosingScrollView()
 
 
   }

@@ -100,33 +100,33 @@ public class MarkdownTextView: NSTextView {
 //    }
 //  }
   
-  func adjustedHeight(height: CGFloat) -> CGFloat {
-    return height + (adjustedInsets() * 2) + configuration.theme.overScrollAmount
-  }
-  
-  func adjustedInsets() -> CGFloat {
-
-    let minInsets = configuration.theme.insets
-    guard let targetContentWidth = configuration.theme.maxReadingWidth,
-          let availableWidth = self.textContainer?.size.width
-    else {
-      return minInsets
-    }
-
-    /// If the available width is less than target, use minimum insets
-    if availableWidth <= targetContentWidth {
-      return minInsets
-    }
-
-    /// Calculate how much total padding we need
-    let totalPadding = availableWidth - targetContentWidth
-
-    /// Since lineFragmentPadding is applied to both sides,
-    /// divide by 2 to get the per-side value
-    let padding = totalPadding / 2.0
-
-    return max(minInsets, padding)
-  }
+//  func adjustedHeight(height: CGFloat) -> CGFloat {
+//    return height + (adjustedInsets() * 2) + configuration.theme.overScrollAmount
+//  }
+//  
+//  func adjustedInsets() -> CGFloat {
+//
+//    let minInsets = configuration.theme.insets
+//    guard let targetContentWidth = configuration.theme.maxReadingWidth,
+//          let availableWidth = self.textContainer?.size.width
+//    else {
+//      return minInsets
+//    }
+//
+//    /// If the available width is less than target, use minimum insets
+//    if availableWidth <= targetContentWidth {
+//      return minInsets
+//    }
+//
+//    /// Calculate how much total padding we need
+//    let totalPadding = availableWidth - targetContentWidth
+//
+//    /// Since lineFragmentPadding is applied to both sides,
+//    /// divide by 2 to get the per-side value
+//    let padding = totalPadding / 2.0
+//
+//    return max(minInsets, padding)
+//  }
 
 //  public override func didChangeText() {
 //    print("didChangeText")
@@ -164,30 +164,30 @@ extension MarkdownTextView {
 //    }
 //  }
   
-  private func showLoadingOverlay() {
-    guard loadingOverlay == nil else { return }
-    
-    let overlay = NSView(frame: bounds)
-    overlay.wantsLayer = true
-    overlay.layer?.backgroundColor = NSColor.windowBackgroundColor.withAlphaComponent(0.7).cgColor
-    
-    let indicator = NSProgressIndicator(frame: NSRect(x: 0, y: 0, width: 20, height: 20))
-    indicator.style = .spinning
-    indicator.startAnimation(nil)
-    indicator.frame.origin = CGPoint(
-      x: (bounds.width - indicator.frame.width) / 2,
-      y: (bounds.height - indicator.frame.height) / 2
-    )
-    
-    overlay.addSubview(indicator)
-    addSubview(overlay)
-    loadingOverlay = overlay
-  }
-  
-  private func hideLoadingOverlay() {
-    loadingOverlay?.removeFromSuperview()
-    loadingOverlay = nil
-  }
+//  private func showLoadingOverlay() {
+//    guard loadingOverlay == nil else { return }
+//    
+//    let overlay = NSView(frame: bounds)
+//    overlay.wantsLayer = true
+//    overlay.layer?.backgroundColor = NSColor.windowBackgroundColor.withAlphaComponent(0.7).cgColor
+//    
+//    let indicator = NSProgressIndicator(frame: NSRect(x: 0, y: 0, width: 20, height: 20))
+//    indicator.style = .spinning
+//    indicator.startAnimation(nil)
+//    indicator.frame.origin = CGPoint(
+//      x: (bounds.width - indicator.frame.width) / 2,
+//      y: (bounds.height - indicator.frame.height) / 2
+//    )
+//    
+//    overlay.addSubview(indicator)
+//    addSubview(overlay)
+//    loadingOverlay = overlay
+//  }
+//  
+//  private func hideLoadingOverlay() {
+//    loadingOverlay?.removeFromSuperview()
+//    loadingOverlay = nil
+//  }
 }
 
 

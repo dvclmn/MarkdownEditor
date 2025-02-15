@@ -24,17 +24,17 @@ extension MarkdownEditor {
     }
     
     /// This is for communicating changes from within AppKit, back to SwiftUI
-    public func textDidChange(_ notification: Notification) {
-      print("Ran `textDidChange`")
-      guard let textView = notification.object as? NSTextView else { return }
-      parent.text = textView.string
-    }
-
-    public func textViewDidChangeSelection(_ notification: Notification) {
-      guard let textView = notification.object as? NSTextView else { return }
-      self.selectedRanges = textView.selectedRanges
-    }
-    
+//    public func textDidChange(_ notification: Notification) {
+//      print("Ran `textDidChange`")
+//      guard let textView = notification.object as? NSTextView else { return }
+//      parent.text = textView.string
+//    }
+//
+//    public func textViewDidChangeSelection(_ notification: Notification) {
+//      guard let textView = notification.object as? NSTextView else { return }
+//      self.selectedRanges = textView.selectedRanges
+//    }
+//    
   }
 }
 
