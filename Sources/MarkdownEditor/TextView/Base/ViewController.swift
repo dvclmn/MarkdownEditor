@@ -22,39 +22,34 @@ public class MarkdownController: NSViewController {
 
   public init(
 //    frame frameRect: NSRect,
-    textStorage: MarkdownTextStorage,
+//    textStorage: MarkdownTextStorage,
     configuration: EditorConfiguration
   ) {
     /// Create text storage and layout manager
-    
-    self.highlighter = try! Self.makeHighlighter(for: textView)
-    
-    super.init(nibName: nil, bundle: nil)
-    
+   
 //    if textView.textLayoutManager == nil {
 //      textView.nsuiLayoutManager?.allowsNonContiguousLayout = true
 //    }
 //    
     let layoutManager = MarkdownLayoutManager(configuration: configuration)
-    textStorage.addLayoutManager(layoutManager)
+//    textStorage.addLayoutManager(layoutManager)
 
     /// Create text container
-    let textContainer = NSTextContainer(
-      containerSize: NSSize(
-        width: frameRect.width,
-        height: .greatestFiniteMagnitude
-      )
-    )
+    let textContainer = NSTextContainer()
     textContainer.widthTracksTextView = true
     layoutManager.addTextContainer(textContainer)
 
     /// Create text view
     textView = MarkdownTextView(
-      frame: frameRect,
+      frame: .zero,
       textContainer: textContainer,
       configuration: configuration
     )
 
+    
+    self.highlighter = try! Self.makeHighlighter(for: textView)
+    
+    super.init(nibName: nil, bundle: nil)
     
   }
 
@@ -62,12 +57,12 @@ public class MarkdownController: NSViewController {
     fatalError("init(coder:) has not been implemented")
   }
   
-  override func loadView() {
+  public override func loadView() {
     /// Create scroll view
     
     let scrollView = NSScrollView()
     
-    scrollView.hasVerticalScroller = configuration.isEditable
+    scrollView.hasVerticalScroller = textView.configuration.isEditable
     scrollView.drawsBackground = false
     scrollView.documentView = textView
 
@@ -89,14 +84,14 @@ public class MarkdownController: NSViewController {
   }
 
   /// Override layout so that when the view's bounds change, we invalidate and recalc the intrinsic size.
-  public override func layout() {
-    super.layout()
-
-    /// Ensure the scroll view and text view have their frames updated.
-    scrollView.frame = self.bounds
-
-
-  }
+//  public override func layout() {
+//    super.layout()
+//
+//    /// Ensure the scroll view and text view have their frames updated.
+//    scrollView.frame = self.bounds
+//
+//
+//  }
 }
 
 

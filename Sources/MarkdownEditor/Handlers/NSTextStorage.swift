@@ -13,13 +13,13 @@ public class MarkdownTextStorage: NSTextStorage {
   private let backingStore = NSMutableAttributedString()
   let configuration: EditorConfiguration
   
-  private var currentProcessingTask: Task<Void, Never>?
-  private var lastProcessedText: String?
-  private var isProcessingEnabled = true
+//  private var currentProcessingTask: Task<Void, Never>?
+//  private var lastProcessedText: String?
+//  private var isProcessingEnabled = true
   
-  private let cache = MarkdownCache.shared
+//  private let cache = MarkdownCache.shared
   
-  var processingStateChanged: ((Bool) -> Void)?
+//  var processingStateChanged: ((Bool) -> Void)?
 
   init(configuration: EditorConfiguration) {
     self.configuration = configuration
@@ -51,7 +51,7 @@ public class MarkdownTextStorage: NSTextStorage {
     edited(.editedCharacters, range: range, changeInLength: str.count - range.length)
     endEditing()
     /// Trigger async processing
-    scheduleProcessing()
+//    scheduleProcessing()
   }
 
   public override func setAttributes(_ attrs: [NSAttributedString.Key: Any]?, range: NSRange) {
@@ -61,47 +61,47 @@ public class MarkdownTextStorage: NSTextStorage {
     endEditing()
   }
   
-  private func processText(_ text: String) async {
-    processingStateChanged?(true)
-    
-    guard let highlightr else {
-      fatalError("Error initializing Highlightr")
-    }
-    
-    let processed = await cache.cachedText(for: text) { inputText in
-      ProcessedMarkdown.process(
-        text: inputText,
-        configuration: self.configuration,
-        highlightr: highlightr
-//        codeStorage: self.codeStorage
-      ).attributedString
-    }
-    
-    await MainActor.run {
-      guard !Task.isCancelled else { return }
-      
-      self.beginEditing()
-      self.backingStore.setAttributedString(processed)
-      self.edited(.editedAttributes, range: NSRange(location: 0, length: self.length), changeInLength: 0)
-      self.endEditing()
-      
-      self.lastProcessedText = text
-      self.processingStateChanged?(false)
-    }
-  }
+//  private func processText(_ text: String) async {
+//    processingStateChanged?(true)
+//    
+//    guard let highlightr else {
+//      fatalError("Error initializing Highlightr")
+//    }
+//    
+//    let processed = await cache.cachedText(for: text) { inputText in
+//      ProcessedMarkdown.process(
+//        text: inputText,
+//        configuration: self.configuration,
+//        highlightr: highlightr
+////        codeStorage: self.codeStorage
+//      ).attributedString
+//    }
+//    
+//    await MainActor.run {
+//      guard !Task.isCancelled else { return }
+//      
+//      self.beginEditing()
+//      self.backingStore.setAttributedString(processed)
+//      self.edited(.editedAttributes, range: NSRange(location: 0, length: self.length), changeInLength: 0)
+//      self.endEditing()
+//      
+//      self.lastProcessedText = text
+//      self.processingStateChanged?(false)
+//    }
+//  }
   
   // Helper method to temporarily disable processing (useful during bulk updates)
-  func performWithoutProcessing(_ updates: () -> Void) {
-    isProcessingEnabled = false
-    updates()
-    isProcessingEnabled = true
-    scheduleProcessing()
-  }
+//  func performWithoutProcessing(_ updates: () -> Void) {
+//    isProcessingEnabled = false
+//    updates()
+//    isProcessingEnabled = true
+//    scheduleProcessing()
+//  }
   
   // Add this method to force immediate processing
-  func forceProcessing() {
-    scheduleProcessing()
-  }
+//  func forceProcessing() {
+//    scheduleProcessing()
+//  }
 
 //  public override func processEditing() {
 //    super.processEditing()
@@ -110,26 +110,26 @@ public class MarkdownTextStorage: NSTextStorage {
 //    highlightCodeBlocks()
 //  }
 //  
-  private func scheduleProcessing() {
-    guard isProcessingEnabled else { return }
-    
-    // Cancel any existing processing
-    currentProcessingTask?.cancel()
-    
-    currentProcessingTask = Task {
-//      guard let self = self else { return }
-      
-      // Debounce by waiting a bit
-      try? await Task.sleep(nanoseconds: 100_000_000) // 100ms
-      guard !Task.isCancelled else { return }
-      
-      let currentText = self.string
-      guard currentText != self.lastProcessedText else { return }
-      
-      await self.processText(currentText)
-    }
-  }
-  
+//  private func scheduleProcessing() {
+//    guard isProcessingEnabled else { return }
+//    
+//    // Cancel any existing processing
+//    currentProcessingTask?.cancel()
+//    
+//    currentProcessingTask = Task {
+////      guard let self = self else { return }
+//      
+//      // Debounce by waiting a bit
+//      try? await Task.sleep(nanoseconds: 100_000_000) // 100ms
+//      guard !Task.isCancelled else { return }
+//      
+//      let currentText = self.string
+//      guard currentText != self.lastProcessedText else { return }
+//      
+//      await self.processText(currentText)
+//    }
+//  }
+//  
 
   private func applyDefaultAttributes() {
     let range = NSRange(location: 0, length: backingStore.length)
@@ -240,11 +240,4 @@ public class MarkdownTextStorage: NSTextStorage {
 
 
   
-}
-
-struct MarkdownRanges {
-  let all: NSRange
-  let leading: NSRange
-  let content: NSRange
-  let trailing: NSRange
 }

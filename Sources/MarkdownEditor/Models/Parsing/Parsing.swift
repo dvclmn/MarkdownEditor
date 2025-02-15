@@ -15,3 +15,10 @@ enum SyntaxRangeType {
   case trailingSyntax
 }
 
+
+struct MarkdownRanges {
+  let all: NSRange
+  let leading: NSRange
+  let content: NSRange
+  let trailing: NSRange
+}

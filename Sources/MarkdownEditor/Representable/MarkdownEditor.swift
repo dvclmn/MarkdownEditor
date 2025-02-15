@@ -28,38 +28,29 @@ public struct MarkdownEditor: NSViewControllerRepresentable {
   }
 
   public func makeNSViewController(context: Context) -> MarkdownController {
-    
-    let storage = MarkdownTextStorage(configuration: configuration)
-    storage.processingStateChanged = { isProcessing in
-      // Update your loading state here
-    }
-    
-    let view = MarkdownController(
-      frame: .zero,
-      textStorage: storage,
-      configuration: configuration
-    )
-    view.textView.delegate = context.coordinator
-    view.textView.setUpTextView(configuration)
 
-    view.textView.heightChanged = { newHeight in
+    let viewController = MarkdownController(configuration: configuration)
+    viewController.textView.delegate = context.coordinator
+    viewController.textView.setUpTextView(configuration)
+
+    viewController.textView.heightChanged = { newHeight in
       DispatchQueue.main.async {
         self.height(newHeight)
       }
     }
 
-    return view
+    return viewController
   }
 
   public func updateNSViewController(_ nsView: MarkdownController, context: Context) {
 
-    let textView = nsView.textView
-
-    if textView.string != text {
-      textView.string = text
-      
-//      textView.processText(text)
-      textView.invalidateIntrinsicContentSize()
-    }
+//    let textView = nsView.textView
+//
+//    if textView.string != text {
+//      textView.string = text
+//      
+////      textView.processText(text)
+//      textView.invalidateIntrinsicContentSize()
+//    }
   }
 }
