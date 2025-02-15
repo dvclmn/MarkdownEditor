@@ -41,8 +41,7 @@ struct ProcessedMarkdown {
 
   static func process(
     text: String,
-    configuration: EditorConfiguration,
-    highlightr: Highlightr
+    configuration: EditorConfiguration
   ) -> ProcessedMarkdown {
     let store = NSMutableAttributedString(string: text)
 
@@ -214,10 +213,7 @@ struct ProcessedMarkdown {
     }
   }
 
-  private static func highlightCodeBlocks(
-    in backingStore: NSMutableAttributedString,
-    using highlightr: Highlightr
-  ) {
+  private static func highlightCodeBlocks(in backingStore: NSMutableAttributedString) {
     //    self.beginEditing()
     guard let regex = Markdown.Syntax.codeBlock.nsRegex else { return }
     let text = backingStore.string
@@ -236,22 +232,13 @@ struct ProcessedMarkdown {
         .replacingOccurrences(of: "```", with: "")
         .trimmingCharacters(in: .whitespaces)
 
-      guard let highlightedCode = highlightr.highlight(codeBlock, as: languageHint ?? "txt") else {
-        return
-      }
-      //      guard let highlightr = highlightr,
-      //      else {
-      //        return
-      //      }
-
-      let attributedCode = NSMutableAttributedString(attributedString: highlightedCode)
-      attributedCode.addAttribute(
+      backingStore.addAttribute(
         TextBackground.codeBlock.attributeKey,
         value: true,
-        range: NSRange(location: 0, length: attributedCode.length)
+        range: NSRange(location: 0, length: backingStore.length)
       )
 
-      backingStore.replaceCharacters(in: fullRange, with: attributedCode)
+//      backingStore.replaceCharacters(in: fullRange, with: attributedCode)
 
     }
     //    self.endEditing()

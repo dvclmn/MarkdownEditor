@@ -12,7 +12,7 @@ import SwiftUI
 extension MarkdownTextView {
 
   func setUpTextView(_ config: EditorConfiguration) {
-    
+
     isEditable = config.isEditable
     drawsBackground = false
     isRichText = false

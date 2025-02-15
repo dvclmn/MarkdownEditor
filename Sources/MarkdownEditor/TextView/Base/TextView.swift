@@ -60,7 +60,6 @@ public class MarkdownTextView: NSTextView {
     return NSSize(width: NSView.noIntrinsicMetric, height: max(calculatedHeight, minEditorHeight))
   }
   
-  
   public override func layout() {
     super.layout()
     

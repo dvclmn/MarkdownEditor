@@ -13,31 +13,25 @@ import TreeSitterSwift
 import SwiftTreeSitter
 import Neon
 
-//import TreeSitterClient
-
 public class MarkdownController: NSViewController {
 
   let textView: MarkdownTextView
-  private let highlighter: TextViewHighlighter
+  let scrollView: NSScrollView
+  
+  private let highlighter: TextViewHighlighter?
 
-  public init(
-//    frame frameRect: NSRect,
-//    textStorage: MarkdownTextStorage,
-    configuration: EditorConfiguration
-  ) {
+  public init(configuration: EditorConfiguration) {
+    
     /// Create text storage and layout manager
-   
-//    if textView.textLayoutManager == nil {
-//      textView.nsuiLayoutManager?.allowsNonContiguousLayout = true
-//    }
-//    
+    let textStorage = NSTextStorage()
     let layoutManager = MarkdownLayoutManager(configuration: configuration)
-//    textStorage.addLayoutManager(layoutManager)
+    textStorage.addLayoutManager(layoutManager)
 
     /// Create text container
     let textContainer = NSTextContainer()
     textContainer.widthTracksTextView = true
     layoutManager.addTextContainer(textContainer)
+    
 
     /// Create text view
     textView = MarkdownTextView(
@@ -45,11 +39,21 @@ public class MarkdownController: NSViewController {
       textContainer: textContainer,
       configuration: configuration
     )
-
     
-    self.highlighter = try! Self.makeHighlighter(for: textView)
+    scrollView = NSScrollView()
+    scrollView.hasVerticalScroller = textView.configuration.isEditable
+    scrollView.drawsBackground = false
+    scrollView.documentView = textView
     
-    super.init(nibName: nil, bundle: nil)
+    do {
+      self.highlighter = try Self.makeHighlighter(for: textView)
+      
+      super.init(nibName: nil, bundle: nil)
+    } catch {
+      print("Error creating highlighter: \(error)")
+      self.highlighter = nil
+      super.init(nibName: nil, bundle: nil)
+    }
     
   }
 
@@ -60,11 +64,9 @@ public class MarkdownController: NSViewController {
   public override func loadView() {
     /// Create scroll view
     
-    let scrollView = NSScrollView()
+//    let scrollView = NSScrollView()
     
-    scrollView.hasVerticalScroller = textView.configuration.isEditable
-    scrollView.drawsBackground = false
-    scrollView.documentView = textView
+    
 
     self.view = scrollView
     
@@ -78,7 +80,7 @@ public class MarkdownController: NSViewController {
 //    ])
     
 
-    highlighter.observeEnclosingScrollView()
+    highlighter?.observeEnclosingScrollView()
 
 
   }
@@ -95,38 +97,38 @@ public class MarkdownController: NSViewController {
 }
 
 
-extension NSTextView {
-  private var maximumUsableWidth: CGFloat {
-    guard let scrollView = enclosingScrollView else {
-      return bounds.width
-    }
-
-    let usableWidth = scrollView.contentSize.width - textContainerInset.width
-
-    guard scrollView.rulersVisible, let rulerView = scrollView.verticalRulerView else {
-      return usableWidth
-    }
-
-    return usableWidth - rulerView.requiredThickness
-  }
-
-
-  public var wrapsTextToHorizontalBounds: Bool {
-    get {
-      textContainer?.widthTracksTextView ?? false
-    }
-    set {
-      textContainer?.widthTracksTextView = newValue
-
-      let max = CGFloat.greatestFiniteMagnitude
-
-      textContainer?.size = NSSize(width: max, height: max)
-
-      if newValue {
-        let newSize = NSSize(width: maximumUsableWidth, height: frame.height)
-
-        self.frame = NSRect(origin: frame.origin, size: newSize)
-      }
-    }
-  }
-}
+//extension NSTextView {
+//  private var maximumUsableWidth: CGFloat {
+//    guard let scrollView = enclosingScrollView else {
+//      return bounds.width
+//    }
+//
+//    let usableWidth = scrollView.contentSize.width - textContainerInset.width
+//
+//    guard scrollView.rulersVisible, let rulerView = scrollView.verticalRulerView else {
+//      return usableWidth
+//    }
+//
+//    return usableWidth - rulerView.requiredThickness
+//  }
+//
+//
+//  public var wrapsTextToHorizontalBounds: Bool {
+//    get {
+//      textContainer?.widthTracksTextView ?? false
+//    }
+//    set {
+//      textContainer?.widthTracksTextView = newValue
+//
+//      let max = CGFloat.greatestFiniteMagnitude
+//
+//      textContainer?.size = NSSize(width: max, height: max)
+//
+//      if newValue {
+//        let newSize = NSSize(width: maximumUsableWidth, height: frame.height)
+//
+//        self.frame = NSRect(origin: frame.origin, size: newSize)
+//      }
+//    }
+//  }
+//}
