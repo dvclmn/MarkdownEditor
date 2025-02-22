@@ -18,32 +18,19 @@ public class MarkdownController: NSViewController {
 
   let textView: NSTextView
   private let highlighter: TextViewHighlighter
+  
+  var currentTokens: [Token] = []
+//  let tokenDebugView: NSTextField
+  
 
   public init(configuration: EditorConfiguration) {
     
     textView = NSTextView(usingTextLayoutManager: false)
-//    /// Create text storage and layout manager
-//    let textStorage = NSTextStorage()
-//    let layoutManager = NSLayoutManager()
-////    let layoutManager = MarkdownLayoutManager(configuration: configuration)
-//    textStorage.addLayoutManager(layoutManager)
-//
-//    /// Create text container
-//    let textContainer = NSTextContainer()
-//    textContainer.widthTracksTextView = true
-//    layoutManager.addTextContainer(textContainer)
+    
+//    tokenDebugView = NSTextField(labelWithString: "")
+//    tokenDebugView.maximumNumberOfLines = 0
+//    tokenDebugView.lineBreakMode = .byWordWrapping
 //    
-//    /// Create text view
-//    textView = MarkdownTextView(
-//      frame: .zero,
-//      textContainer: textContainer,
-//      configuration: configuration
-//    )
-//    
-//    scrollView = NSScrollView()
-//    scrollView.hasVerticalScroller = textView.configuration.isEditable
-//    scrollView.drawsBackground = false
-//    scrollView.documentView = textView
     do {
       self.highlighter = try Self.makeHighlighter(
         for: textView,
@@ -55,6 +42,8 @@ public class MarkdownController: NSViewController {
         textView.layoutManager?.allowsNonContiguousLayout = true
       }
       
+//      setupTokenTracking()
+      
     } catch {
       fatalError("Error starting `TextViewHighlighter`: \(error)")
     }
@@ -65,7 +54,39 @@ public class MarkdownController: NSViewController {
     fatalError("init(coder:) has not been implemented")
   }
   
+//  private func setupTokenTracking() {
+//    NotificationCenter.default.addObserver(
+//      self,
+//      selector: #selector(selectionDidChange(_:)),
+//      name: NSTextView.didChangeSelectionNotification,
+//      object: textView
+//    )
+//  }
+  
+  @objc private func selectionDidChange(_ notification: Notification) {
+    guard let selectedRange = textView.selectedRanges.first?.rangeValue,
+          selectedRange.length == 0 else {
+      
+      // Clear debug view if there's a selection
+//      tokenDebugView.stringValue = ""
+      return
+    }
+    
+    let position = selectedRange.location
+    let matchingTokens = currentTokens.filter { token in
+      NSLocationInRange(position, token.range)
+    }
+    
+    let resultingString = matchingTokens
+      .map { "Token at position \(position): \($0.debugDescription)" }
+      .joined(separator: "\n")
+    
+    print("Token: \(resultingString)")
+  }
+  
   public override func loadView() {
+    
+    let containerView = NSView()
     
     let scrollView = NSScrollView()
     scrollView.hasVerticalScroller = true
@@ -82,31 +103,30 @@ public class MarkdownController: NSViewController {
       textContainer.widthTracksTextView = true
     }
     
+    
+    
     scrollView.documentView = textView
+    
+    // Setup debug view
+//    tokenDebugView.translatesAutoresizingMaskIntoConstraints = false
+    scrollView.translatesAutoresizingMaskIntoConstraints = false
+    
+    containerView.addSubview(scrollView)
+//    containerView.addSubview(tokenDebugView)
+    
+//    NSLayoutConstraint.activate([
+//      scrollView.topAnchor.constraint(equalTo: containerView.topAnchor),
+//      scrollView.leadingAnchor.constraint(equalTo: containerView.leadingAnchor),
+//      scrollView.trailingAnchor.constraint(equalTo: containerView.trailingAnchor),
+//      scrollView.heightAnchor.constraint(equalTo: containerView.heightAnchor, multiplier: 0.8),
+//      
+//      tokenDebugView.topAnchor.constraint(equalTo: scrollView.bottomAnchor, constant: 8),
+//      tokenDebugView.leadingAnchor.constraint(equalTo: containerView.leadingAnchor),
+//      tokenDebugView.trailingAnchor.constraint(equalTo: containerView.trailingAnchor),
+//      tokenDebugView.bottomAnchor.constraint(equalTo: containerView.bottomAnchor)
+//    ])
+    
     self.view = scrollView
-    
-    
-    
-//    let scrollView = NSScrollView()
-//    
-//    scrollView.hasVerticalScroller = true
-//    scrollView.documentView = textView
-//    
-//    let max = CGFloat.greatestFiniteMagnitude
-//    
-//    textView.minSize = NSSize.zero
-//    textView.maxSize = NSSize(width: max, height: max)
-//    textView.isVerticallyResizable = true
-//    textView.isHorizontallyResizable = true
-//    
-//    textView.isRichText = false  // Discards any attributes when pasting.
-//    
-//    self.view = scrollView
-//    
-//    textView.enclosingScrollView
-//    
-////    self.view = scrollView
-//    highlighter.observeEnclosingScrollView()
 
   }
   
